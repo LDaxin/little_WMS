@@ -18,6 +18,5 @@ class Template(models.Model):
 
 
 class container(models.Model):
-    template = models.ForeignKey(Template)
-
+    template = models.ForeignKey(Template, on_delete=models.RESTRICT)
     prefix = models.CharField(max_length=10)
