@@ -7,7 +7,7 @@ from hub import models as hub_models
 
 
 class Warehouse(models.Model):
-    location = models.ForeignKey(hub_models.Location)
+    location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
     active = models.BooleanField()
     name = models.CharField(max_length=100)
 
@@ -24,7 +24,7 @@ class Storage(models.Model):
     prefix = models.CharField(max_length=5)
 
 class Compartment():
-    storage = models.ForeignKey(Storage)
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
     size_width = models.FloatField()
     size_height = models.FloatField()
