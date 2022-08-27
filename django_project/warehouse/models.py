@@ -23,7 +23,7 @@ class Storage(models.Model):
     
     prefix = models.CharField(max_length=5)
 
-class Compartment():
+class Compartment(models.Model):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
     size_width = models.FloatField()

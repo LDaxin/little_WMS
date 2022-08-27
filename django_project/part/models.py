@@ -1,7 +1,7 @@
 import turtle
 from django.db import models
 
-from django_project.warehouse.models import Warehouse
+from warehouse.models import Warehouse
 from warehouse.models import Compartment
 from container.models import Container
 
@@ -19,7 +19,7 @@ class Template(models.Model):
         ("m", "length"),
     )
 
-    name = models.CharField(200)
+    name = models.CharField(max_length=200)
 
     weight = models.FloatField()
 
