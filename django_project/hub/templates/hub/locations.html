@@ -1,0 +1,34 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+
+{% for loc in locations %}
+
+{{loc}}
+
+{% endfor %}
+
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addLocation">+</button>
+
+
+<div class="modal fade" id="addLocation" tabindex="-1" aria-labelledby="addLocation" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLocationLabel">Standort Hinzufügen</h5>
+            </div>
+            <div class="modal-body">
+                <form action="">
+                    <!-- TODO continue here -->
+                    <div class="mb-3">
+                        <label for=""></label>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
