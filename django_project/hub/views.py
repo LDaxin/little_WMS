@@ -4,5 +4,5 @@ from django.http import HttpResponse
 # Create your views here.
 
 def hub(request):
-    return render(request, "hub/header.html")
+    return render(request, "hub/hub.html")
 
