@@ -21,9 +21,50 @@
                 <form action="">
                     <!-- TODO continue here -->
                     <div class="mb-3">
-                        <label for=""></label>
-
+                        <label for="land" class="form-label">Land</label>
+                        <input type="text" class="form-control" id="land">
                     </div>
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Bundesland</label>
+                        <input type="text" class="form-control" id="country">
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">Stadt</label>
+                        <input type="text" class="form-control" id="city">
+                    </div>
+                    <div class="mb-3">
+                        <label for="zipcode" class="form-label">Postleitzahl</label>
+                        <input type="text" class="form-control" id="zipcode">
+                    </div>
+                    <div class="mb-3">
+                        <label for="street" class="form-label">Straße</label>
+                        <input type="text" class="form-control" id="street">
+                    </div>
+                    <div class="mb-3">
+                        <label for="street_number" class="form-label">Nr.</label>
+                        <input type="text" class="form-control" id="street_number">
+                    </div>
+
+                    <!-- TODO make this optional -->
+                    <div class="mb-3">
+                        <label for="coordinates_longitude" class="form-label">Längengrad</label>
+                        <input type="number" step=0.01 class="form-control" id="coordinates_longitude">
+                    </div>
+                    <div class="mb-3">
+                        <label for="coordinates_latitude" class="form-label">Breitengrad</label>
+                        <input type="number" step=0.01 class="form-control" id="coordinates_latitude">
+                    </div>
+
+                    <!-- TODO implement the /// What3words API -->
+                    <div class="mb-3">
+                        <label for="what3words" class="form-label">what3words</label>
+                        <input type="text"  class="form-control" id="what3words">
+                    </div>
+                    <div class="mb-3">
+                        <label for="what3words_language" class="form-label">what3words Sprache</label>
+                        <input type="text" class="form-control" id="what3words_language">
+                    </div>
+
                 </form>
             </div>
         </div>
