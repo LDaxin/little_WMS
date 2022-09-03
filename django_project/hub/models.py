@@ -9,8 +9,8 @@ class Location(models.Model):
     traditional_street = models.CharField(max_length=200)
     traditional_street_number = models.CharField(max_length=4)
 
-    modern_coordinates_longitude = models.FloatField()
-    modern_coordinates_latitude = models.FloatField()
+    modern_coordinates_longitude = models.FloatField(null=True)
+    modern_coordinates_latitude = models.FloatField(null=True)
 
-    modern_what3words = models.CharField(max_length=100)
-    modern_what3words_lang = models.CharField(max_length=50)
+    modern_what3words = models.CharField(max_length=100, null=True)
+    modern_what3words_lang = models.CharField(max_length=50, null=True)
