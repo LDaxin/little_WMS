@@ -2,19 +2,11 @@
 
 {% block content %}
 
-{% for loc in locations %}
-<div class="container overflow-hidden">
-    <div class="card">
-        <div class="card-body">
-            
-            <p class="card-text">
-                {{loc.traditional_city}}
-            </p>
-        </div>
-    </div>
-</div>
+    {% block cards %}
 
-{% endfor %}
+
+    {% endblock %}
+
 <div class="position-absolute bottom-0 end-0 m-3">
     <button type="button" class="btn btn-success btn-lg" data-bs-toggle="modal" data-bs-target="#addLocation">+</button>
 </div>
@@ -24,7 +16,7 @@
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addLocationLabel">Standort Hinzufügen</h5>
+                <h5 class="modal-title" id="addLocationLabel">{{add}}</h5>
             </div>
             <div class="modal-body">
                 <form method="POST" action="/manage/locations">

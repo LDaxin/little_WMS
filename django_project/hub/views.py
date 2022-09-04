@@ -1,7 +1,7 @@
 from urllib import response
 from django.shortcuts import render
 from django.http import HttpResponse
-from hub.models import Location
+from .models import Location
 from .forms import Form_location
 
 # Create your views here.
@@ -29,4 +29,4 @@ def locations(request):
             location.save()
     else:
         form =Form_location()
-    return render(request, "hub/locations.html", context={"locations":Location.objects.all(), "form":Form_location}, )
+    return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":Form_location, "add":"Standort Hinzufügen"})

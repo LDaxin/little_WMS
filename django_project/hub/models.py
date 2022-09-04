@@ -15,3 +15,6 @@ class Location(models.Model):
 
     modern_what3words = models.CharField(max_length=100, null=True)
     modern_what3words_lang = models.CharField(max_length=50, null=True)
+
+    def __str__(self):
+        return self.name
