@@ -18,12 +18,13 @@ def locations(request):
         if form.is_valid():
             print(form.cleaned_data)
             location = Location.objects.create()
-            location.traditional_land = form.cleaned_data['land']
-            location.traditional_country = form.cleaned_data['country']
-            location.traditional_city = form.cleaned_data['city']
-            location.traditional_zipcode = form.cleaned_data['zipcode']
-            location.traditional_street = form.cleaned_data['street']
-            location.traditional_street_number = form.cleaned_data['street_number']
+            location.name = form.cleaned_data['name']
+            location.traditional_land = form.cleaned_data['traditional_land']
+            location.traditional_country = form.cleaned_data['traditional_country']
+            location.traditional_city = form.cleaned_data['traditional_city']
+            location.traditional_zipcode = form.cleaned_data['traditional_zipcode']
+            location.traditional_street = form.cleaned_data['traditional_street']
+            location.traditional_street_number = form.cleaned_data['traditional_street_number']
 
             location.save()
     else:
