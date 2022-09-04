@@ -28,4 +28,4 @@ def locations(request):
             location.save()
     else:
         form =Form_location()
-    return render(request, "hub/locations.html", context={"location":Location.objects.all(), "form":Form_location}, )
+    return render(request, "hub/locations.html", context={"locations":Location.objects.all(), "form":Form_location}, )
