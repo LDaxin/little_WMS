@@ -19,7 +19,7 @@
                 <h5 class="modal-title" id="addLocationLabel">{{add}}</h5>
             </div>
             <div class="modal-body">
-                <form method="POST" action="/manage/locations">
+                <form method="POST" action="{% block form_header %}{% endblock %}">
                     {% csrf_token %}
                     {% for field in form %}
                         <div class="form-floating mb-3">

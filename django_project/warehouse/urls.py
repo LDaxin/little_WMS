@@ -4,4 +4,5 @@ from part import views as partView
 
 urlpatterns = [
     path("manage/warehouse", views.warehouse, name="warehouse"),
+    path("manage/storage", views.storage, name="storage"),
 ]

@@ -8,13 +8,17 @@ from hub import models as hub_models
 
 class Warehouse(models.Model):
     location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
-    active = models.BooleanField()
+    active = models.BooleanField(default=True)
     name = models.CharField(max_length=100)
 
     prefix = models.CharField(max_length=5)
 
+    def __str__(self):
+        return self.name
 
 class Storage(models.Model):
+
+    warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
 
     compartments = models.IntegerField()
 
@@ -22,6 +26,9 @@ class Storage(models.Model):
     columns = models.IntegerField()
     
     prefix = models.CharField(max_length=5)
+
+    def __str__(self):
+        return self.name
 
 class Compartment(models.Model):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
@@ -34,3 +41,8 @@ class Compartment(models.Model):
     colum = models.IntegerField()
 
     prefix = models.CharField(max_length=6)
+
+    def __str__(self):
+        return self.name
+
+
