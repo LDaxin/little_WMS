@@ -1,0 +1,16 @@
+{% extends "hub/list_view.html" %}
+
+{% block cards %}
+{% for part in list %}
+<div class="container overflow-hidden">
+    <div class="card">
+        <div class="card-body">
+
+            <p class="card-text">
+                {{part}}
+            </p>
+        </div>
+    </div>
+</div>
+
+

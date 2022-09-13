@@ -19,7 +19,6 @@ class Form_storage(forms.ModelForm):
         model = Storage
         fields = (
             "warehouse",
-            "compartments",
             "rows",
             "columns",
         )

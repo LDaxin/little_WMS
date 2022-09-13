@@ -20,29 +20,23 @@ class Storage(models.Model):
 
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
 
-    compartments = models.IntegerField()
-
     rows = models.IntegerField()
     columns = models.IntegerField()
     
     prefix = models.CharField(max_length=5)
 
-    def __str__(self):
-        return self.name
 
 class Compartment(models.Model):
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
-    size_width = models.FloatField()
-    size_height = models.FloatField()
-    size_depth = models.FloatField()
+    size_width = models.FloatField(null=True, blank=True)
+    size_height = models.FloatField(null=True, blank=True)
+    size_depth = models.FloatField(null=True, blank=True)
 
     row = models.IntegerField()
     colum = models.IntegerField()
 
     prefix = models.CharField(max_length=6)
 
-    def __str__(self):
-        return self.name
 
 
