@@ -1,6 +1,6 @@
-{% extends "hub/list_view.html" %}
+{% extends "hub/header.html" %}
 
-{% block cards %}
+{% block content %}
 {% for part in list %}
 <div class="container overflow-hidden">
     <div class="card">
@@ -12,12 +12,11 @@
         </div>
     </div>
 </div>
-
 {% endfor %}
 
+{% include "hub/modal_button/plus.html" with name="storage" %}
+
+{% include "hub/form_modal.html" with add="Lagereinheit Hinzufügen" action="/manage/" name="storage" m_form=form %}
+
 {% endblock %}
 
-
-{% block form_header %}
-/manage/storage
-{% endblock %}
