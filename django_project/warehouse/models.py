@@ -1,4 +1,3 @@
-from sys import prefix
 from django.db import models
 from hub import models as hub_models
 
