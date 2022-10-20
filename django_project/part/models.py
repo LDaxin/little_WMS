@@ -1,6 +1,4 @@
-import turtle
 from django.db import models
-
 from warehouse.models import Warehouse
 from warehouse.models import Compartment
 from maintenance.models import Plan
