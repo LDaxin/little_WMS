@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .models import Location
 from .forms import Form_location
+from part.models import Part
+from part.forms import Form_part
 
 # Create your views here.
 
@@ -20,3 +22,7 @@ def locations(request):
     else:
         form =Form_location()
     return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":Form_location})
+
+def part(request):
+    return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":Form_part})
+

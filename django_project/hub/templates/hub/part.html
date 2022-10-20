@@ -1,0 +1,12 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+
+
+
+
+{% include "hub/modal_button/plus.html" with name="part" %}
+
+{% include "hub/form_modal.html" with add="Teil Hinzufügen" action="/manage/" name="part" m_form=form %}
+
+{% endblock %}
