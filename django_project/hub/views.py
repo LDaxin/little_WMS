@@ -3,7 +3,9 @@ from django.http import HttpResponse
 from .models import Location
 from .forms import Form_location
 from part.models import Part
+from part.models import Tag
 from part.forms import Form_part
+from part.forms import Form_tag
 
 # Create your views here.
 
@@ -26,3 +28,5 @@ def locations(request):
 def part(request):
     return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":Form_part})
 
+def tag(request):
+    return render(request, "hub/tag.html", context={"list":Tag.objects.all(), "form":Form_tag})
