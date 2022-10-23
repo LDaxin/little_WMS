@@ -1,8 +1,8 @@
 from django.db import models
 from warehouse.models import Warehouse
 from warehouse.models import Compartment
-from maintenance.models import Plan
-from maintenance.models import Log
+#from maintenance.models import Plan
+#from maintenance.models import Log
 
 
 # Create your models here.
@@ -23,14 +23,14 @@ class Part(models.Model):
     
     name = models.CharField(max_length=20) 
     
-    width = models.FloatField()
-    depth = models.FloatField()
-    height = models.FloatField()
+    width = models.FloatField(null=True, blank=True)
+    depth = models.FloatField(null=True, blank=True)
+    height = models.FloatField(null=True, blank=True)
 
     
-    weight = models.FloatField()
+    weight = models.FloatField(null=True, blank=True)
 
-    stored = models.BooleanField()
+    stored = models.BooleanField(null=True, blank=True)
 
     tag = models.ManyToManyField(Tag)
 
@@ -40,11 +40,11 @@ class Template(models.Model):
 
     name = models.CharField(max_length=20) 
     
-    width = models.FloatField()
-    depth = models.FloatField()
-    height = models.FloatField()
+    width = models.FloatField(null=True, blank=True)
+    depth = models.FloatField(null=True, blank=True)
+    height = models.FloatField(null=True, blank=True)
 
-    weight = models.FloatField()
+    weight = models.FloatField(null=True, blank=True)
 
     tag = models.ManyToManyField(Tag)
 
@@ -55,21 +55,22 @@ class Template(models.Model):
 class ContainerTemplate(models.Model):
     template = models.OneToOneField(Template, on_delete=models.CASCADE)
 
-    innerWidth = models.FloatField()
-    innerDepth = models.FloatField()
-    innerHeight = models.FloatField()
+    innerWidth = models.FloatField(null=True, blank=True)
+    innerDepth = models.FloatField(null=True, blank=True)
+    innerHeight = models.FloatField(null=True, blank=True)
 
 
 class Container(models.Model):
-    base = models.ForeignKey(ContanerTemplate, on_delete=models.SET_NULL, null=True)
+    base = models.ForeignKey(ContainerTemplate, on_delete=models.SET_NULL, null=True)
     part = models.OneToOneField(Part, on_delete=models.CASCADE)
 
-    innerWidth = models.FloatField()
-    innerDepth = models.FloatField()
-    innerHeight = models.FloatField()
+    innerWidth = models.FloatField(null=True, blank=True)
+    innerDepth = models.FloatField(null=True, blank=True)
+    innerHeight = models.FloatField(null=True, blank=True)
 
 
 #---------------------------------------------------------------------------
+'''
 class DeviceTempalate(models.Model):
     template = models.OneToOneField(Template, on_delete=models.CASCADE)
 
@@ -82,7 +83,7 @@ class Device(models.Model):
     maintenancePlan = models.ForeignKey(Plan, on_delete=models.CASCADE)
 
     maintenanceLog = models.ManyToManyField(Log)
-
+'''
 #---------------------------------------------------------------------------
 class FoodTemplate(models.Model):
     template = models.OneToOneField(Template, on_delete=models.CASCADE)
@@ -90,7 +91,7 @@ class FoodTemplate(models.Model):
     ean8 = models.BooleanField()
     ean13 = models.BooleanField()
 
-    ean = models.IntegerField()
+    ean = models.IntegerField(null=True, blank=True)
 
 
 class Food(models.Model):
@@ -102,20 +103,20 @@ class Food(models.Model):
     ean8 = models.BooleanField()
     ean13 = models.BooleanField()
 
-    ean = models.IntegerField()
+    ean = models.IntegerField(null=True, blank=True)
 
 
 #---------------------------------------------------------------------------
-class SetTemplate(models.Modle):
+class SetTemplate(models.Model):
     template = models.OneToOneField(Template, on_delete=models.CASCADE)
 
-    parts = models.ManyToManyField(Part)
+    #parts = models.ManyToManyField(Part)
 
 
 class Set(models.Model):
-    base = models.ForeignKey(FoodTemplate, on_delete=models.SET_NULL, null=True)
+    base = models.ForeignKey(SetTemplate, on_delete=models.SET_NULL, null=True)
     part = models.OneToOneField(Part, on_delete=models.CASCADE)
 
-    parts = models.ManyToManyField(Part)
+    #parts = models.ManyToManyField(Part)
 
 
