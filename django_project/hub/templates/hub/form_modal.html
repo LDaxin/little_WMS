@@ -9,10 +9,10 @@
                 <form method="POST" action="{{ action }}{{name}}">
                     {% csrf_token %}
 
-                        {% for form in m_form %}
+                        {% for p_form in forms %}
 
 
-                            {% for field in form %}
+                            {% for field in p_form %}
                                 <div class="form-floating mb-3">
                                     {{ field.error }}
                                     {{ field }}
