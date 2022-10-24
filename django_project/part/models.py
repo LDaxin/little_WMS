@@ -17,6 +17,12 @@ class Tag(models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
+    def __str__(self):
+        if self.parent != None:
+            return str(self.parent) + "/" + self.name
+        else:
+            return self.name
+
 #---------------------------------------------------------------------------
 # The Part model is were the unice value is stored
 class Part(models.Model):
