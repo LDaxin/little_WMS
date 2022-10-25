@@ -21,7 +21,7 @@ def locations(request):
             location.save()
     else:
         form =Form_location()
-    return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":[Form_location]})
+    return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":[[Form_location]]})
 
 def part(request):
     if request.method == "POST":
@@ -32,7 +32,7 @@ def part(request):
     else:
         form_p = Form_part()
         Form_c = Form_container()
-    return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":[Form_part, Form_container]})
+    return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":[[Form_part, Form_container],[Form_part, Form_container]]})
 
 def tag(request):
     if request.method == "POST":
@@ -40,4 +40,4 @@ def tag(request):
         if t.is_valid():
             tag = t.save()
             tag.save()
-    return render(request, "hub/tag.html", context={"list":Tag.objects.all(), "form":[Form_tag]})
+    return render(request, "hub/tag.html", context={"list":Tag.objects.all(), "form":[[Form_tag]]})

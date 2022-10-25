@@ -1,6 +1,7 @@
 from django import forms
 from .models import *
 
+#TODO change the styele to the style from the tags from odoo Lager
 class Form_part(forms.ModelForm):
     class Meta:
         model = Part

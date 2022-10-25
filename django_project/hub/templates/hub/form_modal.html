@@ -6,25 +6,43 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form method="POST" action="{{ action }}{{name}}">
-                    {% csrf_token %}
-
-                        {% for p_form in forms %}
-
-
-                            {% for field in p_form %}
-                                <div class="form-floating mb-3">
-                                    {{ field.error }}
-                                    {{ field }}
-                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                                </div>
-                            {% endfor %}
-
-
-                        {% endfor %}
-
-                    <button type="submit" class="btn btn-success" name="add">Hinzufügen</button>
-                </form>
+{% for tab in forms %}
+    {% if forms|length > 1 %}
+        {% if forloop.first %}
+                <div class="accordion" id="accordionExample">
+        {% endif %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                #{{forloop.counter}}
+                            </button>
+                        </h2>
+                    <div id="collapse{{forloop.counter}}" class="accordion-collapse collapse " aria-labelledby="heading{{ forloop.conter }}" data-bs-parent="#accordionExample">
+                        <div class="accordion-body">
+                            <div class="accordion" id="accordionExample">
+    {% endif %}
+                                <form method="POST" action="{{ action }}{{name}}">
+                            {% csrf_token %}
+    {% for p_form in tab %}
+        {% for field in p_form %}
+                                    <div class="form-floating mb-3">
+                                        {{ field.error }}
+                                        {{ field }}
+                                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    </div>
+        {% endfor %}
+    {% endfor %}
+                                    <button type="submit" class="btn btn-success" name="add">Hinzufügen</button>
+                                </form>
+    {% if forms|length > 1 %}
+                            </div>
+                        </div>
+                    </div>
+        {% if forloop.last %}
+                </div>
+        {% endif %}
+    {% endif %}
+{% endfor %}
             </div>
         </div>
     </div>
