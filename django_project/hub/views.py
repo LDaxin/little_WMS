@@ -32,7 +32,7 @@ def part(request):
     else:
         form_p = Form_part()
         Form_c = Form_container()
-    return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":[[Form_part, Form_container],[Form_part, Form_container]]})
+    return render(request, "hub/part.html", context={"list":Part.objects.all(), "form":[[Form_part],[Form_container]]})
 
 def tag(request):
     if request.method == "POST":
