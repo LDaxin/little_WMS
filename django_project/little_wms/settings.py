@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'hub.apps.HubConfig',
-    'container.apps.ContainerConfig',
     'part.apps.PartConfig',
     'warehouse.apps.WarehouseConfig',
     'django.contrib.admin',

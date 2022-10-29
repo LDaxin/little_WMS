@@ -1,22 +1,25 @@
-import imp
 from django.shortcuts import render
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.decorators import api_view
-from part import models
-from .serializer import PartSerializer
+from django.http import HttpResponse
+from .models import *
+from .forms import *
 # Create your views here.
 
-@api_view(['GET', 'POST'])
+
 def part(request):
-    if request.method == 'GET':
-        all_parts = models.Part.objects.all()
-        serializer = PartSerializer(all_parts, many=True)
-        return Response(serializer.data)
-    elif request.method == 'POST':
-        
-        serializer = PartSerializer(request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == "POST":
+        p = Form_part(request.POST)
+        if p.is_valid():
+            part = p.save()
+            part.save()
+    else:
+        form_p = Form_part()
+        Form_c = Form_container()
+    return render(request, "part/part.html", context={"list":Part.objects.all(), "form":[[Form_part],[Form_container]]})
+
+def tag(request):
+    if request.method == "POST":
+        t = Form_tag(request.POST)
+        if t.is_valid():
+            tag = t.save()
+            tag.save()
+    return render(request, "part/tag.html", context={"list":Tag.objects.all(), "form":[[Form_tag]]})
