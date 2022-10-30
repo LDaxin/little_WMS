@@ -7,11 +7,27 @@ from .forms import *
 
 def part(request):
     if request.method == "POST":
-        t = FormTemplatePart(request.POST)
-        if t.is_valid():
-            template = t.save()
-            template.save()
-    return render(request, "part/part.html", context={"list":Part.objects.all(), "form":[[FormTemplatePart],[FormTemplateContainer]]})
+        if 'add_1' in request.POST:
+            t = FormTemplatePart(request.POST)
+            if t.is_valid():
+                template = t.save()
+                part = Part(template=template)
+                template.save()
+                part.save()
+        elif 'add_2' in request.POST:
+            t = FormTemplateContainer(request.POST)
+            if t.is_valid():
+                template = t.save()
+                part = Part(template=template)
+                template.save()
+                part.save()
+
+        elif 'add_3' in request.POST:
+            p = FormPartBase(request.POST)
+            if p.is_valid():
+                part = p.save()
+                part.save()
+    return render(request, "part/part.html", context={"list":Part.objects.all(), "form":[[FormTemplatePart],[FormTemplateContainer],[FormPartBase]]})
 
 def tag(request):
     if request.method == "POST":

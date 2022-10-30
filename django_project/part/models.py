@@ -95,14 +95,16 @@ class Part(models.Model):
     def __str__(self):
         return self.template.name + " " + self.code
     
-'''
-class GeneratedCode(models.Model):
-    code = models.CharField(max_length=100, default="", unique=True)
-    generated_code = models.CharField(max_length=100, null=True)
-
     def save(self, *args, **kwargs):
-        if not self.generated_code:
-            self.generated_code = gen_code(self.code)
-        
-        super().save(*args, **kwargs)
-'''
+        if not self.code:
+            code = self.template.code[:9]
+            try:
+                number = Part.objects.filter(code__startswith=code).last().code[9:]
+                number = s.up(number)
+                code = code + number
+            except AttributeError:
+                code = code + "0000001"
+
+            self.code = code
+
+        super().save(*args,**kwargs)

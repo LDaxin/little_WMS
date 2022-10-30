@@ -23,6 +23,7 @@
     {% endif %}
                                 <form method="POST" action="{{ action }}{{name}}">
                             {% csrf_token %}
+                            
     {% for p_form in tab %}
         {% for field in p_form %}
                                     <div class="form-floating mb-3">
@@ -32,7 +33,7 @@
                                     </div>
         {% endfor %}
     {% endfor %}
-                                    <button type="submit" class="btn btn-success" name="add">Hinzufügen</button>
+                                    <button type="submit" class="btn btn-success" name="add_{{ forloop.counter }}">Hinzufügen</button>
                                 </form>
     {% if forms|length > 1 %}
                             </div>
