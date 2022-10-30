@@ -12,7 +12,7 @@ class Warehouse(models.Model):
     name = models.CharField(max_length=100)
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16)
+    code = models.CharField(max_length=16, editable=False, unique=True)
 
 
     def __str__(self):
@@ -26,7 +26,7 @@ class Storage(models.Model):
     columns = models.IntegerField()
     
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16)
+    code = models.CharField(max_length=16, editable=False, unique=True)
 
 
 class Compartment(models.Model):
@@ -40,7 +40,7 @@ class Compartment(models.Model):
     colum = models.IntegerField()
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16)
+    code = models.CharField(max_length=16, editable=False, unique=True)
     
 
 

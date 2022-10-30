@@ -3,7 +3,7 @@ from .models import *
 
 #TODO change the styele to the style from the tags from odoo Lager
 
-class Form_tag(forms.ModelForm):
+class FormTag(forms.ModelForm):
     class Meta:
         model = Tag
         fields = (
@@ -15,13 +15,13 @@ class Form_tag(forms.ModelForm):
                 'parent':("Herachie")
         }
     def __init__(self, *args, **kwargs):
-        super(Form_tag, self).__init__(*args, **kwargs)
+        super(FormTag, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
-class Form_part(forms.ModelForm):
+class FormTemplatePart(forms.ModelForm):
     class Meta:
-        model = Part
+        model = Template
         fields = (
             'name',
             'tag'
@@ -31,13 +31,13 @@ class Form_part(forms.ModelForm):
                 'tag':("Tags")
         }
     def __init__(self, *args, **kwargs):
-        super(Form_part, self).__init__(*args, **kwargs)
+        super(FormTemplatePart, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
-class Form_container(forms.ModelForm):
+class FormTemplateContainer(forms.ModelForm):
     class Meta:
-        model = Part
+        model = Template
         fields = (
             'name',
             'tag',
@@ -53,6 +53,6 @@ class Form_container(forms.ModelForm):
             'innerHeight':("innere Höhe")
         }
     def __init__(self, *args, **kwargs):
-        super(Form_container, self).__init__(*args, **kwargs)
+        super(FormTemplateContainer, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
