@@ -1,0 +1,22 @@
+
+{% extends "hub/header.html" %}
+
+{% block content %}
+{% for part in list %}
+<div class="container overflow-hidden">
+    <div class="card">
+        <div class="card-body">
+
+            <p class="card-text">
+                {{part.traditional_city}}
+            </p>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% include "hub/modal_button/plus.html" with name="shelf" %}
+
+{% include "hub/form_modal.html" with add="Lager Hinzufügen" action="/manage/" name="shelf" forms=form %}
+
+{% endblock %}

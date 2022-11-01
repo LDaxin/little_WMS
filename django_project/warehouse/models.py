@@ -1,36 +1,86 @@
 from django.db import models
 from hub import models as hub_models
+from hub.countsystem import System
 # Create your models here.
+
+s = System()
+
 
 #TODO test if the query will return all stored things even the Container wenn the input is ready
 class Stored(models.Model):
     pass
 
 class Warehouse(models.Model):
-    location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
-    active = models.BooleanField(default=True)
     name = models.CharField(max_length=100)
 
-    ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, editable=False, unique=True)
+    location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
 
+    ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
+    code = models.CharField(max_length=16, unique=True)
 
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            code = "ST"
+            try:
+                number = Warehouse.objects.last().code[2:6]
+                number = s.up(number)
+                code = code + number + "0000000000"
+            except AttributeError:
+                code = code + "00000000000000"
+            self.code = code
+        super().save(*args, **kwargs)
+
 class Storage(models.Model):
+    name = models.CharField(max_length=100)
 
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
+
+    ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
+    code = models.CharField(max_length=16, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            code = self.warehouse.code[:6]
+            try:
+                number = Storage.objects.filter(code__startswith=code).last().code[6:10]
+                number = s.up(number)
+                code = code + number + "000000"
+
+            except AttributeError:
+                code = code + "0001000000"
+            self.code = code
+        super().save(*args, **kwargs)
+
+class Shelf(models.Model):
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
     rows = models.IntegerField()
     columns = models.IntegerField()
     
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, editable=False, unique=True)
+    code = models.CharField(max_length=16, unique=True)
+    
+    def save(self, *args, **kwargs):
+        if not self.code:
+            code = self.storage.code[:10] 
+            try:
+                number = Shelf.objects.filter(code__startswith=code).last().code[10:13]
+                number = s.up(number)
+                code = code + number + "000"
 
+            except AttributeError:
+                code = code + "001000"
+            self.code = code
+        super().save(*args, **kwargs)
 
 class Compartment(models.Model):
-    storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
+    shelf = models.ForeignKey(Shelf, on_delete=models.CASCADE)
 
     size_width = models.FloatField(null=True, blank=True)
     size_height = models.FloatField(null=True, blank=True)
@@ -40,9 +90,21 @@ class Compartment(models.Model):
     colum = models.IntegerField()
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, editable=False, unique=True)
+    code = models.CharField(max_length=16, unique=True)
     
 
+    def save(self, *args, **kwargs):
+        if not self.code:
+            code = self.shelf.code[:13] 
+            try:
+                number = Compartment.objects.filter(code__startswith=code).last().code[13:]
+                number = s.up(number)
+                code = code + number 
+
+            except AttributeError:
+                code = code + "001"
+            self.code = code
+        super().save(*args, **kwargs)
 
 '''
 class Container(models.Model):

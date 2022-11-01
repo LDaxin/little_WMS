@@ -70,7 +70,7 @@ class Template(models.Model):
                 name_part = self.name[:5]
             code = self.pType + name_part.upper() 
             try:
-                number = Template.objects.filter(code__startswith=code).last().code[7:-7]
+                number = Template.objects.filter(code__startswith=code).last().code[7:9]
                 number = s.up(number)
                 code = code + number + "0000000"
             except AttributeError:

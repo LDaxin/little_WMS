@@ -1,35 +1,56 @@
 from django import forms
 from .models import *
-
-class Form_warehouse(forms.ModelForm):
+class FormWarehouse(forms.ModelForm):
     class Meta:
         model = Warehouse
         fields = (
-            "location",
-            "name"
+            "name",
+            "location"
         )
+        labels = {
+                "name":("Name"),
+                "location":("Standort")
+        }
 
     def __init__(self, *args, **kwargs):
-        super(Form_warehouse, self).__init__(*args, **kwargs)
+        super(FormWarehouse, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
-class Form_storage(forms.ModelForm):
+class FormStorage(forms.ModelForm):
     class Meta:
         model = Storage
         fields = (
-            "warehouse",
+            "name",
+            "warehouse"
+        )
+        labels = {
+                "name":("Name"),
+                "warehouse":("Wahrenhaus")
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(FormStorage, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"]= "form-control"
+
+
+class FormShelf(forms.ModelForm):
+    class Meta:
+        model = Shelf
+        fields = (
+            "storage",
             "rows",
             "columns",
         )
         labels = {
-            "warehouse":("Lager"),
-            "compartments":("Fächer zahl"),
-            "rows":("Reihen"),
-            "columns":("Spaslten"),
+                "storage":("Lager"),
+                "rows":("Reihen"),
+            "columns":("Faecher pro Reihe"),
         }
 
     def __init__(self, *args, **kwargs):
-        super(Form_storage, self).__init__(*args, **kwargs)
+        super(FormShelf, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
+
