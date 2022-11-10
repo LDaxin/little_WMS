@@ -16,7 +16,7 @@ class Warehouse(models.Model):
     location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, unique=True)
+    code = models.CharField(max_length=16, unique=True, editable=False)
 
     def __str__(self):
         return self.name
@@ -39,7 +39,7 @@ class Storage(models.Model):
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, unique=True)
+    code = models.CharField(max_length=16, unique=True, editable=False)
 
     def __str__(self):
         return self.name
@@ -64,7 +64,7 @@ class Shelf(models.Model):
     columns = models.IntegerField()
     
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, unique=True)
+    code = models.CharField(max_length=16, unique=True, editable=False)
     
     def save(self, *args, **kwargs):
         if not self.code:
@@ -90,7 +90,7 @@ class Compartment(models.Model):
     colum = models.IntegerField()
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
-    code = models.CharField(max_length=16, unique=True)
+    code = models.CharField(max_length=16, unique=True, editable=False)
     
 
     def save(self, *args, **kwargs):

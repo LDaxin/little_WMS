@@ -57,7 +57,7 @@ class Template(models.Model):
 
     tag = models.ManyToManyField(Tag, blank=True)
 
-    code = models.CharField(max_length=16, unique=True)
+    code = models.CharField(max_length=16, unique=True, editable=False)
     
     def __str__(self):
         return self.name
@@ -90,7 +90,7 @@ class Part(models.Model):
 
     tag = models.ManyToManyField(Tag, blank=True)
 
-    code = models.CharField(max_length=16)
+    code = models.CharField(max_length=16, unique=True, editable=False)
 
     def __str__(self):
         return self.template.name + " " + self.code
