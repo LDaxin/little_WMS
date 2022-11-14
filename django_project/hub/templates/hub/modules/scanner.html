@@ -1,8 +1,20 @@
-<div style="width: 500px" id="reader"></div>
+<div style="padding:2px">
+    <fieldset disabled>
+    <input class="form-control" style="width:100%; text-align:center" id="last-scann"></input>
+    </fieldset>
+</div>
+
+<div style="width:100%;padding-bottom:100%" id="reader"></div>
+
 <script>
     function onScanSuccess(decodedText, decodedResult) {
         // Handle on success condition with the decoded text or result.
         console.log(`Scan result: ${decodedText}`, decodedResult);
+        if(decodedResult.result.format.formatName == "QR_CODE"){
+            if(decodedText.length == 16){
+                $("#last-scann").val(decodedText);
+            }
+        }
     }
 
     var html5QrcodeScanner = new Html5QrcodeScanner(
