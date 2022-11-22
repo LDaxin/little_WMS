@@ -2,6 +2,7 @@
     <head>
         {% load static %}
         <link rel="stylesheet" href="{% static 'hub/bootstrap/css/bootstrap.min.css' %}">
+        <script src="{% static 'hub/bootstrap/js/popper.min.js' %}"></script>
         <script src="{% static 'hub/bootstrap/js/bootstrap.min.js' %}"></script>
         <script src="{% static 'hub/jquery/jquery-3.6.1.min.js' %}"></script>
         <script src="{% static 'hub/qrcodescanner/html5-qrcode.min.js' %}"></script>
@@ -9,37 +10,31 @@
     </head>
     <body>
         
-        <nav class="navbar navbar-expand-lg bg-light">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="/">Little WMS</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav">
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Bewegen</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/manage">Verwalten</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Listen</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link">Statistiken</a>
-                        </li>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="p-2">
+                <input class="btn btn-outline-primary" style="width:50px"value="<-">
+            </div>
+
+            <div class="p-2">
+                    {% block indicator %}
+                    {% endblock %}
+            </div>
+
+            <div class="p-2">
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        ---
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Einstellunge</a></li>
+                        <li><a class="dropdown-item" href="#">Admin</a></li>
                     </ul>
                 </div>
             </div>
-        </nav>
 
-<!-- TODO add bread crumps list   -->
+        </div>
 
         {% block content %}
-
-        
 
         {% endblock %}
 
