@@ -9,34 +9,36 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body>
-        
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <div class="p-2">
-                <input class="btn btn-outline-primary" style="width:50px"value="<-">
-            </div>
+        <nav class="navbar sticky-top bg-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-            <div class="p-2">
-                {% block indicator %}
-                {% endblock %}
-            </div>
-
-            <div class="p-2">
-                <div class="dropdown">
-                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        ---
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#">Einstellunge</a></li>
-                        <li><a class="dropdown-item" href="#">Admin</a></li>
+                <div class="offcanvas offcanvas-start" id="navbarScroll">
+                <div class="offcanvas-body">
+                    <ul class="navbar-nav text-right">
+                        <a class="nav-link" href="#">Link</a>
                     </ul>
                 </div>
+                </div>
+
+                <a class="navbar-brand" href="#">
+                    <img style="width:100" src="{% static 'hub/SVG/'|add:symbol|add:'.svg' %}">
+                </a>
+                
+                <button class="btn btn-outline-primary"> 
+                    <--
+                </button>
+
             </div>
-
-        </div>
-
+        </nav>
+        
+        <div class="container-fluid">
         {% block content %}
 
         {% endblock %}
+        </div>
 
     </body>
 
