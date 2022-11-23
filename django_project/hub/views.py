@@ -6,7 +6,7 @@ from .forms import *
 # Create your views here.
 
 def hub(request):
-    return render(request, "hub/hub.html")
+    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Container', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search']})
 
 def manage(request):
     return render(request, "hub/manage.html")
