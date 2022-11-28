@@ -3,8 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path("manage/part", views.part, name="part"),
-    path("manage/tag", views.tag, name="tag"),
+    path("part", views.part, name="part"),
+    path("tag", views.tag, name="tag"),
     
     # path("part/", partView.part, name="part"),
 ]

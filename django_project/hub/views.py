@@ -1,6 +1,9 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.template.loader import render_to_string
 from .models import *
+from part.models import *
+from warehouse.models import *
 from .forms import *
 
 # Create your views here.
@@ -21,3 +24,39 @@ def locations(request):
         form =Form_location()
     return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":[[Form_location]]})
 
+def results(request):
+    if request.method == "GET":
+        if request.GET['type']=="part":
+            if request.GET['search'] == "NONE":
+                r = Part.objects.all()
+            else:
+                r = Part.objects.filter(template__name__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r})
+
+        elif request.GET['type']=="warehouse":
+            if request.GET['search'] == "NONE":
+                r = Warehouse.objects.all()
+            else:
+                r = Warehouse.objects.filter(name__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r})
+
+        elif request.GET['type']=="storage":
+            if request.GET['search'] == "NONE":
+                r = Storage.objects.all()
+            else:
+                r = Storage.objects.filter(name__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r})
+
+        elif request.GET['type']=="shelf":
+            if request.GET['search'] == "NONE":
+                r = Self.objects.all()
+            else:
+                r = Shelf.objects.filter(name__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r})
+
+        elif request.GET['type']=="location":
+            if request.GET['search'] == "NONE":
+                r = Location.objects.all()
+            else:
+                r = Location.objects.filter(name__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r})

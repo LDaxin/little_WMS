@@ -27,7 +27,7 @@ def part(request):
             if p.is_valid():
                 part = p.save()
                 part.save()
-    return render(request, "part/part.html", context={"list":Part.objects.all(), "form":[[FormTemplatePart],[FormTemplateContainer],[FormPartBase]]})
+    return render(request, "part/part.html", context={"symbol":"Part", "list":Part.objects.all(), "form":[[FormTemplatePart],[FormTemplateContainer],[FormPartBase]]})
 
 def tag(request):
     if request.method == "POST":

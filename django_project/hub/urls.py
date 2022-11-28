@@ -4,8 +4,8 @@ from . import views
 
 urlpatterns = [
     path("",views.hub, name="hub"),
-    path("manage/",views.manage, name="manage"),
-    path("manage/location", views.locations, name="locations"),
+    path("location", views.locations, name="locations"),
+    path("module/search/results", views.results, name="results"),
     
     # path("part/", partView.part, name="part"),
 ]

@@ -21,7 +21,7 @@
                         <div class="accordion-body">
                             <div class="accordion" id="accordionExample">
     {% endif %}
-                                <form method="POST" action="{{ action }}{{name}}">
+                                <form method="POST" action="{{name}}">
                             {% csrf_token %}
                             
     {% for p_form in tab %}

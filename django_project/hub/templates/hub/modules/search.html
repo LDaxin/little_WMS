@@ -1,0 +1,24 @@
+<div class="d-flex p-2">
+    <div class="input-group">
+        <input id="sTerm" onChange="lResults($('#sTerm').val());" class="form-control">
+        <button id="search" class="btn btn-primary" onClick="lResults($('#sTerm').val());">Search</button>
+    </div>
+</div>
+
+<div id="results">
+</div>
+
+<script>
+
+    function lResults(search){
+        if(search == ""){
+            search = "NONE";
+        }
+        $.get("module/search/results?type={{ type }}&search="+search, function(data){
+            $("#results").html(data)
+        });
+    }
+
+    $("#results").load(lResults(""));
+
+</script>
