@@ -2,18 +2,7 @@
 
 {% block content %}
 
-{% for part in list %}
-<div class="container overflow-hidden">
-    <div class="card">
-        <div class="card-body">
-
-            <p class="card-text">
-                {{part.traditional_city}}
-            </p>
-        </div>
-    </div>
-</div>
-{% endfor %}
+{% include "hub/modules/search.html" with type="location" %}
 
 {% include "hub/modal_button/plus.html" with name="location" %}
 

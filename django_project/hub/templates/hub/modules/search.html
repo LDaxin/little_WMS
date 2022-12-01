@@ -5,10 +5,43 @@
     </div>
 </div>
 
-<div id="results">
-</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">
+                <input class="form-check-input" type="checkbox" value="" id="checkAll" onclick="eventCheckBox()">
+            </th>
+        {% if type == "part" %}
+            <th scope="col">Name</th>
+            <th scope="col">Code</th>
+            <th scope="col">Anzahl</th>
+        {% elif type == "location" %}
+            <th scope="col">Name</th>
 
+        {% elif type == "shelf" %}
+            <th scope="col">Code</th>
+
+        {% else %}
+            <th scope="col">Name</th>
+            <th scope="col">Code</th>
+
+        {% endif %}
+        </tr>
+    </thead>
+
+<tbody id="results">
+</tbody>
+
+</table>
 <script>
+
+    function eventCheckBox(){
+        if ($("#checkAll").prop("checked")){
+            $(".checkboxlist").prop("checked", true)
+        }else{
+            $(".checkboxlist").prop("checked", false)
+        }
+    }
 
     function lResults(search){
         if(search == ""){

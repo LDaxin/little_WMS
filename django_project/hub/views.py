@@ -31,32 +31,32 @@ def results(request):
                 r = Part.objects.all()
             else:
                 r = Part.objects.filter(template__name__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r})
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"part"})
 
         elif request.GET['type']=="warehouse":
             if request.GET['search'] == "NONE":
                 r = Warehouse.objects.all()
             else:
                 r = Warehouse.objects.filter(name__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r})
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"warehouse"})
 
         elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":
                 r = Storage.objects.all()
             else:
                 r = Storage.objects.filter(name__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r})
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
         elif request.GET['type']=="shelf":
             if request.GET['search'] == "NONE":
-                r = Self.objects.all()
+                r = Shelf.objects.all()
             else:
-                r = Shelf.objects.filter(name__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r})
+                r = Shelf.objects.filter(code__contains=request.GET['search'])
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"shelf"})
 
         elif request.GET['type']=="location":
             if request.GET['search'] == "NONE":
                 r = Location.objects.all()
             else:
                 r = Location.objects.filter(name__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r})
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})

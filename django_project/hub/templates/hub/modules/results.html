@@ -1,7 +1,24 @@
 {% for r in results %}
-<div class="card p-2">
-    <div class="card-body">
-        {{ r.template.name }}
-    </div>
-</div>
+        <tr>
+
+            <td>
+                <input class="form-check-input checkboxlist" type="checkbox" value="" id="{{ r.id }}">
+            </td>
+
+            {% if type == "part" %}
+            <td>{{ r.template.name }}</td>
+            <td>{{r.code}}</td>
+            <td>{{r.count}}</td>
+
+            {% elif type == "location" %}
+            <td>{{ r.name }}</td>
+
+            {% elif type == "shelf" %}
+            <td>{{ r.code }}</td>
+
+            {% else %}
+            <td>{{ r.name }}</td>
+            <td>{{r.code}}</td>
+            {% endif %}
+        </tr>
 {% endfor %}
