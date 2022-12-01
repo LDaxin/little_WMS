@@ -68,7 +68,7 @@ class Template(models.Model):
                 name_part = self.name + "00000"[len(self.name):]
             else:
                 name_part = self.name[:5]
-            code = self.pType + name_part.upper() 
+            code = self.pType + name_part.upper().replace(" ", "")
             try:
                 number = Template.objects.filter(code__startswith=code).last().code[7:9]
                 number = s.up(number)
