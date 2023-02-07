@@ -3,8 +3,8 @@ from . import views
 from part import views as partView
 
 urlpatterns = [
-    path("warehouse", views.warehouse, name="warehouse"),
-    path("storage", views.storage, name="storage"),
-    path("shelf", views.shelf, name="shelf"),
-    path("compartment", views.compartment, name="compartment"),
+    path("warehouse", views.warehouses, name="warehouses"),
+    path("storage", views.storages, name="storages"),
+    path("shelf", views.shelfs, name="shelfs"),
+    path("compartment", views.compartments, name="compartments"),
 ]

@@ -4,7 +4,7 @@ from .models import *
 
 
 # Create your views here.
-def warehouse(request):
+def warehouses(request):
     if request.method == "POST":
         w = FormWarehouse(request.POST)
         if w.is_valid():
@@ -13,10 +13,10 @@ def warehouse(request):
             ref.save()
             warehouse.ref = ref
             warehouse.save()
-    return render(request, "warehouse/warehouse.html", context={"list": Warehouse.objects.all(),"form":[[FormWarehouse]]})
+    return render(request, "warehouse/warehouses.html", context={"list": Warehouse.objects.all(),"form":[FormWarehouse]})
 
 
-def storage(request):
+def storages(request):
     if request.method == "POST":
         s = FormStorage(request.POST)
         if s.is_valid():
@@ -25,10 +25,10 @@ def storage(request):
             ref.save()
             storage.ref = ref
             storage.save()
-    return render(request, "warehouse/storage.html", context={"list": Storage.objects.all(), "form":[[FormStorage]]})
+    return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "form":[FormStorage]})
 
 
-def shelf(request):
+def shelfs(request):
     if request.method == "POST":
         s = FormShelf(request.POST)
         if s.is_valid():
@@ -47,8 +47,8 @@ def shelf(request):
                     c.ref = ref
                     ref.save()
                     c.save()
-    return render(request, "warehouse/shelf.html", context={"list": Shelf.objects.all(),"form":[[FormShelf]]})
+    return render(request, "warehouse/shelfs.html", context={"list": Shelf.objects.all(),"form":[FormShelf]})
 
 
-def compartment(request):
-    return render(request, "warehouse/compartment.html", context={"list": Compartment.objects.all()})
+def compartments(request):
+    return render(request, "warehouse/compartments.html", context={"list": Compartment.objects.all()})

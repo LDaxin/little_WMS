@@ -20,40 +20,13 @@ class FormTag(forms.ModelForm):
             visible.field.widget.attrs["class"]= "form-control"
 
 class FormTemplatePart(forms.ModelForm):
+
     class Meta:
         model = Template
-        fields = (
-            'name',
-            'tag'
-         )
-        labels = {
-                'name':("Name"),
-                'tag':("Tags")
-        }
+        fields = '__all__'
+
     def __init__(self, *args, **kwargs):
         super(FormTemplatePart, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
-
-class FormTemplateContainer(forms.ModelForm):
-    class Meta:
-        model = Template
-        fields = (
-            'name',
-            'tag',
-            'innerWidth',
-            'innerDepth',
-            'innerHeight'
-         )
-        labels = {
-                'name':("Name"),
-                'tag':("Tags"),
-                'innerWidth':("innere Breite"),
-            'innerDepth':("innere Tiefe"),
-            'innerHeight':("innere Höhe")
-        }
-    def __init__(self, *args, **kwargs):
-        super(FormTemplateContainer, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
@@ -61,12 +34,7 @@ class  FormPartBase(forms.ModelForm):
 
     class Meta:
         model = Part
-        fields = (
-                'template',
-        )
-        labels = {
-                'template':("Template"),
-        }
+        fields ='__all__' 
     def __init__(self, *args, **kwargs):
         super(FormPartBase, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():

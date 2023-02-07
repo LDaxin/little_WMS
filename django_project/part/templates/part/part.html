@@ -2,10 +2,6 @@
 
 {% block content %}
 
-{% include "hub/modules/search.html" with type="part" %}
-
-{% include "hub/modal_button/plus.html" with name="part" %}
-
-{% include "hub/form_modal.html" with add="Teil Hinzufügen" action="/manage/" name="part" forms=form %}
+{% include "part/partFields.html" %}
 
 {% endblock %}

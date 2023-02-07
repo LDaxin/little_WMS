@@ -1,9 +1,14 @@
+
+
+<!-- ____________________________Search Bar______________________________________ -->
+
 <div class="d-flex p-2">
     <div class="input-group">
-        <input id="sTerm" onChange="lResults($('#sTerm').val());" class="form-control">
-        <button id="search" class="btn btn-primary" onClick="lResults($('#sTerm').val());">Search</button>
+        <input id="sTerm" placeholder="Suche" onChange="lResults($('#sTerm').val());" class="form-control">
     </div>
 </div>
+
+<!-- ____________________________Result Table______________________________________ -->
 
 <table class="table">
     <thead>
@@ -33,6 +38,9 @@
 </tbody>
 
 </table>
+
+<!-- ____________________________SCRIPTS______________________________________ -->
+
 <script>
 
     function eventCheckBox(){
@@ -47,7 +55,7 @@
         if(search == ""){
             search = "NONE";
         }
-        $.get("module/search/results?type={{ type }}&search="+search, function(data){
+        $.get("/module/search/results?type={{ type }}&search="+search, function(data){
             $("#results").html(data)
         });
     }

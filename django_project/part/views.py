@@ -1,33 +1,60 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
-# Create your views here.
+from django.core.exceptions import ObjectDoesNotExist
 
 
-def part(request):
-    if request.method == "POST":
-        if 'add_1' in request.POST:
-            t = FormTemplatePart(request.POST)
-            if t.is_valid():
-                template = t.save()
-                part = Part(template=template)
-                template.save()
-                part.save()
-        elif 'add_2' in request.POST:
-            t = FormTemplateContainer(request.POST)
-            if t.is_valid():
-                template = t.save()
-                part = Part(template=template)
-                template.save()
-                part.save()
+def fListGen(typ):
+    fList = []
+    for enableField in Type._meta.get_fields():
+        for field in Template._meta.get_fields():
+            try:
+                if (not field.null and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
+                    fList.append(field.name)
+            except AttributeError:
+                pass
+        for field in Part._meta.get_fields():
+            try:
+                if (not field.null and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
+                    fList.append(field.name)
+            except AttributeError:
+                pass
+    return fList
 
-        elif 'add_3' in request.POST:
-            p = FormPartBase(request.POST)
-            if p.is_valid():
-                part = p.save()
-                part.save()
-    return render(request, "part/part.html", context={"symbol":"Part", "list":Part.objects.all(), "form":[[FormTemplatePart],[FormTemplateContainer],[FormPartBase]]})
+
+
+def parts(request, typ):
+
+    t = Type.objects.filter(tName__exact=typ).first()
+
+    if t == None:
+         return HttpResponseNotFound('<h1>Page not found</h1>')
+    else:
+
+        fList = fListGen(t)
+
+        return render(request, "part/parts.html", context={"symbol":t.tSymbol, 'type':t.tName, "name":"part", "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":True})
+
+
+def part(request, typ, part_id):
+
+    try:
+
+        p = Part.objects.get(pk=part_id)
+
+        if typ != p.template.pType.tName:
+
+            return HttpResponseNotFound('<h1>Page not found 404</h1>')
+
+        fList = fListGen(p)
+
+        return render(request, "part/part.html", context={"symbol":p.template.pType,"form":[FormTemplatePart , FormPartBase], "l":fList})
+
+    except ObjectDoesNotExist:
+
+        return HttpResponseNotFound('<h1>Page not found 404</h1>')
+
 
 def tag(request):
     if request.method == "POST":
@@ -35,4 +62,4 @@ def tag(request):
         if t.is_valid():
             tag = t.save()
             tag.save()
-    return render(request, "part/tag.html", context={"list":Tag.objects.all(), "form":[[FormTag]]})
+    return render(request, "part/tag.html", context={"list":Tag.objects.all(), "form":[FormTag]})

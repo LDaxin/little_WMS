@@ -31,11 +31,39 @@ class Tag(models.Model):
 #---------------------------------------------------------------------------
 # The Part model is were the unice value is stored
 
+class Type(models.Model):
+    tName = models.CharField(max_length=20)
+    tShort = models.CharField(max_length=2)
+    tSymbol = models.CharField(max_length=20)
+
+    name = models.BooleanField(default=False)
+    description = models.BooleanField(default=False)
+    alias = models.BooleanField(default=False)
+    pType = models.BooleanField(default=False)
+    tag = models.BooleanField(default=False)
+
+    width = models.BooleanField(default=False)
+    depth = models.BooleanField(default=False)
+    height = models.BooleanField(default=False)
+
+    innerWidth = models.BooleanField(default=False)
+    innerDepth = models.BooleanField(default=False)
+    innerHeight = models.BooleanField(default=False)
+
+    ref = models.BooleanField(default=False)
+
+    count = models.BooleanField(default=False)
+    weight = models.BooleanField(default=False)
+    volume = models.BooleanField(default=False)
+    length = models.BooleanField(default=False)
+    pTag = models.BooleanField(default=False)
+
+    stored = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.tName
+
 class Template(models.Model):
-    type_list = [
-            ("BA", "BA"),
-            ("CO", "CO"),
-            ]
 
     name = models.CharField(max_length=20) 
 
@@ -43,7 +71,7 @@ class Template(models.Model):
     
     alias = models.CharField(max_length=400, null=True, blank=True)
 
-    pType = models.CharField(max_length=10, choices=type_list, default="BA")
+    pType = models.ForeignKey(Type, on_delete=models.PROTECT)
 
     width = models.FloatField(null=True, blank=True)
     depth = models.FloatField(null=True, blank=True)
@@ -68,7 +96,7 @@ class Template(models.Model):
                 name_part = self.name + "00000"[len(self.name):]
             else:
                 name_part = self.name[:5]
-            code = self.pType + name_part.upper().replace(" ", "")
+            code = self.pType.tShort + name_part.upper().replace(" ", "")
             try:
                 number = Template.objects.filter(code__startswith=code).last().code[7:9]
                 number = s.up(number)
@@ -83,12 +111,15 @@ class Template(models.Model):
 class Part(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE)
     count = models.IntegerField(null=True, blank=True)
+    weight = models.IntegerField(null=True, blank=True)
+    volume = models.IntegerField(null=True, blank=True)
+    length = models.IntegerField(null=True, blank=True)
 
     stored = models.ForeignKey(Stored, related_name= "stored", on_delete = models.SET_NULL, null=True, blank=True)
 
     ref = models.OneToOneField(Stored, on_delete = models.CASCADE, null=True, blank=True)
 
-    tag = models.ManyToManyField(Tag, blank=True)
+    pTag = models.ManyToManyField(Tag, null=True, blank=True)
 
     code = models.CharField(max_length=16, unique=True, editable=False)
 
@@ -108,3 +139,4 @@ class Part(models.Model):
             self.code = code
 
         super().save(*args,**kwargs)
+

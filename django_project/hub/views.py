@@ -9,10 +9,7 @@ from .forms import *
 # Create your views here.
 
 def hub(request):
-    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Container', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search']})
-
-def manage(request):
-    return render(request, "hub/manage.html")
+    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search'], "type":Type.objects.all()})
 
 def locations(request):
     if request.method == "POST":
@@ -22,7 +19,7 @@ def locations(request):
             location.save()
     else:
         form =Form_location()
-    return render(request, "hub/location.html", context={"list":Location.objects.all(), "form":[[Form_location]]})
+    return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
 
 def results(request):
     if request.method == "GET":
