@@ -10,20 +10,20 @@ def fListGen(typ):
     for enableField in Type._meta.get_fields():
         for field in Template._meta.get_fields():
             try:
-                if (not field.null and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
+                if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
                     fList.append(field.name)
             except AttributeError:
                 pass
         for field in Part._meta.get_fields():
             try:
-                if (not field.null and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
+                if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
                     fList.append(field.name)
             except AttributeError:
                 pass
     return fList
 
 
-
+# TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 def parts(request, typ):
 
     t = Type.objects.filter(tName__exact=typ).first()
@@ -31,6 +31,17 @@ def parts(request, typ):
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
+        if request.method == "POST":
+            re = request.POST.copy()
+            re["pType"] = str(t.id) 
+            te = FormTemplatePart(re)
+            if te.is_valid():
+                template = te.save()
+                re["template"] = template 
+                p = FormPartBase(re)
+                if p.is_valid():
+                    p.save()
+
 
         fList = fListGen(t)
 

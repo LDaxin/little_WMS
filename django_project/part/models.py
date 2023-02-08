@@ -36,11 +36,10 @@ class Type(models.Model):
     tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
 
-    name = models.BooleanField(default=False)
-    description = models.BooleanField(default=False)
-    alias = models.BooleanField(default=False)
-    pType = models.BooleanField(default=False)
-    tag = models.BooleanField(default=False)
+    name = models.BooleanField(default=True, editable=False)
+    description = models.BooleanField(default=True)
+    tag = models.BooleanField(default=True)
+    alias = models.BooleanField(default=True)
 
     width = models.BooleanField(default=False)
     depth = models.BooleanField(default=False)
@@ -71,7 +70,7 @@ class Template(models.Model):
     
     alias = models.CharField(max_length=400, null=True, blank=True)
 
-    pType = models.ForeignKey(Type, on_delete=models.PROTECT)
+    pType = models.ForeignKey(Type, on_delete=models.PROTECT, blank=True)
 
     width = models.FloatField(null=True, blank=True)
     depth = models.FloatField(null=True, blank=True)
@@ -109,7 +108,7 @@ class Template(models.Model):
 
 
 class Part(models.Model):
-    template = models.ForeignKey(Template, on_delete=models.CASCADE)
+    template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
     count = models.IntegerField(null=True, blank=True)
     weight = models.IntegerField(null=True, blank=True)
     volume = models.IntegerField(null=True, blank=True)
@@ -119,7 +118,7 @@ class Part(models.Model):
 
     ref = models.OneToOneField(Stored, on_delete = models.CASCADE, null=True, blank=True)
 
-    pTag = models.ManyToManyField(Tag, null=True, blank=True)
+    pTag = models.ManyToManyField(Tag, blank=True)
 
     code = models.CharField(max_length=16, unique=True, editable=False)
 
