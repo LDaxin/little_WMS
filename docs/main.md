@@ -16,7 +16,7 @@ I love to know what I have and were it is especially in my workshop but don't wa
 
 This is the storage structure Parts can be Soared in all of the storage construct besides in a Location.
 
-## Parts
+### Parts
 
 - Container
 
