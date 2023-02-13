@@ -8,7 +8,25 @@ s = System()
 
 #TODO test if the query will return all stored things even the Container wenn the input is ready
 class Stored(models.Model):
-    pass
+    def __str__(self):
+        mo = Warehouse.objects.filter(ref_id=self.id).first()
+        if mo != None:
+            code = mo.code
+        else:
+            mo = Storage.objects.filter(ref_id=self.id).first()
+            if mo != None:
+                code = mo.code
+            else:
+                mo = Shelf.objects.filter(ref_id=self.id).first()
+                if mo != None:
+                    code = mo.code
+                else:
+                    mo = Compartment.objects.filter(ref_id=self.id).first()
+                    if mo != None:
+                        code = mo.code
+                    else:
+                        code = "Error"
+        return code
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=100)

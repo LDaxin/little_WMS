@@ -48,6 +48,9 @@ class Type(models.Model):
     name = models.BooleanField(default=True, editable=False)
     unit = models.BooleanField(default=True, editable=False)
     count = models.BooleanField(default=True, editable=False)
+    stored = models.BooleanField(default=True, editable=False)
+
+
     description = models.BooleanField(default=True)
     tag = models.BooleanField(default=True)
     alias = models.BooleanField(default=True)
@@ -67,7 +70,6 @@ class Type(models.Model):
     length = models.BooleanField(default=False)
     pTag = models.BooleanField(default=False)
 
-    stored = models.BooleanField(default=False)
 
     def __str__(self):
         return self.tName
