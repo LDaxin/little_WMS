@@ -28,6 +28,15 @@ class Tag(models.Model):
         else:
             return self.name
 
+class Unit(models.Model):
+    name = models.CharField(max_length=20)
+    symbol = models.CharField(max_length=4)
+    maximum = models.BigIntegerField(null=True, blank=True)
+    minimum = models.BigIntegerField(default=0)
+
+    def __str__(self):
+        return self.name
+
 #---------------------------------------------------------------------------
 # The Part model is were the unice value is stored
 
@@ -37,6 +46,8 @@ class Type(models.Model):
     tSymbol = models.CharField(max_length=20)
 
     name = models.BooleanField(default=True, editable=False)
+    unit = models.BooleanField(default=True, editable=False)
+    count = models.BooleanField(default=True, editable=False)
     description = models.BooleanField(default=True)
     tag = models.BooleanField(default=True)
     alias = models.BooleanField(default=True)
@@ -51,7 +62,6 @@ class Type(models.Model):
 
     ref = models.BooleanField(default=False)
 
-    count = models.BooleanField(default=False)
     weight = models.BooleanField(default=False)
     volume = models.BooleanField(default=False)
     length = models.BooleanField(default=False)
@@ -65,6 +75,7 @@ class Type(models.Model):
 class Template(models.Model):
 
     name = models.CharField(max_length=20) 
+    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
 
     description = models.TextField(null=True, blank=True)
     
@@ -109,7 +120,7 @@ class Template(models.Model):
 
 class Part(models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
-    count = models.IntegerField(null=True, blank=True)
+    count = models.IntegerField(default=1, blank=True)
     weight = models.IntegerField(null=True, blank=True)
     volume = models.IntegerField(null=True, blank=True)
     length = models.IntegerField(null=True, blank=True)
