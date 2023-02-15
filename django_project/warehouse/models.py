@@ -11,19 +11,23 @@ class Stored(models.Model):
     def __str__(self):
         mo = Warehouse.objects.filter(ref_id=self.id).first()
         if mo != None:
-            code = mo.code
+            code =  mo.location.name + "/" + mo.name + " | " + mo.code 
+            code = "Warehouse | " + code
         else:
             mo = Storage.objects.filter(ref_id=self.id).first()
             if mo != None:
-                code = mo.code
+                code = mo.warehouse.location.name + "/" + mo.warehouse.name + "/" + mo.name + " | " + mo.code  
+                code = "Storage | " + code
             else:
                 mo = Shelf.objects.filter(ref_id=self.id).first()
                 if mo != None:
-                    code = mo.code
+                    code =  mo.storage.warehouse.location.name + "/" + mo.storage.warehouse.name + "/" + mo.storage.name + "/" + mo.name + " | " + mo.code 
+                    code = "Shelf | " + code
                 else:
                     mo = Compartment.objects.filter(ref_id=self.id).first()
                     if mo != None:
-                        code = mo.code
+                        code =  mo.shelf.storage.warehouse.location.name + "/" + mo.shelf.storage.warehouse.name + "/" + mo.shelf.storage.name + "/" + mo.shelf.name + "/" + mo.name +" | " + mo.code 
+                        code = "Compartment | " + code
                     else:
                         code = "Error"
         return code
@@ -76,6 +80,7 @@ class Storage(models.Model):
         super().save(*args, **kwargs)
 
 class Shelf(models.Model):
+    name = models.CharField(max_length=100)
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
     rows = models.IntegerField()
@@ -98,6 +103,7 @@ class Shelf(models.Model):
         super().save(*args, **kwargs)
 
 class Compartment(models.Model):
+    name = models.CharField(max_length=100)
     shelf = models.ForeignKey(Shelf, on_delete=models.CASCADE)
 
     size_width = models.FloatField(null=True, blank=True)
