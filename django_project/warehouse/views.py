@@ -2,7 +2,6 @@ from django.shortcuts import render
 from .forms import *
 from .models import *
 
-
 # Create your views here.
 def warehouses(request):
     if request.method == "POST":
@@ -43,6 +42,7 @@ def shelfs(request):
                     c.shelf = shelf
                     c.row = x
                     c.colum = y
+                    c.name = str(x) + "." + str(y) 
                     ref = Stored()
                     c.ref = ref
                     ref.save()
