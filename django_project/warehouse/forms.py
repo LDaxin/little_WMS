@@ -39,13 +39,11 @@ class FormShelf(forms.ModelForm):
     class Meta:
         model = Shelf
         fields = (
-            "name",
             "storage",
             "rows",
             "columns",
         )
         labels = {
-                "name":("Name"),
                 "storage":("Lager"),
                 "rows":("Reihen"),
             "columns":("Faecher pro Reihe"),

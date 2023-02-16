@@ -11,22 +11,22 @@ class Stored(models.Model):
     def __str__(self):
         mo = Warehouse.objects.filter(ref_id=self.id).first()
         if mo != None:
-            code =  mo.location.name + "/" + mo.name + " | " + mo.code 
+            code =  "/" + mo.name + " | " + mo.code 
             code = "Warehouse | " + code
         else:
             mo = Storage.objects.filter(ref_id=self.id).first()
             if mo != None:
-                code = mo.warehouse.location.name + "/" + mo.warehouse.name + "/" + mo.name + " | " + mo.code  
+                code = "/" + mo.warehouse.name + "/" + mo.name + " | " + mo.code  
                 code = "Storage | " + code
             else:
                 mo = Shelf.objects.filter(ref_id=self.id).first()
                 if mo != None:
-                    code =  mo.storage.warehouse.location.name + "/" + mo.storage.warehouse.name + "/" + mo.storage.name + "/" + mo.name + " | " + mo.code 
+                    code =  "/" + mo.storage.warehouse.name + "/" + mo.storage.name + "/" + mo.name + " | " + mo.code 
                     code = "Shelf | " + code
                 else:
                     mo = Compartment.objects.filter(ref_id=self.id).first()
                     if mo != None:
-                        code =  mo.shelf.storage.warehouse.location.name + "/" + mo.shelf.storage.warehouse.name + "/" + mo.shelf.storage.name + "/" + mo.shelf.name + "/" + mo.name +" | " + mo.code 
+                        code =  "/" + mo.shelf.storage.warehouse.name + "/" + mo.shelf.storage.name + "/" + mo.shelf.name + "/" + mo.name +" | " + mo.code 
                         code = "Compartment | " + code
                     else:
                         code = "Error"
@@ -100,6 +100,9 @@ class Shelf(models.Model):
             except AttributeError:
                 code = code + "001000"
             self.code = code
+        if not self.name:
+            name = self.code[10:13].replace("0", "")
+            self.name = name
         super().save(*args, **kwargs)
 
 class Compartment(models.Model):
@@ -130,26 +133,3 @@ class Compartment(models.Model):
             self.code = code
         super().save(*args, **kwargs)
 
-'''
-class Container(models.Model):
-    code = models.CharField(max_length=16)
-    stored = models.ForeignKey(Stored, related_name= "stored", on_delete = models.SET_NULL, null=True, blank=True)
-
-    innerWidth = models.FloatField(null=True, blank=True)
-    innerDepth = models.FloatField(null=True, blank=True)
-    innerHeight = models.FloatField(null=True, blank=True)
-
-    ref = models.OneToOneField(Stored, on_delete = models.CASCADE)
-
-
------------------------------------------------------------------------------------------------
-
-    warehouse = models.OneToOneField(Warehouse, on_delete=models.CASCADE, null=True, blank=True)
-
-    storage = models.OneToOneField(Storage, on_delete=models.CASCADE, null=True, blank=True)
-
-    compartment = models.OneToOneField(Compartment, on_delete=models.CASCADE, null=True, blank=True)
-
-    container = models.OneToOneField(Part, on_delete=models.CASCADE, null=True, blank=True)
-    
-    '''

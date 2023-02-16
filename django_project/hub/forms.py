@@ -5,7 +5,6 @@ class Form_location(forms.ModelForm):
     class Meta:
         model = Location
         fields = (
-            'name',
             'traditional_land', 
             'traditional_country',
             'traditional_city',
@@ -14,7 +13,6 @@ class Form_location(forms.ModelForm):
             'traditional_street_number'
          )
         labels = {
-            'name':("Name"),
             'traditional_land':("Land"), 
             'traditional_country':("Bundesland"),
             'traditional_city':("Stadt"),
