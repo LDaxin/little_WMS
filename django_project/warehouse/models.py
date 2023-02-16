@@ -11,25 +11,29 @@ class Stored(models.Model):
     def __str__(self):
         mo = Warehouse.objects.filter(ref_id=self.id).first()
         if mo != None:
-            code =  "/" + mo.name + " | " + mo.code 
+            code =  mo.name + " | " + mo.code 
             code = "Warehouse | " + code
         else:
             mo = Storage.objects.filter(ref_id=self.id).first()
             if mo != None:
-                code = "/" + mo.warehouse.name + "/" + mo.name + " | " + mo.code  
+                code = mo.warehouse.name + "/" + mo.name + " | " + mo.code  
                 code = "Storage | " + code
             else:
                 mo = Shelf.objects.filter(ref_id=self.id).first()
                 if mo != None:
-                    code =  "/" + mo.storage.warehouse.name + "/" + mo.storage.name + "/" + mo.name + " | " + mo.code 
+                    code = mo.storage.warehouse.name + "/" + mo.storage.name + "/" + mo.name + " | " + mo.code 
                     code = "Shelf | " + code
                 else:
                     mo = Compartment.objects.filter(ref_id=self.id).first()
                     if mo != None:
-                        code =  "/" + mo.shelf.storage.warehouse.name + "/" + mo.shelf.storage.name + "/" + mo.shelf.name + "/" + mo.name +" | " + mo.code 
+                        code = mo.shelf.storage.warehouse.name + "/" + mo.shelf.storage.name + "/" + mo.shelf.name + "/" + mo.name +" | " + mo.code 
                         code = "Compartment | " + code
                     else:
-                        code = "Error"
+                        try:
+                            code = self.part_set.template.name
+                        except:
+                            code = "error"
+
         return code
 
 class Warehouse(models.Model):

@@ -1,5 +1,5 @@
 from django.db import models
-from hub.models import Stored
+from warehouse.models import Stored
 from hub.countsystem import System
 #from maintenance.models import Plan
 #from maintenance.models import Log
