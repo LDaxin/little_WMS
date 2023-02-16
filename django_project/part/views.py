@@ -3,21 +3,27 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
+from warehouse.models import Stored
 
 
 def fListGen(typ):
     fList = []
+    notList =["ref"]
     for enableField in Type._meta.get_fields():
         for field in Template._meta.get_fields():
             try:
                 if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
-                    fList.append(field.name)
+                    for notField in notList:
+                        if notField != field.name:
+                            fList.append(field.name)
             except AttributeError:
                 pass
         for field in Part._meta.get_fields():
             try:
                 if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
-                    fList.append(field.name)
+                    for notField in notList:
+                        if notField != field.name:
+                            fList.append(field.name)
             except AttributeError:
                 pass
     return fList
@@ -39,6 +45,10 @@ def parts(request, typ):
                 template = te.save()
                 re["template"] = template 
                 p = FormPartBase(re)
+                if t.ref:
+                    ref = Stored()
+                    ref.save()
+                    p.ref = ref
                 if p.is_valid():
                     p.save()
 

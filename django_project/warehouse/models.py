@@ -30,7 +30,7 @@ class Stored(models.Model):
                         code = "Compartment | " + code
                     else:
                         try:
-                            code = self.part_set.template.name
+                            code = self.part_set.all().template.name
                         except:
                             code = "error"
 
