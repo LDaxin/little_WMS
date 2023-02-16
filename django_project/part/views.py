@@ -26,7 +26,7 @@ def fListGen(typ):
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 def parts(request, typ):
 
-    t = Type.objects.filter(tName__exact=typ).first()
+    t = Type.objects.get(tName__exact=typ)
 
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -45,7 +45,7 @@ def parts(request, typ):
 
         fList = fListGen(t)
 
-        return render(request, "part/parts.html", context={"symbol":t.tSymbol, 'type':t.tName, "name":"part", "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":True})
+        return render(request, "part/parts.html", context={"symbol":t.tSymbol, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
 
 
 def part(request, typ, part_id):

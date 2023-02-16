@@ -55,7 +55,7 @@
         if(search == ""){
             search = "NONE";
         }
-        $.get("/module/search/results?type={{ type }}&search="+search, function(data){
+        $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
             $("#results").html(data)
         });
     }

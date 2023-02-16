@@ -25,9 +25,9 @@ def results(request):
     if request.method == "GET":
         if request.GET['type']=="part":
             if request.GET['search'] == "NONE":
-                r = Part.objects.all()
+                r = Part.objects.filter(template__pType__tName__exact=request.GET["ptype"])
             else:
-                r = Part.objects.filter(template__name__contains=request.GET['search'])
+                r = Part.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"part"})
 
         elif request.GET['type']=="warehouse":
