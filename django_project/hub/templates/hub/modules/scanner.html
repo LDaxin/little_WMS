@@ -1,8 +1,11 @@
-<div style="padding:2px">
-    <fieldset disabled>
-    <input class="form-control" style="width:100%; text-align:center" id="last-scann"></input>
-    </fieldset>
-</div>
+
+{% if input == ""  %}
+    <div style="padding:2px">
+        <fieldset disabled>
+            <input class="form-control" style="width:100%; text-align:center" id="last-scann"></input>
+        </fieldset>
+    </div>
+{% endif %}
 
 <div style="width:100%;padding-bottom:100%" id="reader"></div>
 
@@ -12,12 +15,17 @@
         console.log(`Scan result: ${decodedText}`, decodedResult);
         if(decodedResult.result.format.formatName == "QR_CODE"){
             if(decodedText.length == 16){
+                {% if input == ""  %}
                 $("#last-scann").val(decodedText);
+                {% else %}
+                $("#{{input}}").val(decodedText);
+                lResults(decodedText)
+                {% endif %}
             }
         }
     }
 
     var html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: 250 });
+        "reader", { fps: 10, qrbox: 550 });
     html5QrcodeScanner.render(onScanSuccess);
 </script>

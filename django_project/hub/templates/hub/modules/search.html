@@ -4,7 +4,8 @@
 
 <div class="d-flex p-2">
     <div class="input-group">
-        <input id="sTerm" placeholder="Suche" onChange="lResults($('#sTerm').val());" class="form-control">
+        <input id={{searchFieldName}} placeholder="Suche" class="form-control">
+        {% include "hub/modules/scanner.html" with input=searchFieldName %}
     </div>
 </div>
 
@@ -43,23 +44,28 @@
 
 <script>
 
-    function eventCheckBox(){
-        if ($("#checkAll").prop("checked")){
-            $(".checkboxlist").prop("checked", true)
-        }else{
-            $(".checkboxlist").prop("checked", false)
-        }
-    }
 
-    function lResults(search){
-        if(search == ""){
-            search = "NONE";
+        function eventCheckBox(){
+            if ($("#checkAll").prop("checked")){
+                $(".checkboxlist").prop("checked", true)
+            }else{
+                $(".checkboxlist").prop("checked", false)
+            }
         }
-        $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
-            $("#results").html(data)
+
+        function lResults(search){
+            console.log(search)
+            if(search == ""){
+                search = "NONE";
+            }
+            $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
+                $("#results").html(data)
+            });
+        }
+
+        $("#results").load(lResults(""));
+
+        $("#{{searchFieldName}}").on("input", function(){
+            lResults($('#{{searchFieldName}}').val())
         });
-    }
-
-    $("#results").load(lResults(""));
-
 </script>

@@ -55,7 +55,7 @@ def parts(request, typ):
 
         fList = fListGen(t)
 
-        return render(request, "part/parts.html", context={"symbol":t.tSymbol, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
+        return render(request, "part/parts.html", context={"symbol":t.tSymbol, "searchFieldName":"partSearch" + t.tName, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
 
 
 def part(request, typ, part_id):
