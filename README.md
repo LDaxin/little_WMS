@@ -8,16 +8,18 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 ## Roadmap
 - [ ] Stage 1 (Base)
 
-    - [x] Locations
+    - [ ] Locations
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
-        - [ ] search
+        - [ ] search 
             - [ ] scann
 
     - [ ] Warehouses
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
@@ -26,6 +28,7 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 
     - [ ] Storages
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
@@ -34,6 +37,7 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 
     - [ ] Shelfs
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
@@ -42,6 +46,7 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 
     - [ ] compartments
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
@@ -50,13 +55,14 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 
     - [ ] Parts
         - [x] create new
+        - [x] list
         - [ ] delete
         - [ ] view
         - [ ] edit
         - [ ] search
             - [ ] scann
-        - [ ] Part types (in Admin screen)
-        - [ ] Units (in Admin screen)
+        - [x] Part types (in Admin screen)
+        - [x] Units (in Admin screen)
         - [ ] Checkout
         - [ ] Checkin
 
