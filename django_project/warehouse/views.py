@@ -12,7 +12,7 @@ def warehouses(request):
             ref.save()
             warehouse.ref = ref
             warehouse.save()
-    return render(request, "warehouse/warehouses.html", context={"list": Warehouse.objects.all(), "searchFieldName":"partSearch", "form":[FormWarehouse]})
+    return render(request, "warehouse/warehouses.html", context={"list": Warehouse.objects.all(), "searchFieldName":"warehouseSearch", "form":[FormWarehouse]})
 
 
 def storages(request):
@@ -24,7 +24,7 @@ def storages(request):
             ref.save()
             storage.ref = ref
             storage.save()
-    return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"partSearch" , "form":[FormStorage]})
+    return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 
 def shelfs(request):
@@ -47,7 +47,7 @@ def shelfs(request):
                     c.ref = ref
                     ref.save()
                     c.save()
-    return render(request, "warehouse/shelfs.html", context={"list": Shelf.objects.all(), "searchFieldName":"partSearch" ,"form":[FormShelf]})
+    return render(request, "warehouse/shelfs.html", context={"list": Shelf.objects.all(), "searchFieldName":"shelfSearch" ,"form":[FormShelf]})
 
 
 def compartments(request):
