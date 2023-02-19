@@ -4,6 +4,7 @@ from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
 from warehouse.models import Stored
+from django.contrib.auth.decorators import login_required
 
 
 def fListGen(typ):
@@ -30,6 +31,7 @@ def fListGen(typ):
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
+@login_required(login_url='/accounts/login/')
 def parts(request, typ):
 
     t = Type.objects.get(tName__exact=typ)
@@ -58,6 +60,7 @@ def parts(request, typ):
         return render(request, "part/parts.html", context={"symbol":t.tSymbol, "searchFieldName":"partSearch" + t.tName, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
 
 
+@login_required(login_url='/accounts/login/')
 def part(request, typ, part_id):
 
     try:
@@ -77,6 +80,7 @@ def part(request, typ, part_id):
         return HttpResponseNotFound('<h1>Page not found 404</h1>')
 
 
+@login_required(login_url='/accounts/login/')
 def tag(request):
     if request.method == "POST":
         t = FormTag(request.POST)

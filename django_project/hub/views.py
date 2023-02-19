@@ -5,12 +5,15 @@ from .models import *
 from part.models import *
 from warehouse.models import *
 from .forms import *
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@login_required(login_url='/accounts/login/')
 def hub(request):
     return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search'], "type":Type.objects.all()})
 
+@login_required(login_url='/accounts/login/')
 def locations(request):
     if request.method == "POST":
         l = Form_location(request.POST)
@@ -21,6 +24,7 @@ def locations(request):
         form =Form_location()
     return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
 
+@login_required(login_url='/accounts/login/')
 def results(request):
     if request.method == "GET":
         if request.GET['type']=="part":

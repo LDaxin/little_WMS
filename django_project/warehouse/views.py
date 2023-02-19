@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from .forms import *
 from .models import *
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
+@login_required(login_url='/accounts/login/')
 def warehouses(request):
     if request.method == "POST":
         w = FormWarehouse(request.POST)
@@ -15,6 +17,7 @@ def warehouses(request):
     return render(request, "warehouse/warehouses.html", context={"list": Warehouse.objects.all(), "searchFieldName":"warehouseSearch", "form":[FormWarehouse]})
 
 
+@login_required(login_url='/accounts/login/')
 def storages(request):
     if request.method == "POST":
         s = FormStorage(request.POST)
@@ -27,6 +30,7 @@ def storages(request):
     return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 
+@login_required(login_url='/accounts/login/')
 def shelfs(request):
     if request.method == "POST":
         s = FormShelf(request.POST)
@@ -50,5 +54,6 @@ def shelfs(request):
     return render(request, "warehouse/shelfs.html", context={"list": Shelf.objects.all(), "searchFieldName":"shelfSearch" ,"form":[FormShelf]})
 
 
+@login_required(login_url='/accounts/login/')
 def compartments(request):
     return render(request, "warehouse/compartments.html", context={"list": Compartment.objects.all()})
