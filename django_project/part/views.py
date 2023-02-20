@@ -67,13 +67,30 @@ def part(request, typ, part_id):
         p = Part.objects.get(pk=part_id)
         if p.template.pType.tName == typ:
             fList = fListGen(typ)
-            return render(request, "part/modules/partFields.html", context={"symbol":p.template.pType,"form":[FormTemplatePart , FormPartBase], "l":fList})
+            temp = FormTemplatePart(instance=p.template)
+            par = FormPartBase(instance=p)
+            return render(request, "part/modules/part.html", context={"symbol":p.template.pType,"form":[temp , par], "l":fList})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+@login_required(login_url='/accounts/login/')
+def partIncert(request, typ, part_id):
+
+    try:
+        p = Part.objects.get(pk=part_id)
+        if p.template.pType.tName == typ:
+            fList = fListGen(typ)
+            temp = FormTemplatePart(instance=p.template)
+            par = FormPartBase(instance=p)
+            return render(request, "part/modules/partIncert.html", context={"symbol":p.template.pType,"form":[temp, par], "l":fList})
+        else:
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
+    
+    except:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
 
