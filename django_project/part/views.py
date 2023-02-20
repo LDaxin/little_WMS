@@ -66,10 +66,10 @@ def part(request, typ, part_id):
     try:
         p = Part.objects.get(pk=part_id)
         if p.template.pType.tName == typ:
-            fList = fListGen(typ)
+            fList = fListGen(p.template.pType)
             temp = FormTemplatePart(instance=p.template)
             par = FormPartBase(instance=p)
-            return render(request, "part/modules/part.html", context={"symbol":p.template.pType,"form":[temp , par], "l":fList})
+            return render(request, "part/modules/part.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par], "l":fList, "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -82,10 +82,10 @@ def partIncert(request, typ, part_id):
     try:
         p = Part.objects.get(pk=part_id)
         if p.template.pType.tName == typ:
-            fList = fListGen(typ)
+            fList = fListGen(p.template.pType)
             temp = FormTemplatePart(instance=p.template)
             par = FormPartBase(instance=p)
-            return render(request, "part/modules/partIncert.html", context={"symbol":p.template.pType,"form":[temp, par], "l":fList})
+            return render(request, "part/modules/partIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par], "l":fList, "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
