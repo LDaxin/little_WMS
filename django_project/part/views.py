@@ -61,7 +61,7 @@ def parts(request, typ):
 
 
 @login_required(login_url='/accounts/login/')
-def partH(request, typ, part_id):
+def part(request, typ, part_id):
 
     try:
         p = Part.objects.get(pk=part_id)
