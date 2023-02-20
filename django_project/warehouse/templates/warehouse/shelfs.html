@@ -5,8 +5,8 @@
 
 {% include "hub/modules/search.html" with type="shelf" %}
 
-{% include "hub/modal_button/plus.html" with name="shelf" %}
+{% include "hub/modules/plus.html" with name="shelf" %}
 
-{% include "hub/form_modal.html" with add="Lager Hinzufügen" action="/manage/" name="shelf" forms=form %}
+{% include "hub/modules/form_modal.html" with add="Lager Hinzufügen" action="/manage/" name="shelf" forms=form %}
 
 {% endblock %}

@@ -61,13 +61,13 @@ def parts(request, typ):
 
 
 @login_required(login_url='/accounts/login/')
-def part(request, typ, part_id):
+def partH(request, typ, part_id):
 
     try:
         p = Part.objects.get(pk=part_id)
         if p.template.pType.tName == typ:
             fList = fListGen(typ)
-            return render(request, "part/partFields.html", context={"symbol":p.template.pType,"form":[FormTemplatePart , FormPartBase], "l":fList})
+            return render(request, "part/modules/partFields.html", context={"symbol":p.template.pType,"form":[FormTemplatePart , FormPartBase], "l":fList})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
