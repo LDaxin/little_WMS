@@ -9,7 +9,7 @@
 
             <div class="modal-body">
 
-                <form method="POST" action="{{name}}">
+                <form method="POST" action="./add" id="addForm">
                     {% csrf_token %}
 
                     {% for p_form in form %}
@@ -34,10 +34,32 @@
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
-                    <button type="submit" class="btn btn-success" name="add_{{ forloop.counter }}">Add</button>
+                    <button type="submit" class="btn btn-success" id="addButton">Add</button>
                 </form>
 
             </div>
         </div>
     </div>
 </div>
+
+
+<script>
+    $("#addButton").on("click", function(){
+        $("#addForm").submit(function(e){
+            e.preventDefault();
+
+            var form = $(this);
+            var actionUrl = form.attr('action');
+    
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data)
+                {
+                    $(".toast-container").append(data);
+                }
+            });
+        });
+    });
+</script>

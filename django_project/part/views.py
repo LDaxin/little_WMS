@@ -39,6 +39,17 @@ def parts(request, typ):
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
+        fList = fListGen(t)
+        return render(request, "part/parts.html", context={"symbol":t.tSymbol, "searchFieldName":"partSearch" + t.tName, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
+
+@login_required(login_url='/accounts/login/')
+def addPart(request, typ):
+
+    t = Type.objects.get(tName__exact=typ)
+    
+    if t == None:
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no part type named " + typ, "toastType":"alert"})
+    else:
         if request.method == "POST":
             re = request.POST.copy()
             re["pType"] = str(t.id) 
@@ -52,12 +63,10 @@ def parts(request, typ):
                     ref.save()
                     p.ref = ref
                 if p.is_valid():
-                    p.save()
-
-
-        fList = fListGen(t)
-
-        return render(request, "part/parts.html", context={"symbol":t.tSymbol, "searchFieldName":"partSearch" + t.tName, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
+                    pa = p.save()
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
+            return HttpResponseNotFound('<h1>Page not found</h1>')
+    
 
 
 @login_required(login_url='/accounts/login/')
