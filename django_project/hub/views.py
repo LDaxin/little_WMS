@@ -6,6 +6,7 @@ from part.models import *
 from warehouse.models import *
 from .forms import *
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 # Create your views here.
 
@@ -31,21 +32,22 @@ def results(request):
             if request.GET['search'] == "NONE":
                 r = Part.objects.filter(template__pType__tName__exact=request.GET["ptype"])
             else:
-                r = Part.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
+                #r = Part.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
+                r = Part.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__contains=request.GET['search']), template__pType__tName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"part"})
 
         elif request.GET['type']=="warehouse":
             if request.GET['search'] == "NONE":
                 r = Warehouse.objects.all()
             else:
-                r = Warehouse.objects.filter(name__contains=request.GET['search'])
+                r = Warehouse.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"warehouse"})
 
         elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":
                 r = Storage.objects.all()
             else:
-                r = Storage.objects.filter(name__contains=request.GET['search'])
+                r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
         elif request.GET['type']=="shelf":
@@ -59,5 +61,5 @@ def results(request):
             if request.GET['search'] == "NONE":
                 r = Location.objects.all()
             else:
-                r = Location.objects.filter(name__contains=request.GET['search'])
+                r = Location.objects.filter(Q(code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})
