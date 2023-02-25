@@ -4,9 +4,13 @@
 
 {% include "hub/modules/search.html" with type="location" %}
 
-{% include "hub/modules/plus.html" with name="location" %}
+<div class="fixed-bottom  m-3">
+    {% include "hub/modules/plus.html" with name="location" %}
+    {% include "hub/modules/minus.html" with name="location" %}
+</div>
 
 {% include "hub/modules/form_modal.html" with add="Standort Hinzufügen" action="" name="location" forms=form %}
+{% include "hub/modules/delete_modal.html" with name="location" %}
 
 {% endblock %}
 

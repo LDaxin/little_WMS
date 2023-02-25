@@ -10,9 +10,15 @@ from django.db.models import Q
 
 # Create your views here.
 
+
+
+
 @login_required(login_url='/accounts/login/')
 def hub(request):
     return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search'], "type":Type.objects.all()})
+
+
+
 
 @login_required(login_url='/accounts/login/')
 def locations(request):
@@ -24,6 +30,9 @@ def locations(request):
     else:
         form =Form_location()
     return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
+
+
+
 
 @login_required(login_url='/accounts/login/')
 def results(request):

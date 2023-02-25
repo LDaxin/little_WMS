@@ -4,8 +4,12 @@
 
 {% include "hub/modules/search.html" %}
 
-{% include "hub/modules/plus.html" %}
+<div class="fixed-bottom  m-3">
+    {% include "hub/modules/plus.html" %}
+    {% include "hub/modules/minus.html" %}
+</div>
 
 {% include "hub/modules/form_modal.html" with typ=typ %}
+{% include "hub/modules/delete_modal.html" %}
 
 {% endblock %}

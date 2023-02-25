@@ -5,8 +5,12 @@
 
 {% include "hub/modules/search.html" with type="shelf" %}
 
-{% include "hub/modules/plus.html" with name="shelf" %}
+<div class="fixed-bottom  m-3">
+    {% include "hub/modules/plus.html" with name="shelf" %}
+    {% include "hub/modules/minus.html" with name="shelf" %}
+</div>
 
 {% include "hub/modules/form_modal.html" with add="Lager Hinzufügen" action="/manage/" name="shelf" forms=form %}
+{% include "hub/modules/delete_modal.html" with name="shelf" %}
 
 {% endblock %}

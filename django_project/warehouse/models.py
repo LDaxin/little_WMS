@@ -45,7 +45,7 @@ class Warehouse(models.Model):
     code = models.CharField(max_length=16, unique=True, editable=False)
 
     def __str__(self):
-        return self.name
+        return self.name + " " + self.code
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -68,7 +68,7 @@ class Storage(models.Model):
     code = models.CharField(max_length=16, unique=True, editable=False)
 
     def __str__(self):
-        return self.name
+        return self.name + " " + self.code
 
     def save(self, *args, **kwargs):
         if not self.code:
@@ -93,6 +93,9 @@ class Shelf(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
     
+    def __str__(self):
+        return self.name + " " + self.code
+
     def save(self, *args, **kwargs):
         if not self.code:
             code = self.storage.code[:10] 
@@ -123,6 +126,8 @@ class Compartment(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
     
+    def __str__(self):
+        return self.name + " " + self.code
 
     def save(self, *args, **kwargs):
         if not self.code:

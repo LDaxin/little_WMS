@@ -4,9 +4,13 @@
 
 {% include "hub/modules/search.html" with type="storage" %}
 
-{% include "hub/modules/plus.html" with name="storage" %}
+<div class="fixed-bottom  m-3">
+    {% include "hub/modules/plus.html" with name="storage" %}
+    {% include "hub/modules/minus.html" with name="storage" %}
+</div>
 
 {% include "hub/modules/form_modal.html" with add="Lagereinheit Hinzufügen" action="/manage/" name="storage" forms=form %}
+{% include "hub/modules/delete_modal.html" with name="storage" %}
 
 {% endblock %}
 

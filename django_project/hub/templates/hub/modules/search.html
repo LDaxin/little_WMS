@@ -5,13 +5,13 @@
 <div class="d-flex p-2">
     <div class="input-group">
         <input id={{searchFieldName}} placeholder="Suche" class="form-control">
-  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-    Button with data-bs-target
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRSearch" aria-expanded="false" aria-controls="switchQRSearch">
+      QR
   </button>
 
     </div>
 </div>
-        <div class="collapse" id="collapseExample">
+        <div class="collapse" id="switchQRSearch">
             {% include "hub/modules/scanner.html" with input=searchFieldName %}
         </div>
 

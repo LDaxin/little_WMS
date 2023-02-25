@@ -1,0 +1,40 @@
+
+<div class="modal fade" id="sub{{ name }}" tabindex="-1" aria-labelledby="sub{{name}}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="subLocationLabel">Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    do you realy want to delete these items:
+                </p>
+                <ul id="del_list">
+                    
+                </ul>
+
+                
+                <form method="POST" action="{{name}}">
+                    <button type="submit" class="btn btn-danger" name="sub_">Delete</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).on("change", ".checkboxlist", function(){
+        if(this.checked){
+            $("#del_list").append("<li id='"+ this.id +"_'> "+ this.value +" </li>");
+        }else{
+            $("#"+ this.id +"_").remove();
+        }
+    });
+
+</script>
+
