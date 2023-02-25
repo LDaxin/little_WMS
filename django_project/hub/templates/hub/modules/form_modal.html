@@ -34,7 +34,7 @@
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
-                    <button type="submit" class="btn btn-success" id="addButton">Add</button>
+                    <button type="submit" class="btn btn-success" id="addButton" data-bs-dismiss="modal" >Add</button>
                 </form>
 
             </div>
@@ -57,6 +57,7 @@
                 data: form.serialize(), // serializes the form's elements.
                 success: function(data)
                 {
+                    lResults($('#{{searchFieldName}}').val());
                     $(".toast-container").append(data);
                 }
             });
