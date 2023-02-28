@@ -65,7 +65,8 @@ def addPart(request, typ):
                 if p.is_valid():
                     pa = p.save()
                     return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
-            return HttpResponseNotFound('<h1>Page not found</h1>')
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
     
 
 

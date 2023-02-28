@@ -22,14 +22,18 @@ def hub(request):
 
 @login_required(login_url='/accounts/login/')
 def locations(request):
+    return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
+
+
+@login_required(login_url='/accounts/login/')
+def addLocation(request):
     if request.method == "POST":
         l = Form_location(request.POST)
         if l.is_valid():
             location = l.save()
             location.save()
-    else:
-        form =Form_location()
-    return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
+            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(location) + " was added to your system.", "toastType":"status"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
 
 
