@@ -68,7 +68,32 @@ def addPart(request, typ):
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
     
+@login_required(login_url='/accounts/login/')
+def delPart(request, typ):
 
+    t = Type.objects.get(tName__exact=typ)
+    
+    if t == None:
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no part type named " + typ, "toastType":"alert"})
+    else:
+        if request.method == "POST":
+            delList = []
+            delListReturn = ""
+            for key, value in request.POST.items():
+                if key[0:1] == '_':
+                    try:
+                        pa = Part.objects.filter(template__pType__tName__exact=typ, pk=value).first()
+                        delList.append(pa)
+                    except Exception as e:
+                        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+            for i in delList:
+                delListReturn = delListReturn + i.__str__() + " "
+                i.deleted = True
+                i.save()
+
+            return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
 def part(request, typ, part_id):

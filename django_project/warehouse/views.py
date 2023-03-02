@@ -7,7 +7,6 @@ from django.contrib.auth.decorators import login_required
 def warehouses(request):
     return render(request, "warehouse/warehouses.html", context={"list": Warehouse.objects.all(), "searchFieldName":"warehouseSearch", "form":[FormWarehouse]})
 
-
 @login_required(login_url='/accounts/login/')
 def addWarehouse(request):
     if request.method == "POST":
@@ -20,6 +19,29 @@ def addWarehouse(request):
             war = warehouse.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(warehouse) + " was added to your system.", "toastType":"status"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
+
+@login_required(login_url='/accounts/login/')
+def delWarehouse(request):
+    if request.method == "POST":
+        delList = []
+        delListReturn = ""
+        for key, value in request.POST.items():
+            if key[0:1] == '_':
+                try:
+                    pa = Warehouse.objects.filter(pk=value).first()
+                    delList.append(pa)
+                except Exception as e:
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+        for i in delList:
+            delListReturn = delListReturn + i.__str__() + " "
+            i.deleted = True
+            i.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
 
 
 @login_required(login_url='/accounts/login/')
@@ -38,6 +60,28 @@ def addStorage(request):
             so = storage.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(storage) + " was added to your system.", "toastType":"status"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
+@login_required(login_url='/accounts/login/')
+def delStorage(request):
+    if request.method == "POST":
+        delList = []
+        delListReturn = ""
+        for key, value in request.POST.items():
+            if key[0:1] == '_':
+                try:
+                    pa = Storage.objects.filter(pk=value).first()
+                    delList.append(pa)
+                except Exception as e:
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+        for i in delList:
+            delListReturn = delListReturn + i.__str__() + " "
+            i.deleted = True
+            i.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
 
 
 @login_required(login_url='/accounts/login/')
@@ -71,6 +115,29 @@ def addShelf(request):
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":sh + " was added to your system. with "+ str(num) + "Compartments" , "toastType":"status"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
+@login_required(login_url='/accounts/login/')
+def delShelf(request):
+    if request.method == "POST":
+        delList = []
+        delListReturn = ""
+        for key, value in request.POST.items():
+            if key[0:1] == '_':
+                try:
+                    pa = Shelf.objects.filter(pk=value).first()
+                    delList.append(pa)
+                except Exception as e:
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+        for i in delList:
+            delListReturn = delListReturn + i.__str__() + " "
+            i.deleted = True
+            i.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
+
+
 
 @login_required(login_url='/accounts/login/')
 def compartments(request):
@@ -79,4 +146,25 @@ def compartments(request):
 
 @login_required(login_url='/accounts/login/')
 def addCompartment(request):
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
+@login_required(login_url='/accounts/login/')
+def delCompartment(request):
+    if request.method == "POST":
+        delList = []
+        delListReturn = ""
+        for key, value in request.POST.items():
+            if key[0:1] == '_':
+                try:
+                    pa = Compartment.objects.filter(pk=value).first()
+                    delList.append(pa)
+                except Exception as e:
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+        for i in delList:
+            delListReturn = delListReturn + i.__str__() + " "
+            i.deleted = True
+            i.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})

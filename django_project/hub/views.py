@@ -24,6 +24,27 @@ def hub(request):
 def locations(request):
     return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
 
+@login_required(login_url='/accounts/login/')
+def delLocation(request):
+    if request.method == "POST":
+        delList = []
+        delListReturn = ""
+        for key, value in request.POST.items():
+            if key[0:1] == '_':
+                try:
+                    pa = Location.objects.filter(pk=value).first()
+                    delList.append(pa)
+                except Exception as e:
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+        for i in delList:
+            delListReturn = delListReturn + i.__str__() + " "
+            i.deleted = True
+            i.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+
 
 @login_required(login_url='/accounts/login/')
 def addLocation(request):
