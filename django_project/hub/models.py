@@ -15,5 +15,7 @@ class Location(models.Model):
     modern_what3words = models.CharField(max_length=100, null=True)
     modern_what3words_lang = models.CharField(max_length=50, null=True)
 
+    deleted = models.BooleanField(default=False, null=True, blank=True)
+
     def __str__(self):
         return self.traditional_land + " " + self.traditional_country + " " + self.traditional_zipcode  + " " + self.traditional_street  + " " + self.traditional_street_number

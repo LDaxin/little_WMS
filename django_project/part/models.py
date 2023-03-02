@@ -133,6 +133,8 @@ class Part(models.Model):
 
     code = models.CharField(max_length=16, unique=True, editable=False)
 
+    deleted = models.BooleanField(default=False, null=True, blank=True)
+
     def __str__(self):
         return self.template.name + " " + self.code
     

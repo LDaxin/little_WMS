@@ -44,6 +44,8 @@ class Warehouse(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
 
+    deleted = models.BooleanField(default=False, null=True, blank=True)
+
     def __str__(self):
         return self.name + " " + self.code
 
@@ -66,6 +68,8 @@ class Storage(models.Model):
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
+
+    deleted = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + self.code
@@ -92,6 +96,8 @@ class Shelf(models.Model):
     
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
+
+    deleted = models.BooleanField(default=False, null=True, blank=True)
     
     def __str__(self):
         return self.name + " " + self.code
@@ -125,6 +131,8 @@ class Compartment(models.Model):
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
+
+    deleted = models.BooleanField(default=False, null=True, blank=True)
     
     def __str__(self):
         return self.name + " " + self.code
