@@ -88,8 +88,7 @@ def delPart(request, typ):
                         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
             for i in delList:
                 delListReturn = delListReturn + i.__str__() + " "
-                i.deleted = True
-                i.save()
+                i.delete()
 
             return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
 

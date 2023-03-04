@@ -1,7 +1,8 @@
 from django.db import models
+from softdelete.models import SoftDeleteObject
 
 # Create your models here.
-class Location(models.Model):
+class Location(SoftDeleteObject, models.Model):
     traditional_land = models.CharField(max_length=50)
     traditional_country = models.CharField(max_length=50)
     traditional_city = models.CharField(max_length=50)
@@ -14,8 +15,6 @@ class Location(models.Model):
 
     modern_what3words = models.CharField(max_length=100, null=True)
     modern_what3words_lang = models.CharField(max_length=50, null=True)
-
-    deleted = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.traditional_land + " " + self.traditional_country + " " + self.traditional_zipcode  + " " + self.traditional_street  + " " + self.traditional_street_number

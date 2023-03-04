@@ -28,13 +28,13 @@ DEBUG = True
 ALLOWED_HOSTS = []
 LOGIN_REDIRECT_URL = "/"
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'hub.apps.HubConfig',
     'part.apps.PartConfig',
     'warehouse.apps.WarehouseConfig',
+    'softdelete',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

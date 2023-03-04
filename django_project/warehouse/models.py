@@ -1,13 +1,14 @@
 from django.db import models
 from hub import models as hub_models
 from hub.countsystem import System
+from softdelete.models import SoftDeleteObject
 # Create your models here.
 
 s = System()
 
 
 #TODO test if the query will return all stored things even the Container wenn the input is ready
-class Stored(models.Model):
+class Stored(SoftDeleteObject, models.Model):
     def __str__(self):
         mo = Warehouse.objects.filter(ref_id=self.id).first()
         if mo != None:
@@ -36,7 +37,7 @@ class Stored(models.Model):
 
         return code
 
-class Warehouse(models.Model):
+class Warehouse(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=100)
 
     location = models.ForeignKey(hub_models.Location, on_delete=models.CASCADE)
@@ -44,7 +45,6 @@ class Warehouse(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
 
-    deleted = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + self.code
@@ -61,7 +61,7 @@ class Warehouse(models.Model):
             self.code = code
         super().save(*args, **kwargs)
 
-class Storage(models.Model):
+class Storage(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=100)
 
     warehouse = models.ForeignKey(Warehouse, on_delete=models.CASCADE)
@@ -69,7 +69,6 @@ class Storage(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
 
-    deleted = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.name + " " + self.code
@@ -87,7 +86,7 @@ class Storage(models.Model):
             self.code = code
         super().save(*args, **kwargs)
 
-class Shelf(models.Model):
+class Shelf(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=100)
     storage = models.ForeignKey(Storage, on_delete=models.CASCADE)
 
@@ -97,7 +96,6 @@ class Shelf(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
 
-    deleted = models.BooleanField(default=False, null=True, blank=True)
     
     def __str__(self):
         return self.name + " " + self.code
@@ -118,7 +116,7 @@ class Shelf(models.Model):
             self.name = name
         super().save(*args, **kwargs)
 
-class Compartment(models.Model):
+class Compartment(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=100)
     shelf = models.ForeignKey(Shelf, on_delete=models.CASCADE)
 
@@ -132,7 +130,6 @@ class Compartment(models.Model):
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
     code = models.CharField(max_length=16, unique=True, editable=False)
 
-    deleted = models.BooleanField(default=False, null=True, blank=True)
     
     def __str__(self):
         return self.name + " " + self.code

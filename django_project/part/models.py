@@ -1,6 +1,7 @@
 from django.db import models
 from warehouse.models import Stored
 from hub.countsystem import System
+from softdelete.models import SoftDeleteObject
 #from maintenance.models import Plan
 #from maintenance.models import Log
 
@@ -16,7 +17,8 @@ In der class Part is the unice Data is stored
 s = System()
 
 
-class Tag(models.Model):
+
+class Tag(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
@@ -26,7 +28,9 @@ class Tag(models.Model):
         else:
             return self.name
 
-class Unit(models.Model):
+
+
+class Unit(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     symbol = models.CharField(max_length=4)
     maximum = models.BigIntegerField(null=True, blank=True)
@@ -38,7 +42,7 @@ class Unit(models.Model):
 #---------------------------------------------------------------------------
 # The Part model is were the unice value is stored
 
-class Type(models.Model):
+class Type(SoftDeleteObject, models.Model):
     tName = models.CharField(max_length=20)
     tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
@@ -72,13 +76,13 @@ class Type(models.Model):
     def __str__(self):
         return self.tName
 
-class Template(models.Model):
+class Template(SoftDeleteObject, models.Model):
 
-    name = models.CharField(max_length=20) 
+    name = models.CharField(max_length=20)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
 
     description = models.TextField(null=True, blank=True)
-    
+
     alias = models.CharField(max_length=400, null=True, blank=True)
 
     pType = models.ForeignKey(Type, on_delete=models.PROTECT, blank=True)
@@ -96,10 +100,11 @@ class Template(models.Model):
     tag = models.ManyToManyField(Tag, blank=True)
 
     code = models.CharField(max_length=16, unique=True, editable=False)
-    
+
     def __str__(self):
         return self.name
-    
+
+
     def save(self, *args, **kwargs):
         if not self.code:
             if len(self.name) < 5:
@@ -117,8 +122,7 @@ class Template(models.Model):
 
         super().save(*args, **kwargs)
 
-
-class Part(models.Model):
+class Part(SoftDeleteObject, models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
     count = models.IntegerField(default=1, blank=True)
     weight = models.IntegerField(null=True, blank=True)
@@ -133,7 +137,6 @@ class Part(models.Model):
 
     code = models.CharField(max_length=16, unique=True, editable=False)
 
-    deleted = models.BooleanField(default=False, null=True, blank=True)
 
     def __str__(self):
         return self.template.name + " " + self.code
