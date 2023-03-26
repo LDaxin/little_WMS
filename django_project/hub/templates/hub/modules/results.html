@@ -1,14 +1,16 @@
+{% load static %}
 {% for r in results %}
-        <tr>
+
+    <tr id="{{ r.id }}_item" value="{{ r.id }}">
 
             <td>
                 <input class="checkboxlist form-check-input" type="checkbox" value="{{r}}" id="{{ r.id }}">
             </td>
 
             {% if type == "part" %}
-            <td>{{ r.template.name }}</td>
-            <td>{{r.code}}</td>
-            <td>{{r.count}}</td>
+            <td class='itemClick_'>{{ r.template.name }}</td>
+            <td class='itemClick_'>{{r.code}}</td>
+            <td class='itemClick_'>{{r.count}}</td>
 
             {% elif type == "location" %}
             <td>{{ r.name }}</td>
@@ -20,5 +22,16 @@
             <td>{{ r.name }}</td>
             <td>{{r.code}}</td>
             {% endif %}
+
+            <td>
+                <button type="button" class="btn btn-light itemClick">
+                    <img style="width:10px" src="{% static 'hub/SVG/pencil-fill.svg' %}">
+                </button>
+            </td>
+            <td>
+                <button type="button" class="btn btn-light itemClick">
+                    <img style="width:10px" src="{% static 'hub/SVG/eye-fill.svg' %}">
+                </button>
+            </td>
         </tr>
 {% endfor %}
