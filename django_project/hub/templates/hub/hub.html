@@ -6,12 +6,12 @@
 
     {% for l in fields %}
 
-        {% if l == "Part" %}
+        {% if l == "Article" %}
 
         {% for t in paType %}
         <div class="col-6 col-sm-4 p-2">
 
-            <a class="card-block text-decorations-none" href="part/{{t.tName|lower}}">
+            <a class="card-block text-decorations-none" href="article/{{t.tName|lower}}">
                 <div class="card p-2 justify-content-between align-items-center">
                     <div class"=card-body ">
                         <img style="width:100px" src="{% static 'hub/SVG/'|add:t.tSymbol|add:'.svg' %}">

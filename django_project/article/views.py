@@ -19,7 +19,7 @@ def fListGen(typ):
                             fList.append(field.name)
             except AttributeError:
                 pass
-        for field in Part._meta.get_fields():
+        for field in Article._meta.get_fields():
             try:
                 if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
                     for notField in notList:
@@ -32,7 +32,7 @@ def fListGen(typ):
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 @login_required(login_url='/accounts/login/')
-def parts(request, typ):
+def articles(request, typ):
 
     t = Type.objects.get(tName__exact=typ)
 
@@ -40,24 +40,24 @@ def parts(request, typ):
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
         fList = fListGen(t)
-        return render(request, "part/parts.html", context={"symbol":t.tSymbol, "searchFieldName":"partSearch" + t.tName, 'type':"part", "name":typ, "form":[FormTemplatePart , FormPartBase], "l":fList, "typ":typ})
+        return render(request, "article/articles.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle , FormArticleBase], "l":fList, "typ":typ})
 
 @login_required(login_url='/accounts/login/')
-def addPart(request, typ):
+def addArticle(request, typ):
 
     t = Type.objects.get(tName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no part type named " + typ, "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
     else:
         if request.method == "POST":
             re = request.POST.copy()
             re["pType"] = str(t.id) 
-            te = FormTemplatePart(re)
+            te = FormTemplateArticle(re)
             if te.is_valid():
                 template = te.save()
                 re["template"] = template 
-                p = FormPartBase(re)
+                p = FormArticleBase(re)
                 if t.ref:
                     ref = Stored()
                     ref.save()
@@ -69,12 +69,12 @@ def addPart(request, typ):
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
     
 @login_required(login_url='/accounts/login/')
-def delPart(request, typ):
+def delArticle(request, typ):
 
     t = Type.objects.get(tName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no part type named " + typ, "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
     else:
         if request.method == "POST":
             delList = []
@@ -82,7 +82,7 @@ def delPart(request, typ):
             for key, value in request.POST.items():
                 if key[0:1] == '_':
                     try:
-                        pa = Part.objects.filter(template__pType__tName__exact=typ, pk=value).first()
+                        pa = Article.objects.filter(template__pType__tName__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
                         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
@@ -95,15 +95,15 @@ def delPart(request, typ):
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
-def part(request, typ, part_id):
+def article(request, typ, article_id):
 
     try:
-        p = Part.objects.get(pk=part_id)
+        p = Article.objects.get(pk=article_id)
         if p.template.pType.tName == typ:
             fList = fListGen(p.template.pType)
-            temp = FormTemplatePart(instance=p.template)
-            par = FormPartBase(instance=p)
-            return render(request, "part/modules/part.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par], "l":fList, "typ":typ})
+            temp = FormTemplateArticle(instance=p.template)
+            par = FormArticleBase(instance=p)
+            return render(request, "article/modules/article.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par], "l":fList, "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -111,15 +111,15 @@ def part(request, typ, part_id):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
-def partIncert(request, typ, part_id):
+def articleIncert(request, typ, article_id):
 
     try:
-        p = Part.objects.get(pk=part_id)
+        p = Article.objects.get(pk=article_id)
         if p.template.pType.tName == typ:
             fList = fListGen(p.template.pType)
-            temp = FormTemplatePart(instance=p.template)
-            par = FormPartBase(instance=p)
-            return render(request, "part/modules/partIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par], "l":fList, "typ":typ})
+            temp = FormTemplateArticle(instance=p.template)
+            par = FormArticleBase(instance=p)
+            return render(request, "article/modules/articleIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par], "l":fList, "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -135,4 +135,4 @@ def tag(request):
         if t.is_valid():
             tag = t.save()
             tag.save()
-    return render(request, "part/tag.html", context={"list":Tag.objects.all(), "form":[FormTag]})
+    return render(request, "article/tag.html", context={"list":Tag.objects.all(), "form":[FormTag]})

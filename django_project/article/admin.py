@@ -1,9 +1,9 @@
 from django.contrib import admin
-from part.models import *
+from article.models import *
 
 # Register your models here.
 
-admin.site.register(Part)
+admin.site.register(Article)
 admin.site.register(Template)
 admin.site.register(Type)
 admin.site.register(Unit)

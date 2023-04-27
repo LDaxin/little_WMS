@@ -32,7 +32,7 @@ LOGIN_REDIRECT_URL = "/"
 
 INSTALLED_APPS = [
     'hub.apps.HubConfig',
-    'part.apps.PartConfig',
+    'article.apps.ArticleConfig',
     'storage.apps.StorageConfig',
     'softdelete',
     'django.contrib.admin',

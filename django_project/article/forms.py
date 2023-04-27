@@ -19,23 +19,23 @@ class FormTag(forms.ModelForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
-class FormTemplatePart(forms.ModelForm):
+class FormTemplateArticle(forms.ModelForm):
 
     class Meta:
         model = Template
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-        super(FormTemplatePart, self).__init__(*args, **kwargs)
+        super(FormTemplateArticle, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
-class  FormPartBase(forms.ModelForm):
+class  FormArticleBase(forms.ModelForm):
 
     class Meta:
-        model = Part
+        model = Article
         fields ='__all__' 
     def __init__(self, *args, **kwargs):
-        super(FormPartBase, self).__init__(*args, **kwargs)
+        super(FormArticleBase, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"

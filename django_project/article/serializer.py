@@ -2,8 +2,8 @@ from re import template
 from rest_framework import serializers
 from . import models
 
-class PartSerializer(serializers.ModelSerializer):
+class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Part
+        model = models.Article
         fields = ('id', 'template', 'tag')
         

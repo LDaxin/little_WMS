@@ -9,9 +9,9 @@ from softdelete.models import SoftDeleteObject
 # Create your models here.
 
 """
-The Part model holds all parts and information about the Parts.
+The Article model holds all articles and information about the Articles.
 
-In der class Part is the unice Data is stored 
+In der class Article is the unice Data is stored 
 """
 
 s = System()
@@ -38,7 +38,7 @@ class Unit(SoftDeleteObject, models.Model):
         return self.name
 
 #---------------------------------------------------------------------------
-# The Part model is were the unice value is stored
+# The Article model is were the unice value is stored
 
 class Type(SoftDeleteObject, models.Model):
     tName = models.CharField(max_length=20)
@@ -106,10 +106,10 @@ class Template(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             if len(self.name) < 5:
-                name_part = self.name + "00000"[len(self.name):]
+                name_article = self.name + "00000"[len(self.name):]
             else:
-                name_part = self.name[:5]
-            code = self.pType.tShort + name_part.upper().replace(" ", "")
+                name_article = self.name[:5]
+            code = self.pType.tShort + name_article.upper().replace(" ", "")
             try:
                 number = Template.objects.filter(code__startswith=code).last().code[7:9]
                 number = s.up(number)
@@ -120,7 +120,7 @@ class Template(SoftDeleteObject, models.Model):
 
         super().save(*args, **kwargs)
 
-class Part(SoftDeleteObject, models.Model):
+class Article(SoftDeleteObject, models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
     count = models.IntegerField(default=1, blank=True)
     weight = models.IntegerField(null=True, blank=True)
@@ -143,7 +143,7 @@ class Part(SoftDeleteObject, models.Model):
         if not self.code:
             code = self.template.code[:9]
             try:
-                number = Part.objects.filter(code__startswith=code).last().code[9:]
+                number = Article.objects.filter(code__startswith=code).last().code[9:]
                 number = s.up(number)
                 code = code + number
             except AttributeError:
