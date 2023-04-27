@@ -33,7 +33,7 @@ LOGIN_REDIRECT_URL = "/"
 INSTALLED_APPS = [
     'hub.apps.HubConfig',
     'part.apps.PartConfig',
-    'warehouse.apps.WarehouseConfig',
+    'storage.apps.StorageConfig',
     'softdelete',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from warehouse.models import *
+from storage.models import *
 
 # Register your models here.
 admin.site.register(Type)

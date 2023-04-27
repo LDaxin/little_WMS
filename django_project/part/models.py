@@ -1,5 +1,5 @@
 from django.db import models
-from warehouse.models import Stored
+from storage.models import Stored
 from hub.countsystem import System
 from softdelete.models import SoftDeleteObject
 #from maintenance.models import Plan

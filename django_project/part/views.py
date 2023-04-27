@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
 from django.core.exceptions import ObjectDoesNotExist
-from warehouse.models import Stored
+from storage.models import Stored
 from django.contrib.auth.decorators import login_required
 
 

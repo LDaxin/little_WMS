@@ -3,7 +3,7 @@
 The html s are sorted in the different applications 
 - hub
 - part
-- warehouse
+- storage
 - registration
 
 In this folders are the base html witch are build with includes of modules and extends the header.html.

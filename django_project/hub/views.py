@@ -3,8 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from .models import *
 import part.models as pa
-#from warehouse.models import *
-import warehouse.models as st
+#from storage.models import *
+import storage.models as st
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -72,12 +72,12 @@ def results(request):
                 r = Part.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__contains=request.GET['search']), template__pType__tName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"part"})
 
-        elif request.GET['type']=="warehouse":
+        elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":
-                r = Warehouse.objects.all()
+                r = Storage.objects.all()
             else:
-                r = Warehouse.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
-            return render(request, "hub/modules/results.html", context={"results":r, "type":"warehouse"})
+                r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
         elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":

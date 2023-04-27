@@ -6,11 +6,11 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/accounts/login/')
 def storage(request):
-    return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
+    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
 def storages(request, typ):
-    return render(request, "warehouse/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
+    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
 def addStorage(request):
