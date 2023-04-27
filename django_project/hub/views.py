@@ -2,8 +2,10 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from .models import *
-from part.models import *
-from warehouse.models import *
+#from part.models import *
+import part.models as pa
+#from warehouse.models import *
+import warehouse.models as st
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -15,7 +17,8 @@ from django.db.models import Q
 
 @login_required(login_url='/accounts/login/')
 def hub(request):
-    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Shelf', 'Storage', 'Warehouse', 'Location', 'Search'], "type":Type.objects.all()})
+    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Check_in', 'Check_out', 'Part', 'Storage'], "paType":pa.Type.objects.all(), "stType":st.Type.objects.all()})
+
 
 
 

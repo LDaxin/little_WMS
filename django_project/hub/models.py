@@ -18,3 +18,8 @@ class Location(SoftDeleteObject, models.Model):
 
     def __str__(self):
         return self.traditional_land + " " + self.traditional_country + " " + self.traditional_zipcode  + " " + self.traditional_street  + " " + self.traditional_street_number
+
+
+class Code(SoftDeleteObject, models.Model):
+    length = models.IntegerField(default = 16)
+

@@ -1,0 +1,29 @@
+
+<div class="modal fade" id="add{{ name }}" tabindex="-1" aria-labelledby="add{{name}}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="addLocationLabel">{{ title }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body" id="modal-{{modalName}}">
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(".itemClick").click(function(){
+        console.log("click");
+        $("#add{{name}}").modal("show");
+
+        $.get("/" + this.value , function(data){
+            $("#results").html(data)
+        });
+    });
+</script>
