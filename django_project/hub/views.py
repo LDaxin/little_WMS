@@ -2,7 +2,6 @@ from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from .models import *
-#from part.models import *
 import part.models as pa
 #from warehouse.models import *
 import warehouse.models as st
