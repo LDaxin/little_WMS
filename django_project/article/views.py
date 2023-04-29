@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 def fListGen(typ):
     fList = []
     notList =["ref"]
-    for enableField in Type._meta.get_fields():
+    for enableField in ArticleType._meta.get_fields():
         for field in Template._meta.get_fields():
             try:
                 if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
@@ -34,7 +34,7 @@ def fListGen(typ):
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
 
-    t = Type.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(tName__exact=typ)
 
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -45,7 +45,7 @@ def articles(request, typ):
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
 
-    t = Type.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(tName__exact=typ)
     
     if t == None:
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
@@ -71,7 +71,7 @@ def addArticle(request, typ):
 @login_required(login_url='/accounts/login/')
 def delArticle(request, typ):
 
-    t = Type.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(tName__exact=typ)
     
     if t == None:
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})

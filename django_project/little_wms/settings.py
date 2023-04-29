@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'hub.apps.HubConfig',
     'article.apps.ArticleConfig',
     'storage.apps.StorageConfig',
+    'codeSystem.apps.CodeSystemConfig',
     'softdelete',
     'django.contrib.admin',
     'django.contrib.auth',

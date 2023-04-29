@@ -3,23 +3,22 @@ from softdelete.models import SoftDeleteObject
 
 # Create your models here.
 class Location(SoftDeleteObject, models.Model):
-    traditional_land = models.CharField(max_length=50)
-    traditional_country = models.CharField(max_length=50)
-    traditional_city = models.CharField(max_length=50)
-    traditional_zipcode = models.CharField(max_length=15)
-    traditional_street = models.CharField(max_length=200)
-    traditional_street_number = models.CharField(max_length=4)
+    traditionalLand = models.CharField(max_length=50)
+    traditionalCountry = models.CharField(max_length=50)
+    traditionalCity = models.CharField(max_length=50)
+    traditionalZipcode = models.CharField(max_length=15)
+    traditionalStreet = models.CharField(max_length=200)
+    traditionalStreetNumber = models.CharField(max_length=4)
 
-    modern_coordinates_longitude = models.FloatField(null=True)
-    modern_coordinates_latitude = models.FloatField(null=True)
+    modernCoordinatesLongitude = models.FloatField(null=True)
+    modernCoordinatesLatitude = models.FloatField(null=True)
 
-    modern_what3words = models.CharField(max_length=100, null=True)
-    modern_what3words_lang = models.CharField(max_length=50, null=True)
+    modernWhat3Words = models.CharField(max_length=100, null=True)
+    modernWhat3WordsLang = models.CharField(max_length=50, null=True)
 
     def __str__(self):
-        return self.traditional_land + " " + self.traditional_country + " " + self.traditional_zipcode  + " " + self.traditional_street  + " " + self.traditional_street_number
+        return self.traditionalLand + " " + self.traditionalCountry + " " + self.traditionalZipcode  + " " + self.traditionalStreet  + " " + self.traditionalStreetNumber
 
-
-class Code(SoftDeleteObject, models.Model):
-    length = models.IntegerField(default = 16)
+class Settings(SoftDeleteObject, models.Model):
+    storageDepth = models.IntegerField(default = 5)
 

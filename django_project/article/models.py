@@ -2,9 +2,7 @@ from django.db import models
 from storage.models import Stored
 from hub.countsystem import System
 from softdelete.models import SoftDeleteObject
-#from maintenance.models import Plan
-#from maintenance.models import Log
-
+from codeSystem.models import UuidCode
 
 # Create your models here.
 
@@ -16,17 +14,23 @@ In der class Article is the unice Data is stored
 
 s = System()
 
-
-
 class Tag(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
-    def __str__(self):
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = UuidCode().save()
+        super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
         if self.parent != None:
             return str(self.parent) + "/" + self.name
         else:
             return self.name
+
 
 class Unit(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
@@ -34,13 +38,20 @@ class Unit(SoftDeleteObject, models.Model):
     maximum = models.BigIntegerField(null=True, blank=True)
     minimum = models.BigIntegerField(default=0)
 
-    def __str__(self):
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = UuidCode().save()
+        super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
         return self.name
 
 #---------------------------------------------------------------------------
 # The Article model is were the unice value is stored
 
-class Type(SoftDeleteObject, models.Model):
+class ArticleType(SoftDeleteObject, models.Model):
     tName = models.CharField(max_length=20)
     tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
@@ -70,8 +81,14 @@ class Type(SoftDeleteObject, models.Model):
     length = models.BooleanField(default=False)
     pTag = models.BooleanField(default=False)
 
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
-    def __str__(self):
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = UuidCode().save()
+        super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
         return self.tName
 
 class Template(SoftDeleteObject, models.Model):
@@ -83,7 +100,7 @@ class Template(SoftDeleteObject, models.Model):
 
     alias = models.CharField(max_length=400, null=True, blank=True)
 
-    pType = models.ForeignKey(Type, on_delete=models.PROTECT, blank=True)
+    pType = models.ForeignKey(ArticleType, on_delete=models.PROTECT, blank=True)
 
     width = models.FloatField(null=True, blank=True)
     depth = models.FloatField(null=True, blank=True)
@@ -97,28 +114,16 @@ class Template(SoftDeleteObject, models.Model):
 
     tag = models.ManyToManyField(Tag, blank=True)
 
-    code = models.CharField(max_length=16, unique=True, editable=False)
-
-    def __str__(self):
-        return self.name
-
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         if not self.code:
-            if len(self.name) < 5:
-                name_article = self.name + "00000"[len(self.name):]
-            else:
-                name_article = self.name[:5]
-            code = self.pType.tShort + name_article.upper().replace(" ", "")
-            try:
-                number = Template.objects.filter(code__startswith=code).last().code[7:9]
-                number = s.up(number)
-                code = code + number + "0000000"
-            except AttributeError:
-                code = code + "000000000"
-            self.code = code
-
+            self.code = UuidCode().save()
         super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
+        return self.name
+
 
 class Article(SoftDeleteObject, models.Model):
     template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
@@ -133,23 +138,14 @@ class Article(SoftDeleteObject, models.Model):
 
     pTag = models.ManyToManyField(Tag, blank=True)
 
-    code = models.CharField(max_length=16, unique=True, editable=False)
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
-
-    def __str__(self):
-        return self.template.name + " " + self.code
-    
     def save(self, *args, **kwargs):
         if not self.code:
-            code = self.template.code[:9]
-            try:
-                number = Article.objects.filter(code__startswith=code).last().code[9:]
-                number = s.up(number)
-                code = code + number
-            except AttributeError:
-                code = code + "0000001"
+            self.code = UuidCode().save()
+        super().save(*args, **kwargs)
 
-            self.code = code
 
-        super().save(*args,**kwargs)
-
+    def __str__(self, *args, **kwargs):
+        return self.template.name + " " + self.code
+    

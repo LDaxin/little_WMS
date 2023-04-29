@@ -5,6 +5,6 @@ from article.models import *
 
 admin.site.register(Article)
 admin.site.register(Template)
-admin.site.register(Type)
+admin.site.register(ArticleType)
 admin.site.register(Unit)
 admin.site.register(Tag)

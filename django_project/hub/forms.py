@@ -5,20 +5,20 @@ class Form_location(forms.ModelForm):
     class Meta:
         model = Location
         fields = (
-            'traditional_land', 
-            'traditional_country',
-            'traditional_city',
-            'traditional_zipcode',
-            'traditional_street',
-            'traditional_street_number'
+            'traditionalLand', 
+            'traditionalCountry',
+            'traditionalCity',
+            'traditionalZipcode',
+            'traditionalStreet',
+            'traditionalStreetNumber'
          )
         labels = {
-            'traditional_land':("Land"), 
-            'traditional_country':("Bundesland"),
-            'traditional_city':("Stadt"),
-            'traditional_zipcode':("Postleitzahl"),
-            'traditional_street':("Straße"),
-            'traditional_street_number':("Nr.")
+            'traditionalLand':("Land"), 
+            'traditionalCountry':("Bundesland"),
+            'traditionalCity':("Stadt"),
+            'traditionalZipcode':("Postleitzahl"),
+            'traditionalStreet':("Straße"),
+            'traditionalStreetNumber':("Nr.")
         }
 
     def __init__(self, *args, **kwargs):
