@@ -14,4 +14,6 @@ class UuidCode(SoftDeleteObject, models.Model):
            self.code = code
        super().save(*args, **kwargs)
     
+   def __str__(self, *args, **kwargs):
+       return self.code
 

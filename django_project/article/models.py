@@ -22,7 +22,9 @@ class Tag(SoftDeleteObject, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = UuidCode().save()
+            uCode = UuidCode()
+            self.code = uCode
+            uCode.save()
         super().save(*args, **kwargs)
 
     def __str__(self, *args, **kwargs):
@@ -42,7 +44,9 @@ class Unit(SoftDeleteObject, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = UuidCode().save()
+            uCode = UuidCode()
+            self.code = uCode
+            uCode.save()
         super().save(*args, **kwargs)
 
     def __str__(self, *args, **kwargs):
@@ -85,7 +89,9 @@ class ArticleType(SoftDeleteObject, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = UuidCode().save()
+            uCode = UuidCode()
+            self.code = uCode
+            uCode.save()
         super().save(*args, **kwargs)
 
     def __str__(self, *args, **kwargs):
@@ -118,7 +124,9 @@ class Template(SoftDeleteObject, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = UuidCode().save()
+            uCode = UuidCode()
+            self.code = uCode
+            uCode.save()
         super().save(*args, **kwargs)
 
     def __str__(self, *args, **kwargs):
@@ -142,10 +150,12 @@ class Article(SoftDeleteObject, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.code:
-            self.code = UuidCode().save()
+            uCode = UuidCode()
+            self.code = uCode
+            uCode.save()
         super().save(*args, **kwargs)
 
 
     def __str__(self, *args, **kwargs):
-        return self.template.name + " " + self.code
+        return self.template.name + " " + self.code.code
     
