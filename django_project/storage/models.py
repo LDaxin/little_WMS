@@ -20,13 +20,7 @@ codeStyleChoices=[('numeric', 'numeric'), ('alphaNumeric', 'alphaNumeric')]
 
 class StorageType(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
-    stage = models.IntegerField(validators=[validators.MaxValueValidator(100),validators.MinValueValidator(0)])
     symbol = models.CharField(max_length=20)
-    prefix = models.CharField(max_length=2)
-
-    codeLength = models.IntegerField(validators=[validators.MaxValueValidator(200),validators.MinValueValidator(1)])
-    codeStyle = models.CharField(choices= codeStyleChoices,  max_length=20)
-    codePrefix = models.BooleanField(default=False)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
