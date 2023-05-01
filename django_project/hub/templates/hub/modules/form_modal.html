@@ -47,6 +47,7 @@
     $("#addButton").on("click", function(){
         $("#addForm").submit(function(e){
             e.preventDefault();
+            e.stopImmediatePropagation();
 
             var form = $(this);
             var actionUrl = form.attr('action');
@@ -59,8 +60,11 @@
                 {
                     lResults($('#{{searchFieldName}}').val());
                     $(".toast-container").append(data);
+
                 }
             });
+
+            return false;
         });
     });
 </script>
