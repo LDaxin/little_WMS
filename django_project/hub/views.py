@@ -75,28 +75,8 @@ def results(request):
 
         elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":
-                r = Storage.objects.all()
+                r = st.Storage.objects.all()
             else:
-                r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
+                r = st.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
-        elif request.GET['type']=="storage":
-            if request.GET['search'] == "NONE":
-                r = Storage.objects.all()
-            else:
-                r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
-            return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
-
-        elif request.GET['type']=="shelf":
-            if request.GET['search'] == "NONE":
-                r = Shelf.objects.all()
-            else:
-                r = Shelf.objects.filter(code__contains=request.GET['search'])
-            return render(request, "hub/modules/results.html", context={"results":r, "type":"shelf"})
-
-        elif request.GET['type']=="location":
-            if request.GET['search'] == "NONE":
-                r = Location.objects.all()
-            else:
-                r = Location.objects.filter(Q(code__contains=request.GET['search']))
-            return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})

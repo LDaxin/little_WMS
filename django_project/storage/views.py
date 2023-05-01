@@ -3,9 +3,8 @@ from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 
-
 @login_required(login_url='/accounts/login/')
-def storage(request):
+def storage(request, typ):
     return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
@@ -13,20 +12,25 @@ def storages(request, typ):
     return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
-def addStorage(request):
+def addStorage(request, typ):
+
+    t = StorageType.objects.get(lowerName__exact=typ)
+
     if request.method == "POST":
         s = FormStorage(request.POST)
         if s.is_valid():
             storage = s.save(commit=False)
             ref = Stored()
             ref.save()
+            storage.typ = t
             storage.ref = ref
             so = storage.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(storage) + " was added to your system.", "toastType":"status"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
-def delStorage(request):
+def delStorage(request, typ):
     if request.method == "POST":
         delList = []
         delListReturn = ""

@@ -57,6 +57,7 @@ class Unit(SoftDeleteObject, models.Model):
 
 class ArticleType(SoftDeleteObject, models.Model):
     tName = models.CharField(max_length=20)
+    lowerName = models.CharField(max_length=200, blank=True)
     tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
 
@@ -88,6 +89,7 @@ class ArticleType(SoftDeleteObject, models.Model):
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
+        self.lowerName = self.tName.lower()
         if not self.code:
             uCode = UuidCode()
             self.code = uCode

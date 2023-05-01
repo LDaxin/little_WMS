@@ -34,7 +34,7 @@ def fListGen(typ):
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
 
-    t = ArticleType.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(lowerName__exact=typ)
 
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -45,7 +45,7 @@ def articles(request, typ):
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
 
-    t = ArticleType.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
@@ -71,7 +71,7 @@ def addArticle(request, typ):
 @login_required(login_url='/accounts/login/')
 def delArticle(request, typ):
 
-    t = ArticleType.objects.get(tName__exact=typ)
+    t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})

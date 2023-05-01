@@ -20,21 +20,23 @@ codeStyleChoices=[('numeric', 'numeric'), ('alphaNumeric', 'alphaNumeric')]
 
 class StorageType(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
+    lowerName = models.CharField(max_length=200, blank=True)
     symbol = models.CharField(max_length=20)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
+        self.lowerName = self.name.lower()
         if not self.code:
             uCode = UuidCode()
             self.code = uCode
             uCode.save()
         super().save(*args, **kwargs)
 
+
 class Storage(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
-
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
