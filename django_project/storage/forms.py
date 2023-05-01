@@ -6,9 +6,11 @@ class FormStorage(forms.ModelForm):
         model = Storage
         fields = (
             "name",
+            "parent",
         )
         labels = {
                 "name":("Name"),
+                "parent":("Ort"),
         }
 
     def __init__(self, *args, **kwargs):
