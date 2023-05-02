@@ -2,6 +2,7 @@ from django.db import models
 from storage.models import Stored
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
+from hub.fields import SelfForeignKey
 
 # Create your models here.
 
@@ -13,7 +14,7 @@ In der class Article is the unice Data is stored
 
 class Tag(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
