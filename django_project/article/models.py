@@ -1,6 +1,5 @@
 from django.db import models
 from storage.models import Stored
-from hub.countsystem import System
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 
@@ -11,8 +10,6 @@ The Article model holds all articles and information about the Articles.
 
 In der class Article is the unice Data is stored 
 """
-
-s = System()
 
 class Tag(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)

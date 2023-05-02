@@ -1,14 +1,11 @@
 from django.db import models
 from django.core import validators
 from hub import models as hub_models
-from hub.countsystem import System
+from hub.fields import SelfForeignKey
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from django import forms
 # Create your models here.
-
-s = System()
-
 
 
 #TODO test if the query will return all stored things even the Container wenn the input is ready
@@ -37,7 +34,7 @@ class StorageType(SoftDeleteObject, models.Model):
 class Storage(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
     ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
 
