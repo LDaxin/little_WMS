@@ -58,13 +58,14 @@ def addArticle(request, typ):
                 template = te.save()
                 re["template"] = template 
                 p = FormArticleBase(re)
+                if p.is_valid():
+                    pa = p.save()
                 if t.ref:
                     ref = Stored()
                     ref.save()
-                    p.ref = ref
-                if p.is_valid():
-                    pa = p.save()
-                    return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
+                    pa.ref = ref
+                    pa.save()
+                return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
     
