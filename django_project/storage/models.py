@@ -11,7 +11,7 @@ from django import forms
 #TODO test if the query will return all stored things even the Container wenn the input is ready
 class Stored(SoftDeleteObject, models.Model):
     def __str__(self, *args, **kwargs):
-        return "Hallo"
+        return str(self.id)
 
 codeStyleChoices=[('numeric', 'numeric'), ('alphaNumeric', 'alphaNumeric')]
 
