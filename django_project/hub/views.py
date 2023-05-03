@@ -70,13 +70,13 @@ def results(request):
             else:
                 #r = Article.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
 
-                r = ar.Article.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__contains=request.GET['search']), template__pType__tName__exact=request.GET["ptype"])
+                r = ar.Article.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), template__pType__tName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
         elif request.GET['type']=="storage":
             if request.GET['search'] == "NONE":
                 r = st.Storage.objects.all()
             else:
-                r = st.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
+                r = st.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 

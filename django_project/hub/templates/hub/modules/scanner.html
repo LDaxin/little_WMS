@@ -14,16 +14,14 @@
         // Handle on success condition with the decoded text or result.
         //console.log(`Scan result: ${decodedText}`, decodedResult);
         if(decodedResult.result.format.formatName == "QR_CODE"){
-            if(decodedText.length == 16){
-                {% if input == ""  %}
-                $("#last-scann").val(decodedText);
-                {% else %}
-                if(decodedText !=  $("#{{input}}").val()){
-                $("#{{input}}").val(decodedText);
-                lResults(decodedText);
-                }
-                {% endif %}
+            {% if input == ""  %}
+            $("#last-scann").val(decodedText);
+            {% else %}
+            if(decodedText !=  $("#{{input}}").val()){
+            $("#{{input}}").val(decodedText);
+            lResults(decodedText);
             }
+            {% endif %}
         }
     }
 
