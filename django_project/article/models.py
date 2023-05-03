@@ -80,7 +80,7 @@ class ArticleType(SoftDeleteObject, models.Model):
     def __str__(self, *args, **kwargs):
         return self.tName
 
-class Template(SoftDeleteObject, models.Model):
+class ArticleTemplate(SoftDeleteObject, models.Model):
 
     name = models.CharField(max_length=20)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
@@ -117,7 +117,7 @@ class Template(SoftDeleteObject, models.Model):
 
 
 class Article(SoftDeleteObject, models.Model):
-    template = models.ForeignKey(Template, on_delete=models.CASCADE, blank=True)
+    template = models.ForeignKey(ArticleTemplate, on_delete=models.CASCADE, blank=True)
     count = models.IntegerField(default=1, blank=True)
     weight = models.IntegerField(null=True, blank=True)
     volume = models.IntegerField(null=True, blank=True)

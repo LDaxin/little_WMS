@@ -11,7 +11,7 @@ def fListGen(typ):
     fList = []
     notList =["ref"]
     for enableField in ArticleType._meta.get_fields():
-        for field in Template._meta.get_fields():
+        for field in ArticleTemplate._meta.get_fields():
             try:
                 if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
                     for notField in notList:

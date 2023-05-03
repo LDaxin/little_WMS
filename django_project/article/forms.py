@@ -22,7 +22,7 @@ class FormTag(forms.ModelForm):
 class FormTemplateArticle(forms.ModelForm):
 
     class Meta:
-        model = Template
+        model = ArticleTemplate
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
