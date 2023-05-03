@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
+from stored.models import Stored
 from django.core.exceptions import ObjectDoesNotExist
 from storage.models import Stored
 from django.contrib.auth.decorators import login_required

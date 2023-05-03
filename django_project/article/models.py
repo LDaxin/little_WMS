@@ -4,6 +4,7 @@ from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
 from tag.models import Tag
+from stored.models import Stored
 
 # Create your models here.
 

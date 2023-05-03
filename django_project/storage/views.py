@@ -20,10 +20,7 @@ def addStorage(request, typ):
         s = FormStorage(request.POST)
         if s.is_valid():
             storage = s.save(commit=False)
-            ref = Stored()
-            ref.save()
             storage.typ = t
-            storage.ref = ref
             so = storage.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(storage) + " was added to your system.", "toastType":"status"})
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})

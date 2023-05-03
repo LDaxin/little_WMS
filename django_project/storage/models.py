@@ -5,13 +5,9 @@ from hub.fields import SelfForeignKey
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from django import forms
+from stored.models import Stored
 # Create your models here.
 
-
-#TODO test if the query will return all stored things even the Container wenn the input is ready
-class Stored(SoftDeleteObject, models.Model):
-    def __str__(self, *args, **kwargs):
-        return str(self.id)
 
 
 class StorageType(SoftDeleteObject, models.Model):
@@ -35,7 +31,7 @@ class Storage(SoftDeleteObject, models.Model):
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
-    ref = models.OneToOneField(Stored,on_delete = models.CASCADE)
+    ref = models.OneToOneField(Stored,on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -44,5 +40,9 @@ class Storage(SoftDeleteObject, models.Model):
             uCode = UuidCode()
             self.code = uCode
             uCode.save()
+        if not self.ref:
+            ref = Stored()
+            self.ref = ref
+            ref.save()
         super().save(*args, **kwargs)
     
