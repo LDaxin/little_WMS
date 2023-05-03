@@ -13,7 +13,6 @@ class Stored(SoftDeleteObject, models.Model):
     def __str__(self, *args, **kwargs):
         return str(self.id)
 
-codeStyleChoices=[('numeric', 'numeric'), ('alphaNumeric', 'alphaNumeric')]
 
 class StorageType(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
