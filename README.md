@@ -6,73 +6,35 @@ it's a small scale WMS.
 This is a WMS(Warehouse Managment System) for personal use. It's vision is to be so simple to use that you use it.
 
 ## Roadmap
-- [ ] Stage 1 (Base)
+- [o] Stage 1 (Base)
 
-    - [ ] Locations
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search 
-            - [ ] scann
+    - [.] views
+        - [X] list view
+        - [ ] single view
+        - [ ] movement view
 
-    - [ ] Warehouses
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search
-            - [ ] scann
+    - [o] functions
+        - [o] articles
+            - [X] add articles
+            - [X] delete articles
+            - [ ] move articles between storages
+            - [ ] view articles
+            - [ ] edit articles
+        - [o] storages
+            - [X] add storage
+            - [X] delete storage
+            - [ ] view storages
+            - [ ] edit storages
+        - [ ] print labels
+        - [X] simple search
 
-    - [ ] Storages
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search
-            - [ ] scann
-
-    - [ ] Shelfs
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search
-            - [ ] scann
-
-    - [ ] compartments
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search
-            - [ ] scann
-
-    - [ ] Parts
-        - [x] create new
-        - [x] list
-        - [ ] delete
-        - [ ] view
-        - [ ] edit
-        - [ ] search
-            - [ ] scann
-        - [x] Part types (in Admin screen)
-        - [x] Units (in Admin screen)
-        - [ ] Checkout
-        - [ ] Checkin
+    - [X] Soft delete
 
     - [ ] User management (in Admin screen)
         - [ ] Login
             - [ ] Login screen
             - [ ] Login
             - [ ] Logout
-
-    - [ ] Print lables
 
 Learn more in [Docs](docs/main.md)
 
