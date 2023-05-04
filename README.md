@@ -6,21 +6,21 @@ it's a small scale WMS.
 This is a WMS(Warehouse Managment System) for personal use. It's vision is to be so simple to use that you use it.
 
 ## Roadmap
-- [o] Stage 1 (Base)
+- [ ] Stage 1 (Base)
 
-    - [.] views
+    - [ ] views
         - [X] list view
         - [ ] single view
         - [ ] movement view
 
-    - [o] functions
-        - [o] articles
+    - [ ] functions
+        - [ ] articles
             - [X] add articles
             - [X] delete articles
             - [ ] move articles between storages
             - [ ] view articles
             - [ ] edit articles
-        - [o] storages
+        - [ ] storages
             - [X] add storage
             - [X] delete storage
             - [ ] view storages
@@ -31,10 +31,10 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
     - [X] Soft delete
 
     - [ ] User management (in Admin screen)
-        - [ ] Login
-            - [ ] Login screen
-            - [ ] Login
-            - [ ] Logout
+        - [X] Login
+            - [X] Login screen
+            - [X] Login
+        - [ ] Logout
 
 Learn more in [Docs](docs/main.md)
 
