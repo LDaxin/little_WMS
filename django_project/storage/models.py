@@ -25,6 +25,8 @@ class StorageType(SoftDeleteObject, models.Model):
             uCode.save()
         super().save(*args, **kwargs)
 
+    def __str__(self, *args, **kwargs):
+        return self.name
 
 class Storage(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
@@ -46,3 +48,5 @@ class Storage(SoftDeleteObject, models.Model):
             ref.save()
         super().save(*args, **kwargs)
     
+    def __str__(self, *args, **kwargs):
+        return self.name

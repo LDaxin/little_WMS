@@ -14,8 +14,6 @@ The Article model holds all articles and information about the Articles.
 In der class Article is the unice Data is stored 
 """
 
-
-
 class Unit(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     symbol = models.CharField(max_length=4)
