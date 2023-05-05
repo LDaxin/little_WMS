@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'codeSystem.apps.CodeSystemConfig',
     'tag.apps.TagConfig',
     'stored.apps.StoredConfig',
+    'movment.apps.MovmentConfig',
     'softdelete',
     'django.contrib.admin',
     'django.contrib.auth',
