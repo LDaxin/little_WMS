@@ -25,7 +25,7 @@ class Unit(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            self.code = uCode
+            self.code = "un" + uCode
             uCode.save()
         super().save(*args, **kwargs)
 
@@ -72,7 +72,7 @@ class ArticleType(SoftDeleteObject, models.Model):
         self.lowerName = self.tName.lower()
         if not self.code:
             uCode = UuidCode()
-            self.code = uCode
+            self.code = "at"uCode
             uCode.save()
         super().save(*args, **kwargs)
 
@@ -107,7 +107,7 @@ class ArticleTemplate(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            self.code = uCode
+            self.code = "ae" + uCode
             uCode.save()
         super().save(*args, **kwargs)
 
@@ -133,7 +133,7 @@ class Article(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            self.code = uCode
+            self.code = "a0" + uCode
             uCode.save()
         super().save(*args, **kwargs)
 

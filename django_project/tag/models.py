@@ -15,7 +15,7 @@ class Tag(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            self.code = uCode
+            self.code = "t0" + uCode
             uCode.save()
         super().save(*args, **kwargs)
 
