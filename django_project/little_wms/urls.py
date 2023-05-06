@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include("hub.urls")),
     path('', include("article.urls")),
     path('', include("storage.urls")),
+    path('', include("movement.urls")),
     path('api-auth/', include('rest_framework.urls')),
 ]

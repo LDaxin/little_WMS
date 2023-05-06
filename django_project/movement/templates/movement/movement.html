@@ -1,0 +1,15 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+
+
+{% include "hub/modules/scanner.html" with input="scan" %}
+
+<script>
+        function lResults(search){
+            console.log(search)
+        }
+
+</script>
+
+{% endblock %}
