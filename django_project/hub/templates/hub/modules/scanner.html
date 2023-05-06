@@ -11,17 +11,8 @@
 
 <script>
     function onScanSuccess(decodedText, decodedResult) {
-        // Handle on success condition with the decoded text or result.
-        //console.log(`Scan result: ${decodedText}`, decodedResult);
         if(decodedResult.result.format.formatName == "QR_CODE"){
-            {% if input == ""  %}
-            $("#last-scann").val(decodedText);
-            {% else %}
-            if(decodedText !=  $("#{{input}}").val()){
-            $("#{{input}}").val(decodedText);
             lResults(decodedText);
-            }
-            {% endif %}
         }
     }
 

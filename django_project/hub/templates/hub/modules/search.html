@@ -61,14 +61,18 @@
             }
         }
 
+        var scanBuffer = ""
+
         function lResults(search){
             console.log(search)
-            if(search == ""){
-                search = "NONE";
+            if(search==scanBuffer){
+                if(search == ""){
+                    search = "NONE";
+                }
+                $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
+                    $("#results").html(data)
+                });
             }
-            $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
-                $("#results").html(data)
-            });
         }
 
         $("#results").load(lResults(""));
