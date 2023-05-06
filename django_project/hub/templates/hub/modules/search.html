@@ -61,11 +61,11 @@
             }
         }
 
-        var scanBuffer = ""
+        var scanBuffer = "*"
 
         function lResults(search){
-            console.log(search)
-            if(search==scanBuffer){
+            if(search!=scanBuffer){
+                console.log(search)
                 if(search == ""){
                     search = "NONE";
                 }
