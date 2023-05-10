@@ -21,7 +21,8 @@ class StorageType(SoftDeleteObject, models.Model):
         self.lowerName = self.name.lower()
         if not self.code:
             uCode = UuidCode()
-            self.code = "st" + uCode
+            uCode.prefix = "st" 
+            self.code = uCode
             uCode.save()
         super().save(*args, **kwargs)
 
@@ -40,7 +41,7 @@ class Storage(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            self.code = "s0" + uCode
+            uCode.prefix = "s0" 
             uCode.save()
         if not self.ref:
             ref = Stored()
