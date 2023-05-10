@@ -3,12 +3,39 @@
 {% block content %}
 
 
+<input id='bla' placeholder="Suche" class="form-control">
+
 {% include "hub/modules/scanner.html" with input="scan" %}
 
 <script>
-        function lResults(search){
-            console.log(search)
+    var buffer = []
+    var scanBuffer
+
+    function lResults(search){
+         
+        if(scanBuffer != search){
+            scanBuffer = search;
+
+            var bufferElement = {code:search};
+            buffer.push(bufferElement);
+
+            // code storable storage name
+
+            //$.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
+            $.get(`/movement/request?code=${search}`, function(data){
+
+                console.log(data)
+            });
+
         }
+    };
+
+
+
+    $("#results").load(lResults(""));
+    $("#bla").on("input", function(){
+        lResults($('#bla').val())
+    });
 
 </script>
 
