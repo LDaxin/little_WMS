@@ -42,6 +42,7 @@ class Storage(SoftDeleteObject, models.Model):
         if not self.code:
             uCode = UuidCode()
             uCode.prefix = "s0" 
+            self.code = uCode
             uCode.save()
         if not self.ref:
             ref = Stored()
