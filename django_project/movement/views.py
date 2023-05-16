@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.template.loader import render_to_string
 from storage.models import Storage
 from article.models import Article
 from django.contrib.auth.decorators import login_required
@@ -12,6 +13,21 @@ def movement(request):
 
     return render(request, "movement/movement.html")
 
+#render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
+
+def movementStore(request):
+    if request.method == "POST":
+        hallo = []
+        storageObject = Storage.objects.get(code__code__exact = request.POST["storageCode"])
+        for formField in request.POST:
+            if formField.startswith('articleCode'):
+                articleObject = Article.objects.get(code__code__exact = request.POST[formField])
+                articleObject.stored = storageObject.ref
+                articleObject.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":str(hallo), "toastType":"alert"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":'what are you trying to do', "toastType":"alert"})
+
 
 @login_required(login_url='/accounts/login/')
 def movementCodeInfo(request):
@@ -20,23 +36,28 @@ def movementCodeInfo(request):
             try:
                 article = Article.objects.get(code__code__exact=request.GET['code'])
             except ObjectDoesNotExist:
-                return JsonResponse({"name": "bla2"})
+                return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"no such a article in the System", "toastType":"alert"})})
 
-            returnJson = {"name":article.template.name, "code":article.code.code, "storable":True, "storage":article.template.pType.ref}
+            if article.stored != None:
+                stored = True
+            else:
+                stored = False
+
+            returnJson = {"error":"", "name":article.template.name, "code":article.code.code, "storable":True, "storage":article.template.pType.ref, "stored":stored}
             return JsonResponse(returnJson)
 
         elif request.GET['code'][0:2] == "s0":
             try:
                 storage = Storage.objects.get(code__code__exact=request.GET['code'])
             except ObjectDoesNotExist:
-                return JsonResponse({"name": "bla2"})
+                return JsonResponse({"error":"no such a storage in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"no such a storage in the System", "toastType":"alert"})})
 
-            returnJson = {"name":storage.name, "code":storage.code.code, "storable":False, "storage":True}
+            returnJson = {"error":"", "name":storage.name, "code":storage.code.code, "storable":False, "storage":True, "stored":False}
             return JsonResponse(returnJson)
 
              #code storable storage name
 
 
-        return JsonResponse({"name": "bla"})
-    return JsonResponse({"foo":"nonononono"})
+        return JsonResponse({"error":"not a valide code", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"not a valide code", "toastType":"alert"})})
+    return JsonResponse({"error":"what are you triing to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"what are you triing to do?", "toastType":"alert"})})
 

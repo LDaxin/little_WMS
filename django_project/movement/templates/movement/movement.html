@@ -3,13 +3,115 @@
 {% block content %}
 
 
-<input id='bla' placeholder="Suche" class="form-control">
+<input id='bla' placeholder="search" class="form-control">
 
 {% include "hub/modules/scanner.html" with input="scan" %}
+<!--
+<div class="input-group">
+    <input id='article' placeholder="" class="form-control" disabled="disabled" readonly="readonly">
+    <label class="form-label" for="article">article</label>
+    <input id='storage' placeholder="" class="form-control" disabled="disabled" readonly="readonly">
+    <label class="form-label" for="storage">storage</label>
+</div>
+-->
+
+
+<div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
+    <label class="btn bt-outline-succsess" for="store">store</label>
+
+    <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
+    <label class="btn bt-outline-succsess" for="remove">remove</label>
+</div>
+
+<div class="btn-group" role="group">
+    <input type="radio" class="btn-check" name="options-outlined2" id="single" autocomplete="off" checked>
+    <label class="btn bt-outline-succsess" for="single">single</label>
+
+    <input type="radio" class="btn-check" name="options-outlined2" id="mass" autocomplete="off">
+    <label class="btn bt-outline-succsess" for="mass">mass</label>
+</div>
+
+<form method="POST" action="./store/" id="storeForm">
+    {% csrf_token %}
+    <div id="storeFormArticle">
+    </div>
+    <div id="storeFormStorage">
+    </div>
+</form>
 
 <script>
-    var buffer = []
+    var backLog = []
+    var actionBuffer = {article:[], storage:""}
+    var articleBuffer = []
+    var storageBuffer = []
     var scanBuffer
+
+    function checkForErrors(data){
+        if(data.error == ""){
+            console.log(data)
+            choseDirection(data)
+        }
+        else{
+            $(".toast-container").append(data.errorToast);
+        };
+    };
+
+    function choseDirection(data){
+        if($("#store").is(":checked")){
+            storeArticle(data);
+        }
+        else{
+            removeArticle(data);
+        };
+    };
+
+    function storeArticle(data){
+        if($("#single").is(":checked")){
+            if(data.storage ){
+                if(!(data.storable)){
+                    storageBuffer = []
+                    storageBuffer.push(data)
+                    $("#storeFormStorage").html('<input type="text" name="storageName" value="' + data.name + '"><input type="hidden" name="storageCode" value="' + data.code + '">')
+                        }else{
+                    console.log("neeeeee")
+                }
+            }else if(data.storable){
+                articleBuffer = []
+                articleBuffer.push(data)
+                $("#storeFormArticle").html('<input type="text" name="articleName" value="' + data.name + '"><input type="hidden" name="articleCode" value="' + data.code + '">')
+
+            }
+            console.log(articleBuffer.length)
+            console.log(storageBuffer.length)
+            console.log("-------------------")
+
+            if(articleBuffer.length == 1 && storageBuffer.length == 1){
+
+                var form = $("#storeForm");
+                var actionUrl = form.attr('action');
+
+                $.ajax({
+                    type: "POST",
+                    url: actionUrl,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function(data1)
+                    {
+                        $(".toast-container").append(data1);
+
+                    }
+                });
+
+                storageBuffer = []
+                articleBuffer = []
+            }
+        }
+    };
+
+    function removeArticle(data){
+    };
+
+
 
     function lResults(search){
          
@@ -17,17 +119,11 @@
             scanBuffer = search;
 
             var bufferElement = {code:search};
-            buffer.push(bufferElement);
 
-            // code storable storage name
-
-            //$.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
             $.get(`/movement/request?code=${search}`, function(data){
-
-                console.log(data)
+                checkForErrors(data);
             });
-
-        }
+        };
     };
 
 
