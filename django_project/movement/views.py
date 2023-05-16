@@ -18,7 +18,11 @@ def movement(request):
 def movementStore(request):
     if request.method == "POST":
         hallo = []
-        storageObject = Storage.objects.get(code__code__exact = request.POST["storageCode"])
+        if request.POST["storageCode"].startswith("s0"):
+            storageObject = Storage.objects.get(code__code__exact = request.POST["storageCode"])
+        elif request.POST["storageCode"].startswith("a0"):
+            storageObject = Article.objects.get(code__code__exact = request.POST["storageCode"])
+
         for formField in request.POST:
             if formField.startswith('articleCode'):
                 articleObject = Article.objects.get(code__code__exact = request.POST[formField])

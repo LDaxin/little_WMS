@@ -69,12 +69,10 @@
     function storeArticle(data){
         if($("#single").is(":checked")){
             if(data.storage ){
-                if(!(data.storable)){
+                if(!(data.storable) || storageBuffer.length != 1 ){
                     storageBuffer = []
                     storageBuffer.push(data)
                     $("#storeFormStorage").html('<input type="text" name="storageName" value="' + data.name + '"><input type="hidden" name="storageCode" value="' + data.code + '">')
-                        }else{
-                    console.log("neeeeee")
                 }
             }else if(data.storable){
                 articleBuffer = []
@@ -98,6 +96,8 @@
                     success: function(data1)
                     {
                         $(".toast-container").append(data1);
+                        $("#storeFormArticle").html("")
+                        $("#storeFormStorage").html("")
 
                     }
                 });
