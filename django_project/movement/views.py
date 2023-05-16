@@ -28,6 +28,7 @@ def movementStore(request):
                 articleObject = Article.objects.get(code__code__exact = request.POST[formField])
                 articleObject.stored = storageObject.ref
                 articleObject.save()
+                hallo.append(articleObject)
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":str(hallo), "toastType":"alert"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":'what are you trying to do', "toastType":"alert"})

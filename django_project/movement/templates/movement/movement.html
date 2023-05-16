@@ -24,14 +24,6 @@
     <label class="btn bt-outline-succsess" for="remove">remove</label>
 </div>
 
-<div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="options-outlined2" id="single" autocomplete="off" checked>
-    <label class="btn bt-outline-succsess" for="single">single</label>
-
-    <input type="radio" class="btn-check" name="options-outlined2" id="mass" autocomplete="off">
-    <label class="btn bt-outline-succsess" for="mass">mass</label>
-</div>
-
 <form method="POST" action="./store/" id="storeForm">
     {% csrf_token %}
     <div id="storeFormArticle">
@@ -67,48 +59,47 @@
     };
 
     function storeArticle(data){
-        if($("#single").is(":checked")){
-            if(data.storage ){
-                if(!(data.storable) || storageBuffer.length != 1 ){
-                    storageBuffer = []
-                    storageBuffer.push(data)
-                    $("#storeFormStorage").html('<input type="text" name="storageName" value="' + data.name + '"><input type="hidden" name="storageCode" value="' + data.code + '">')
+        if(data.storage && articleBuffer.length > 0 ){
+            storageBuffer = []
+            storageBuffer.push(data)
+            $("#storeFormStorage").html('<input type="text" name="storageName" value="' + data.name + '"><input type="hidden" name="storageCode" value="' + data.code + '">')
+        }else if(data.storable){
+            articleBuffer.push(data)
+            $("#storeFormArticle").append('<input type="text" name="articleName' + articleBuffer.length + '" value="' + data.name + '"><input type="hidden" name="articleCode' + articleBuffer.length + '" value="' + data.code + '">')
+        }
+
+        console.log(articleBuffer.length)
+        console.log(storageBuffer.length)
+        console.log("-------------------")
+
+        if(articleBuffer.length > 0 && storageBuffer.length == 1){
+
+            var form = $("#storeForm");
+            var actionUrl = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data1)
+                {
+                    $(".toast-container").append(data1);
+
                 }
-            }else if(data.storable){
-                articleBuffer = []
-                articleBuffer.push(data)
-                $("#storeFormArticle").html('<input type="text" name="articleName" value="' + data.name + '"><input type="hidden" name="articleCode" value="' + data.code + '">')
+            });
 
-            }
-            console.log(articleBuffer.length)
-            console.log(storageBuffer.length)
-            console.log("-------------------")
+            $("#storeFormArticle").html("")
+            $("#storeFormStorage").html("")
 
-            if(articleBuffer.length == 1 && storageBuffer.length == 1){
-
-                var form = $("#storeForm");
-                var actionUrl = form.attr('action');
-
-                $.ajax({
-                    type: "POST",
-                    url: actionUrl,
-                    data: form.serialize(), // serializes the form's elements.
-                    success: function(data1)
-                    {
-                        $(".toast-container").append(data1);
-                        $("#storeFormArticle").html("")
-                        $("#storeFormStorage").html("")
-
-                    }
-                });
-
-                storageBuffer = []
-                articleBuffer = []
-            }
+            storageBuffer = []
+            articleBuffer = []
         }
     };
 
     function removeArticle(data){
+        if(data.storable && data.stored){
+
+        }
     };
 
 
