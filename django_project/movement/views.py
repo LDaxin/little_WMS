@@ -15,6 +15,20 @@ def movement(request):
 
 #render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
 
+@login_required(login_url='/accounts/login/')
+def movementRemove(request):
+    if request.method == "POST":
+
+        articleObject = Article.objects.get(code__code__exact = request.POST["articleCode1"])
+        articleObject.stored = None
+        articleObject.save()
+
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":str(request.POST), "toastType":"alert"})
+
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":'what are you trying to do', "toastType":"alert"})
+
+
+@login_required(login_url='/accounts/login/')
 def movementStore(request):
     if request.method == "POST":
         hallo = []

@@ -2,19 +2,9 @@
 
 {% block content %}
 
-
 <input id='bla' placeholder="search" class="form-control">
 
 {% include "hub/modules/scanner.html" with input="scan" %}
-<!--
-<div class="input-group">
-    <input id='article' placeholder="" class="form-control" disabled="disabled" readonly="readonly">
-    <label class="form-label" for="article">article</label>
-    <input id='storage' placeholder="" class="form-control" disabled="disabled" readonly="readonly">
-    <label class="form-label" for="storage">storage</label>
-</div>
--->
-
 
 <div class="btn-group" role="group">
     <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
@@ -29,6 +19,11 @@
     <div id="storeFormArticle">
     </div>
     <div id="storeFormStorage">
+    </div>
+</form>
+<form method="POST" action="./remove/" id="removeForm">
+    {% csrf_token %}
+    <div id="removeFormArticle">
     </div>
 </form>
 
@@ -84,24 +79,44 @@
                 success: function(data1)
                 {
                     $(".toast-container").append(data1);
-
                 }
             });
-
-            $("#storeFormArticle").html("")
-            $("#storeFormStorage").html("")
-
-            storageBuffer = []
-            articleBuffer = []
+            clearBuffer()
         }
     };
 
     function removeArticle(data){
         if(data.storable && data.stored){
 
+            articleBuffer.push(data)
+            $("#removeFormArticle").append('<input type="text" name="articleName' + articleBuffer.length + '" value="' + data.name + '"><input type="hidden" name="articleCode' + articleBuffer.length + '" value="' + data.code + '">')
+
+            var form = $("#removeForm");
+            var actionUrl = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data1)
+                {
+                    $(".toast-container").append(data1);
+
+                }
+            });
+
+            clearBuffer()
+
         }
     };
 
+    function clearBuffer(){
+        $("#storeFormArticle").html("")
+        $("#storeFormStorage").html("")
+        $("#removeFormArticle").html("")
+        articleBuffer = []
+        storageBuffer = []
+    }
 
 
     function lResults(search){
@@ -118,6 +133,8 @@
     };
 
 
+    $("#store").change(function(){clearBuffer()})
+    $("#remove").change(function(){clearBuffer()})
 
     $("#results").load(lResults(""));
     $("#bla").on("input", function(){
