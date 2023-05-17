@@ -19,9 +19,6 @@ def hub(request):
     return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['movement', 'Article', 'Storage'], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
 
 
-
-
-
 @login_required(login_url='/accounts/login/')
 def locations(request):
     return render(request, "hub/locations.html", context={"list":Location.objects.all(), "form":[Form_location]})
@@ -66,11 +63,11 @@ def results(request):
     if request.method == "GET":
         if request.GET['type']=="article":
             if request.GET['search'] == "NONE":
-                r = ar.Article.objects.filter(template__pType__tName__exact=request.GET["ptype"])
+                r = ar.Article.objects.filter(template__pType__lowerName__exact=request.GET["ptype"])
             else:
                 #r = Article.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
 
-                r = ar.Article.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), template__pType__tName__exact=request.GET["ptype"])
+                r = ar.Article.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), template__pType__lowerName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
         elif request.GET['type']=="storage":
