@@ -34,7 +34,7 @@
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
-                    <button type="submit" class="btn btn-success" id="addButton" data-bs-dismiss="modal" >Add</button>
+                    <button type="submit" class="btn btn-success" id="addButton" >Add</button>
                 </form>
 
             </div>
@@ -60,6 +60,8 @@
                 {
                     lResults($('#{{searchFieldName}}').val());
                     $(".toast-container").append(data);
+
+                    $("#add{{ name }}").modal("hide")
 
                 }
             });
