@@ -77,9 +77,9 @@ def article(request, typ, article_id):
 
     try:
         p = Article.objects.get(pk=article_id)
-        if p.template.pType.tName == typ:
-            temp = FormTemplateArticle(instance=p.template)
-            par = FormArticleBase(instance=p)
+        if p.template.pType.lowerName == typ:
+            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
+            par = FormArticleBase(instance=p, typ=p.template.pType)
             return render(request, "article/modules/article.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
@@ -92,9 +92,9 @@ def articleIncert(request, typ, article_id):
 
     try:
         p = Article.objects.get(pk=article_id)
-        if p.template.pType.tName == typ:
-            temp = FormTemplateArticle(instance=p.template)
-            par = FormArticleBase(instance=p)
+        if p.template.pType.lowerName == typ:
+            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
+            par = FormArticleBase(instance=p, typ=p.template.pType)
             return render(request, "article/modules/articleIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
