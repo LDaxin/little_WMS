@@ -8,29 +8,6 @@ from storage.models import Stored
 from django.contrib.auth.decorators import login_required
 
 
-def fListGen(typ):
-    fList = []
-    notList =["ref"]
-    for enableField in ArticleType._meta.get_fields():
-        for field in ArticleTemplate._meta.get_fields():
-            try:
-                if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
-                    for notField in notList:
-                        if notField != field.name:
-                            fList.append(field.name)
-            except AttributeError:
-                pass
-        for field in Article._meta.get_fields():
-            try:
-                if (not field.blank and enableField.name == field.name) or (getattr(typ, enableField.name) and enableField.name == field.name):
-                    for notField in notList:
-                        if notField != field.name:
-                            fList.append(field.name)
-            except AttributeError:
-                pass
-    return fList
-
-
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
@@ -40,8 +17,7 @@ def articles(request, typ):
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
-        fList = fListGen(t)
-        return render(request, "article/articles.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle , FormArticleBase], "l":fList, "typ":typ})
+        return render(request, "article/articles.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
 
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
@@ -61,7 +37,7 @@ def addArticle(request, typ):
                 p = FormArticleBase(re)
                 if p.is_valid():
                     pa = p.save()
-                if t.ref:
+                if t.article_toggle_ref:
                     ref = Stored()
                     ref.save()
                     pa.ref = ref
@@ -102,10 +78,9 @@ def article(request, typ, article_id):
     try:
         p = Article.objects.get(pk=article_id)
         if p.template.pType.tName == typ:
-            fList = fListGen(p.template.pType)
             temp = FormTemplateArticle(instance=p.template)
             par = FormArticleBase(instance=p)
-            return render(request, "article/modules/article.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par], "l":fList, "typ":typ})
+            return render(request, "article/modules/article.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -118,10 +93,9 @@ def articleIncert(request, typ, article_id):
     try:
         p = Article.objects.get(pk=article_id)
         if p.template.pType.tName == typ:
-            fList = fListGen(p.template.pType)
             temp = FormTemplateArticle(instance=p.template)
             par = FormArticleBase(instance=p)
-            return render(request, "article/modules/articleIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par], "l":fList, "typ":typ})
+            return render(request, "article/modules/articleIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     

@@ -42,30 +42,30 @@ class ArticleType(SoftDeleteObject, models.Model):
     tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
 
-    name = models.BooleanField(default=True, editable=False)
-    unit = models.BooleanField(default=True, editable=False)
-    count = models.BooleanField(default=True, editable=False)
-    stored = models.BooleanField(default=True, editable=False)
+    template_toggle_name = models.BooleanField(default=True, editable=False)
+    template_toggle_unit = models.BooleanField(default=True, editable=False)
+    template_toggle_count = models.BooleanField(default=True, editable=False)
+    template_toggle_stored = models.BooleanField(default=True, editable=False)
 
 
-    description = models.BooleanField(default=True)
-    tag = models.BooleanField(default=True)
-    alias = models.BooleanField(default=True)
+    template_toggle_description = models.BooleanField(default=True)
+    template_toggle_tag = models.BooleanField(default=True)
+    template_toggle_alias = models.BooleanField(default=True)
 
-    width = models.BooleanField(default=False)
-    depth = models.BooleanField(default=False)
-    height = models.BooleanField(default=False)
+    template_toggle_width = models.BooleanField(default=False)
+    template_toggle_depth = models.BooleanField(default=False)
+    template_toggle_height = models.BooleanField(default=False)
 
-    innerWidth = models.BooleanField(default=False)
-    innerDepth = models.BooleanField(default=False)
-    innerHeight = models.BooleanField(default=False)
+    template_toggle_innerWidth = models.BooleanField(default=False)
+    template_toggle_innerDepth = models.BooleanField(default=False)
+    template_toggle_innerHeight = models.BooleanField(default=False)
 
-    ref = models.BooleanField(default=False)
+    article_toggle_ref = models.BooleanField(default=False)
 
-    weight = models.BooleanField(default=False)
-    volume = models.BooleanField(default=False)
-    length = models.BooleanField(default=False)
-    pTag = models.BooleanField(default=False)
+    article_toggle_weight = models.BooleanField(default=False)
+    article_toggle_volume = models.BooleanField(default=False)
+    article_toggle_length = models.BooleanField(default=False)
+    article_toggle_tag = models.BooleanField(default=False)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -100,8 +100,6 @@ class ArticleTemplate(SoftDeleteObject, models.Model):
     innerDepth = models.FloatField(null=True, blank=True)
     innerHeight = models.FloatField(null=True, blank=True)
 
-    weight = models.FloatField(null=True, blank=True)
-
     tag = models.ManyToManyField(Tag, blank=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
@@ -129,7 +127,7 @@ class Article(SoftDeleteObject, models.Model):
 
     ref = models.OneToOneField(Stored, on_delete = models.CASCADE, null=True, blank=True)
 
-    pTag = models.ManyToManyField(Tag, blank=True)
+    tag = models.ManyToManyField(Tag, blank=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
