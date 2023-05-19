@@ -46,21 +46,6 @@
 
 </table>
 
-<div class="modal fade" id="singleModal" tabindex="-1" aria-labelledby="singleModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-
-            <div class="modal-header">
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <div class="modal-body" id="singleModalBody">
-
-
-            </div>
-        </div>
-    </div>
-</div>
 
 
 <!-- ____________________________SCRIPTS______________________________________ -->
@@ -90,8 +75,8 @@
 
                         console.log($(this).val())
                         $.get("./"+$(this).val()+"/i", function(data){
-                            $("#singleModalBody").html(data)
-                            $("#singleModal").modal("show")
+                            $("#modalBodysingle").html(data)
+                            $("#modalsingle").modal("show")
 
                         })
                     })
