@@ -5,13 +5,11 @@
 {% include "hub/modules/search.html" %}
 
 <div class="fixed-bottom  m-3">
-    {% include "hub/modules/plus.html" %}
-    {% include "hub/modules/minus.html" %}
+    {% include "hub/modules/modalButton.html" with modalId="Add" buttonSymbol=" + " buttonColor="success" %}
+    {% include "hub/modules/modalButton.html" with modalId="Del" buttonSymbol=" - " buttonColor="danger" %}
 </div>
 
-{% include "hub/modules/form_modal.html" with typ=typ %}
-{% include "hub/modules/delete_modal.html" %}
-
-{% include "hub/modules/single_modal.html" with typ=typ name="neoder" %}
+{% include "hub/modules/formModal.html" with modalId="Add"%}
+{% include "hub/modules/deleteModal.html" with modalId="Del" %}
 
 {% endblock %}

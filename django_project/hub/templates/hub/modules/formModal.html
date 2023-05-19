@@ -1,0 +1,50 @@
+{% extends "hub/modules/modal.html" %}
+
+{% block title %}Add{% endblock %}
+
+{% block body %}
+    <form method="POST" action="./add" id="addForm">
+        {% csrf_token %}
+
+        {% for p_form in form %}
+            {% for field in p_form %}
+            
+                <div class="form-floating mb-2">
+                    {{ field.error }}
+                    {{ field }}
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        <button type="submit" class="btn btn-success" id="addButton" >Add</button>
+    </form>
+
+    <script>
+        $("#addButton").on("click", function(){
+            $("#addForm").submit(function(e){
+                e.preventDefault();
+                e.stopImmediatePropagation();
+
+                var form = $(this);
+                var actionUrl = form.attr('action');
+        
+                $.ajax({
+                    type: "POST",
+                    url: actionUrl,
+                    data: form.serialize(), // serializes the form's elements.
+                    success: function(data)
+                    {
+                        lResults($('#{{searchFieldName}}').val());
+                        $(".toast-container").append(data);
+
+                        $("#modal{{modalId}}").modal("hide")
+
+                    }
+                });
+
+                return false;
+            });
+        });
+    </script>
+{% endblock %}
+

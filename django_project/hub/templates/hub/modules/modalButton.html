@@ -1,0 +1,8 @@
+
+<button type="button" class="btn btn-{{buttonColor}} btn-lg float-end" data-bs-toggle="modal{{modalId}}" id="modalButton{{modalId}}"  data-bs-target="#sub{{name}}">{{buttonSymbol}}</button>
+
+<script>
+    $("#modalButton{{modalId}}").click(function(){
+        $("#modal{{modalId}}").modal("show")
+    })
+</script>

@@ -58,9 +58,9 @@ def delArticle(request, typ):
             delList = []
             delListReturn = ""
             for key, value in request.POST.items():
-                if key[0:1] == '_':
+                if key.startswith("_"):
                     try:
-                        pa = Article.objects.filter(template__pType__tName__exact=typ, pk=value).first()
+                        pa = Article.objects.filter(template__pType__lowerName__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
                         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
