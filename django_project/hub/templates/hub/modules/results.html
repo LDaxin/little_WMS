@@ -24,14 +24,15 @@
             {% endif %}
 
             <td>
-                <button type="button" class="btn btn-light itemClick">
+                <button type="button" class="btn btn-light itemClickEdit" value="{{ r.id }}">
                     <img style="width:10px" src="{% static 'hub/SVG/pencil-fill.svg' %}">
                 </button>
             </td>
             <td>
-                <button type="button" class="btn btn-light itemClick">
+                <button type="button" class="btn btn-light itemClickView" value="{{ r.id }}">
                     <img style="width:10px" src="{% static 'hub/SVG/eye-fill.svg' %}">
                 </button>
             </td>
         </tr>
 {% endfor %}
+
