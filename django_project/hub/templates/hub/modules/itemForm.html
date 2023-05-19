@@ -1,9 +1,10 @@
-<h1> {{ article.template.name }} </h1>
-<form method="POST" action="{{name}}">
+
+<form method="POST" action="./add" id="addForm">
     {% csrf_token %}
 
     {% for p_form in form %}
         {% for field in p_form %}
+        
             <div class="form-floating mb-2">
                 {{ field.error }}
                 {{ field }}
@@ -11,7 +12,4 @@
             </div>
         {% endfor %}
     {% endfor %}
-    {% if add %}
-    <button type="submit" class="btn btn-success" name="add_{{ forloop.counter }}">Hinzufügen</button>
-    {% endif %}
 </form>

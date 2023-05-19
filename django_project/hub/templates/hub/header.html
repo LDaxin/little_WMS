@@ -37,9 +37,9 @@
 
                 <a class="navbar-brand" href="#">
                     {% if symbol == None %}
-                    <img style="width:100px" src="{% static 'hub/SVG/Logo.svg' %}">
+                        <img style="width:100px" src="{% static 'hub/SVG/Logo.svg' %}">
                     {% else %}
-                    <img style="width:100px" src="{% static 'hub/SVG/'|add:symbol|add:'.svg' %}">
+                        <img style="width:100px" src="{% static 'hub/SVG/'|add:symbol|add:'.svg' %}">
                     {% endif %}
                 </a>
                 

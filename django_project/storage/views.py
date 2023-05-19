@@ -1,15 +1,46 @@
 from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/accounts/login/')
-def storage(request, typ):
+def storage(request, typ, storageId):
+    try:
+        storageObject = Storage.objects.get(pk=storageId)
+        if storageObject.typ.lowerName == typ:
+            instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
+            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
+        else:
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
+    
+    except:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
+
+@login_required(login_url='/accounts/login/')
+def storageIncert(request, typ, storageId):
+    try:
+        storageObject = Storage.objects.get(pk=storageId)
+        if storageObject.typ.lowerName == typ:
+            instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
+            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
+        else:
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
+    
+    except:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
     return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
 def storages(request, typ):
-    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
+
+    storageTypeObject = StorageType.objects.get(lowerName__exact=typ)
+
+    if storageTypeObject == None:
+         return HttpResponseNotFound('<h1>Page not found</h1>')
+    else:
+        return render(request, "hub/modules/items.html", context={"symbol":storageTypeObject.symbol, "searchFieldName":"storageSearch" + storageTypeObject.name, 'type':"storage", "name":typ, "form":[FormStorage(typ=storageTypeObject)],  "typ":typ})
 
 @login_required(login_url='/accounts/login/')
 def addStorage(request, typ):

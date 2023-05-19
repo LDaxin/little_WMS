@@ -17,7 +17,7 @@ def articles(request, typ):
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
-        return render(request, "article/articles.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
+        return render(request, "hub/modules/items.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
 
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
@@ -73,14 +73,14 @@ def delArticle(request, typ):
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
-def article(request, typ, article_id):
+def article(request, typ, articleId):
 
     try:
-        p = Article.objects.get(pk=article_id)
+        p = Article.objects.get(pk=articleId)
         if p.template.pType.lowerName == typ:
             temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
             par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "article/modules/article.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ})
+            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -88,21 +88,19 @@ def article(request, typ, article_id):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
-def articleIncert(request, typ, article_id):
+def articleIncert(request, typ, articleId):
 
     try:
-        p = Article.objects.get(pk=article_id)
+        p = Article.objects.get(pk=articleId)
         if p.template.pType.lowerName == typ:
             temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
             par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "article/modules/articleIncert.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ})
+            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
-
-
 
 @login_required(login_url='/accounts/login/')
 def tag(request):
