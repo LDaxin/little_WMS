@@ -1,5 +1,5 @@
 
-<div class="toast" data-bs-delay="5000" role="{{toastType}}" aria-live="assertive" aria-atomic="true">
+<div id="{{toastId}}" class="toast" data-bs-delay="5000" role="{{toastType}}" aria-live="assertive" aria-atomic="true">
     <div class="toast-header">
         <strong class="me-auto">{{toastName}}</strong>
         <small class="text-muted toastTimeCounter"></small>
@@ -14,6 +14,6 @@
 
 <script>
     $(document).ready(function () {
-        $('.toast').toast('show');
+        $('#{{toastId}}').toast('show');
     })
 </script>

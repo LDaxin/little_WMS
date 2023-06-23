@@ -34,15 +34,15 @@ def delLocation(request):
                     pa = Location.objects.filter(pk=value).first()
                     delList.append(pa)
                 except Exception as e:
-                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
         for i in delList:
             delListReturn = delListReturn + i.__str__() + " "
             i.deleted = True
             i.save()
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
 
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 
 @login_required(login_url='/accounts/login/')
@@ -52,8 +52,8 @@ def addLocation(request):
         if l.is_valid():
             location = l.save()
             location.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":str(location) + " was added to your system.", "toastType":"status"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(location) + " was added to your system.", "toastType":"status"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 
 

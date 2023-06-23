@@ -25,7 +25,7 @@ def addArticle(request, typ):
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no article type named " + typ, "toastType":"alert"})
     else:
         if request.method == "POST":
             re = request.POST.copy()
@@ -42,9 +42,9 @@ def addArticle(request, typ):
                     ref.save()
                     pa.ref = ref
                     pa.save()
-                return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
+                return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
     
 @login_required(login_url='/accounts/login/')
 def delArticle(request, typ):
@@ -52,7 +52,7 @@ def delArticle(request, typ):
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no article type named " + typ, "toastType":"alert"})
     else:
         if request.method == "POST":
             delList = []
@@ -63,14 +63,14 @@ def delArticle(request, typ):
                         pa = Article.objects.filter(template__pType__lowerName__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
-                        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":e, "toastType":"alert"})
+                        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
             for i in delList:
                 delListReturn = delListReturn + i.__str__() + " "
                 i.delete()
 
-            return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastText":delListReturn, "toastType":"alert"})
+            return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"thomething went wrong", "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
 def article(request, typ, articleId):
@@ -101,6 +101,27 @@ def articleIncert(request, typ, articleId):
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
+
+@login_required(login_url='/accounts/login/')
+def articleChange(request, typ, articleId):
+
+    t = ArticleType.objects.get(lowerName__exact=typ)
+    
+    if t == None:
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"toastError", "toastText":"no article type named " + typ, "toastType":"alert"})
+    else:
+        if request.method == "POST":
+            pass
+
+def articleTemplateChange(request, typ, articleId):
+
+    t = ArticleType.objects.get(lowerName__exact=typ)
+    
+    if t == None:
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"toastError", "toastText":"no article type named " + typ, "toastType":"alert"})
+    else:
+        if request.method == "POST":
+            pass
 
 @login_required(login_url='/accounts/login/')
 def tag(request):

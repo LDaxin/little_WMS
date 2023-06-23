@@ -13,7 +13,6 @@ def movement(request):
 
     return render(request, "movement/movement.html")
 
-#render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":"no article type named " + typ, "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
 def movementRemove(request):
@@ -23,9 +22,9 @@ def movementRemove(request):
         articleObject.stored = None
         articleObject.save()
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":str(request.POST), "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":str(request.POST), "toastType":"alert"})
 
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":'what are you trying to do', "toastType":"alert"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":'what are you trying to do', "toastType":"alert"})
 
 
 @login_required(login_url='/accounts/login/')
@@ -44,8 +43,8 @@ def movementStore(request):
                 articleObject.save()
                 hallo.append(articleObject)
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":str(hallo), "toastType":"alert"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastText":'what are you trying to do', "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":str(hallo), "toastType":"alert"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":'what are you trying to do', "toastType":"alert"})
 
 
 @login_required(login_url='/accounts/login/')
@@ -55,7 +54,7 @@ def movementCodeInfo(request):
             try:
                 article = Article.objects.get(code__code__exact=request.GET['code'])
             except ObjectDoesNotExist:
-                return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"no such a article in the System", "toastType":"alert"})})
+                return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a article in the System", "toastType":"alert"})})
 
             if article.stored != None:
                 stored = True
@@ -69,7 +68,7 @@ def movementCodeInfo(request):
             try:
                 storage = Storage.objects.get(code__code__exact=request.GET['code'])
             except ObjectDoesNotExist:
-                return JsonResponse({"error":"no such a storage in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"no such a storage in the System", "toastType":"alert"})})
+                return JsonResponse({"error":"no such a storage in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a storage in the System", "toastType":"alert"})})
 
             returnJson = {"error":"", "name":storage.name, "code":storage.code.code, "storable":False, "storage":True, "stored":False}
             return JsonResponse(returnJson)
@@ -77,6 +76,6 @@ def movementCodeInfo(request):
              #code storable storage name
 
 
-        return JsonResponse({"error":"not a valide code", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"not a valide code", "toastType":"alert"})})
-    return JsonResponse({"error":"what are you triing to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastText":"what are you triing to do?", "toastType":"alert"})})
+        return JsonResponse({"error":"not a valide code", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"not a valide code", "toastType":"alert"})})
+    return JsonResponse({"error":"what are you triing to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you triing to do?", "toastType":"alert"})})
 
