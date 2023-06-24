@@ -5,6 +5,7 @@ from .models import *
 import article.models as ar
 #from storage.models import *
 import storage.models as st
+import location.models as lo
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -37,3 +38,9 @@ def results(request):
                 r = st.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
+        elif request.GET['type']=="location":
+            if request.GET['search'] == "NONE":
+                r = lo.Location.objects.all()
+            else:
+                r = lo.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})

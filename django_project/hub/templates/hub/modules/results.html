@@ -3,6 +3,7 @@
 
     <tr id="{{ r.id }}_item" value="{{ r.id }}">
 
+     ff
             <td>
                 <input class="checkboxlist form-check-input" type="checkbox" value="{{r}}" id="{{ r.id }}">
             </td>
@@ -13,7 +14,7 @@
             <td class='itemClick_'>{{r.count}}</td>
 
             {% elif type == "location" %}
-            <td>{{ r.name }}</td>
+            <td>{{ r }}</td>
 
             {% elif type == "shelf" %}
             <td>{{ r.code }}</td>
