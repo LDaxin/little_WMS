@@ -8,9 +8,10 @@ from django.contrib.auth.decorators import login_required
 def storage(request, typ, storageId):
     try:
         storageObject = Storage.objects.get(pk=storageId)
+
         if storageObject.typ.lowerName == typ:
             instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
+            return render(request, "hub/modules/item.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
