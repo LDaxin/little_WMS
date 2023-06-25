@@ -10,18 +10,16 @@
 
             {% if type == "article" %}
             <td class='itemClick_'>{{ r.template.name }}</td>
-            <td class='itemClick_'>{{r.code}}</td>
             <td class='itemClick_'>{{r.count}}</td>
 
             {% elif type == "location" %}
             <td>{{ r }}</td>
 
-            {% elif type == "shelf" %}
-            <td>{{ r.code }}</td>
+            {% elif type == "storage" %}
+            <td>{{ r.name }}</td>
 
             {% else %}
             <td>{{ r.name }}</td>
-            <td>{{r.code}}</td>
             {% endif %}
 
             <td>
