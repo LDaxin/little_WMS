@@ -6,6 +6,7 @@ import article.models as ar
 #from storage.models import *
 import storage.models as st
 import location.models as lo
+import tag.models as ta
 from .forms import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -17,7 +18,7 @@ from django.db.models import Q
 
 @login_required(login_url='/accounts/login/')
 def hub(request):
-    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['movement', 'Article', 'Storage', 'Location'], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
+    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['movement', 'Article', 'Storage', 'Location', "Tag"], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
 
 @login_required(login_url='/accounts/login/')
 def results(request):
@@ -44,3 +45,9 @@ def results(request):
             else:
                 r = lo.Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
             return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})
+        elif request.GET["type"]=="tag":
+            if request.GET['search'] == "NONE":
+                r = ta.Tag.objects.all()
+            else:
+                r = ta.Tag.objects.filter(Q(name__contains=request.GET['search']))
+            return render(request, "hub/modules/results.html", context={"results":r, "type":"tag"})

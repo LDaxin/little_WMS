@@ -111,11 +111,3 @@ def updateArticle(request, typ, articleId):
             return render(request, "hub/modules/toast.html", context={"toastName":"Update", "toastId":"successToast", "toastText":"article was updated", "toastType":"alert"})
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
-@login_required(login_url='/accounts/login/')
-def tag(request):
-    if request.method == "POST":
-        t = FormTag(request.POST)
-        if t.is_valid():
-            tag = t.save()
-            tag.save()
-    return render(request, "article/tag.html", context={"list":Tag.objects.all(), "form":[FormTag]})

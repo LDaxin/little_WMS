@@ -30,6 +30,16 @@ def locations(request):
     return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "modalId":"single", "name":"location", "type":"location", "form":[FormLocation]})
 
 @login_required(login_url='/accounts/login/')
+def addLocation(request):
+    if request.method == "POST":
+        l = FormLocation(request.POST)
+        if l.is_valid():
+            location = l.save()
+            location.save()
+            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(location) + " was added to your system.", "toastType":"status"})
+    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+
+@login_required(login_url='/accounts/login/')
 def delLocation(request):
     if request.method == "POST":
         delList = []
@@ -46,17 +56,6 @@ def delLocation(request):
             i.deleted = True
             i.save()
         return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
-
-
-@login_required(login_url='/accounts/login/')
-def addLocation(request):
-    if request.method == "POST":
-        l = FormLocation(request.POST)
-        if l.is_valid():
-            location = l.save()
-            location.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(location) + " was added to your system.", "toastType":"status"})
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
