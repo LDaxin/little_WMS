@@ -9,9 +9,33 @@ from django.contrib.auth.decorators import login_required
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
+
+@login_required(login_url='/accounts/login/')
+def article(request, typ, articleId):
+    try:
+        p = Article.objects.get(pk=articleId)
+        if p.template.pType.lowerName == typ:
+            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
+            par = FormArticleBase(instance=p, typ=p.template.pType)
+            return render(request, "hub/modules/item.html", context={"symbol":p.template.pType.tSymbol, "searchFieldName":"articleSearch" + p.template.pType.tName, "id":articleId, "modalId":"single", "form":[temp , par],  "typ":typ, "actionType":"update"})
+        else:
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
+    
+    except:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+@login_required(login_url='/accounts/login/')
+def articleIncert(request, typ, articleId):
+        p = Article.objects.get(pk=articleId)
+        if p.template.pType.lowerName == typ:
+            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
+            par = FormArticleBase(instance=p, typ=p.template.pType)
+            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol, "searchFieldName":"articleSearch" + p.template.pType.tName, "id":articleId, "modalId":"single", "form":[temp, par],  "typ":typ, "actionType":"update"})
+        else:
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
+
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
-
     t = ArticleType.objects.get(lowerName__exact=typ)
 
     if t == None:
@@ -21,7 +45,6 @@ def articles(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
-
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
@@ -45,10 +68,9 @@ def addArticle(request, typ):
                 return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
-    
+
 @login_required(login_url='/accounts/login/')
 def delArticle(request, typ):
-
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
@@ -73,55 +95,21 @@ def delArticle(request, typ):
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
-def article(request, typ, articleId):
+def updateArticle(request, typ, articleId):
+    articleTypeObject = ArticleType.objects.get(lowerName__exact=typ)
+    articleObject = Article.objects.get(pk=articleId)
 
-    try:
-        p = Article.objects.get(pk=articleId)
-        if p.template.pType.lowerName == typ:
-            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
-            par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/item.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ, "actionType":"update"})
-        else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
-    
-    except:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
-
-@login_required(login_url='/accounts/login/')
-def articleIncert(request, typ, articleId):
-
-    try:
-        p = Article.objects.get(pk=articleId)
-        if p.template.pType.lowerName == typ:
-            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
-            par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ, "actionType":"update"})
-        else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
-    
-    except:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
-
-@login_required(login_url='/accounts/login/')
-def articleChange(request, typ, articleId):
-
-    t = ArticleType.objects.get(lowerName__exact=typ)
-    
-    if t == None:
+    if articleTypeObject == None:
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"toastError", "toastText":"no article type named " + typ, "toastType":"alert"})
     else:
         if request.method == "POST":
-            pass
-
-def articleTemplateChange(request, typ, articleId):
-
-    t = ArticleType.objects.get(lowerName__exact=typ)
-    
-    if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"toastError", "toastText":"no article type named " + typ, "toastType":"alert"})
-    else:
-        if request.method == "POST":
-            pass
+            articleTemplatForm = FormTemplateArticle(request.POST, instance=articleObject.template, initial={"pType":str(articleTypeObject.id)})
+            articleTemplatForm.save()
+            articleBaseForm = FormArticleBase(request.POST, instance=articleObject)
+            if articleBaseForm.is_valid():
+                articleBaseForm.save()
+            return render(request, "hub/modules/toast.html", context={"toastName":"Update", "toastId":"successToast", "toastText":"article was updated", "toastType":"alert"})
+        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
 def tag(request):
