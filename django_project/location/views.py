@@ -8,7 +8,7 @@ from .forms import *
 
 @login_required(login_url='/accounts/login/')
 def locations(request):
-    return render(request, "hub/modules/items.html", context={"list":Location.objects.all(), "type":"location", "form":[FormLocation]})
+    return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "name":"location", "type":"location", "form":[FormLocation]})
 
 @login_required(login_url='/accounts/login/')
 def delLocation(request):
