@@ -46,7 +46,7 @@ def location(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/item.html", context={"symbol":"location", "form":[locationForm]})
+        return render(request, "hub/modules/item.html", context={"symbol":"location", "form":[locationForm], "actionType":"update"})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -55,7 +55,7 @@ def locationIncert(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/itemForm.html", context={"symbol":"location", "form":[locationForm]})
+        return render(request, "hub/modules/itemForm.html", context={"symbol":"location", "form":[locationForm], "actionType":"update"})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 

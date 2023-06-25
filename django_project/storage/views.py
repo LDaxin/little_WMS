@@ -11,13 +11,12 @@ def storage(request, typ, storageId):
 
         if storageObject.typ.lowerName == typ:
             instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
-            return render(request, "hub/modules/item.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
+            return render(request, "hub/modules/item.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ, "actionType":"update"})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
-    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
 def storageIncert(request, typ, storageId):
@@ -25,13 +24,12 @@ def storageIncert(request, typ, storageId):
         storageObject = Storage.objects.get(pk=storageId)
         if storageObject.typ.lowerName == typ:
             instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ})
+            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum],  "typ":typ, "actionType":"update"})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
-    return render(request, "storage/storages.html", context={"list": Storage.objects.all(), "searchFieldName":"storageSearch" , "form":[FormStorage]})
 
 @login_required(login_url='/accounts/login/')
 def storages(request, typ):

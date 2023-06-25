@@ -1,5 +1,5 @@
 
-<form method="POST" action="./add" id="addForm">
+<form method="POST" action="./{{ actionType }}}" id="{{ actionType }}Form">
     {% csrf_token %}
 
     {% for p_form in form %}

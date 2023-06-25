@@ -80,7 +80,7 @@ def article(request, typ, articleId):
         if p.template.pType.lowerName == typ:
             temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
             par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/item.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ})
+            return render(request, "hub/modules/item.html", context={"symbol":p.template.pType.tSymbol,"form":[temp , par],  "typ":typ, "actionType":"update"})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     
@@ -95,7 +95,7 @@ def articleIncert(request, typ, articleId):
         if p.template.pType.lowerName == typ:
             temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
             par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ})
+            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol,"form":[temp, par],  "typ":typ, "actionType":"update"})
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
     

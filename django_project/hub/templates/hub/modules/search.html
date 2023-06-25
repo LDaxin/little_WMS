@@ -75,7 +75,7 @@
 
                         console.log($(this).val())
                         $.get("./"+$(this).val()+"/i", function(data){
-                            $("#modalBodysingle").html(data)
+                            $("#modalBodyAddonsingle").html(data)
                             $("#modalsingle").modal("show")
 
                         })
