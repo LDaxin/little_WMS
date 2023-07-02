@@ -33,6 +33,7 @@ LOGIN_REDIRECT_URL = "/"
 INSTALLED_APPS = [
     'hub.apps.HubConfig',
     'location.apps.LocationConfig',
+    'label.apps.LabelConfig',
     'article.apps.ArticleConfig',
     'storage.apps.StorageConfig',
     'codeSystem.apps.CodeSystemConfig',
