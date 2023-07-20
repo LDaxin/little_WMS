@@ -6,7 +6,21 @@ it's a small scale WMS.
 This is a WMS(Warehouse Managment System) for personal use. It's vision is to be so simple to use that you use it.
 
 ## Roadmap
-- [ ] Stage 1 (Base)
+- [.] Stage 1 (Base)
+    - [ ] Models
+        - [ ] Article Template
+        - [ ] Article
+        - [ ] Storage
+        - [ ] Tag
+        - [ ] Settings
+        - [ ] Code
+    - [ ] Functions
+        - [ ] Adding Objects to the Models
+            - [ ] Article
+            - [ ] Storage
+            - [ ] Tag
+            - [ ] Location
+        - [ ] 
 
     - [ ] views
         - [X] list view
