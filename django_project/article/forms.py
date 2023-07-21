@@ -34,12 +34,11 @@ class FormTemplateArticle(forms.ModelForm):
     class Meta:
         model = ArticleTemplate
         fields = '__all__'
-        exclude = ("pType",)
 
     def __init__(self, *args,typ= None, **kwargs):
         super(FormTemplateArticle, self).__init__(*args, **kwargs)
         if not typ == None:
-            for delField in getArticleTypeFields(typ, 'template', []):
+            for delField in getArticleTypeFields(typ, 'template', ["pType"]):
                 del self.fields[delField]
 
         for visible in self.visible_fields():
