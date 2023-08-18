@@ -27,5 +27,6 @@ urlpatterns = [
     path('', include("movement.urls")),
     path('', include("location.urls")),
     path('', include("export.urls")),
+    path('', include("codeSystem.urls")),
     path('api-auth/', include('rest_framework.urls')),
 ]

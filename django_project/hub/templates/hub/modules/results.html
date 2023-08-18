@@ -21,6 +21,10 @@
             {% elif type == "storage" %}
             <td>{{ r.name }}</td>
 
+            {% elif type == "code" %}
+            <td>{{ r.code }}</td>
+            <td>{{ r.used }}</td>
+
             {% else %}
             <td>{{ r.name }}</td>
             {% endif %}

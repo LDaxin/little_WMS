@@ -8,6 +8,7 @@ class UuidCode(SoftDeleteObject, models.Model):
    uuidCode = models.UUIDField(default = uuid.uuid4, editable = False, unique = True)
    code = models.CharField(max_length = 32, editable = False, unique = True, blank=True)
    prefix = models.CharField(max_length = 2, editable = False)
+   used = models.BooleanField(default = True)
 
    def save(self, *args, **kwargs):
        if not self.code:
