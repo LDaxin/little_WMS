@@ -47,25 +47,11 @@ class ArticleType(SoftDeleteObject, models.Model):
     template_toggle_count = models.BooleanField(default=True, editable=False)
     template_toggle_stored = models.BooleanField(default=True, editable=False)
 
-
     template_toggle_description = models.BooleanField(default=True)
     template_toggle_tag = models.BooleanField(default=True)
     template_toggle_alias = models.BooleanField(default=True)
 
-    template_toggle_width = models.BooleanField(default=False)
-    template_toggle_depth = models.BooleanField(default=False)
-    template_toggle_height = models.BooleanField(default=False)
-
-    template_toggle_innerWidth = models.BooleanField(default=False)
-    template_toggle_innerDepth = models.BooleanField(default=False)
-    template_toggle_innerHeight = models.BooleanField(default=False)
-
     article_toggle_ref = models.BooleanField(default=False)
-
-    article_toggle_weight = models.BooleanField(default=False)
-    article_toggle_volume = models.BooleanField(default=False)
-    article_toggle_length = models.BooleanField(default=False)
-    article_toggle_tag = models.BooleanField(default=False)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -92,14 +78,6 @@ class ArticleTemplate(SoftDeleteObject, models.Model):
 
     pType = models.ForeignKey(ArticleType, on_delete=models.PROTECT, blank=True)
 
-    width = models.FloatField(null=True, blank=True)
-    depth = models.FloatField(null=True, blank=True)
-    height = models.FloatField(null=True, blank=True)
-
-    innerWidth = models.FloatField(null=True, blank=True)
-    innerDepth = models.FloatField(null=True, blank=True)
-    innerHeight = models.FloatField(null=True, blank=True)
-
     tag = models.ManyToManyField(Tag, blank=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
@@ -118,10 +96,8 @@ class ArticleTemplate(SoftDeleteObject, models.Model):
 
 class Article(SoftDeleteObject, models.Model):
     template = models.ForeignKey(ArticleTemplate, on_delete=models.CASCADE, blank=True)
-    count = models.IntegerField(default=1, blank=True)
-    weight = models.IntegerField(null=True, blank=True)
-    volume = models.IntegerField(null=True, blank=True)
-    length = models.IntegerField(null=True, blank=True)
+
+    count = models.BigIntegerField(default=1)
 
     stored = models.ForeignKey(Stored, related_name= "stored", on_delete = models.SET_NULL, null=True, blank=True)
 

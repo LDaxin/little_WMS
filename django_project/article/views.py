@@ -41,19 +41,35 @@ def articles(request, typ):
     if t == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
-        return render(request, "hub/modules/items.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
+        context={
+            "symbol":t.tSymbol,
+            "searchFieldName":"articleSearch" + t.tName,
+            'type':"article",
+            "name":typ,
+            "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],
+            "typ":typ
+        }
+        return render(request, "hub/modules/items.html", context=context)
+        #return render(request, "hub/modules/items.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
 
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no article type named " + typ, "toastType":"alert"})
+        context = {
+                "toastName":"Error",
+                "toastId":"errorToast",
+                "toastText":"no article type named " + typ,
+                "toastType":"alert"
+            }
+        return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
             re = request.POST.copy()
-            re["pType"] = str(t.id) 
+            re["pType"] = str(t.id)
             te = FormTemplateArticle(re)
+            #return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":re, "toastType":"status"})
             if te.is_valid():
                 template = te.save()
                 re["template"] = template 
@@ -65,6 +81,7 @@ def addArticle(request, typ):
                     ref.save()
                     pa.ref = ref
                     pa.save()
+
                 return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
