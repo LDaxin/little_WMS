@@ -39,17 +39,7 @@ class Unit(SoftDeleteObject, models.Model):
 class ArticleType(SoftDeleteObject, models.Model):
     tName = models.CharField(max_length=20)
     lowerName = models.CharField(max_length=200, blank=True)
-    tShort = models.CharField(max_length=2)
     tSymbol = models.CharField(max_length=20)
-
-    template_toggle_name = models.BooleanField(default=True, editable=False)
-    template_toggle_unit = models.BooleanField(default=True, editable=False)
-    template_toggle_count = models.BooleanField(default=True, editable=False)
-    template_toggle_stored = models.BooleanField(default=True, editable=False)
-
-    template_toggle_description = models.BooleanField(default=True)
-    template_toggle_tag = models.BooleanField(default=True)
-    template_toggle_alias = models.BooleanField(default=True)
 
     article_toggle_ref = models.BooleanField(default=False)
 
@@ -67,35 +57,12 @@ class ArticleType(SoftDeleteObject, models.Model):
     def __str__(self, *args, **kwargs):
         return self.tName
 
-class ArticleTemplate(SoftDeleteObject, models.Model):
-
+class Article(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
-
     description = models.TextField(null=True, blank=True)
 
-    alias = models.CharField(max_length=400, null=True, blank=True)
-
     pType = models.ForeignKey(ArticleType, on_delete=models.PROTECT, blank=True)
-
-    tag = models.ManyToManyField(Tag, blank=True)
-
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
-
-    def save(self, *args, **kwargs):
-        if not self.code:
-            uCode = UuidCode()
-            uCode.prefix = "ae" 
-            self.code = uCode
-            uCode.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self, *args, **kwargs):
-        return self.name
-
-
-class Article(SoftDeleteObject, models.Model):
-    template = models.ForeignKey(ArticleTemplate, on_delete=models.CASCADE, blank=True)
 
     count = models.BigIntegerField(default=1)
 
@@ -117,5 +84,5 @@ class Article(SoftDeleteObject, models.Model):
 
 
     def __str__(self, *args, **kwargs):
-        return self.template.name + " " + self.code.code
+        return self.name + " " + self.code.code
     

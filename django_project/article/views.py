@@ -14,12 +14,19 @@ from django.contrib.auth.decorators import login_required
 def article(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
-        if p.template.pType.lowerName == typ:
-            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
-            par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/item.html", context={"symbol":p.template.pType.tSymbol, "searchFieldName":"articleSearch" + p.template.pType.tName, "id":articleId, "modalId":"single", "form":[temp , par],  "typ":typ, "actionType":"update"})
+        if p.pType.lowerName == typ:
+            par = FormArticleBase(instance=p)
+            context = {
+                "symbol":p.pType.tSymbol,
+                "searchFieldName":"articleSearch" + p.pType.tName,
+                "id":articleId,
+                "modalId":"single",
+                "form":[par],
+                "typ":typ
+            }
+            return render(request, "hub/modules/item.html", context=context)
         else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.tName)
     
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -27,12 +34,19 @@ def article(request, typ, articleId):
 @login_required(login_url='/accounts/login/')
 def articleIncert(request, typ, articleId):
         p = Article.objects.get(pk=articleId)
-        if p.template.pType.lowerName == typ:
-            temp = FormTemplateArticle(instance=p.template, typ=p.template.pType)
-            par = FormArticleBase(instance=p, typ=p.template.pType)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":p.template.pType.tSymbol, "searchFieldName":"articleSearch" + p.template.pType.tName, "id":articleId, "modalId":"single", "form":[temp, par],  "typ":typ, "actionType":"update"})
+        if p.pType.lowerName == typ:
+            par = FormArticleBase(instance=p)
+            context = {
+                "symbol":p.pType.tSymbol,
+                "searchFieldName":"articleSearch" + p.pType.tName,
+                "id":articleId,
+                "modalId":"single",
+                "form":[par],
+                "typ":typ
+            }
+            return render(request, "hub/modules/itemForm.html", context=context)
         else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.template.pType.tName)
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.tName)
 
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
@@ -46,11 +60,10 @@ def articles(request, typ):
             "searchFieldName":"articleSearch" + t.tName,
             'type':"article",
             "name":typ,
-            "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],
+            "form":[FormArticle()],
             "typ":typ
         }
         return render(request, "hub/modules/items.html", context=context)
-        #return render(request, "hub/modules/items.html", context={"symbol":t.tSymbol, "searchFieldName":"articleSearch" + t.tName, 'type':"article", "name":typ, "form":[FormTemplateArticle(typ=t), FormArticleBase(typ=t)],  "typ":typ})
 
 @login_required(login_url='/accounts/login/')
 def addArticle(request, typ):
@@ -64,34 +77,50 @@ def addArticle(request, typ):
                 "toastType":"alert"
             }
         return render(request, "hub/modules/toast.html", context=context)
+
     else:
         if request.method == "POST":
-            re = request.POST.copy()
-            re["pType"] = str(t.id)
-            te = FormTemplateArticle(re)
-            #return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":re, "toastType":"status"})
-            if te.is_valid():
-                template = te.save()
-                re["template"] = template 
-                p = FormArticleBase(re)
-                if p.is_valid():
-                    pa = p.save()
+            p = FormArticle(request.POST)
+            if p.is_valid():
+                pa = p.save(commit=False)
+                pa.pType = t
+
                 if t.article_toggle_ref:
                     ref = Stored()
                     ref.save()
                     pa.ref = ref
-                    pa.save()
 
-                return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":pa.template.name + " was added to your system.", "toastType":"status"})
+                pa.save()
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+                context = {
+                    "toastName":"Add Succses",
+                    "toastId":"successToast",
+                    "toastText":pa.name + " was added to your system.",
+                    "toastType":"status"
+                }
+
+                return render(request, "hub/modules/toast.html", context=context)
+
+        context = {
+                "toastName":"Error",
+                "toastId":"errorToast",
+                "toastText":"no article type named " + typ,
+                "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def delArticle(request, typ):
     t = ArticleType.objects.get(lowerName__exact=typ)
     
     if t == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no article type named " + typ, "toastType":"alert"})
+        context = {
+                "toastName":"Error",
+                "toastId":"errorToast",
+                "toastText":"no article type named " + typ,
+                "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
             delList = []
@@ -99,17 +128,35 @@ def delArticle(request, typ):
             for key, value in request.POST.items():
                 if key.startswith("_"):
                     try:
-                        pa = Article.objects.filter(template__pType__lowerName__exact=typ, pk=value).first()
+                        pa = Article.objects.filter(pType__lowerName__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
-                        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":e,
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
             for i in delList:
                 delListReturn = delListReturn + i.__str__() + " "
                 i.delete()
 
-            return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
+            context = {
+                "toastName":"Delete",
+                "toastId":"successToast",
+                "toastText":delListReturn,
+                "toastType":"status"
+            }
+            return render(request, "hub/modules/toast.html", context=context)
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+        context = {
+            "toastName":"Error",
+            "toastId":"errorToast",
+            "toastText":"something went wrong",
+            "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def updateArticle(request, typ, articleId):
@@ -117,14 +164,30 @@ def updateArticle(request, typ, articleId):
     articleObject = Article.objects.get(pk=articleId)
 
     if articleTypeObject == None:
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"toastError", "toastText":"no article type named " + typ, "toastType":"alert"})
+        context = {
+            toastName:"Error",
+            toastId:"toastError",
+            toastText:"no article type named " + typ,
+            toastType:"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
-            articleTemplatForm = FormTemplateArticle(request.POST, instance=articleObject.template, initial={"pType":str(articleTypeObject.id)})
-            articleTemplatForm.save()
             articleBaseForm = FormArticleBase(request.POST, instance=articleObject)
             if articleBaseForm.is_valid():
                 articleBaseForm.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Update", "toastId":"successToast", "toastText":"article was updated", "toastType":"alert"})
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+            context = {
+                "toastName":"Update",
+                "toastId":"successToast",
+                "toastText":"article was updated",
+                "toastType":"status"
+            }
+            return render(request, "hub/modules/toast.html", context=context)
+        context = {
+            "toastName":"Error",
+            "toastId":"errorToast",
+            "toastText":"something went wrong",
+            "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
 

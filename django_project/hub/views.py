@@ -26,11 +26,11 @@ def results(request):
     if request.method == "GET":
         if request.GET['type']=="article":
             if request.GET['search'] == "NONE":
-                r = ar.Article.objects.filter(template__pType__lowerName__exact=request.GET["ptype"])
+                r = ar.Article.objects.filter(pType__lowerName__exact=request.GET["ptype"])
             else:
-                #r = Article.objects.filter(template__name__contains=request.GET['search'], template__pType__tName__exact=request.GET["ptype"])
+                #r = Article.objects.filter(name__contains=request.GET['search'], pType__tName__exact=request.GET["ptype"])
 
-                r = ar.Article.objects.filter(Q(template__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), template__pType__lowerName__exact=request.GET["ptype"])
+                r = ar.Article.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), pType__lowerName__exact=request.GET["ptype"])
             return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
         elif request.GET['type']=="storage":
