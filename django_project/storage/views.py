@@ -11,7 +11,15 @@ def storage(request, typ, storageId):
 
         if storageObject.typ.lowerName == typ:
             instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
-            return render(request, "hub/modules/item.html", context={"symbol":storageObject.typ.symbol, "searchFieldName":"storageSearch" + storageObject.typ.name, "modalId":"single", "form":[instancedStorageForum],  "typ":typ, "id":storageId, "actionType":"update"})
+            context = {
+                "symbol":storageObject.typ.symbol,
+                "searchFieldName":"storageSearch" + storageObject.typ.name,
+                "modalId":"single",
+                "form":[instancedStorageForum],
+                "typ":typ,
+                "id":storageId
+            }
+            return render(request, "hub/modules/item.html", context=mainContext)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
@@ -24,7 +32,15 @@ def storageIncert(request, typ, storageId):
         storageObject = Storage.objects.get(pk=storageId)
         if storageObject.typ.lowerName == typ:
             instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
-            return render(request, "hub/modules/itemForm.html", context={"symbol":storageObject.typ.symbol,"form":[instancedStorageForum], "searchFieldName":"storageSearch" + storageObject.typ.name, "modalId":"single", "setorageId":storageId, "modalId":"single", "id":storageId,  "typ":typ, "actionType":"update"})
+            context = {
+                "symbol":storageObject.typ.symbol,
+                "searchFieldName":"storageSearch" + storageObject.typ.name,
+                "modalId":"single",
+                "form":[instancedStorageForum],
+                "typ":typ,
+                "id":storageId
+            }
+            return render(request, "hub/modules/itemForm.html", context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
@@ -39,7 +55,15 @@ def storages(request, typ):
     if storageTypeObject == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
     else:
-        return render(request, "hub/modules/items.html", context={"symbol":storageTypeObject.symbol, "searchFieldName":"storageSearch" + storageTypeObject.name, 'type':"storage", "name":typ, "form":[FormStorage(typ=storageTypeObject)],  "typ":typ})
+        context = {
+            "symbol":storageTypeObject.symbol,
+            "searchFieldName":"storageSearch" + storageTypeObject.name,
+            'type':"storage",
+            "name":typ,
+            "form":[FormStorage()],
+            "typ":typ
+        }
+        return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def addStorage(request, typ):
@@ -52,9 +76,27 @@ def addStorage(request, typ):
             storage = s.save(commit=False)
             storage.typ = t
             so = storage.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(storage) + " was added to your system.", "toastType":"status"})
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+            context = {
+                "toastName":"Add Succses",
+                "toastId":"successToast",
+                "toastText":str(storage) + " was added to your system.",
+                "toastType":"status"
+            }
+            return render(request, "hub/modules/toast.html", context=context)
+        context = {
+            "toastName":"Error",
+            "toastId":"errorToast",
+            "toastText":"something went wrong",
+            "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
+    context = {
+        "toastName":"Error",
+        "toastId":"errorToast",
+        "toastText":"something went wrong",
+        "toastType":"alert"
+    }
+    return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def delStorage(request, typ):
@@ -67,15 +109,32 @@ def delStorage(request, typ):
                     pa = Storage.objects.filter(pk=value).first()
                     delList.append(pa)
                 except Exception as e:
-                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
+                    context = {
+                        "toastName":"Error",
+                        "toastId":"errorToast",
+                        "toastText":e,
+                        "toastType":"alert"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
         for i in delList:
             delListReturn = delListReturn + i.__str__() + " "
             i.deleted = True
             i.save()
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
-
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+        context = {
+            "toastName":"Delete",
+            "toastId":"successToast",
+            "toastText":delListReturn,
+            "toastType":"status"
+        }
+        return render(request, "hub/modules/toast.html", context=context)
+    context = {
+        "toastName":"Error",
+        "toastId":"errorToast",
+        "toastText":"something went wrong",
+        "toastType":"alert"
+    }
+    return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def updateStorage(request, storageId, typ):
@@ -85,5 +144,17 @@ def updateStorage(request, storageId, typ):
         form = FormStorage(request.POST, instance=storageObject)
         if form.is_valid():
             form.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":str(storageObject) + " was updated.", "toastType":"status"})
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thething went wrong", "toastType":"alert"})
+            context = {
+                "toastName":"Update",
+                "toastId":"successToast",
+                "toastText":str(storageObject) + " was updated",
+                "toastType":"status"
+            }
+            return render(request, "hub/modules/toast.html", context=context)
+        context ={
+            "toastName":"Error",
+            "toastId":"errorToast",
+            "toastText":"something went wrong",
+            "toastType":"alert"
+        }
+        return render(request, "hub/modules/toast.html", context=context)

@@ -13,7 +13,7 @@ class FormStorage(forms.ModelForm):
                 "parent":("Ort"),
         }
 
-    def __init__(self, *args, typ = None,  **kwargs):
+    def __init__(self, *args, **kwargs):
         super(FormStorage, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
