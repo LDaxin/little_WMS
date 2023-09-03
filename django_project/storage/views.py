@@ -6,38 +6,37 @@ from django.contrib.auth.decorators import login_required
 
 @login_required(login_url='/accounts/login/')
 def storage(request, typ, storageId):
-    try:
         storageObject = Storage.objects.get(pk=storageId)
 
         if storageObject.typ.lowerName == typ:
-            instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
+            instancedStorageForum = FormStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
                 "searchFieldName":"storageSearch" + storageObject.typ.name,
                 "modalId":"single",
                 "form":[instancedStorageForum],
                 "typ":typ,
+                "actionType":"update",
                 "id":storageId
             }
-            return render(request, "hub/modules/item.html", context=mainContext)
+            return render(request, "hub/modules/item.html", context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
     
-    except:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
 def storageIncert(request, typ, storageId):
     try:
         storageObject = Storage.objects.get(pk=storageId)
         if storageObject.typ.lowerName == typ:
-            instancedStorageForum = FormStorage(instance=storageObject, typ=storageObject.typ)
+            instancedStorageForum = FormStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
                 "searchFieldName":"storageSearch" + storageObject.typ.name,
                 "modalId":"single",
                 "form":[instancedStorageForum],
                 "typ":typ,
+                "actionType":"update",
                 "id":storageId
             }
             return render(request, "hub/modules/itemForm.html", context=context)

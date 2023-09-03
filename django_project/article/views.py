@@ -15,13 +15,14 @@ def article(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
         if p.pType.lowerName == typ:
-            par = FormArticleBase(instance=p)
+            par = FormArticle(instance=p)
             context = {
                 "symbol":p.pType.tSymbol,
                 "searchFieldName":"articleSearch" + p.pType.tName,
                 "id":articleId,
                 "modalId":"single",
                 "form":[par],
+                "actionType":"update",
                 "typ":typ
             }
             return render(request, "hub/modules/item.html", context=context)
@@ -33,20 +34,24 @@ def article(request, typ, articleId):
 
 @login_required(login_url='/accounts/login/')
 def articleIncert(request, typ, articleId):
+    try:
         p = Article.objects.get(pk=articleId)
         if p.pType.lowerName == typ:
-            par = FormArticleBase(instance=p)
+            par = FormArticle(instance=p)
             context = {
                 "symbol":p.pType.tSymbol,
                 "searchFieldName":"articleSearch" + p.pType.tName,
                 "id":articleId,
                 "modalId":"single",
                 "form":[par],
+                "actionType":"update",
                 "typ":typ
             }
             return render(request, "hub/modules/itemForm.html", context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.tName)
+    except:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
 def articles(request, typ):
@@ -173,9 +178,9 @@ def updateArticle(request, typ, articleId):
         return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
-            articleBaseForm = FormArticleBase(request.POST, instance=articleObject)
-            if articleBaseForm.is_valid():
-                articleBaseForm.save()
+            articleForm = FormArticle(request.POST, instance=articleObject)
+            if articleForm.is_valid():
+                articleForm.save()
             context = {
                 "toastName":"Update",
                 "toastId":"successToast",
