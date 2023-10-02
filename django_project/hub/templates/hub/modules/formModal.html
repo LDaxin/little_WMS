@@ -20,6 +20,18 @@
     </form>
 
     <script>
+        $("#id_tag").select2({
+            theme: "bootstrap-5",
+            dropdownParent: $("#modal{{modalId}}"),
+            width: "100%",
+            placeholder: "Select tags"
+        });
+        $("#id_unit").select2({
+            theme: "bootstrap-5",
+            dropdownParent: $("#modal{{modalId}}"),
+            width: "100%",
+            placeholder: "Select unit"
+        });
         $("#addButton").on("click", function(){
             $("#addForm").submit(function(e){
                 e.preventDefault();

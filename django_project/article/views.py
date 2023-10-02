@@ -15,7 +15,7 @@ def article(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
         if p.pType.lowerName == typ:
-            par = FormArticle(instance=p)
+            par = FormChangeArticle(instance=p)
             context = {
                 "symbol":p.pType.tSymbol,
                 "searchFieldName":"articleSearch" + p.pType.tName,
@@ -37,7 +37,7 @@ def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
         if p.pType.lowerName == typ:
-            par = FormArticle(instance=p)
+            par = FormChangeArticle(instance=p)
             context = {
                 "symbol":p.pType.tSymbol,
                 "searchFieldName":"articleSearch" + p.pType.tName,
@@ -45,7 +45,7 @@ def articleIncert(request, typ, articleId):
                 "modalId":"single",
                 "form":[par],
                 "actionType":"update",
-                "typ":typ
+                "typ":typ,
             }
             return render(request, "hub/modules/itemForm.html", context=context)
         else:
@@ -87,6 +87,7 @@ def addArticle(request, typ):
         if request.method == "POST":
             p = FormArticle(request.POST)
             if p.is_valid():
+
                 pa = p.save(commit=False)
                 pa.pType = t
 

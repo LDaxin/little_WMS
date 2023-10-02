@@ -1,5 +1,5 @@
 
-<form method="POST" action="./{{id}}/{{ actionType }}" id="{{ actionType }}Form">
+<form method="POST" action="./{{id}}/{{ actionType }}" id="{{id}}{{ actionType }}Form">
     {% csrf_token %}
 
     {% for p_form in form %}
@@ -15,28 +15,40 @@
     <button type="submit" class="btn btn-success" id="{{actionType}}Button" >{{actionType}}</button>
 </form>
 
-    <script>
-        $("#{{actionType}}Button").on("click", function(){
-            $("#{{actionType}}Form").submit(function(e){
-                e.preventDefault();
-                e.stopImmediatePropagation();
+<script>
+    $("#id_tag_change").select2({
+        theme: "bootstrap-5",
+        dropdownParent: $("#modal{{modalId}}"),
+        width: "100%",
+        placeholder: "Select tags"
+    });
+    $("#id_unit_change").select2({
+        theme: "bootstrap-5",
+        dropdownParent: $("#modal{{modalId}}"),
+        width: "100%",
+        placeholder: "Select tags"
+    });
+    $("#{{actionType}}Button").on("click", function(){
+        $("#{{actionType}}Form").submit(function(e){
+            e.preventDefault();
+            e.stopImmediatePropagation();
 
-                var form = $(this);
-                var actionUrl = form.attr('action');
-        
-                $.ajax({
-                    type: "POST",
-                    url: actionUrl,
-                    data: form.serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        lResults($('#{{searchFieldName}}').val());
-                        $(".toast-container").append(data);
-                        $("#modal{{modalId}}").modal("hide");
-                    }
-                });
-
-                return false;
+            var form = $(this);
+            var actionUrl = form.attr('action');
+    
+            $.ajax({
+                type: "POST",
+                url: actionUrl,
+                data: form.serialize(), // serializes the form's elements.
+                success: function(data)
+                {
+                    lResults($('#{{searchFieldName}}').val());
+                    $(".toast-container").append(data);
+                    $("#modal{{modalId}}").modal("hide");
+                }
             });
+
+            return false;
         });
-    </script>
+    });
+</script>
