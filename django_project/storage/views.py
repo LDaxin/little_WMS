@@ -9,7 +9,7 @@ def storage(request, typ, storageId):
         storageObject = Storage.objects.get(pk=storageId)
 
         if storageObject.typ.lowerName == typ:
-            instancedStorageForum = FormStorage(instance=storageObject)
+            instancedStorageForum = FormChangeStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
                 "searchFieldName":"storageSearch" + storageObject.typ.name,
@@ -29,7 +29,7 @@ def storageIncert(request, typ, storageId):
     try:
         storageObject = Storage.objects.get(pk=storageId)
         if storageObject.typ.lowerName == typ:
-            instancedStorageForum = FormStorage(instance=storageObject)
+            instancedStorageForum = FormChangeStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
                 "searchFieldName":"storageSearch" + storageObject.typ.name,

@@ -9,7 +9,7 @@ from .forms import *
 def tag(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
-        tagForm = FormTag(instance=tagObject)
+        tagForm = FormChangeTag(instance=tagObject)
         return render(request, "hub/modules/item.html", context={"symbol":"Tag", "searchFieldName":"tagSearch", "id":tagId, "modalId":"single", "form":[tagForm], "actionType":"update"})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -18,7 +18,7 @@ def tag(request, tagId):
 def tagIncert(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
-        tagForm = FormTag(instance=tagObject)
+        tagForm = FormChangeTag(instance=tagObject)
         return render(request, "hub/modules/itemForm.html", context={"searchFieldName":"tagSearch",  "id":tagId, "modalId":"single", "form":[tagForm], "actionType":"update"})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')

@@ -28,6 +28,12 @@
         width: "100%",
         placeholder: "Select tags"
     });
+    $("#id_parent_change").select2({
+        theme: "bootstrap-5",
+        dropdownParent: $("#modal{{modalId}}"),
+        width: "100%",
+        placeholder: "Select patent"
+    });
     $("#{{actionType}}Button").on("click", function(){
         $("#{{actionType}}Form").submit(function(e){
             e.preventDefault();

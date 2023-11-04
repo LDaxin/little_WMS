@@ -11,10 +11,12 @@ class  FormArticle(forms.ModelForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
 
+
+
 class FormChangeArticle(forms.ModelForm):
     class Meta:
         model = Article
-        exclude = ('pType', 'ref')
+        exclude = ('pType', 'ref', 'code')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)

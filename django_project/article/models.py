@@ -72,7 +72,7 @@ class Article(SoftDeleteObject, models.Model):
 
     tag = models.ManyToManyField(Tag, blank=True)
 
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         if not self.code:

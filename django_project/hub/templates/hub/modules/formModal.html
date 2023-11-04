@@ -32,6 +32,12 @@
             width: "100%",
             placeholder: "Select unit"
         });
+        $("#id_parent").select2({
+            theme: "bootstrap-5",
+            dropdownParent: $("#modal{{modalId}}"),
+            width: "100%",
+            placeholder: "Select parent"
+        });
         $("#addButton").on("click", function(){
             $("#addForm").submit(function(e){
                 e.preventDefault();
