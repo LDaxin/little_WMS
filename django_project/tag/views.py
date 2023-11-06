@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import *
 from .forms import *
+from django.db.models import Q
 
 # Create your views here.
 
@@ -66,3 +67,11 @@ def updateTag(request, tagId):
             tagForm.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":"Tag was updated.", "toastType":"status"})
 
+@login_required(login_url='/accounts/login/')
+def searchTags(request):
+    if request.method == "GET":
+        if request.GET['search'] == "":
+            r = Tag.objects.all()
+        else:
+            r = Tag.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+        return render(request, "hub/modules/results.html", context={"results":r, "type":"tag"})

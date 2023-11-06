@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 @login_required(login_url='/accounts/login/')
 def storage(request, typ, storageId):
@@ -157,3 +158,13 @@ def updateStorage(request, storageId, typ):
             "toastType":"alert"
         }
         return render(request, "hub/modules/toast.html", context=context)
+
+
+@login_required(login_url='/accounts/login/')
+def searchStorages(request, typ):
+    if request.method == "GET":
+        if request.GET['search'] == "":
+            r = Storage.objects.filter(typ__lowerName__exact=typ)
+        else:
+            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__lowerName__exact=typ)
+        return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})

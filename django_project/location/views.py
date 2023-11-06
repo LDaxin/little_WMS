@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from django.contrib.auth.decorators import login_required
 from .forms import *
+from django.db.models import Q
 
 # Create your views here.
 
@@ -68,3 +69,12 @@ def updateLocation(request, locationId):
             locationForm.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":"Location was updated", "toastType":"status"})
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thething went wrong", "toastType":"alert"})
+
+@login_required(login_url='/accounts/login/')
+def searchLocations(request):
+    if request.method == "GET":
+        if request.GET['search'] == "":
+            r = Location.objects.all()
+        else:
+            r = Location.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+        return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})

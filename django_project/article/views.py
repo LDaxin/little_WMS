@@ -6,6 +6,7 @@ from stored.models import Stored
 from django.core.exceptions import ObjectDoesNotExist
 from storage.models import Stored
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -197,3 +198,11 @@ def updateArticle(request, typ, articleId):
         }
         return render(request, "hub/modules/toast.html", context=context)
 
+@login_required(login_url='/accounts/login/')
+def searchArticle(request, typ):
+    if request.method == "GET":
+        if request.GET['search'] == "":
+            r = Article.objects.filter(pType__lowerName__exact=typ)
+        else:
+            r = Article.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), pType__lowerName__exact=typ)
+        return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})

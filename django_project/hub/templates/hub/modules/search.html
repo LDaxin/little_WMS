@@ -2,16 +2,14 @@
 
 <div class="d-flex p-2">
     <div class="input-group">
-        <input id={{searchFieldName}} placeholder="search" class="form-control">
-  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRSearch" aria-expanded="false" aria-controls="switchQRSearch">
-      QR
-  </button>
-
+        <input id={{searchFieldName}} class="form-control" name="search" type="search" "qtype="search" placeholder="Search" hx-get="./search" hx-trigger="load, keyup changed delay:500ms" hx-target="#results">
+      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRSearch" aria-expanded="false" aria-controls="switchQRSearch">QR</button>
     </div>
 </div>
-        <div class="collapse" id="switchQRSearch">
-            {% include "hub/modules/scanner.html" with input=searchFieldName %}
-        </div>
+
+<div class="collapse" id="switchQRSearch">
+    {% include "hub/modules/scanner.html" with input=searchFieldName %}
+</div>
 
 <!-- ____________________________Result Table______________________________________ -->
 
@@ -47,49 +45,3 @@
 </tbody>
 
 </table>
-
-
-
-<!-- ____________________________SCRIPTS______________________________________ -->
-
-<script>
-
-        function eventCheckBox(){
-            if ($("#checkAll").prop("checked")){
-                $(".checkboxlist").prop("checked", true)
-            }else{
-                $(".checkboxlist").prop("checked", false)
-            }
-        }
-
-        var scanBuffer
-
-        function lResults(search){
-            if(search!=scanBuffer){
-                console.log(search)
-                if(search == ""){
-                    search = "NONE";
-                }
-                $.get("/module/search/results?type={{ type }}&ptype={{name}}&search="+search, function(data){
-                    $("#results").html(data)
-
-                    $(":button.itemClickEdit").click(function(){
-
-                        console.log($(this).val())
-                        $.get("./"+$(this).val()+"/i", function(data){
-                            $("#modalBodyAddonsingle").html(data)
-                            $("#modalsingle").modal("show")
-
-                        })
-                    })
-                });
-            }
-        }
-
-        $("#results").load(lResults(""));
-
-        $("#{{searchFieldName}}").on("input", function(){
-            lResults($('#{{searchFieldName}}').val())
-        });
-        
-</script>

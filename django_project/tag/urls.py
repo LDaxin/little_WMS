@@ -7,6 +7,7 @@ urlpatterns = [
     re_path(r'^tag/(?P<tagId>[0-9]+)', views.tag, name="Tag"),
     re_path(r"^tag/add", views.addTag, name="add Tag"),
     re_path(r"^tag/del", views.delTag, name="del Tag"),
+    re_path(r"^tag/search", views.searchTags, name="search"),
     re_path(r"^tag/", views.tags, name="Tags"),
 ]
 

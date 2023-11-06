@@ -7,6 +7,7 @@ urlpatterns = [
     re_path(r'^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)', views.storage, name="storage"),
     re_path(r"^storage/(?P<typ>\w+)/add", views.addStorage, name="add Storage"),
     re_path(r"^storage/(?P<typ>\w+)/del", views.delStorage, name="del Storage"),
+    re_path(r"^storage/(?P<typ>\w+)/search", views.searchStorages, name="search"),
     re_path(r"^storage/(?P<typ>\w+)/", views.storages, name="storages"),
 ]
 
