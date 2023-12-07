@@ -5,50 +5,5 @@ it's a small scale WMS.
 
 This is a WMS(Warehouse Managment System) for personal use. It's vision is to be so simple to use that you use it.
 
-## Roadmap
-- [.] Stage 1 (Base)
-    - [ ] Models
-        - [ ] Article Template
-        - [ ] Article
-        - [ ] Storage
-        - [ ] Tag
-        - [ ] Settings
-        - [ ] Code
-    - [ ] Functions
-        - [ ] Adding Objects to the Models
-            - [ ] Article
-            - [ ] Storage
-            - [ ] Tag
-            - [ ] Location
-        - [ ] 
-
-    - [ ] views
-        - [X] list view
-        - [ ] single view
-        - [ ] movement view
-
-    - [ ] functions
-        - [ ] articles
-            - [X] add articles
-            - [X] delete articles
-            - [ ] move articles between storages
-            - [ ] view articles
-            - [ ] edit articles
-        - [ ] storages
-            - [X] add storage
-            - [X] delete storage
-            - [ ] view storages
-            - [ ] edit storages
-        - [ ] print labels
-        - [X] simple search
-
-    - [X] Soft delete
-
-    - [ ] User management (in Admin screen)
-        - [X] Login
-            - [X] Login screen
-            - [X] Login
-        - [ ] Logout
-
 Learn more in [Docs](docs/main.md)
 
