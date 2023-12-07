@@ -5,6 +5,9 @@ from softdelete.models import SoftDeleteObject
 
 #TODO test if the query will return all stored things even the Container wenn the input is ready
 class Stored(SoftDeleteObject, models.Model):
+
+    active = models.BooleanField(default = True)
+
     def __str__(self, *args, **kwargs):
         return str(self.id)
 
