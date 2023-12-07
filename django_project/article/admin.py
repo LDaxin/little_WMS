@@ -5,5 +5,4 @@ from article.models import *
 
 admin.site.register(Article)
 admin.site.register(ArticleType)
-admin.site.register(Unit)
 admin.site.register(Tag)

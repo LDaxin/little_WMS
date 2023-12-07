@@ -14,29 +14,11 @@ The Article model holds all articles and information about the Articles.
 In der class Article is the unice Data is stored 
 """
 
-class Unit(SoftDeleteObject, models.Model):
-    name = models.CharField(max_length=20)
-    symbol = models.CharField(max_length=4)
-    maximum = models.BigIntegerField(null=True, blank=True)
-    minimum = models.BigIntegerField(default=0)
-
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
-
-    def save(self, *args, **kwargs):
-        if not self.code:
-            uCode = UuidCode()
-            uCode.prefix = "un" 
-            self.code = uCode
-            uCode.save()
-        super().save(*args, **kwargs)
-
-    def __str__(self, *args, **kwargs):
-        return self.name
-
 #---------------------------------------------------------------------------
 # The Article model is were the unice value is stored
 
 class ArticleType(SoftDeleteObject, models.Model):
+
     tName = models.CharField(max_length=20)
     lowerName = models.CharField(max_length=200, blank=True)
     tSymbol = models.CharField(max_length=20)
@@ -58,22 +40,18 @@ class ArticleType(SoftDeleteObject, models.Model):
         return self.tName
 
 class Article(SoftDeleteObject, models.Model):
+    #name of the article
     name = models.CharField(max_length=20)
-    unit = models.ForeignKey(Unit, on_delete=models.PROTECT)
-    description = models.TextField(null=True, blank=True)
-
+    #Article Type
     pType = models.ForeignKey(ArticleType, on_delete=models.PROTECT, blank=True)
-
-    count = models.BigIntegerField(default=1)
-
+    #The place where the article is stored
     stored = models.ForeignKey(Stored, related_name= "stored", on_delete = models.SET_NULL, null=True, blank=True)
-
+    #the storage space where other articles can be stored in the Article
     ref = models.OneToOneField(Stored, on_delete = models.CASCADE, null=True, blank=True)
-
-    tag = models.ManyToManyField(Tag, blank=True)
-
+    #the unique code for the article
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
 
+    # here the code gets the prefix for the article
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()

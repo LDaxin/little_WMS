@@ -91,11 +91,13 @@ def addArticle(request, typ):
 
                 pa = p.save(commit=False)
                 pa.pType = t
-
+                ref = Stored()
                 if t.article_toggle_ref:
-                    ref = Stored()
-                    ref.save()
-                    pa.ref = ref
+                    ref.active = True
+                else:
+                    ref.active = False
+                ref.save()
+                pa.ref = ref
 
                 pa.save()
 
