@@ -16,7 +16,7 @@
                 </div>
             {% endfor %}
         {% endfor %}
-        <button type="submit" class="btn btn-success" id="addButton" >Add</button>
+        <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
     </form>
 
     <script>
@@ -37,31 +37,6 @@
             dropdownParent: $("#modal{{modalId}}"),
             width: "100%",
             placeholder: "Select parent"
-        });
-        $("#addButton").on("click", function(){
-            $("#addForm").submit(function(e){
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                var form = $(this);
-                var actionUrl = form.attr('action');
-        
-                $.ajax({
-                    type: "POST",
-                    url: actionUrl,
-                    data: form.serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        lResults($('#{{searchFieldName}}').val());
-                        $(".toast-container").append(data);
-
-                        $("#modal{{modalId}}").modal("hide")
-
-                    }
-                });
-
-                return false;
-            });
         });
     </script>
 {% endblock %}
