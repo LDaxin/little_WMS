@@ -23,33 +23,14 @@
 
         <nav class="navbar sticky-top bg-light">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
 
-                <div class="offcanvas offcanvas-start" id="navbarScroll">
-                <div class="offcanvas-header">
-                    <h5 class="offcanvas-title" id="offcanvasNavbarLabel"></h5>
-                    <button type="button" class="btn-close position-relativ top-0 end-0" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-                </div>
-                <div class="offcanvas-body">
-                    <ul class="navbar-nav text-right">
-                        <a class="nav-link" href="#">Link</a>
-                    </ul>
-                </div>
-                </div>
-
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand">
                     {% if symbol == None %}
                         <img style="width:100px" src="{% static 'hub/SVG/Logo.svg' %}">
                     {% else %}
                         <img style="width:100px" src="{% static 'hub/SVG/'|add:symbol|add:'.svg' %}">
                     {% endif %}
                 </a>
-                
-                <button class="btn btn-outline-primary"> 
-                    <--
-                </button>
 
             </div>
         </nav>

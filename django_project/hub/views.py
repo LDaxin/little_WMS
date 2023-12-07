@@ -19,5 +19,5 @@ from django.db.models import Q
 
 @login_required(login_url='/accounts/login/')
 def hub(request):
-    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['movement', 'Article', 'Storage', 'Location', "Tag", "Code"], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
+    return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['movement', 'Article', 'Storage', "Code"], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
 
