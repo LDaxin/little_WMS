@@ -38,6 +38,15 @@ def addModal(request, typ):
     return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+def delModal(request, typ):
+    context = {
+        "modalId":"del",
+        "form":[FormArticle()],
+        "actionType":"del",
+    }
+    return render(request, "hub/modules/delForm.html", context=context)
+
+@login_required(login_url='/accounts/login/')
 def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
@@ -162,7 +171,7 @@ def delArticle(request, typ):
                 "toastText":delListReturn,
                 "toastType":"status"
             }
-            return render(request, "hub/modules/toast.html", context=context)
+            return render(request, "hub/modules/itemDelete.html", context=context)
 
         context = {
             "toastName":"Error",

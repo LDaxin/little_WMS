@@ -66,6 +66,24 @@ def storages(request, typ):
         return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+def addModal(request, typ):
+    context = {
+        "modalId":"add",
+        "form":[FormStorage()],
+        "actionType":"add",
+    }
+    return render(request, "hub/modules/addForm.html", context=context)
+
+@login_required(login_url='/accounts/login/')
+def delModal(request, typ):
+    context = {
+        "modalId":"del",
+        "form":[FormStorage()],
+        "actionType":"del",
+    }
+    return render(request, "hub/modules/delForm.html", context=context)
+
+@login_required(login_url='/accounts/login/')
 def addStorage(request, typ):
 
     t = StorageType.objects.get(lowerName__exact=typ)
@@ -127,7 +145,7 @@ def delStorage(request, typ):
             "toastText":delListReturn,
             "toastType":"status"
         }
-        return render(request, "hub/modules/toast.html", context=context)
+        return render(request, "hub/modules/itemDelete.html", context=context)
     context = {
         "toastName":"Error",
         "toastId":"errorToast",

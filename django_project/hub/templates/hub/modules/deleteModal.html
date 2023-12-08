@@ -4,64 +4,7 @@
 
 
 {% block body %}
-    <p>
-        do you realy want to delete these items:
-    </p>
-    <ul id="delList">
-        
-    </ul>
-    <form id="delForm" method="POST" action="./del">
-        {% csrf_token %}
-        <button type="submit" id="delButton" class="btn btn-danger" name="sub_">Delete</button>
-    </form>
-    <script>
-
-        $(document).on("change", "#checkAll", function(){
-            if(this.checked){
-                $(".checkboxlist").each(function(){
-                    $("#delList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
-                    $("#delForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
-                });
-            }else{
-                $(".checkboxlist").each(function(){
-                    $("."+ this.id +"_").remove();
-                });
-            }
-        });
-
-        $(document).on("change", ".checkboxlist", function(){
-            if(this.checked){
-                $("#delList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
-                $("#delForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
-            }else{
-                $("."+ this.id +"_").remove();
-            }
-        });
-
-        $("#delButton").on("click", function(){
-            $("#delForm").submit(function(e){
-                e.preventDefault();
-
-                var form = $(this);
-                var actionUrl = form.attr('action');
-        
-                $.ajax({
-                    type: "POST",
-                    url: actionUrl,
-                    data: form.serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        lResults($('#{{searchFieldName}}').val());
-                        $(".toast-container").append(data);
-                        $(".checkboxlist").each(function(){
-                        $("."+ this.id +"_").remove();
-                        $("#modal{{modalId}}").modal("hide")
-                });
-                    }
-                });
-            });
-        });
-    </script>
+    {% include "hub/modules/delForm.html" %}
 {% endblock %}
 
 

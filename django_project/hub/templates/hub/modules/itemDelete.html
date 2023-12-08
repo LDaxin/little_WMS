@@ -1,0 +1,10 @@
+
+{% include "hub/modules/toast.html" %}
+
+<div hx-trigger="load" hx-target="#results" hx-get="./search?search="></div>
+
+<div hx-trigger="load" hx-target="#delModalInner" hx-swap="outerHTML" hx-get="./del/modal"></div>
+
+<script> 
+    $("#modalDel").modal("hide");
+</script>
