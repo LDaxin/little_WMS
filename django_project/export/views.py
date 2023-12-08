@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
-from stored.models import Stored
+from space.models import Space
 from django.contrib.auth.decorators import login_required
 
 # Create your views here.

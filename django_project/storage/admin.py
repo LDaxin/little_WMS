@@ -4,4 +4,4 @@ from storage.models import *
 # Register your models here.
 admin.site.register(StorageType)
 admin.site.register(Storage)
-admin.site.register(Stored)
+admin.site.register(Space)

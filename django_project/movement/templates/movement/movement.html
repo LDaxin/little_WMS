@@ -87,7 +87,7 @@
     };
 
     function removeArticle(data){
-        if(data.storable && data.stored){
+        if(data.storable && data.space){
 
             articleBuffer.push(data)
             $("#removeFormArticle").append('<input type="text" name="articleName' + articleBuffer.length + '" value="' + data.name + '"><input type="hidden" name="articleCode' + articleBuffer.length + '" value="' + data.code + '">')

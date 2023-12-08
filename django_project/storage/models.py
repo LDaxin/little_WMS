@@ -5,7 +5,7 @@ from hub.fields import SelfForeignKey
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from django import forms
-from stored.models import Stored
+from space.models import Space
 # Create your models here.
 
 
@@ -35,7 +35,7 @@ class Storage(SoftDeleteObject, models.Model):
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
-    ref = models.OneToOneField(Stored,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
+    space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -45,11 +45,11 @@ class Storage(SoftDeleteObject, models.Model):
             uCode.prefix = "s0" 
             self.code = uCode
             uCode.save()
-        if not self.ref:
-            ref = Stored()
-            ref.prefix = "s0"
-            self.ref = ref
-            ref.save()
+        if not self.space:
+            space = Space()
+            space.prefix = "s0"
+            self.space = space
+            space.save()
         super().save(*args, **kwargs)
     
     def __str__(self, *args, **kwargs):

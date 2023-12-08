@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'storage.apps.StorageConfig',
     'codeSystem.apps.CodeSystemConfig',
     'tag.apps.TagConfig',
-    'stored.apps.StoredConfig',
+    'space.apps.SpaceConfig',
     'export.apps.ExportConfig',
     'movement.apps.MovementConfig',
     'softdelete',

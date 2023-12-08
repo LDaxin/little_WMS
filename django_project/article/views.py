@@ -2,9 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from .forms import *
-from stored.models import Stored
+from space.models import Space
 from django.core.exceptions import ObjectDoesNotExist
-from storage.models import Stored
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 
@@ -13,25 +12,21 @@ from django.db.models import Q
 
 @login_required(login_url='/accounts/login/')
 def article(request, typ, articleId):
-    try:
-        p = Article.objects.get(pk=articleId)
-        if p.pType.lowerName == typ:
-            par = FormChangeArticle(instance=p)
-            context = {
-                "symbol":p.pType.tSymbol,
-                "searchFieldName":"articleSearch" + p.pType.tName,
-                "id":articleId,
-                "modalId":"single",
-                "form":[par],
-                "actionType":"update",
-                "typ":typ
-            }
-            return render(request, "hub/modules/item.html", context=context)
-        else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.tName)
-    
-    except:
-        return HttpResponseNotFound('<h1>Page not found</h1>')
+    p = Article.objects.get(pk=articleId)
+    if p.pType.lowerName == typ:
+        par = FormChangeArticle(instance=p)
+        context = {
+            "symbol":p.pType.tSymbol,
+            "searchFieldName":"articleSearch" + p.pType.tName,
+            "id":articleId,
+            "modalId":"single",
+            "form":[par],
+            "actionType":"update",
+            "typ":typ
+        }
+        return render(request, "hub/modules/item.html", context=context)
+    else:
+        return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.tName)
 
 @login_required(login_url='/accounts/login/')
 def addModal(request, typ):
@@ -100,14 +95,14 @@ def addArticle(request, typ):
 
                 pa = p.save(commit=False)
                 pa.pType = t
-                ref = Stored()
-                if t.article_toggle_ref:
-                    ref.active = True
+                space = Space()
+                if t.article_toggle_space:
+                    space.active = True
                 else:
-                    ref.active = False
-                ref.prefix = "a0"
-                ref.save()
-                pa.ref = ref
+                    space.active = False
+                space.prefix = "a0"
+                space.save()
+                pa.space = space
 
                 pa.save()
 
