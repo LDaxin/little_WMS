@@ -12,7 +12,7 @@
             </div>
         {% endfor %}
     {% endfor %}
-    <button type="submit" class="btn btn-success" id="{{actionType}}Button" >{{actionType}}</button>
+    <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="./{{id}}/{{ actionType }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
 </form>
 
 <script>
@@ -33,28 +33,5 @@
         dropdownParent: $("#modal{{modalId}}"),
         width: "100%",
         placeholder: "Select patent"
-    });
-    $("#{{actionType}}Button").on("click", function(){
-        $("#{{actionType}}Form").submit(function(e){
-            e.preventDefault();
-            e.stopImmediatePropagation();
-
-            var form = $(this);
-            var actionUrl = form.attr('action');
-    
-            $.ajax({
-                type: "POST",
-                url: actionUrl,
-                data: form.serialize(), // serializes the form's elements.
-                success: function(data)
-                {
-                    lResults($('#{{searchFieldName}}').val());
-                    $(".toast-container").append(data);
-                    $("#modal{{modalId}}").modal("hide");
-                }
-            });
-
-            return false;
-        });
     });
 </script>

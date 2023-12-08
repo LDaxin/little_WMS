@@ -22,6 +22,4 @@ class FormChangeArticle(forms.ModelForm):
         super(FormChangeArticle, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
-        self.fields['tag'].widget.attrs['id'] = 'id_tag_change'
         self.fields['stored'].widget.attrs['id'] = 'id_stored_change'
-        self.fields['unit'].widget.attrs['id'] = 'id_unit_change'

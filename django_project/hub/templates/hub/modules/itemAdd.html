@@ -1,0 +1,11 @@
+
+
+{% include "hub/modules/toast.html" %}
+
+<div hx-trigger="load" hx-target="#results" hx-get="./search?search="></div>
+
+<div hx-trigger="load" hx-target="#addForm" hx-swap="outerHTML" hx-get="./add/modal"></div>
+
+<script> 
+    $("#modalAdd").modal("hide");
+</script>

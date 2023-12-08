@@ -34,6 +34,15 @@ def article(request, typ, articleId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
+def addModal(request, typ):
+    context = {
+        "modalId":"add",
+        "form":[FormArticle()],
+        "actionType":"add",
+    }
+    return render(request, "hub/modules/addForm.html", context=context)
+
+@login_required(login_url='/accounts/login/')
 def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
@@ -108,7 +117,7 @@ def addArticle(request, typ):
                     "toastType":"status"
                 }
 
-                return render(request, "hub/modules/toast.html", context=context)
+                return render(request, "hub/modules/itemAdd.html", context=context)
 
         context = {
                 "toastName":"Error",

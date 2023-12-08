@@ -82,7 +82,7 @@ def addStorage(request, typ):
                 "toastText":str(storage) + " was added to your system.",
                 "toastType":"status"
             }
-            return render(request, "hub/modules/toast.html", context=context)
+            return render(request, "hub/modules/itemAdd.html", context=context)
         context = {
             "toastName":"Error",
             "toastId":"errorToast",

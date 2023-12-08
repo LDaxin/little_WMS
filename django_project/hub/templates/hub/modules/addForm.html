@@ -1,0 +1,24 @@
+<form method="POST" action="./add" id="addForm">
+    {% csrf_token %}
+
+    {% for p_form in form %}
+        {% for field in p_form %}
+
+            <div class="form-floating mb-2">
+                {{ field.error }}
+                {{ field }}
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
+</form>
+
+<script>
+    $("#id_parent").select2({
+        theme: "bootstrap-5",
+        dropdownParent: $("#modal{{modalId}}"),
+        width: "100%",
+        placeholder: "Select parent"
+    });
+</script>
