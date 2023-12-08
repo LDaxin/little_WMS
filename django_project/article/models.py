@@ -47,7 +47,7 @@ class Article(SoftDeleteObject, models.Model):
     #The place where the article is stored
     stored = models.ForeignKey(Stored, related_name= "stored", on_delete = models.SET_NULL, null=True, blank=True)
     #the storage space where other articles can be stored in the Article
-    ref = models.OneToOneField(Stored, on_delete = models.CASCADE, null=True, blank=True)
+    ref = models.OneToOneField(Stored, on_delete = models.CASCADE, related_name = "itemArticle", null=True, blank=True)
     #the unique code for the article
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
 

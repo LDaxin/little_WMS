@@ -105,6 +105,7 @@ def addArticle(request, typ):
                     ref.active = True
                 else:
                     ref.active = False
+                ref.prefix = "a0"
                 ref.save()
                 pa.ref = ref
 

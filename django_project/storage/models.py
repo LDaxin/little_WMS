@@ -35,7 +35,7 @@ class Storage(SoftDeleteObject, models.Model):
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
-    ref = models.OneToOneField(Stored,on_delete = models.CASCADE, editable = False, blank = True, null = True)
+    ref = models.OneToOneField(Stored,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -47,6 +47,7 @@ class Storage(SoftDeleteObject, models.Model):
             uCode.save()
         if not self.ref:
             ref = Stored()
+            ref.prefix = "s0"
             self.ref = ref
             ref.save()
         super().save(*args, **kwargs)
