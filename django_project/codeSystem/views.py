@@ -27,13 +27,21 @@ def addCode(request):
 
 
     context = {
-        "toastName": "Error",
-        "toastId": "errorToast",
-        "toastText": "something went wrong",
-        "toastType": "alert"
+        "toastName": "add success",
+        "toastId": "successToast",
+        "toastText": "added "+ str(request.POST["number"]) + " codes",
+        "toastType": "status"
     }
-    return render(request, "hub/modules/toast.html", context=context)
+    return render(request, "hub/modules/itemAdd.html", context=context)
 
+@login_required(login_url='/accounts/login/')
+def addModal(request):
+    context = {
+        "modalId":"add",
+        "form":[FormCode()],
+        "actionType":"add",
+    }
+    return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
 def codes(request):
