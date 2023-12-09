@@ -10,7 +10,7 @@ import csv
 def storage(request, typ, storageId):
         storageObject = Storage.objects.get(pk=storageId)
 
-        if storageObject.typ.lowerName == typ:
+        if storageObject.typ.name == typ:
             instancedStorageForum = FormChangeStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
@@ -30,7 +30,7 @@ def storage(request, typ, storageId):
 def storageIncert(request, typ, storageId):
     try:
         storageObject = Storage.objects.get(pk=storageId)
-        if storageObject.typ.lowerName == typ:
+        if storageObject.typ.name == typ:
             instancedStorageForum = FormChangeStorage(instance=storageObject)
             context = {
                 "symbol":storageObject.typ.symbol,
@@ -51,7 +51,7 @@ def storageIncert(request, typ, storageId):
 @login_required(login_url='/accounts/login/')
 def storages(request, typ):
 
-    storageTypeObject = StorageType.objects.get(lowerName__exact=typ)
+    storageTypeObject = StorageType.objects.get(name__exact=typ)
 
     if storageTypeObject == None:
          return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -87,7 +87,7 @@ def delModal(request, typ):
 @login_required(login_url='/accounts/login/')
 def addStorage(request, typ):
 
-    t = StorageType.objects.get(lowerName__exact=typ)
+    t = StorageType.objects.get(name__exact=typ)
 
     if request.method == "POST":
         s = FormStorage(request.POST)
@@ -183,9 +183,9 @@ def updateStorage(request, storageId, typ):
 def searchStorages(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
-            r = Storage.objects.filter(typ__lowerName__exact=typ)
+            r = Storage.objects.filter(typ__name__exact=typ)
         else:
-            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__lowerName__exact=typ)
+            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__name__exact=typ)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
 
@@ -201,7 +201,7 @@ def exportStorages(request, typ):
     for key, value in request.POST.items():
         if key.startswith("_"):
             storage = Storage.objects.get(pk=value)
-            if storage.typ.lowerName == typ:
+            if storage.typ.name == typ:
                 thereIsOne = True
                 writer.writerow([storage.name, storage.code.code, storage.typ.name])
     return response

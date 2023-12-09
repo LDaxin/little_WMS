@@ -7,7 +7,7 @@
     </div>
 {% endif %}
 
-<div style="width:100%;padding-bottom:100%" id="reader"></div>
+<div style="width:100%;padding-bottom:100%" id="reader{{input}}"></div>
 
 <script>
     function onScanSuccess(decodedText, decodedResult) {
@@ -17,7 +17,7 @@
     }
 
     var html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: 250 });
+        "reader{{input}}", { fps: 10, qrbox: 250 });
     html5QrcodeScanner.render(onScanSuccess);
     
 </script>

@@ -18,16 +18,15 @@ In der class Article is the unice Data is space
 
 class ArticleType(SoftDeleteObject, models.Model):
 
-    tName = models.CharField(max_length=20)
-    lowerName = models.CharField(max_length=200, blank=True)
-    tSymbol = models.CharField(max_length=20)
+    name = models.CharField(max_length=20)
+    symbol = models.CharField(max_length=20)
 
     article_toggle_space = models.BooleanField(default=False)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
-        self.lowerName = self.tName.lower()
+        self.name = self.name.lower()
         if not self.code:
             uCode = UuidCode()
             uCode.prefix = "at" 
@@ -36,7 +35,7 @@ class ArticleType(SoftDeleteObject, models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self, *args, **kwargs):
-        return self.tName
+        return self.name
 
 class Article(SoftDeleteObject, models.Model):
     #name of the article

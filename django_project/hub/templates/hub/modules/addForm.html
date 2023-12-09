@@ -5,10 +5,26 @@
         {% for field in p_form %}
 
             <div class="form-floating mb-2">
+                <div class="input-group">
+                <span class="input-group-text">{{ field.label }}</span>
+
                 {{ field.error }}
                 {{ field }}
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+
+                {% if field.name == "stored" %}
+                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRAdd{{field.name}}" aria-expanded="false" aria-controls="switchQRAdd{{field.name}}">QR</button>
+                </div>
             </div>
+
+            <div id="switchQRAdd{{field.name}}" class="collapse" >
+                {% include "hub/modules/scanner.html" with input=field.name %}
+            </div>
+                {% else %}
+                </div>
+                </div>
+                {% endif %}
+
+
         {% endfor %}
     {% endfor %}
     <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
