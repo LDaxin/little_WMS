@@ -6,6 +6,7 @@ from space.models import Space
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+import csv
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -222,3 +223,21 @@ def searchArticle(request, typ):
         else:
             r = Article.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), pType__lowerName__exact=typ)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
+
+@login_required(login_url='/accounts/login/')
+def exportArticles(request, typ):
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="articles.csv"'
+
+    thereIsOne = False
+
+    writer = csv.writer(response)
+    writer.writerow(['name', 'code', 'type'])
+    for key, value in request.POST.items():
+        if key.startswith("_"):
+            article = Article.objects.get(pk=value)
+            if article.pType.lowerName == typ:
+                thereIsOne = True
+                writer.writerow([article.name, article.code.code, article.pType.tName])
+    return response

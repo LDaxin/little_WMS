@@ -11,5 +11,6 @@ urlpatterns = [
     #re_path(r"^code/del", views.delcode, name="del code"),
     #re_path(r"^code/upadte", views.delcode, name="del code"),
     re_path(r"^code/search", views.searchCodes, name="search"),
+    re_path(r"^code/export", views.codesExport, name="codes export"),
     re_path(r"^code/", views.codes, name="codes"),
 ]

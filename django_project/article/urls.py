@@ -12,5 +12,6 @@ urlpatterns = [
     re_path(r"^article/(?P<typ>\w+)/del", views.delArticle, name="del Article"),
     re_path(r"^article/(?P<typ>\w+)/upadte", views.delArticle, name="del Article"),
     re_path(r"^article/(?P<typ>\w+)/search", views.searchArticle, name="search"),
+    re_path(r"^article/(?P<typ>\w+)/export", views.exportArticles, name="articles export"),
     re_path(r"^article/(?P<typ>\w+)/", views.articles, name="articles"),
 ]

@@ -5,12 +5,21 @@
 {% include "hub/modules/search.html" %}
 
 <div class="fixed-bottom  m-3">
+
     {% include "hub/modules/modalButton.html" with modalId="Add" buttonSymbol=" + " buttonColor="success" %}
+
     {% include "hub/modules/modalButton.html" with modalId="Del" buttonSymbol=" - " buttonColor="danger" %}
+
+    {% include "hub/modules/modalButton.html" with modalId="Export" buttonSymbol=" Export " buttonColor="primary" %}
+
 </div>
 
 {% include "hub/modules/addModal.html" with modalId="Add"%}
+
 {% include "hub/modules/deleteModal.html" with modalId="Del" %}
+
+{% include "hub/modules/exportModal.html" with modalId="Export" %}
+
 {% include "hub/modules/singleModal.html" with modalId="single" %}
 
 {% endblock %}

@@ -10,6 +10,7 @@ urlpatterns = [
     re_path(r"^storage/(?P<typ>\w+)/del/modal", views.delModal, name="del Storage Modal"),
     re_path(r"^storage/(?P<typ>\w+)/del", views.delStorage, name="del Storage"),
     re_path(r"^storage/(?P<typ>\w+)/search", views.searchStorages, name="search"),
+    re_path(r"^storage/(?P<typ>\w+)/export", views.exportStorages, name="storages export"),
     re_path(r"^storage/(?P<typ>\w+)/", views.storages, name="storages"),
 ]
 

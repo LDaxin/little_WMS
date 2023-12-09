@@ -1,0 +1,43 @@
+<div id="exportModalInner">
+    <p>
+    Export these items:
+    </p>
+    <ul id="exportList">
+
+    </ul>
+    <form exportForm method="POST" action="./export" id="exportForm">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success" hx-trigger="downloadCSV" hx-target="#download-link" hx-get="./export" >Export</button>
+        <a id="download-link" style="display: none;"></a>
+    </form>
+    <script>
+        function downloadCSV(responseText) {
+            var downloadLink = document.getElementById('download-link');
+            downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(responseText);
+            downloadLink.download = 'example.csv';
+            downloadLink.click();
+        }
+
+        $(document).on("change", "#checkAll", function(){
+            if(this.checked){
+                $(".checkboxlist").each(function(){
+                    $("#exportList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
+                    $("#exportForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
+                });
+            }else{
+                $(".checkboxlist").each(function(){
+                    $("."+ this.id +"_").remove();
+                });
+            }
+        });
+
+        $(document).on("change", ".checkboxlist", function(){
+            if(this.checked){
+                $("#exportList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
+                $("#exportForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
+            }else{
+                $("."+ this.id +"_").remove();
+            }
+        });
+    </script>
+</div>

@@ -4,6 +4,7 @@ from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+import csv
 
 
 # Create your views here.
@@ -50,7 +51,8 @@ def codes(request):
         "searchFieldName":"codeSearch",
         "name":"code",
         "form":[FormCode()],
-        "type":"code"
+        "type":"code",
+        "function":["add", "del", "export"]
     }
     return render(request, "hub/modules/items.html", context=context)
 
@@ -63,3 +65,19 @@ def searchCodes(request):
             r = UuidCode.objects.filter(Q(prefix__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
         return render(request, "hub/modules/results.html", context={"results":r, "type":"code"})
 
+@login_required(login_url='/accounts/login/')
+def codesExport(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="codes.csv"'
+
+    thereIsOne = False
+
+    writer = csv.writer(response)
+    writer.writerow(['prefix', 'code'])
+    for key, value in request.POST.items():
+        if key.startswith("_"):
+            code = UuidCode.objects.get(pk=value)
+            if code.used == False:
+                thereIsOne = True
+                writer.writerow([code.prefix, code.code])
+    return response

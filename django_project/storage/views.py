@@ -4,6 +4,7 @@ from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+import csv
 
 @login_required(login_url='/accounts/login/')
 def storage(request, typ, storageId):
@@ -186,3 +187,21 @@ def searchStorages(request, typ):
         else:
             r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__lowerName__exact=typ)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
+
+
+@login_required(login_url='/accounts/login/')
+def exportStorages(request, typ):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="storages.csv"'
+
+    thereIsOne = False
+
+    writer = csv.writer(response)
+    writer.writerow(['name', 'code', 'type'])
+    for key, value in request.POST.items():
+        if key.startswith("_"):
+            storage = Storage.objects.get(pk=value)
+            if storage.typ.lowerName == typ:
+                thereIsOne = True
+                writer.writerow([storage.name, storage.code.code, storage.typ.name])
+    return response

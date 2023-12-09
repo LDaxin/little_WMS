@@ -6,3 +6,4 @@ from softdelete.models import SoftDeleteObject
 class ExportTemplate(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
     fields = models.JSONField()
+
