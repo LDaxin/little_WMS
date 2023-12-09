@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
+from codeSystem.models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
@@ -94,6 +95,11 @@ def addStorage(request, typ):
         if s.is_valid():
             storage = s.save(commit=False)
             storage.typ = t
+            if s["code"].value() != "":
+                code = UuidCode.objects.get(pk=int(s["code"].value()))
+                code.used = True
+                code.save()
+                storage.code = code
             so = storage.save()
             context = {
                 "toastName":"Add Succses",

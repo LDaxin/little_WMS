@@ -35,7 +35,7 @@ class Storage(SoftDeleteObject, models.Model):
 
     space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = True, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         if not self.code:

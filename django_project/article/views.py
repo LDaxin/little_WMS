@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
+from codeSystem.models import *
 from .forms import *
 from space.models import Space
 from django.core.exceptions import ObjectDoesNotExist
@@ -113,6 +114,12 @@ def addArticle(request, typ):
                 space.prefix = "a0"
                 space.save()
                 pa.space = space
+
+                if p["code"].value() != "":
+                    code = UuidCode.objects.get(pk=int(p["code"].value()))
+                    code.used = True
+                    code.save()
+                    pa.code = code
 
                 pa.save()
 
