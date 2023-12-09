@@ -11,7 +11,7 @@
                 {{ field.error }}
                 {{ field }}
 
-                {% if field.name == "stored" %}
+                {% if field.name == "stored" or field.name == "code"%}
                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRAdd{{field.name}}" aria-expanded="false" aria-controls="switchQRAdd{{field.name}}">QR</button>
                 </div>
             </div>
