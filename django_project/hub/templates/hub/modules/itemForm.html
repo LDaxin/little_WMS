@@ -6,10 +6,28 @@
         {% for field in p_form %}
         
             <div class="form-floating mb-2">
+                <div class="input-group">
+                <span class="input-group-text">{{ field.label }}</span>
+
                 {{ field.error }}
                 {{ field }}
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                
+                {% if field.name == "stored" or field.name == "code"%}
+                <div id="QRButtonDivid_{{field.name}}">
+                <button id="QRButtonid_{{field.name}}" class="btn btn-primary" type="button" hx-get="./scanner/id_{{field.name}}/on" hx-trigger="click, refresh">QR</button>
+                </div>
+                </div>
             </div>
+
+            <div id="infoDivid_{{field.name}}">
+            </div>
+
+            <div id="scannerDivid_{{field.name}}">
+            </div>
+                {% else %}
+                </div>
+            </div>
+                {% endif %}
         {% endfor %}
     {% endfor %}
     <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="./{{id}}/{{ actionType }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>

@@ -5,32 +5,5 @@
 
 {% block body %}
     
-    <script>
-        $("#changeButton").on("click", function(){
-            $("#changeForum").submit(function(e){
-                e.preventDefault();
-                e.stopImmediatePropagation();
-
-                var form = $(this);
-                var actionUrl = form.attr('action');
-        
-                $.ajax({
-                    type: "POST",
-                    url: actionUrl,
-                    data: form.serialize(), // serializes the form's elements.
-                    success: function(data)
-                    {
-                        lResults($('#{{searchFieldName}}').val());
-                        $(".toast-container").append(data);
-
-                        $("#modal{{modalId}}").modal("hide")
-
-                    }
-                });
-
-                return false;
-            });
-        });
-    </script>
 {% endblock %}
 

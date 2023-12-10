@@ -4,9 +4,12 @@ from codeSystem.models import *
 from space.models import *
 
 class  FormArticle(forms.ModelForm):
+    stored = forms.CharField(max_length=34, required=False)
+    code = forms.CharField(max_length=34, required=False)
+
     class Meta:
         model = Article
-        exclude = ('pType', 'space')
+        exclude = ('pType', 'space', 'code', 'stored')
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
@@ -18,9 +21,10 @@ class  FormArticle(forms.ModelForm):
 
 
 class FormChangeArticle(forms.ModelForm):
+    stored = forms.CharField(max_length=32, required=False)
     class Meta:
         model = Article
-        exclude = ('pType', 'space', 'code')
+        exclude = ('pType', 'space', 'code', 'stored')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)

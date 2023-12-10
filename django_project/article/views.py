@@ -105,6 +105,78 @@ def addArticle(request, typ):
             if p.is_valid():
 
                 pa = p.save(commit=False)
+
+                if p["code"].value() != "":
+                    try:
+                        code = UuidCode.objects.get(code=str(p["code"].value()))
+                        if code.used:
+                            context = {
+                                "toastName":"Error",
+                                "toastId":"errorToast",
+                                "toastText":"code is already used",
+                                "toastType":"alert"
+                            }
+                            return render(request, "hub/modules/toast.html", context=context)
+                    except:
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":"no code with id " + p["code"].value(),
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
+
+
+                if p["stored"].value().startswith("a0"):
+                    try:
+                        space = Artice.objects.get(code__code=int(p["stored"].value()))
+                        if space.space.active == False:
+                            context = {
+                                "toastName":"Error",
+                                "toastId":"errorToast",
+                                "toastText":"no active space with code " + p["stored"].value(),
+                                "toastType":"alert"
+                            }
+                            return render(request, "hub/modules/toast.html", context=context)
+                        pa.space = space
+
+                    except:
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":"no article with code " + p["stored"].value(),
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
+                elif p["stored"].value().startswith("s0"):
+                    try:
+                        space = Space.objects.get(code__code=int(p["stored"].value()))
+                        pa.space = space
+                    except:
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":"no space with code " + p["stored"].value(),
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
+                elif p["stored"].value() == "":
+                    pass
+                else:
+                    context = {
+                        "toastName":"Error",
+                        "toastId":"errorToast",
+                        "toastText":"code" + p["stored"].value() + " not found",
+                        "toastType":"alert"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
+
+
+                if p["code"].value() != "":
+                    code.used = True
+                    code.save()
+                    pa.code = code
+
                 pa.pType = t
                 space = Space()
                 if t.article_toggle_space:
@@ -115,11 +187,6 @@ def addArticle(request, typ):
                 space.save()
                 pa.space = space
 
-                if p["code"].value() != "":
-                    code = UuidCode.objects.get(pk=int(p["code"].value()))
-                    code.used = True
-                    code.save()
-                    pa.code = code
 
                 pa.save()
 
@@ -135,7 +202,7 @@ def addArticle(request, typ):
         context = {
                 "toastName":"Error",
                 "toastId":"errorToast",
-                "toastText":"no article type named " + typ,
+                "toastText":"no article type named " + typ + str(request.POST["stored"]),
                 "toastType":"alert"
         }
         return render(request, "hub/modules/toast.html", context=context)
@@ -248,3 +315,23 @@ def exportArticles(request, typ):
                 thereIsOne = True
                 writer.writerow([article.name, article.code.code, article.pType.name])
     return response
+
+@login_required(login_url='/accounts/login/')
+def articleScanner(request, typ, scannerId, state):
+    if state == "on":
+        context = {
+            "input":scannerId,
+            "state":state
+        }
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+
+    elif state == "off":
+        context = {
+            "input":scannerId,
+            "state":state
+        }
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+

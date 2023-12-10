@@ -11,6 +11,7 @@ urlpatterns = [
     re_path(r"^storage/(?P<typ>\w+)/del", views.delStorage, name="del Storage"),
     re_path(r"^storage/(?P<typ>\w+)/search", views.searchStorages, name="search"),
     re_path(r"^storage/(?P<typ>\w+)/export", views.exportStorages, name="storages export"),
+    re_path(r"^storage/(?P<typ>\w+)/scanner/(?P<scannerId>\w+)/(?P<state>\w+)", views.storageScanner, name="storages scanner"),
     re_path(r"^storage/(?P<typ>\w+)/", views.storages, name="storages"),
 ]
 

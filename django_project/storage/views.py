@@ -95,11 +95,34 @@ def addStorage(request, typ):
         if s.is_valid():
             storage = s.save(commit=False)
             storage.typ = t
-            if s["code"].value() != "":
-                code = UuidCode.objects.get(pk=int(s["code"].value()))
+            if s["code"].value().startswith("s0"):
+                try:
+                    code = UuidCode.objects.get(code=s["code"].value())
+                    if code.used:
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":"code is already used",
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
+                    code.used = True
+                    code.save()
+                    storage.code = code
+                except:
+                    context = {
+                        "toastName":"Error",
+                        "toastId":"errorToast",
+                        "toastText":"not valid code",
+                        "toastType":"alert"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
+            else:
+                code = UuidCode()
                 code.used = True
                 code.save()
                 storage.code = code
+
             so = storage.save()
             context = {
                 "toastName":"Add Succses",
@@ -211,3 +234,15 @@ def exportStorages(request, typ):
                 thereIsOne = True
                 writer.writerow([storage.name, storage.code.code, storage.typ.name])
     return response
+
+@login_required(login_url='/accounts/login/')
+def storageScanner(request, typ, scannerId, state):
+    context = {
+        "input":scannerId,
+        "state":state
+    }
+    if state == "on":
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+    else:
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+    return HttpResponseNotFound('<h1>Page not found</h1>')

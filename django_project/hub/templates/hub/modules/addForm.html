@@ -11,19 +11,20 @@
                 {{ field.error }}
                 {{ field }}
 
+
                 {% if field.name == "stored" or field.name == "code"%}
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRAdd{{field.name}}" aria-expanded="false" aria-controls="switchQRAdd{{field.name}}">QR</button>
+                <div id="QRButtonDivid_{{field.name}}">
+                <button id="QRButtonid_{{field.name}}" class="btn btn-primary" type="button" hx-get="./scanner/id_{{field.name}}/on" hx-trigger="click, refresh">QR</button>
+                </div>
                 </div>
             </div>
 
-            <div id="switchQRAdd{{field.name}}" class="collapse" >
-                {% include "hub/modules/scanner.html" with input=field.name %}
+            <div id="scannerDivid_{{field.name}}">
             </div>
                 {% else %}
                 </div>
                 </div>
                 {% endif %}
-
 
         {% endfor %}
     {% endfor %}

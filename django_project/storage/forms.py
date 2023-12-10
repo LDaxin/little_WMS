@@ -4,9 +4,10 @@ from codeSystem.models import *
 
 
 class FormStorage(forms.ModelForm):
+    code = forms.CharField(max_length=34, required=False)
     class Meta:
         model = Storage
-        fields = ('name', 'parent', 'code')
+        fields = ('name', 'parent')
 
     def __init__(self, *args, **kwargs):
         super(FormStorage, self).__init__(*args, **kwargs)

@@ -1,0 +1,21 @@
+
+<div id="QRButtonDiv{{input}}" hx-swap-oob="true">
+{% if state == 'on' %}
+<button id="QRButton{{input}}" hx-trigger="click, refresh" class="btn btn-primary" type="button" hx-get="./scanner/{{input}}/off">QR</button>
+{% endif %}
+{% if state == 'off' %}
+<button id="QRButton{{input}}" hx-trigger="click, refresh" class="btn btn-primary" type="button" hx-get="./scanner/{{input}}/on">QR</button>
+{% endif %}
+</div>
+
+
+
+<div id="scannerDiv{{input}}" hx-swap="outerHTML" hx-swap-oob="true">
+    {% if state == 'on' %}
+        {% include 'hub/modules/scanner.html' %}
+    {% endif %}
+</div>
+
+
+
+

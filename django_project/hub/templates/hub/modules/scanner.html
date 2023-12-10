@@ -1,23 +1,21 @@
 
-{% if input == ""  %}
-    <div style="padding:2px">
-        <fieldset disabled>
-            <input class="form-control" style="width:100%; text-align:center" id="last-scann"></input>
-        </fieldset>
-    </div>
-{% endif %}
 
 <div style="width:100%;padding-bottom:100%" id="reader{{input}}"></div>
 
 <script>
-    function onScanSuccess(decodedText, decodedResult) {
+
+    function onScanSuccess{{input}}(decodedText, decodedResult) {
         if(decodedResult.result.format.formatName == "QR_CODE"){
-            lResults(decodedText);
+            console.log(decodedResult);
+            $("#{{input}}").val(decodedText);
+            html5QrcodeScanner{{input}}.pause();
+            html5QrcodeScanner{{input}}.clear();
+            htmx.trigger("#{{input}}", "refresh", {});
+            htmx.trigger("#QRButton{{input}}", "refresh", {});
         }
     }
 
-    var html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader{{input}}", { fps: 10, qrbox: 250 });
-    html5QrcodeScanner.render(onScanSuccess);
+    var html5QrcodeScanner{{input}} = new Html5QrcodeScanner("reader{{input}}", { fps: 10, qrbox: 250});
+    html5QrcodeScanner{{input}}.render(onScanSuccess{{input}});
     
 </script>

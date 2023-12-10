@@ -2,13 +2,15 @@
 
 <div class="d-flex p-2">
     <div class="input-group">
-        <input id={{searchFieldName}} class="form-control" name="search" type="search" "qtype="search" placeholder="Search" hx-get="./search" hx-trigger="load, keyup changed delay:500ms" hx-target="#results">
-      <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#switchQRSearch" aria-expanded="false" aria-controls="switchQRSearch">QR</button>
+        <input id={{searchFieldName}} class="form-control" name="search" type="search" qtype="search" placeholder="Search" hx-get="./search" hx-trigger="load, keyup changed delay:500ms, refresh" hx-target="#results">
+        <div id="QRButtonDiv{{searchFieldName}}">
+
+            <button id="QRButton{{searchFieldName}}" class="btn btn-primary" type="button" hx-trigger="click, refresh" hx-get="./scanner/{{searchFieldName}}/on">QR</button>
+        </div>
     </div>
 </div>
 
-<div class="collapse" id="switchQRSearch">
-    {% include "hub/modules/scanner.html" with input=searchFieldName %}
+<div id="scannerDiv{{searchFieldName}}">
 </div>
 
 <!-- ____________________________Result Table______________________________________ -->
