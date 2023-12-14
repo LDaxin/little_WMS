@@ -118,10 +118,7 @@ def addStorage(request, typ):
                     }
                     return render(request, "hub/modules/toast.html", context=context)
             else:
-                code = UuidCode()
-                code.used = True
-                code.save()
-                storage.code = code
+                pass
 
             so = storage.save()
             context = {

@@ -19,7 +19,7 @@ def movementRemove(request):
     if request.method == "POST":
 
         articleObject = Article.objects.get(code__code__exact = request.POST["articleCode1"])
-        articleObject.space = None
+        articleObject.stored = None
         articleObject.save()
 
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":str(request.POST), "toastType":"alert"})
@@ -39,7 +39,7 @@ def movementStore(request):
         for formField in request.POST:
             if formField.startswith('articleCode'):
                 articleObject = Article.objects.get(code__code__exact = request.POST[formField])
-                articleObject.space = storageObject.space
+                articleObject.stored = storageObject.space
                 articleObject.save()
                 hallo.append(articleObject)
 
@@ -56,12 +56,7 @@ def movementCodeInfo(request):
             except ObjectDoesNotExist:
                 return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a article in the System", "toastType":"alert"})})
 
-            if article.space != None:
-                space = True
-            else:
-                space = False
-
-            returnJson = {"error":"", "name":article.template.name, "code":article.code.code, "storable":True, "storage":article.template.pType.space, "space":space}
+            returnJson = {"error":"", "name":article.name, "code":article.code.code, "storable":True, "storage":False, "space":article.space.active}
             return JsonResponse(returnJson)
 
         elif request.GET['code'][0:2] == "s0":

@@ -6,12 +6,18 @@
 
     function onScanSuccess{{input}}(decodedText, decodedResult) {
         if(decodedResult.result.format.formatName == "QR_CODE"){
-            console.log(decodedResult);
+            {% if move == 'true' %}
+            lResults(decodedText);
+            console.log(decodedText);
+            $("#{{input}}").val(decodedText);
+            {% else %}
             $("#{{input}}").val(decodedText);
             html5QrcodeScanner{{input}}.pause();
             html5QrcodeScanner{{input}}.clear();
             htmx.trigger("#{{input}}", "refresh", {});
             htmx.trigger("#QRButton{{input}}", "refresh", {});
+            {% endif %}
+
         }
     }
 

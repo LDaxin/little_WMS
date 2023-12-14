@@ -17,6 +17,7 @@ def article(request, typ, articleId):
     p = Article.objects.get(pk=articleId)
     if p.pType.name == typ:
         par = FormChangeArticle(instance=p)
+        par.fields["stored"].initial = p.stored
         context = {
             "symbol":p.pType.symbol,
             "searchFieldName":"articleSearch" + p.pType.name,

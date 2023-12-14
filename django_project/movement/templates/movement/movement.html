@@ -2,9 +2,9 @@
 
 {% block content %}
 
-<input id='bla' placeholder="search" class="form-control">
+<input id='scan' placeholder="search" class="form-control">
 
-{% include "hub/modules/scanner.html" with input="scan" %}
+{% include "hub/modules/scanner.html" with input="scan" move="true" %}
 
 <div class="btn-group" role="group">
     <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
@@ -87,13 +87,14 @@
     };
 
     function removeArticle(data){
-        if(data.storable && data.space){
+        if(data.storable){
 
             articleBuffer.push(data)
             $("#removeFormArticle").append('<input type="text" name="articleName' + articleBuffer.length + '" value="' + data.name + '"><input type="hidden" name="articleCode' + articleBuffer.length + '" value="' + data.code + '">')
 
             var form = $("#removeForm");
             var actionUrl = form.attr('action');
+            console.log(actionUrl)
 
             $.ajax({
                 type: "POST",
@@ -138,8 +139,8 @@
     $("#remove").change(function(){clearBuffer()})
 
     $("#results").load(lResults(""));
-    $("#bla").on("input", function(){
-        lResults($('#bla').val())
+    $("#scan").on("input", function(){
+        lResults($('#scan').val())
     });
 
 </script>
