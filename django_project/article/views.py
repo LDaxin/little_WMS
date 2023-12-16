@@ -8,6 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
+from storage.models import *
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -274,6 +275,28 @@ def updateArticle(request, typ, articleId):
         if request.method == "POST":
             articleForm = FormArticle(request.POST, instance=articleObject)
             if articleForm.is_valid():
+                if articleForm.cleaned_data["stored"].startswith("s0"):
+                    space = Storage.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
+                elif articleForm.cleaned_data["stored"].startswith("a0"):
+                    space = Article.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
+                    if space.active == False:
+                        context = {
+                            "toastName":"Error",
+                            "toastId":"errorToast",
+                            "toastText":"article code has no space",
+                            "toastType":"alert"
+                        }
+                        return render(request, "hub/modules/toast.html", context=context)
+                else:
+                    context = {
+                        "toastName":"Error",
+                        "toastId":"errorToast",
+                        "toastText":"no valide code",
+                        "toastType":"alert"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
+
+                articleObject.stored = space
                 articleForm.save()
             context = {
                 "toastName":"Update",

@@ -21,7 +21,7 @@ class  FormArticle(forms.ModelForm):
 
 
 class FormChangeArticle(forms.ModelForm):
-    stored = forms.CharField(max_length=32, required=False)
+    stored = forms.CharField(max_length=34, required=False)
     class Meta:
         model = Article
         exclude = ('pType', 'space', 'code', 'stored')
