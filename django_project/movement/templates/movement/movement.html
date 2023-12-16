@@ -55,7 +55,7 @@
     };
 
     function storeArticle(data){
-        if(data.storage && articleBuffer.length > 0 ){
+        if(data.space && articleBuffer.length > 0 ){
             storageBuffer = []
             storageBuffer.push(data)
             $("#storeFormStorage").html('<input type="text" name="storageName" value="' + data.name + '"><input type="hidden" name="storageCode" value="' + data.code + '">')
