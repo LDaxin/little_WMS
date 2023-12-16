@@ -22,7 +22,14 @@ def movementRemove(request):
         articleObject.stored = None
         articleObject.save()
 
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":str(request.POST), "toastType":"alert"})
+        context = {
+            "toastName":"Success",
+            "toastId":"successToast",
+            "toastText":"success fully removed " + articleObject.name,
+            "toastType":"success"
+        }
+
+        return render(request, "hub/modules/toast.html", context=context)
 
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":'what are you trying to do', "toastType":"alert"})
 
@@ -65,7 +72,7 @@ def movementCodeInfo(request):
             except ObjectDoesNotExist:
                 return JsonResponse({"error":"no such a storage in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a storage in the System", "toastType":"alert"})})
 
-            returnJson = {"error":"", "name":storage.name, "code":storage.code.code, "storable":False, "storage":True, "space":False}
+            returnJson = {"error":"", "name":storage.name, "code":storage.code.code, "storable":False, "storage":True, "space":True}
             return JsonResponse(returnJson)
 
              #code storable storage name
