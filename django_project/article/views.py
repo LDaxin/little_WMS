@@ -275,19 +275,33 @@ def updateArticle(request, typ, articleId):
         if request.method == "POST":
             articleForm = FormArticle(request.POST, instance=articleObject)
             if articleForm.is_valid():
-                if articleForm.cleaned_data["stored"].startswith("s0"):
-                    space = Storage.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
-                elif articleForm.cleaned_data["stored"].startswith("a0"):
-                    space = Article.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
-                    if space.active == False:
+                try:
+                    if articleForm.cleaned_data["stored"].startswith("s0"):
+                        space = Storage.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
+                        articleObject.stored = space
+                    elif articleForm.cleaned_data["stored"].startswith("a0"):
+                        space = Article.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
+                        if space.active == False:
+                            context = {
+                                "toastName":"Error",
+                                "toastId":"errorToast",
+                                "toastText":"article code has no space",
+                                "toastType":"alert"
+                            }
+                            return render(request, "hub/modules/toast.html", context=context)
+                        articleObject.stored = space
+                    elif articleForm.cleaned_data["stored"]=="":
+                        pass
+                    else:
                         context = {
                             "toastName":"Error",
                             "toastId":"errorToast",
-                            "toastText":"article code has no space",
+                            "toastText":"no valide code",
                             "toastType":"alert"
                         }
                         return render(request, "hub/modules/toast.html", context=context)
-                else:
+
+                except:
                     context = {
                         "toastName":"Error",
                         "toastId":"errorToast",
@@ -296,8 +310,8 @@ def updateArticle(request, typ, articleId):
                     }
                     return render(request, "hub/modules/toast.html", context=context)
 
-                articleObject.stored = space
                 articleForm.save()
+
             context = {
                 "toastName":"Update",
                 "toastId":"successToast",
