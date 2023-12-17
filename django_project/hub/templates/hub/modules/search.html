@@ -23,7 +23,6 @@
             </th>
         {% if type == "article" %}
             <th scope="col">Name</th>
-            <th scope="col">Anzahl</th>
 
         {% elif type == "location" %}
             <th scope="col">Name</th>
@@ -39,7 +38,9 @@
             <th scope="col">Name</th>
 
         {% endif %}
+        {% if type != "code" %}
             <th scope="col">Edit</th>
+        {% endif %}
         </tr>
     </thead>
 
