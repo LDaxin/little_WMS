@@ -6,13 +6,16 @@
 
 {% include "hub/modules/scanner.html" with input="scan" move="true" %}
 
-<div class="btn-group" role="group">
-    <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
-    <label class="btn bt-outline-succsess" for="store">store</label>
+<div class="fixed-bottom m-3">
+    <div class="btn-group float-end" role="group">
+        <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
+        <label class="btn btn-outline-success" for="store">store</label>
 
-    <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
-    <label class="btn bt-outline-succsess" for="remove">remove</label>
+        <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
+        <label class="btn btn-outline-danger" for="remove">remove</label>
+    </div>
 </div>
+
 
 <form method="POST" action="./store/" id="storeForm">
     {% csrf_token %}
