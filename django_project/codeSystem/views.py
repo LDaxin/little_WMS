@@ -73,11 +73,17 @@ def codesExport(request):
     thereIsOne = False
 
     writer = csv.writer(response)
-    writer.writerow(['prefix', 'code'])
+    writer.writerow(['prefix', 'code', 'type'])
     for key, value in request.POST.items():
         if key.startswith("_"):
             code = UuidCode.objects.get(pk=value)
             if code.used == False:
+                if code.prefix == "a0":
+                    typ = "Material/Behälter"
+                elif code.prefix == "s0":
+                    typ = "Lager"
+                else:
+                    typ = "unknown"
                 thereIsOne = True
-                writer.writerow([code.prefix, code.code])
+                writer.writerow([code.prefix, code.code, typ])
     return response
