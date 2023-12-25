@@ -1,5 +1,7 @@
 {% extends "hub/header.html" %}
 
+{% load static %}
+
 {% block content %}
 
 <input id='scan' placeholder="search" class="form-control">
@@ -9,10 +11,10 @@
 <div class="fixed-bottom m-3">
     <div class="btn-group float-end" role="group">
         <input type="radio" class="btn-check" name="options-outlined" id="store" autocomplete="off" checked>
-        <label class="btn btn-outline-success" for="store">store</label>
+        <label class="btn btn-outline-success" for="store"><img style="width:60px" src="{% static 'hub/symbols/Store.svg' %}"></label>
 
         <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
-        <label class="btn btn-outline-danger" for="remove">remove</label>
+        <label class="btn btn-outline-danger" for="remove"><img style="width:60px" src="{% static 'hub/symbols/Remove.svg' %}"></label>
     </div>
 </div>
 
