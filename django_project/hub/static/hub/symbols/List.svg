@@ -1,0 +1,21 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.86736714515837 118.9276100846746" width="120.86736714515837" height="118.9276100846746">
+  <!-- svg-source:excalidraw -->
+  
+  <defs>
+    <style class="style-fonts">
+      @font-face {
+        font-family: "Virgil";
+        src: url("https://excalidraw.com/Virgil.woff2");
+      }
+      @font-face {
+        font-family: "Cascadia";
+        src: url("https://excalidraw.com/Cascadia.woff2");
+      }
+      @font-face {
+        font-family: "Assistant";
+        src: url("https://excalidraw.com/Assistant-Regular.woff2");
+      }
+    </style>
+    
+  </defs>
+  <g stroke-linecap="round" transform="translate(10 10) rotate(0 50.433683572579184 49.4638050423373)"><path d="M0 0 C21.01 1.6, 44.82 0.01, 100.87 0 M0 0 C22.39 0.98, 42.76 1.06, 100.87 0 M100.87 0 C102.5 22.89, 99.1 47.38, 100.87 98.93 M100.87 0 C99.15 33.82, 100.73 69.42, 100.87 98.93 M100.87 98.93 C66.72 99.59, 30.28 98.45, 0 98.93 M100.87 98.93 C65.89 98.11, 33.18 98.47, 0 98.93 M0 98.93 C0.52 63.51, -1.54 32.38, 0 0 M0 98.93 C-0.51 58.75, 0.52 19.55, 0 0" stroke="transparent" stroke-width="1" fill="none"></path></g><g stroke-linecap="round"><g transform="translate(33.61771363563503 40.47939753764149) rotate(0 26.67165958165242 -0.8082321085348667)"><path d="M0 0 C13.8 -1.14, 25.89 -2.72, 53.34 -1.62 M0 0 C10.77 -0.24, 21.1 -0.69, 53.34 -1.62" stroke="#000" stroke-width="1" fill="none"></path></g></g><mask></mask><g stroke-linecap="round"><g transform="translate(32.84990652418492 55.82939386608541) rotate(0 26.67165958165242 -0.8082321085348667)"><path d="M0 0 C17.42 -2.04, 36.43 0.86, 53.34 -1.62 M0 0 C15.4 -0.56, 31.76 -0.19, 53.34 -1.62" stroke="#000" stroke-width="1" fill="none"></path></g></g><mask></mask><g stroke-linecap="round"><g transform="translate(37.19274895528633 68.63224866703695) rotate(0 26.67165958165242 -0.8082321085348667)"><path d="M0 0 C13.03 1.88, 29.9 -0.69, 53.34 -1.62 M0 0 C16.14 0.34, 32.89 -1.86, 53.34 -1.62" stroke="#000" stroke-width="1" fill="none"></path></g></g><mask></mask><g stroke-linecap="round"><g transform="translate(39.78266968965863 82.27675956091025) rotate(0 26.67165958165242 -0.8082321085348667)"><path d="M0 0 C11.85 -1.07, 23.83 -2.55, 53.34 -1.62 M0 0 C15.77 -1.79, 32.35 -0.89, 53.34 -1.62" stroke="#000" stroke-width="1" fill="none"></path></g></g><mask></mask></svg>
