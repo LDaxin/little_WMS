@@ -131,8 +131,8 @@ def addArticle(request, typ):
 
                 if p["stored"].value().startswith("a0"):
                     try:
-                        space = Artice.objects.get(code__code=int(p["stored"].value()))
-                        if space.space.active == False:
+                        container = Article.objects.get(code__code=p["stored"].value())
+                        if container.space.active == False:
                             context = {
                                 "toastName":"Error",
                                 "toastId":"errorToast",
@@ -140,7 +140,7 @@ def addArticle(request, typ):
                                 "toastType":"alert"
                             }
                             return render(request, "hub/modules/toast.html", context=context)
-                        pa.space = space
+                        pa.space = container.space
 
                     except:
                         context = {
@@ -152,8 +152,8 @@ def addArticle(request, typ):
                         return render(request, "hub/modules/toast.html", context=context)
                 elif p["stored"].value().startswith("s0"):
                     try:
-                        space = Space.objects.get(code__code=int(p["stored"].value()))
-                        pa.space = space
+                        storage = Storage.objects.get(code__code=p["stored"].value())
+                        pa.stored = storage.space
                     except:
                         context = {
                             "toastName":"Error",
