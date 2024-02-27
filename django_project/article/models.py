@@ -49,6 +49,8 @@ class Article(SoftDeleteObject, models.Model):
     #the unique code for the article
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
 
+    amount = models.CharField(max_length=20, null = True, blank = True)
+
     # here the code gets the prefix for the article
     def save(self, *args, **kwargs):
         if not self.code:
