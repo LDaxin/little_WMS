@@ -51,4 +51,9 @@ class Storage(SoftDeleteObject, models.Model):
         super().save(*args, **kwargs)
     
     def __str__(self, *args, **kwargs):
-        return self.name
+        if self.parent != None:
+            name = str(self.parent) + " / " + self.name
+        else:
+            name = self.name
+        return name
+        
