@@ -67,12 +67,12 @@ def searchCodes(request):
 
 @login_required(login_url='/accounts/login/')
 def codesExport(request):
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="codes.csv"'
 
     thereIsOne = False
 
-    writer = csv.writer(response)
+    writer = csv.writer(response, dialect="excel")
     writer.writerow(['prefix', 'code', 'type'])
     for key, value in request.POST.items():
         if key.startswith("_"):

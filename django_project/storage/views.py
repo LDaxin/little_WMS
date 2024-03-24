@@ -217,12 +217,12 @@ def searchStorages(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def exportStorages(request, typ):
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="storages.csv"'
 
     thereIsOne = False
 
-    writer = csv.writer(response)
+    writer = csv.writer(response, dialect="excel")
     writer.writerow(['name', 'code', 'type'])
     for key, value in request.POST.items():
         if key.startswith("_"):
