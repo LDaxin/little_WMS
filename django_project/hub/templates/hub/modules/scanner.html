@@ -7,6 +7,7 @@
            object-fit: cover;
         }
     </style>
+    <div id="Buttons{{input}}" class="position-absolute bottom-0 end-0 translate-middle"></div>
 </div>
 
 <script>
@@ -48,7 +49,7 @@
             );
             
             $("#flipCamera{{input}}").remove();
-            $("#scannerDiv{{input}}").append("<button type=\"button\" class=\"btn btn-primary position-absolute bottom-0 end-0 translate-middle\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}\">Flip</button>");
+            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}\">Flip</button>");
         });
     }
 
@@ -60,7 +61,7 @@
                     var cameraId = cameras[0].id;
                 }else{
                     var cameraId = cameras[0].id;
-                    $("#scannerDiv{{input}}").append("<button type=\"button\" class=\"btn btn-primary position-absolute bottom-0 end-0 translate-middle\" onclick=\"flipCamera{{input}}(0);\" id=\"flipCamera{{input}}\">Flip</button>");
+                    $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}(0);\" id=\"flipCamera{{input}}\">Flip</button>");
                 }
 
                 var html5QrcodeScanner{{input}} = new Html5Qrcode("reader{{input}}");
