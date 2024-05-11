@@ -1,6 +1,13 @@
 
-
-<div style="width:260px; padding-bottom:100%" id="reader{{input}}"></div>
+<div class="container-sm position-relative" id="scannerDiv{{input}}">
+    <div id="reader{{input}}"></div>
+    <style>
+        #reader{{input}} video {
+           aspect-ratio: 1;
+           object-fit: cover;
+        }
+    </style>
+</div>
 
 <script>
 
@@ -21,7 +28,68 @@
         }
     }
 
-    var html5QrcodeScanner{{input}} = new Html5QrcodeScanner("reader{{input}}", {aspectRatio:1.333334 , fps: 10, qrbox: 250});
-    html5QrcodeScanner{{input}}.render(onScanSuccess{{input}});
+    function flipCamera{{input}}(lastDevice){
+        html5QrcodeScanner{{input}}.stop().then(function () {
+            if (cameras.length-1 == lastDevice){
+                var cameraId = cameras[0].id;
+                newDevice = 0
+            }else{
+                var cameraId = cameras[lastDevice+1].id;
+                newDevice = lastDevice+1
+            }
+            html5QrcodeScanner{{input}}.start(
+                cameraId,
+                {
+                    fps: 10,
+                    qrbox: 250,
+                    aspectRatio: 1.0,
+                },
+                onScanSuccess{{input}},
+            );
+            
+            $("#flipCamera{{input}}").remove();
+            $("#scannerDiv{{input}}").append("<button type=\"button\" class=\"btn btn-primary position-absolute bottom-0 end-0 translate-middle\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}\">Flip</button>");
+        });
+    }
+
+
+
+    Html5Qrcode.getCameras().then(function (cameras) {
+            if (cameras.length > 0) {
+                if (cameras.length == 1) {
+                    var cameraId = cameras[0].id;
+                }else{
+                    var cameraId = cameras[0].id;
+                    $("#scannerDiv{{input}}").append("<button type=\"button\" class=\"btn btn-primary position-absolute bottom-0 end-0 translate-middle\" onclick=\"flipCamera{{input}}(0);\" id=\"flipCamera{{input}}\">Flip</button>");
+                }
+
+                var html5QrcodeScanner{{input}} = new Html5Qrcode("reader{{input}}");
+                html5QrcodeScanner{{input}}.start(
+                    cameraId,
+                    {
+                        fps: 10,
+                        qrbox: 250,
+                        aspectRatio: 1,
+                    },
+                    onScanSuccess{{input}},
+                );
+
+                globalThis.html5QrcodeScanner{{input}} = html5QrcodeScanner{{input}}
+                globalThis.cameras = cameras
+
+            }else{
+                var cameraId = null;
+            }
+        })
+        .catch(function (err) {
+            console.log(err);
+            $("#scannerDiv{{input}}").append("<p>No cameras found connect one and refresh</p>");
+        });
+
+
+
+
+
+
     
 </script>
