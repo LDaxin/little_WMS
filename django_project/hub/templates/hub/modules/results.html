@@ -7,7 +7,7 @@
             </td>
 
             {% if type == "article" %}
-            <td>{{ r.name }}</td>
+            <td>{{ r.base.name }}</td>
 
             {% elif type == "location" %}
             <td>{{ r }}</td>
@@ -29,7 +29,7 @@
             {% if type != "code" %}
             <td>
                 <a type="button" class="btn btn-light" href="./{{ r.id }}" >
-                    <img style="width:10px" src="{% static 'hub/SVG/pencil-fill.svg' %}">
+                    <img style="width:10px" src="{% static 'hub/symbols/Pencil.svg' %}">
                 </a>
             </td>
             {% endif %}
