@@ -9,7 +9,7 @@ class  FormArticle(forms.ModelForm):
 
     class Meta:
         model = Article
-        exclude = ('pType', 'space', 'code', 'stored')
+        exclude = ('pType', 'space', 'code', 'stored', 'base')
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
@@ -19,12 +19,11 @@ class  FormArticle(forms.ModelForm):
         self.fields['stored'].queryset = Space.objects.filter(active=True)
 
 
-
 class FormChangeArticle(forms.ModelForm):
     stored = forms.CharField(max_length=34, required=False)
     class Meta:
         model = Article
-        exclude = ('pType', 'space', 'code', 'stored')
+        exclude = ('pType', 'space', 'code', 'stored', 'base')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)
@@ -32,3 +31,13 @@ class FormChangeArticle(forms.ModelForm):
             visible.field.widget.attrs["class"]= "form-control"
         self.fields['stored'].queryset = Space.objects.filter(active=True)
         #self.fields['Space'].widget.attrs['id'] = 'id_space_change'
+
+class FormArticleBase(forms.ModelForm):
+    class Meta:
+        model = ArticleBase
+        exclude = ('pType', 'code')
+
+    def __init__(self, *args, **kwargs):
+        super(FormArticleBase, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs["class"]= "form-control"

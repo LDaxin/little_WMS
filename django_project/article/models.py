@@ -37,11 +37,28 @@ class ArticleType(SoftDeleteObject, models.Model):
     def __str__(self, *args, **kwargs):
         return self.name
 
-class Article(SoftDeleteObject, models.Model):
-    #name of the article
+class ArticleBase(SoftDeleteObject, models.Model):
+
     name = models.CharField(max_length=20)
-    #Article Type
-    pType = models.ForeignKey(ArticleType, on_delete=models.PROTECT, blank=True)
+
+    pType = models.ForeignKey(ArticleType, on_delete=models.CASCADE, blank=True , null = False)
+
+    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            uCode = UuidCode()
+            uCode.prefix = "ab" 
+            self.code = uCode
+            uCode.save()
+        super().save(*args, **kwargs)
+
+    def __str__(self, *args, **kwargs):
+        return self.name
+
+class Article(SoftDeleteObject, models.Model):
+
+    base = models.ForeignKey(ArticleBase, on_delete=models.CASCADE, blank=True, null=False)
     #The place where the article is stored
     stored = models.ForeignKey(Space, related_name= "space", on_delete = models.SET_NULL, null=True, blank=True)
     #the storage space where other articles can be stored in the Article
@@ -62,5 +79,5 @@ class Article(SoftDeleteObject, models.Model):
 
 
     def __str__(self, *args, **kwargs):
-        return self.name + " " + self.code.code
+        return self.base.name + " " + self.code.code
     

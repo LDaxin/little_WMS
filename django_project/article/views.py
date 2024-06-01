@@ -16,27 +16,29 @@ from storage.models import *
 @login_required(login_url='/accounts/login/')
 def article(request, typ, articleId):
     p = Article.objects.get(pk=articleId)
-    if p.pType.name == typ:
-        par = FormChangeArticle(instance=p)
+    if p.base.pType.name == typ:
+        bpar = FormArticleBase(instance=p.base, prefix="base")
+        par = FormChangeArticle(instance=p, prefix="article")
+
         par.fields["stored"].initial = p.stored
         context = {
-            "symbol":p.pType.symbol,
-            "searchFieldName":"articleSearch" + p.pType.name,
+            "symbol":p.base.pType.symbol,
+            "searchFieldName":"articleSearch" + p.base.pType.name,
             "id":articleId,
             "modalId":"single",
-            "form":[par],
+            "form":[bpar,par],
             "actionType":"update",
             "typ":typ
         }
         return render(request, "hub/modules/item.html", context=context)
     else:
-        return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.name)
+        return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
 
 @login_required(login_url='/accounts/login/')
 def addModal(request, typ):
     context = {
         "modalId":"add",
-        "form":[FormArticle()],
+        "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
         "actionType":"add",
     }
     return render(request, "hub/modules/addForm.html", context=context)
@@ -54,11 +56,11 @@ def delModal(request, typ):
 def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
-        if p.pType.name == typ:
+        if p.base.pType.name == typ:
             par = FormChangeArticle(instance=p)
             context = {
-                "symbol":p.pType.symbol,
-                "searchFieldName":"articleSearch" + p.pType.name,
+                "symbol":p.base.pType.symbol,
+                "searchFieldName":"articleSearch" + p.base.pType.name,
                 "id":articleId,
                 "modalId":"single",
                 "form":[par],
@@ -67,7 +69,7 @@ def articleIncert(request, typ, articleId):
             }
             return render(request, "hub/modules/itemForm.html", context=context)
         else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.pType.name)
+            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -83,7 +85,7 @@ def articles(request, typ):
             "searchFieldName":"articleSearch" + t.name,
             'type':"article",
             "name":typ,
-            "form":[FormArticle()],
+            "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
             "typ":typ
         }
         return render(request, "hub/modules/items.html", context=context)
@@ -103,11 +105,26 @@ def addArticle(request, typ):
 
     else:
         if request.method == "POST":
-            p = FormArticle(request.POST)
+            pb = FormArticleBase(request.POST, prefix="base")
+
+
+            if pb.is_valid():
+                base = pb.save(commit=False)
+                base.pType = t
+                base.save()
+            else:
+                context = {
+                    "toastName":"Error",
+                    "toastId":"errorToast",
+                    "toastText":"article base not valid"+str(pb.errors),
+                    "toastType":"alert"
+                }
+                return render(request, "hub/modules/toast.html", context=context)
+
+            p = FormArticle(request.POST, prefix="article")
             if p.is_valid():
 
                 pa = p.save(commit=False)
-
                 if p["code"].value() != "":
                     try:
                         code = UuidCode.objects.get(code=str(p["code"].value()))
@@ -188,6 +205,7 @@ def addArticle(request, typ):
                 space.prefix = "a0"
                 space.save()
                 pa.space = space
+                pa.base = base
 
 
                 pa.save()
@@ -195,7 +213,7 @@ def addArticle(request, typ):
                 context = {
                     "toastName":"Add Succses",
                     "toastId":"successToast",
-                    "toastText":pa.name + " was added to your system.",
+                    "toastText":pa.base.name + " was added to your system.",
                     "toastType":"status"
                 }
 
@@ -228,7 +246,7 @@ def delArticle(request, typ):
             for key, value in request.POST.items():
                 if key.startswith("_"):
                     try:
-                        pa = Article.objects.filter(pType__name__exact=typ, pk=value).first()
+                        pa = Article.objects.filter(base__pType__name__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
                         context = {
@@ -273,7 +291,20 @@ def updateArticle(request, typ, articleId):
         return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
-            articleForm = FormArticle(request.POST, instance=articleObject)
+            articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base")
+            articleForm =  FormArticle(request.POST, instance=articleObject, prefix="article")
+
+            if articleBaseForm.is_valid():
+                articleBaseForm.save()
+            else:
+                context = {
+                    "toastName":"Error",
+                    "toastId":"errorToast",
+                    "toastText":articleBaseForm.errors,
+                    "toastType":"alert"
+                }
+                return render(request, "hub/modules/toast.html", context=context)
+
             if articleForm.is_valid():
                 try:
                     if articleForm.cleaned_data["stored"].startswith("s0"):
@@ -331,14 +362,13 @@ def updateArticle(request, typ, articleId):
 def searchArticle(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
-            r = Article.objects.filter(pType__name__exact=typ)
+            r = Article.objects.filter(base__pType__name__exact=typ)
         else:
-            r = Article.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), pType__name__exact=typ)
+            r = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), base__pType__name__exact=typ)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
 @login_required(login_url='/accounts/login/')
 def exportArticles(request, typ):
-
     response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="articles.csv"'
 
@@ -349,9 +379,9 @@ def exportArticles(request, typ):
     for key, value in request.POST.items():
         if key.startswith("_"):
             article = Article.objects.get(pk=value)
-            if article.pType.name == typ:
+            if article.base.pType.name == typ:
                 thereIsOne = True
-                writer.writerow([article.name, article.code.code, article.pType.name])
+                writer.writerow([article.base.name, article.code.code, article.base.pType.name])
     return response
 
 @login_required(login_url='/accounts/login/')
