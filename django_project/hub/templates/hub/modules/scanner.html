@@ -1,5 +1,5 @@
 
-<div class="container-sm position-relative" id="scannerDiv{{input}}">
+<div class="container-sm position-relative" id="scanner{{input}}">
     <div id="reader{{input}}"></div>
     <style>
         #reader{{input}} video {
@@ -48,8 +48,8 @@
                 onScanSuccess{{input}},
             );
             
-            $("#flipCamera{{input}}").remove();
-            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}\">Flip</button>");
+            $("#flipCamera{{input}}id").remove();
+            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}id\">Flip</button>");
         });
     }
 
@@ -60,8 +60,8 @@
                 if (cameras.length == 1) {
                     var cameraId = cameras[0].id;
                 }else{
-                    var cameraId = cameras[0].id;
-                    $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}(0);\" id=\"flipCamera{{input}}\">Flip</button>");
+$("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}(1);\" id=\"flipCamera{{input}}id\">Flip</button>");
+                    var cameraId = cameras[1].id;
                 }
 
                 var html5QrcodeScanner{{input}} = new Html5Qrcode("reader{{input}}");
@@ -84,13 +84,7 @@
         })
         .catch(function (err) {
             console.log(err);
-            $("#scannerDiv{{input}}").append("<p>No cameras found connect one and refresh</p>");
+            $("#scanner{{input}}").append("<p>No cameras found connect one and refresh</p>");
         });
-
-
-
-
-
-
     
 </script>
