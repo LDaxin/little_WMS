@@ -7,7 +7,7 @@
             </td>
 
             {% if type == "article" %}
-            <td>{{ r.base.name }}</td>
+            <td>{{ r.name }}</td>
 
             {% elif type == "location" %}
             <td>{{ r }}</td>
@@ -17,6 +17,10 @@
 
             {% elif type == "storage" %}
             <td>{{ r }}</td>
+            
+            <td>
+              {{ r.parent }}
+            </td>
 
             {% elif type == "code" %}
             <td>{{ r.code }}</td>

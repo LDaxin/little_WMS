@@ -13,13 +13,13 @@
 
 
                 {% if field.name == "stored" or field.name == "code"%}
-                <div id="QRButtonDiv{{field.name}}">
-                <button id="QRButton{{field.name}}" class="btn btn-primary" type="button" hx-get="./scanner/{{field.name}}/on" hx-trigger="click, refresh">QR</button>
+                <div id="QRButtonDivid_{{field.name}}">
+                <button id="QRButtonid_{{field.name}}" class="btn btn-primary" type="button" hx-get="./scanner/id_{{field.name}}/on" hx-trigger="click, refresh">QR</button>
                 </div>
                 </div>
             </div>
 
-            <div id="scannerDiv{{field.name}}">
+            <div id="scannerDivid_{{field.name}}">
             </div>
                 {% else %}
                 </div>
