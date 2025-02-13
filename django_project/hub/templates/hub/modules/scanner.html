@@ -12,7 +12,7 @@
 
 <script>
 
-    function onScanSuccess{{input}}(decodedText, decodedResult) {
+    function onScanSuccess{{inputF}}(decodedText, decodedResult) {
         if(decodedResult.result.format.formatName == "QR_CODE"){
             {% if move == 'true' %}
             lResults(decodedText);
@@ -20,8 +20,8 @@
             $("#{{input}}").val(decodedText);
             {% else %}
             $("#{{input}}").val(decodedText);
-            html5QrcodeScanner{{input}}.pause();
-            html5QrcodeScanner{{input}}.clear();
+            html5QrcodeScanner{{inputF}}.pause();
+            html5QrcodeScanner{{inputF}}.clear();
             htmx.trigger("#{{input}}", "refresh", {});
             htmx.trigger("#QRButton{{input}}", "refresh", {});
             {% endif %}
@@ -29,8 +29,8 @@
         }
     }
 
-    function flipCamera{{input}}(lastDevice){
-        html5QrcodeScanner{{input}}.stop().then(function () {
+    function flipCamera{{inputF}}(lastDevice){
+        html5QrcodeScanner{{inputF}}.stop().then(function () {
             if (cameras.length-1 == lastDevice){
                 var cameraId = cameras[0].id;
                 newDevice = 0
@@ -38,18 +38,18 @@
                 var cameraId = cameras[lastDevice+1].id;
                 newDevice = lastDevice+1
             }
-            html5QrcodeScanner{{input}}.start(
+            html5QrcodeScanner{{inputF}}.start(
                 cameraId,
                 {
                     fps: 10,
                     qrbox: 250,
                     aspectRatio: 1.0,
                 },
-                onScanSuccess{{input}},
+                onScanSuccess{{inputF}},
             );
             
             $("#flipCamera{{input}}id").remove();
-            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}("+ newDevice +");\" id=\"flipCamera{{input}}id\">Flip</button>");
+            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}("+ newDevice +");\" id=\"flipCamera{{input}}id\">Flip</button>");
         });
     }
 
@@ -60,22 +60,22 @@
                 if (cameras.length == 1) {
                     var cameraId = cameras[0].id;
                 }else{
-$("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{input}}(1);\" id=\"flipCamera{{input}}id\">Flip</button>");
+$("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}(1);\" id=\"flipCamera{{input}}id\">Flip</button>");
                     var cameraId = cameras[1].id;
                 }
 
-                var html5QrcodeScanner{{input}} = new Html5Qrcode("reader{{input}}");
-                html5QrcodeScanner{{input}}.start(
+                var html5QrcodeScanner{{inputF}} = new Html5Qrcode("reader{{input}}");
+                html5QrcodeScanner{{inputF}}.start(
                     cameraId,
                     {
                         fps: 10,
                         qrbox: 250,
                         aspectRatio: 1,
                     },
-                    onScanSuccess{{input}},
+                    onScanSuccess{{inputF}},
                 );
 
-                globalThis.html5QrcodeScanner{{input}} = html5QrcodeScanner{{input}}
+                globalThis.html5QrcodeScanner{{inputF}} = html5QrcodeScanner{{inputF}}
                 globalThis.cameras = cameras
 
             }else{

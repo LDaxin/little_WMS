@@ -33,6 +33,7 @@ class FormChangeArticle(forms.ModelForm):
         #self.fields['Space'].widget.attrs['id'] = 'id_space_change'
 
 class FormArticleBase(forms.ModelForm):
+
     class Meta:
         model = ArticleBase
         exclude = ('pType', 'code')

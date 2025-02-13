@@ -26,8 +26,8 @@ def article(request, typ, articleId):
             "searchFieldName":"articleSearch" + p.base.pType.name,
             "id":articleId,
             "modalId":"single",
-            "form":[bpar,par],
             "actionType":"update",
+            "form":[bpar,par],
             "typ":typ
         }
         return render(request, "hub/modules/item.html", context=context)
@@ -157,8 +157,7 @@ def addArticle(request, typ):
                                 "toastType":"alert"
                             }
                             return render(request, "hub/modules/toast.html", context=context)
-                        pa.space = container.space
-
+                        pa.stored = container.space
                     except:
                         context = {
                             "toastName":"Error",
@@ -386,10 +385,12 @@ def exportArticles(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def articleScanner(request, typ, scannerId, state):
+
     if state == "on":
         context = {
             "input":scannerId,
-            "state":state
+            "state":state,
+            "inputF":scannerId.replace("-", "_"),
         }
         return render(request, "hub/modules/toggleScanner.html", context=context)
 

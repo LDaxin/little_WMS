@@ -13,6 +13,6 @@ urlpatterns = [
     re_path(r"^article/(?P<typ>\w+)/upadte", views.delArticle, name="del Article"),
     re_path(r"^article/(?P<typ>\w+)/search", views.searchArticle, name="search"),
     re_path(r"^article/(?P<typ>\w+)/export", views.exportArticles, name="articles export"),
-    re_path(r"^article/(?P<typ>\w+)/scanner/(?P<scannerId>\w+)/(?P<state>\w+)", views.articleScanner, name="articles scanner"),
+    re_path(r"^article/(?P<typ>\w+)/scanner/(?P<scannerId>[-A-Za-z0-9_]+)/(?P<state>\w+)", views.articleScanner, name="articles scanner"),
     re_path(r"^article/(?P<typ>\w+)/", views.articles, name="articles"),
 ]
