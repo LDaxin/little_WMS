@@ -1,4 +1,4 @@
-FROM python:3.11.14-slim-trixie as builder
+FROM python:3.12.13-slim-trixie as builder
 
 WORKDIR /usr/src/app
 
@@ -17,7 +17,7 @@ COPY ./requirements.txt .
 RUN pip wheel --no-cache-dir --no-deps --wheel-dir /usr/src/app/wheels -r requirements.txt
 
 
-FROM python:3.11.14-slim-trixie
+FROM python:3.12.13-slim-trixie
 
 RUN mkdir -p /home/app
 
@@ -45,5 +45,5 @@ RUN chown -R app:app $APP_HOME
 
 USER app
 
-ENTRYPOINT ["/home/app/web/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/home/app/web/entrypoint.sh"]
 
