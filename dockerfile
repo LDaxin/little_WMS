@@ -35,11 +35,11 @@ COPY --from=builder /usr/src/app/requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache /wheels/*
 
+COPY ./django_project $APP_HOME
+
 COPY ./entrypoint.sh /home/app/web/entrypoint.sh
 RUN sed -i 's/\r$//g' $APP_HOME/entrypoint.sh
 RUN chmod +x $APP_HOME/entrypoint.sh
-
-COPY ./django_project $APP_HOME
 
 RUN chown -R app:app $APP_HOME
 
