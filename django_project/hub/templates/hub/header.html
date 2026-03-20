@@ -32,7 +32,12 @@
                     {% endif %}
                 </a>
 
-                <a class="btn btn-light" type="button" href="/accounts/logout"><img style="width:45px" src="{% static 'hub/symbols/Signout.svg' %}"></a>
+                <form method="post" action="/accounts/logout/" style="display: inline;">
+                    {% csrf_token %}
+                    <button class="btn btn-light" type="submit">
+                        <img style="width:45px" src="{% static 'hub/symbols/Signout.svg' %}">
+                    </button>
+                </form>
                 <a class="btn btn-light" type="button" href="/accounts/password_change"><img style="width:45px" src="{% static 'hub/symbols/Setting.svg' %}"></a>
 
 
