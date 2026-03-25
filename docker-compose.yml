@@ -1,11 +1,11 @@
 services:
   web:
-    build: ./
-    command: python manage.py runserver 0.0.0.0:8567
-    volumes:
-      - ./django_project/:/app/wms
+    image: nilskrau/little_wms:latest
     ports:
       - 8567:8567
     env_file:
-      - ./.env.dev
+      - .env
+    volumes:
+      - ./data:/app/data
+        
 

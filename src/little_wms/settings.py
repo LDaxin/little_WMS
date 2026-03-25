@@ -94,7 +94,7 @@ WSGI_APPLICATION = "little_wms.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.environ.get("SQL_DATABASE", DB_DIR / "db.sqlite3"),
+        "NAME": os.environ.get("SQL_DATABASE", BASE_DIR / "db.sqlite3"),
     }
 }
 
