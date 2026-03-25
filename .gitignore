@@ -1,2 +1,6 @@
 *.sqlite3
 .env
+coding.sh
+**__pycache__**
+**db.sqlite3
+little_wms-web.tar
