@@ -1,7 +1,4 @@
 #!/bin/bash
-
 python manage.py migrate
-
 python manage.py livereload &
-
 exec "$@"
