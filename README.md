@@ -9,11 +9,11 @@ Learn more in [Docs](docs/main.md)
 
 ## Development setup
 
-Copy ´.env.example' to ´.env´.
-In .env set DEBUG=1 and DJANGO_SUPERUSER_PASSWORD=1.
-Mount the development entrypoint and src directory directly into the container and run in it via ´docker compose up´.
+Copy `.env.example` to `.env`.
+In `.env` set DEBUG=1 and DJANGO_SUPERUSER_PASSWORD=1.
+Mount the development entrypoint and src directory directly into the container and run in it via `docker compose up`.
 
-´´´ docker-compose.yml
+```yml
 services:
   web:
     image: nilskrau/little_wms:latest
@@ -25,5 +25,4 @@ services:
       - ./data:/app/data
       - ./src:/app/wms
       - ./scripts/entrypoint-dev.sh:/app/entrypoint.sh
-´´´
-
+```
