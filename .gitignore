@@ -5,3 +5,4 @@ coding.sh
 **db.sqlite3
 little_wms-web.tar
 data/*
+docker-compose.yml
