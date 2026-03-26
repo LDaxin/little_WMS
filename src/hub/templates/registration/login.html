@@ -1,6 +1,47 @@
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Log In</button>
-</form>
+<!DOCTYPE html>
+<html>
+    <head>
+        {% load livereload_tags %}
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'hub/bootstrap/css/bootstrap.min.css' %}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+        <script src="{% static 'hub/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'hub/bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="https://unpkg.com/html5-qrcode" type="text/javascript">
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        <script src="https://unpkg.com/htmx.org@1.9.7"></script>
+        {% livereload_script %}
+    </head>
+    <body>
+
+        <nav class="navbar sticky-top bg-light">
+            <div class="container-fluid d-flex justify-content-center">
+                <a class="navbar-brand">
+                    <img style="width:50px" src="{% static 'hub/symbols/Logo.svg' %}">
+                </a>
+            </div>
+        </nav>
+
+        <div class="container-md">
+            <h2 class="mb-4">Welcome!</h2>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required type="text" class="form-control" id="id_username" aria-describedby="usernameHelp">
+                    <!-- <div id="usernameHelp" class="form-text">Your account username.</div> -->
+                </div>
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input name="password" autocomplete="current-password" required type="password" class="form-control" id="id_password" aria-describedby="passwordHelp">
+                    <!-- <div id="passwordHelp" class="form-text">Your account password.</div> -->
+                </div>
+                <button class="btn btn-primary" type="submit">Login</button>
+            </form>
+        </div>
+
+    </body>
+</html>
+
