@@ -3,8 +3,6 @@
 What needs to be tested before a release?
 
 ## checklist
-- [ ] Creating different types of Items
+- [ ] Creating different types of items
 - [ ] deleting of those items
 - [ ] changing of those items
-
-`
