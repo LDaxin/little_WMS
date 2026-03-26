@@ -7,10 +7,26 @@ This is a WMS(Warehouse Managment System) for personal use. It's vision is to be
 
 Learn more in [Docs](docs/main.md)
 
+## Installation
+
+```yml
+services:
+  web:
+    image: nilskrau/little_wms:latest
+    ports:
+      - 8567:8567
+    env_file:
+      # set password and secret key
+      - .env
+    volumes:
+      # here the database get's persisted
+      - ./data:/app/data
+```
+
 ## Development setup
 
 Copy `.env.example` to `.env`.
-In `.env` set DEBUG=1 and DJANGO_SUPERUSER_PASSWORD=1.
+In `.env` set `DEBUG=1` and `DJANGO_SUPERUSER_PASSWORD=1`.
 Mount the development entrypoint and src directory directly into the container and run in it via `docker compose up`.
 
 ```yml
@@ -26,3 +42,7 @@ services:
       - ./src:/app/wms
       - ./scripts/entrypoint-dev.sh:/app/entrypoint.sh
 ```
+
+### New requirements
+If new requirements are added, the docker image does need to be build again.
+Simply run `./script/build.sh` and then again `docker compose up`.
