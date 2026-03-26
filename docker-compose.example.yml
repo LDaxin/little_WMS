@@ -6,4 +6,5 @@ services:
     env_file:
       - .env
     volumes:
+      # The database get's stored here
       - ./data:/app/data
