@@ -2,22 +2,27 @@
 
 {% block content %}
 
-        <div class="container-md">
-            <h2 class="mb-4">Welcome!</h2>
-            <form method="post">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="id_username" class="form-label">Username</label>
-                    <input name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required type="text" class="form-control" id="id_username" aria-describedby="usernameHelp">
-                    <!-- <div id="usernameHelp" class="form-text">Your account username.</div> -->
-                </div>
-                <div class="mb-3">
-                    <label for="id_password" class="form-label">Password</label>
-                    <input name="password" autocomplete="current-password" required type="password" class="form-control" id="id_password" aria-describedby="passwordHelp">
-                    <!-- <div id="passwordHelp" class="form-text">Your account password.</div> -->
-                </div>
-                <button class="btn btn-primary" type="submit">Login</button>
-            </form>
-        </div>
+   <div class="container-md">
+     <div class="card">
+       <div class="card-header">
+         <h2 class="mb-4 d-flex justify-content-center">Welcome!</h2>
+       </div>
+       <div class="card-body">
+         <form method="post">
+             {% csrf_token %}
+             <div class="mb-3">
+                 <label for="id_username" class="form-label">Username</label>
+                 <input name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required type="text" class="form-control" id="id_username" aria-describedby="usernameHelp">
+                 <!-- <div id="usernameHelp" class="form-text">Your account username.</div> -->
+             </div>
+             <div class="mb-3">
+                 <label for="id_password" class="form-label">Password</label>
+                 <input name="password" autocomplete="current-password" required type="password" class="form-control" id="id_password" aria-describedby="passwordHelp">
+                 <!-- <div id="passwordHelp" class="form-text">Your account password.</div> -->
+             </div>
+             <button class="btn btn-primary" type="submit">Login</button>
+         </form>
+     </div>
+   </div>
 
 {% endblock %}
