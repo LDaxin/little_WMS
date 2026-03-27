@@ -16,7 +16,7 @@
 11. Create a new git branch with dev as the origin with the following structure:
   - The type of change (doc, feat, or bug) followed by / then the ID of the [Kanban](https://kanban.krauseadrian.de/project/little-wms/kanban) task followed by / with a short name in [camelCase](https://en.wikipedia.org/wiki/Camel_case) for easier readability.
   - For example bug/67/MultySelectError
-  - Put the branch name in the field "Git branch name" for easy traceability
+  - Put the branch name in the [Kanban](https://kanban.krauseadrian.de/project/little-wms/kanban) task field "Git branch name" for easy traceability
 12. When the work is finished, move the task to Ready for testing and ask in the group if someone wants to check it
 13. When someone checked it and commented on the [Kanban](https://kanban.krauseadrian.de/project/little-wms/kanban) task that it is fine, then it can be merged into the dev branch
 14. Move the [Kanban](https://kanban.krauseadrian.de/project/little-wms/kanban) task to Done
