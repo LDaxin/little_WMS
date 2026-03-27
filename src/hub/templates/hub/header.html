@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        {% load livereload_tags %}
         {% load static %}
         <link rel="stylesheet" href="{% static 'hub/bootstrap/css/bootstrap.min.css' %}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -11,9 +12,9 @@
         <script src="https://unpkg.com/html5-qrcode" type="text/javascript">
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.7"></script>
+        {% livereload_script %}
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-
         <div aria-live="polite" aria-atomic="true" class="position-relative">
             <div class="toast-container position-fixed top-0 end-0 p-3">
 
