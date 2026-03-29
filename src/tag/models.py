@@ -1,6 +1,6 @@
 from django.db import models
 from softdelete.models import SoftDeleteObject
-from codeSystem.models import UuidCode
+from codeSystem.models import MuidCode
 from hub.fields import SelfForeignKey
 
 # Create your models here.
@@ -10,11 +10,11 @@ class Tag(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=20)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+    code = models.OneToOneField(MuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         if not self.code:
-            uCode = UuidCode()
+            uCode = MuidCode()
             uCode.prefix = "t0"
             self.code = uCode
             uCode.save()

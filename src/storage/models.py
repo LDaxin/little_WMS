@@ -3,7 +3,7 @@ from django.core import validators
 from hub import models as hub_models
 from hub.fields import SelfForeignKey
 from softdelete.models import SoftDeleteObject
-from codeSystem.models import UuidCode
+from codeSystem.models import MuidCode
 from django import forms
 from space.models import Space
 # Create your models here.
@@ -14,12 +14,12 @@ class StorageType(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
     symbol = models.CharField(max_length=20)
 
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
+    code = models.OneToOneField(MuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower()
         if not self.code:
-            uCode = UuidCode()
+            uCode = MuidCode()
             uCode.prefix = "st" 
             self.code = uCode
             uCode.save()
@@ -35,11 +35,11 @@ class Storage(SoftDeleteObject, models.Model):
 
     space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
-    code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = True, blank = True, null = True)
+    code = models.OneToOneField(MuidCode, on_delete = models.CASCADE, editable = True, blank = True, null = True)
 
     def save(self, *args, **kwargs):
         if not self.code:
-            uCode = UuidCode()
+            uCode = MuidCode()
             uCode.prefix = "s0" 
             self.code = uCode
             uCode.save()

@@ -127,7 +127,7 @@ def addArticle(request, typ):
                 pa = p.save(commit=False)
                 if p["code"].value() != "":
                     try:
-                        code = UuidCode.objects.get(code=str(p["code"].value()))
+                        code = MuidCode.objects.get(code=str(p["code"].value()))
                         if code.used:
                             context = {
                                 "toastName":"Error",

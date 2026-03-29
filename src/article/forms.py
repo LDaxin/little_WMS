@@ -15,7 +15,7 @@ class  FormArticle(forms.ModelForm):
         super(FormArticle, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
-        self.fields['code'].queryset = UuidCode.objects.filter(prefix="a0", used=False)
+        self.fields['code'].queryset = MuidCode.objects.filter(prefix="a0", used=False)
         self.fields['stored'].queryset = Space.objects.filter(active=True)
 
 

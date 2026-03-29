@@ -1,8 +1,8 @@
 from django.contrib import admin
 from codeSystem.models import *
 
-class UuidCodeAdmin(admin.ModelAdmin):
-    readonly_fields = ('uuidCode',)
+class MuidCodeAdmin(admin.ModelAdmin):
+    readonly_fields = ('muidCodePretty',)
 
 # Register your models here.
-admin.site.register(UuidCode)
+admin.site.register(MuidCode)

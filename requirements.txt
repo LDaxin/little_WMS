@@ -2,3 +2,4 @@ Django==6.0.3
 Djangorestframework==3.14.0
 gunicorn==21.2.0
 django-livereload-server==0.5.1
+muid==0.5.3

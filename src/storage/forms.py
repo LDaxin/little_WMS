@@ -13,7 +13,7 @@ class FormStorage(forms.ModelForm):
         super(FormStorage, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
-        self.fields['code'].queryset = UuidCode.objects.filter(prefix="s0", used=False)
+        self.fields['code'].queryset = MuidCode.objects.filter(prefix="s0", used=False)
 
 class FormChangeStorage(forms.ModelForm):
     class Meta:

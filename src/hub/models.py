@@ -1,6 +1,6 @@
 from django.db import models
 from softdelete.models import SoftDeleteObject
-from codeSystem.models import UuidCode
+from codeSystem.models import MuidCode
 from hub.fields import SelfForeignKey
 
 # Create your models here.

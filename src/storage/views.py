@@ -97,7 +97,7 @@ def addStorage(request, typ):
             storage.typ = t
             if s["code"].value().startswith("s0"):
                 try:
-                    code = UuidCode.objects.get(code=s["code"].value())
+                    code = MuidCode.objects.get(code=s["code"].value())
                     if code.used:
                         context = {
                             "toastName":"Error",

@@ -14,7 +14,7 @@ def addCode(request):
         form = FormCode(request.POST)
         if form.is_valid():
             for number in range(0, int(request.POST["number"])):
-                code = UuidCode()
+                code = MuidCode()
                 if request.POST["types"] == "1":
                     code.prefix = "a0"
                     code.used = False
@@ -60,9 +60,9 @@ def codes(request):
 def searchCodes(request):
     if request.method == "GET":
         if request.GET['search'] == "":
-            r = UuidCode.objects.filter(used=False)
+            r = MuidCode.objects.filter(used=False)
         else:
-            r = UuidCode.objects.filter(Q(prefix__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
+            r = MuidCode.objects.filter(Q(prefix__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
         return render(request, "hub/modules/results.html", context={"results":r, "type":"code"})
 
 @login_required(login_url='/accounts/login/')
@@ -76,7 +76,7 @@ def codesExport(request):
     writer.writerow(['prefix', 'code', 'type'])
     for key, value in request.POST.items():
         if key.startswith("_"):
-            code = UuidCode.objects.get(pk=value)
+            code = MuidCode.objects.get(pk=value)
             if code.used == False:
                 if code.prefix == "a0":
                     typ = "Material/Behälter"
