@@ -15,16 +15,14 @@ class MuidCode(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             while True:
-                muidCodeHash = muid.create()
+                muidCodeHash = muid.create(difficulty=8)
                 muidCodePretty = muid.animal(muidCodeHash)
-                print(muidCodePretty)
                 if len(muidCodePretty) < 14:
                     break
 
             codeReadable = self.prefix + " " + muidCodePretty
             print(codeReadable)
             code = codeReadable.replace(" ", "")
-            print(code)
             self.muidCodePretty = muidCodePretty
             self.muidCodeHash = muidCodeHash
             self.codeReadable = codeReadable
