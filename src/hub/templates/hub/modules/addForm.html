@@ -28,7 +28,8 @@
 
         {% endfor %}
     {% endfor %}
-    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
+    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" hx-disabled-elt="this" hx-indicator="#loading-spinner">Add</button>
+    <span id="loading-spinner" class="htmx-indicator">Loading...</span>
 </form>
 
 <script>
