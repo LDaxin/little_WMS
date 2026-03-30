@@ -1,0 +1,10 @@
+services:
+  web:
+    image: nilskrau/little_wms:latest
+    ports:
+      - 8567:8567
+    env_file:
+      - .env
+    volumes:
+      # The database get's stored here
+      - ./data:/app/data
