@@ -4,8 +4,6 @@
 
 {% block content %}
 
-<input id='scan' placeholder="search" class="form-control">
-
 {% include "hub/modules/scanner.html" with input="scan" move="true" %}
 
 <div class="fixed-bottom m-3">
@@ -16,8 +14,8 @@
         <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
         <label class="btn btn-outline-danger" for="remove"><img style="width:60px" src="{% static 'hub/symbols/Remove.svg' %}"></label>
     </div>
+    <input id='scan' placeholder="search" class="form-control">
 </div>
-
 
 <form method="POST" action="./store/" id="storeForm">
     {% csrf_token %}
@@ -32,6 +30,8 @@
     <div id="removeFormArticle">
     </div>
 </form>
+
+
 
 <script>
     var backLog = []
@@ -125,11 +125,10 @@
         storageBuffer = []
         scanBuffer = ""
     }
-/change
 
     function lResults(search){
-         
         if(scanBuffer != search){
+
             scanBuffer = search;
 
             var bufferElement = {code:search};
