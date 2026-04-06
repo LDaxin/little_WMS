@@ -63,7 +63,7 @@ def movementCodeInfo(request):
             except ObjectDoesNotExist:
                 return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a article in the System", "toastType":"alert"})})
 
-            returnJson = {"error":"", "name":article.name, "code":article.code.code, "storable":True, "storage":False, "space":article.space.active}
+            returnJson = {"error":"", "name":article.base.name, "code":article.code.code, "storable":True, "storage":False, "space":article.space.active}
             return JsonResponse(returnJson)
 
         elif request.GET['code'][0:2] == "s0":
