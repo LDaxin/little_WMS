@@ -153,7 +153,7 @@
     $("#store").change(function(){clearBuffer()})
     $("#remove").change(function(){clearBuffer()})
 
-    $("#searchResults").on("click", function(){
+    $("#searchResults").on("change", function(){
         console.log($("#searchResults").val());
         lResults($("#searchResults").val());
     });
