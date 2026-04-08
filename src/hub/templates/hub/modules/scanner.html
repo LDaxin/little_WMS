@@ -16,9 +16,8 @@
         if(decodedResult.result.format.formatName == "QR_CODE"){
             {% if move == 'true' %}
             lResults(decodedResult.decodedText);
-            $("#{{input}}").val(decodedText);
             {% else %}
-            $("#{{input}}").val(decodedText);
+            $("#{{input}}").val(decodedResult.decodedText);
             html5QrcodeScanner{{inputF}}.pause();
             html5QrcodeScanner{{inputF}}.clear();
             htmx.trigger("#{{input}}", "refresh", {});

@@ -5,6 +5,7 @@ from article.models import Article
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 # Create your views here.
 
@@ -25,7 +26,7 @@ def movementRemove(request):
         context = {
             "toastName":"Success",
             "toastId":"successToast",
-            "toastText":"success fully removed " + articleObject.name,
+            "toastText":"success fully removed " + articleObject.base.name,
             "toastType":"success"
         }
 
@@ -79,5 +80,15 @@ def movementCodeInfo(request):
 
 
         return JsonResponse({"error":"not a valide code", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"not a valide code", "toastType":"alert"})})
-    return JsonResponse({"error":"what are you triing to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you triing to do?", "toastType":"alert"})})
+    return JsonResponse({"error":"what are you trying to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you trying to do?", "toastType":"alert"})})
+
+@login_required(login_url='/accounts/login/')
+def movementSearch(request):
+    if request.method == "GET":
+        print(request)
+
+        ra = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+        rs = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+        return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
+    return JsonResponse({"error":"what are you trying to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you trying to do?", "toastType":"alert"})})
 

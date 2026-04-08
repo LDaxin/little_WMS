@@ -14,7 +14,16 @@
         <input type="radio" class="btn-check" name="options-outlined" id="remove" autocomplete="off">
         <label class="btn btn-outline-danger" for="remove"><img style="width:60px" src="{% static 'hub/symbols/Remove.svg' %}"></label>
     </div>
-    <input id='scan' placeholder="search" class="form-control">
+    
+    <form method="GET" action="./search/" id="searchForm">
+        {% csrf_token %}
+        <div class="container" >
+            <select id="searchResults" class="form-select" size="3">
+                
+            </select>
+            <input id='search' class="container-md">
+        </div>
+    </form>
 </div>
 
 <form method="POST" action="./store/" id="storeForm">
@@ -117,6 +126,7 @@
         }
     };
 
+
     function clearBuffer(){
         $("#storeFormArticle").html("")
         $("#storeFormStorage").html("")
@@ -143,11 +153,20 @@
     $("#store").change(function(){clearBuffer()})
     $("#remove").change(function(){clearBuffer()})
 
+    $("#searchResults").on("click", function(){
+        console.log($("#searchResults").val());
+        lResults($("#searchResults").val());
+    });
     $("#results").load(lResults(""));
-    $("#scan").on("input", function(){
-        lResults($('#scan').val())
+    $("#search").on("input", function(){
+        console.log("serching...");
+        var search = $("#search").val();
+        $.get(`/movement/search?search=${search}`, function(data){
+            $("#searchResults").html(data)
+            
+        });
     });
 
 </script>
-
 {% endblock %}
+
