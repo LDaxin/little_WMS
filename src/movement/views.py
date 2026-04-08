@@ -85,10 +85,13 @@ def movementCodeInfo(request):
 @login_required(login_url='/accounts/login/')
 def movementSearch(request):
     if request.method == "GET":
-        print(request)
-
-        ra = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
-        rs = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
-        return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
+        if request.GET['search'] == "":
+            ra = Article.objects.filter(base__name__exact="")
+            rs = Storage.objects.filter(name__exact="")
+            return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
+        else:
+            ra = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            rs = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
     return JsonResponse({"error":"what are you trying to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you trying to do?", "toastType":"alert"})})
 
