@@ -17,7 +17,7 @@
     
     <form method="GET" action="./search/" id="searchForm">
         {% csrf_token %}
-        <div class="container" >
+        <div class="container" id="searchContainer">
             <select id="searchResults" class="form-select" size="3">
                 
             </select>
@@ -158,6 +158,14 @@
         lResults($("#searchResults").val());
     });
     $("#results").load(lResults(""));
+    $("#searchContainer").on("focusin", function(){
+        $("#searchResults").show();
+    });
+        $("#searchContainer").on("focusout", function(){
+        $("#searchResults").hide();
+    });
+
+
     $("#search").on("input", function(){
         console.log("serching...");
         var search = $("#search").val();
@@ -165,6 +173,9 @@
             $("#searchResults").html(data)
             
         });
+    });
+    $(document).ready(function(){
+        $("#searchResults").hide();
     });
 
 </script>
