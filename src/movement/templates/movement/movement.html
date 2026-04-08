@@ -18,7 +18,7 @@
     <form method="GET" action="./search/" id="searchForm">
         {% csrf_token %}
         <div class="container" id="searchContainer">
-            <select id="searchResults" class="form-select" size="3">
+            <select id="searchResults" class="form-select" size="2">
                 
             </select>
             <input id='search' class="container-md">
@@ -171,7 +171,8 @@
         var search = $("#search").val();
         $.get(`/movement/search?search=${search}`, function(data){
             $("#searchResults").html(data)
-            
+            console.log($('#searchResults option').length)
+          $("#searchResults").attr("size",'' + Math.max(2, Math.min($('#searchResults option').length, 15)));
         });
     });
     $(document).ready(function(){
