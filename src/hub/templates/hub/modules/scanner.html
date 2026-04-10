@@ -20,10 +20,10 @@
             $("#{{input}}").val(decodedText);
             {% else %}
             $("#{{input}}").val(decodedText);
+            htmx.trigger("#QRButton{{input}}", "click");
             html5QrcodeScanner{{inputF}}.pause();
             html5QrcodeScanner{{inputF}}.clear();
-            htmx.trigger("#{{input}}", "refresh", {});
-            htmx.trigger("#QRButton{{input}}", "refresh", {});
+            htmx.trigger("#{{input}}", "click");
             {% endif %}
 
         }

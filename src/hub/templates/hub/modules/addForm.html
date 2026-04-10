@@ -6,28 +6,37 @@
 
             <div class="form-floating mb-2">
                 <div class="input-group">
-                <span class="input-group-text">{{ field.label }}</span>
+                    <span class="input-group-text">{{ field.label }}</span>
 
-                {{ field.error }}
-                {{ field }}
+                    {{ field.error }}
+                    {{ field }}
 
-
-                {% if field.name == "stored" or field.name == "code"%}
-                <div id="QRButtonDiv{{field.auto_id}}">
-                <button id="QRButton{{field.auto_id}}" class="btn btn-primary" type="button" hx-get="./scanner/{{field.auto_id}}/on" hx-trigger="click, refresh">QR</button>
-                </div>
+                    {% if field.name == "stored" or field.name == "code"%}
+                    <div id="QRButtonDiv{{field.auto_id}}">
+                        <button 
+                            id="QRButton{{field.auto_id}}" 
+                            class="btn btn-primary scanner" 
+                            type="button" 
+                            hx-post="./scanner/{{field.auto_id}}/toggle" 
+                            hx-swap="outerHTML"
+                            hx-target="#scannerDiv{{field.auto_id}}" 
+                            hx-trigger="click">
+                            QR
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <div id="scannerDiv{{field.auto_id}}">
             </div>
-                {% else %}
+                    {% else %}
                 </div>
-                </div>
-                {% endif %}
+            </div>
+            {% endif %}
 
         {% endfor %}
     {% endfor %}
+    <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
     <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
 </form>
 
@@ -38,4 +47,7 @@
         width: "100%",
         placeholder: "Select parent"
     });
+    function closeScanner() {
+        console.log("hello");
+    };
 </script>
