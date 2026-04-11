@@ -148,11 +148,14 @@ def delStorage(request, typ):
     if request.method == "POST":
         delList = []
         delListReturn = ""
+        childList = []
         for key, value in request.POST.items():
             if key[0:1] == '_':
                 try:
                     pa = Storage.objects.filter(pk=value).first()
+                    ch = Storage.objects.filter(parent__pk=value)
                     delList.append(pa)
+                    childList.append(ch)
                 except Exception as e:
                     context = {
                         "toastName":"Error",
@@ -165,6 +168,10 @@ def delStorage(request, typ):
             delListReturn = delListReturn + i.__str__() + " "
             i.deleted = True
             i.save()
+        for i in childList:
+            for e in i:
+                e.parent = None
+                e.save()
 
         context = {
             "toastName":"Delete",
