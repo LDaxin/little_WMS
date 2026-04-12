@@ -52,7 +52,9 @@ def codes(request):
         "name":"code",
         "form":[FormCode()],
         "type":"code",
-        "function":["add", "del", "export"]
+        "add":True,
+        "del":False,
+        "export":True
     }
     return render(request, "hub/modules/items.html", context=context)
 
