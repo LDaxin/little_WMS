@@ -31,7 +31,7 @@ class StorageType(SoftDeleteObject, models.Model):
 class Storage(SoftDeleteObject, models.Model):
     name = models.CharField(max_length=200)
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
-    parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    parent = SelfForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
