@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
 from storage.models import *
+import uuid
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -137,13 +138,21 @@ def addArticle(request, typ):
                             }
                             return render(request, "hub/modules/toast.html", context=context)
                     except:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"no code with id " + p["code"].value(),
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
+                        if p["code"].value()[:2] == "a0":
+                            if len(p["code"].value()) == 34:
+                                try:
+                                    givenid = p["code"].value()
+                                    partToUUID = givenid[2:10] + "-" + givenid[10:14] + "-" + givenid[14:18] + "-" + givenid[18:22] + "-" + givenid[22:34]
+                                    code = UuidCode(uuidCode=uuid.UUID(partToUUID), prefix="a0")
+                                    code.save()
+                                except:
+                                    context = {
+                                        "toastName":"Error",
+                                        "toastId":"errorToast",
+                                        "toastText": p["code"].value() + " is not a valid code",
+                                        "toastType":"alert"
+                                    }
+                                    return render(request, "hub/modules/toast.html", context=context)
 
 
                 if p["stored"].value().startswith("a0"):
