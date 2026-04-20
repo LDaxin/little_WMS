@@ -6,6 +6,7 @@ from codeSystem.models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
+from time import sleep
 
 @login_required(login_url='/accounts/login/')
 def storage(request, typ, storageId):
@@ -151,11 +152,17 @@ def delStorage(request, typ):
     if request.method == "POST":
         delList = []
         delListReturn = ""
+        childList = []
         for key, value in request.POST.items():
             if key[0:1] == '_':
                 try:
                     pa = Storage.objects.filter(pk=value).first()
-                    delList.append(pa)
+                    ch = Storage.objects.filter(parent__pk=value)
+                    delListReturn = delListReturn + pa.__str__() + ", "
+                    for i in ch:
+                        i.parent = None
+                        i.save()
+                    pa.delete()
                 except Exception as e:
                     context = {
                         "toastName":"Error",
@@ -164,10 +171,6 @@ def delStorage(request, typ):
                         "toastType":"alert"
                     }
                     return render(request, "hub/modules/toast.html", context=context)
-        for i in delList:
-            delListReturn = delListReturn + i.__str__() + " "
-            i.deleted = True
-            i.save()
 
         context = {
             "toastName":"Delete",
