@@ -234,12 +234,27 @@ def exportStorages(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def storageScanner(request, typ, scannerId, state):
-    context = {
-        "input":scannerId,
-        "state":state
-    }
-    if state == "on":
+    if state == "toggle":
+        print(request.POST)
+        if request.POST["active_scanner"] == scannerId:
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"off",
+            }
+            return render(request, "hub/modules/toggleScanner.html", context=context)
+        elif request.POST["active_scanner"] == "":
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"on",
+            }
+        else:
+            context = {
+                "activeInput":request.POST["active_scanner"],
+                "input":scannerId,
+                "state":"on",
+            }
         return render(request, "hub/modules/toggleScanner.html", context=context)
     else:
-        return render(request, "hub/modules/toggleScanner.html", context=context)
-    return HttpResponseNotFound('<h1>Page not found</h1>')
+        return HttpResponseNotFound('<h1>Page not found</h1>')

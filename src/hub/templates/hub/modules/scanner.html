@@ -17,11 +17,11 @@
             {% if move == 'true' %}
             lResults(decodedResult.decodedText);
             {% else %}
-            $("#{{input}}").val(decodedResult.decodedText);
+            $("#{{input}}").val(decodedText);
+            htmx.trigger("#QRButton{{input}}", "click");
             html5QrcodeScanner{{inputF}}.pause();
             html5QrcodeScanner{{inputF}}.clear();
-            htmx.trigger("#{{input}}", "refresh", {});
-            htmx.trigger("#QRButton{{input}}", "refresh", {});
+            htmx.trigger("#{{input}}", "click");
             {% endif %}
         }
     }
