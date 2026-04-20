@@ -5,6 +5,7 @@ from article.models import Article
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 # Create your views here.
 
@@ -25,7 +26,7 @@ def movementRemove(request):
         context = {
             "toastName":"Success",
             "toastId":"successToast",
-            "toastText":"success fully removed " + articleObject.name,
+            "toastText":"success fully removed " + articleObject.base.name,
             "toastType":"success"
         }
 
@@ -63,7 +64,7 @@ def movementCodeInfo(request):
             except ObjectDoesNotExist:
                 return JsonResponse({"error":"no such a article in the System", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"no such a article in the System", "toastType":"alert"})})
 
-            returnJson = {"error":"", "name":article.name, "code":article.code.code, "storable":True, "storage":False, "space":article.space.active}
+            returnJson = {"error":"", "name":article.base.name, "code":article.code.code, "storable":True, "storage":False, "space":article.space.active}
             return JsonResponse(returnJson)
 
         elif request.GET['code'][0:2] == "s0":
@@ -79,5 +80,18 @@ def movementCodeInfo(request):
 
 
         return JsonResponse({"error":"not a valide code", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"not a valide code", "toastType":"alert"})})
-    return JsonResponse({"error":"what are you triing to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you triing to do?", "toastType":"alert"})})
+    return JsonResponse({"error":"what are you trying to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you trying to do?", "toastType":"alert"})})
+
+@login_required(login_url='/accounts/login/')
+def movementSearch(request):
+    if request.method == "GET":
+        if request.GET['search'] == "":
+            ra = Article.objects.filter(base__name__exact="")
+            rs = Storage.objects.filter(name__exact="")
+            return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
+        else:
+            ra = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            rs = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            return render(request, "hub/modules/quickResults.html", context={"resultsA":ra, "resultsS":rs})
+    return JsonResponse({"error":"what are you trying to do?", "errorToast":render_to_string("hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"what are you trying to do?", "toastType":"alert"})})
 

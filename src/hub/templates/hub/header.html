@@ -23,7 +23,7 @@
         </div>
 
         <nav class="navbar sticky-top bg-light">
-            <div class="container-fluid">
+          <div class="container-fluid {% if not request.user.is_authenticated %} d-flex justify-content-center {% endif %}">
 
                 <a class="navbar-brand">
                     {% if symbol == None %}
@@ -32,6 +32,8 @@
                         <img style="width:50px" src="{% static 'hub/symbols/'|add:symbol|add:'.svg' %}">
                     {% endif %}
                 </a>
+
+                {% if request.user.is_authenticated %}
 
                 <form method="post" action="/accounts/logout/" style="display: inline;">
                     {% csrf_token %}
