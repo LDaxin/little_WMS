@@ -63,7 +63,10 @@ def storages(request, typ):
             'type':"storage",
             "name":typ,
             "form":[FormStorage()],
-            "typ":typ
+            "typ":typ,
+            "add":True,
+            "del":True,
+            "export":True
         }
         return render(request, "hub/modules/items.html", context=context)
 

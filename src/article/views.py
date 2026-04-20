@@ -86,7 +86,10 @@ def articles(request, typ):
             'type':"article",
             "name":typ,
             "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
-            "typ":typ
+            "typ":typ,
+            "add":True,
+            "del":True,
+            "export":True,
         }
         return render(request, "hub/modules/items.html", context=context)
 
