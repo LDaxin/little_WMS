@@ -15,9 +15,7 @@
     function onScanSuccess{{inputF}}(decodedText, decodedResult) {
         if(decodedResult.result.format.formatName == "QR_CODE"){
             {% if move == 'true' %}
-            lResults(decodedText);
-            console.log(decodedText);
-            $("#{{input}}").val(decodedText);
+            lResults(decodedResult.decodedText);
             {% else %}
             $("#{{input}}").val(decodedText);
             htmx.trigger("#QRButton{{input}}", "click");
@@ -25,7 +23,6 @@
             html5QrcodeScanner{{inputF}}.clear();
             htmx.trigger("#{{input}}", "click");
             {% endif %}
-
         }
     }
 

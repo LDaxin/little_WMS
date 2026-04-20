@@ -1,6 +1,28 @@
-<h2>Log In</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Log In</button>
-</form>
+{% extends "hub/header.html" %}
+
+{% block content %}
+
+   <div class="container-md mt-4">
+     <div class="card">
+       <div class="card-header d-flex justify-content-center">
+             <h2 class="mt-2 mb-2">Welcome!</h2>
+       </div>
+       <div class="card-body">
+         <form method="post">
+             {% csrf_token %}
+             <div class="mb-3">
+                 <label for="id_username" class="form-label">Username</label>
+                 <input name="username" autofocus autocapitalize="none" autocomplete="username" maxlength="150" required type="text" class="form-control" id="id_username" aria-describedby="usernameHelp">
+                 <!-- <div id="usernameHelp" class="form-text">Your account username.</div> -->
+             </div>
+             <div class="mb-3">
+                 <label for="id_password" class="form-label">Password</label>
+                 <input name="password" autocomplete="current-password" required type="password" class="form-control" id="id_password" aria-describedby="passwordHelp">
+                 <!-- <div id="passwordHelp" class="form-text">Your account password.</div> -->
+             </div>
+             <button class="btn btn-primary" type="submit">Login</button>
+         </form>
+     </div>
+   </div>
+
+{% endblock %}
