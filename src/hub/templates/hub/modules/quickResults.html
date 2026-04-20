@@ -1,0 +1,8 @@
+{% load static %}
+
+{% for r in resultsA %}
+<option value="{{r.code.code}}">{{r.base.name}}</option>
+{% endfor %}
+{% for r in resultsS %}
+<option value="{{r.code.code}}">{{r}}</option>
+{% endfor %}
