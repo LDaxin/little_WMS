@@ -42,10 +42,9 @@
                     </button>
                 </form>
                 <a class="btn btn-light" type="button" href="/accounts/password_change"><img style="width:45px" src="{% static 'hub/symbols/Setting.svg' %}"></a>
-                {% endif  %}
-
-
-
+                {% if request.path != "/" %}
+                    <a class="btn btn-light" type="button" onClick="javascript:history.back();"><img style="width:45px" src="{% static 'hub/symbols/Back.svg' %}"></a>
+                {% endif %}
 
             </div>
         </nav>
@@ -55,6 +54,18 @@
 
         {% endblock %}
         </div>
+
+        <script>
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page was loaded from bfcache (back/forward navigation)
+                    window.location.reload();
+                }
+            });
+        </script>
+
+
+
 
     </body>
 
