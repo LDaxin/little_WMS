@@ -7,7 +7,13 @@
     </ul>
     <form id="delForm" method="POST" action="./del">
         {% csrf_token %}
-        <button type="submit" id="delButton" class="btn btn-danger" hx-trigger="click" hx-post="./del" hx-swap="afterbegin" hx-target=".toast-container" name="sub_">Delete</button>
+        <button type="submit" id="delButton" class="btn btn-danger" hx-trigger="click" hx-post="./del" hx-swap="afterbegin" hx-target=".toast-container" name="sub_" hx-disabled-elt="this" hx-indicator="#loading-spinner">
+            <span class="btn-label">Delete</span>
+            <span id="loading-spinner" class="htmx-indicator">
+            <div id="loading-spinner" class="spinner-border spinner-border-sm htmx-indicator" role="status">
+            </div>
+            </span>
+        </button>
     </form>
     <script>
 

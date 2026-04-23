@@ -7,7 +7,13 @@
     </ul>
     <form exportForm method="POST" action="./export" id="exportForm">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success" hx-trigger="downloadCSV" hx-target="#download-link" hx-get="./export" >Export</button>
+        <button type="submit" class="btn btn-success" hx-trigger="downloadCSV" hx-target="#download-link" hx-get="./export" hx-disabled-elt="this" hx-indicator="#loading-spinner">
+            <span class="btn-label">Export</span>
+            <span id="loading-spinner" class="htmx-indicator">
+            <div id="loading-spinner" class="spinner-border spinner-border-sm htmx-indicator" role="status">
+            </div>
+            </span>
+        </button>
         <a id="download-link" style="display: none;"></a>
     </form>
     <script>

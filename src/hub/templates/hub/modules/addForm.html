@@ -37,7 +37,13 @@
         {% endfor %}
     {% endfor %}
     <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
-    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
+    <button class="btn btn-success text-center" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" hx-disabled-elt="this" hx-indicator="#loading-spinner">
+      <span class="btn-label">Add</span>
+      <span id="loading-spinner" class="htmx-indicator">
+      <div id="loading-spinner" class="spinner-border spinner-border-sm htmx-indicator" role="status">
+      </div>
+      </span>
+    </button>
 </form>
 
 <script>
