@@ -6,6 +6,7 @@ from codeSystem.models import *
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
+import uuid
 from time import sleep
 
 @login_required(login_url='/accounts/login/')
@@ -114,13 +115,20 @@ def addStorage(request, typ):
                     code.save()
                     storage.code = code
                 except:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":"not valid code",
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
+                    if len(s["code"].value()) == 34:
+                        try:
+                            givenid = s["code"].value()
+                            partToUUID = givenid[2:10] + "-" + givenid[10:14] + "-" + givenid[14:18] + "-" + givenid[18:22] + "-" + givenid[22:34]
+                            code = UuidCode(uuidCode=uuid.UUID(partToUUID), prefix="s0")
+                            code.save()
+                        except:
+                            context = {
+                                "toastName":"Error",
+                                "toastId":"errorToast",
+                                "toastText": s["code"].value() + " is not a valid code",
+                                "toastType":"alert"
+                            }
+                            return render(request, "hub/modules/toast.html", context=context)
             else:
                 pass
 
