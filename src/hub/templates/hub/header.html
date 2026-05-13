@@ -23,7 +23,7 @@
         </div>
 
         <nav class="navbar sticky-top bg-light">
-            <div class="container-fluid">
+          <div class="container-fluid {% if not request.user.is_authenticated %} d-flex justify-content-center {% endif %}">
 
                 <a class="navbar-brand">
                     {% if symbol == None %}
@@ -33,6 +33,8 @@
                     {% endif %}
                 </a>
 
+                {% if request.user.is_authenticated %}
+
                 <form method="post" action="/accounts/logout/" style="display: inline;">
                     {% csrf_token %}
                     <button class="btn btn-light" type="submit">
@@ -40,9 +42,10 @@
                     </button>
                 </form>
                 <a class="btn btn-light" type="button" href="/accounts/password_change"><img style="width:45px" src="{% static 'hub/symbols/Setting.svg' %}"></a>
-
-
-
+                {% if request.path != "/" %}
+                    <a class="btn btn-light" type="button" onClick="javascript:history.back();"><img style="width:45px" src="{% static 'hub/symbols/Back.svg' %}"></a>
+                {% endif %}
+                {% endif %}
 
             </div>
         </nav>
@@ -52,6 +55,18 @@
 
         {% endblock %}
         </div>
+
+        <script>
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    // Page was loaded from bfcache (back/forward navigation)
+                    window.location.reload();
+                }
+            });
+        </script>
+
+
+
 
     </body>
 

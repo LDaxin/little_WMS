@@ -87,7 +87,10 @@ def articles(request, typ):
             'type':"article",
             "name":typ,
             "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
-            "typ":typ
+            "typ":typ,
+            "add":True,
+            "del":True,
+            "export":True,
         }
         return render(request, "hub/modules/items.html", context=context)
 
@@ -394,21 +397,29 @@ def exportArticles(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def articleScanner(request, typ, scannerId, state):
-
-    if state == "on":
-        context = {
-            "input":scannerId,
-            "state":state,
-            "inputF":scannerId.replace("-", "_"),
-        }
+    if state == "toggle":
+        print(request.POST)
+        if request.POST["active_scanner"] == scannerId:
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"off",
+            }
+            return render(request, "hub/modules/toggleScanner.html", context=context)
+        elif request.POST["active_scanner"] == "":
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"on",
+            }
+        else:
+            context = {
+                "activeInput":request.POST["active_scanner"],
+                "input":scannerId,
+                "state":"on",
+            }
         return render(request, "hub/modules/toggleScanner.html", context=context)
 
-    elif state == "off":
-        context = {
-            "input":scannerId,
-            "state":state
-        }
-        return render(request, "hub/modules/toggleScanner.html", context=context)
 
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
 import uuid
+from time import sleep
 
 @login_required(login_url='/accounts/login/')
 def storage(request, typ, storageId):
@@ -64,7 +65,10 @@ def storages(request, typ):
             'type':"storage",
             "name":typ,
             "form":[FormStorage()],
-            "typ":typ
+            "typ":typ,
+            "add":True,
+            "del":True,
+            "export":True
         }
         return render(request, "hub/modules/items.html", context=context)
 
@@ -156,11 +160,17 @@ def delStorage(request, typ):
     if request.method == "POST":
         delList = []
         delListReturn = ""
+        childList = []
         for key, value in request.POST.items():
             if key[0:1] == '_':
                 try:
                     pa = Storage.objects.filter(pk=value).first()
-                    delList.append(pa)
+                    ch = Storage.objects.filter(parent__pk=value)
+                    delListReturn = delListReturn + pa.__str__() + ", "
+                    for i in ch:
+                        i.parent = None
+                        i.save()
+                    pa.delete()
                 except Exception as e:
                     context = {
                         "toastName":"Error",
@@ -169,10 +179,6 @@ def delStorage(request, typ):
                         "toastType":"alert"
                     }
                     return render(request, "hub/modules/toast.html", context=context)
-        for i in delList:
-            delListReturn = delListReturn + i.__str__() + " "
-            i.deleted = True
-            i.save()
 
         context = {
             "toastName":"Delete",
@@ -242,12 +248,27 @@ def exportStorages(request, typ):
 
 @login_required(login_url='/accounts/login/')
 def storageScanner(request, typ, scannerId, state):
-    context = {
-        "input":scannerId,
-        "state":state
-    }
-    if state == "on":
+    if state == "toggle":
+        print(request.POST)
+        if request.POST["active_scanner"] == scannerId:
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"off",
+            }
+            return render(request, "hub/modules/toggleScanner.html", context=context)
+        elif request.POST["active_scanner"] == "":
+            context = {
+                "activeInput":"",
+                "input":scannerId,
+                "state":"on",
+            }
+        else:
+            context = {
+                "activeInput":request.POST["active_scanner"],
+                "input":scannerId,
+                "state":"on",
+            }
         return render(request, "hub/modules/toggleScanner.html", context=context)
     else:
-        return render(request, "hub/modules/toggleScanner.html", context=context)
-    return HttpResponseNotFound('<h1>Page not found</h1>')
+        return HttpResponseNotFound('<h1>Page not found</h1>')

@@ -6,11 +6,17 @@
 
 <div class="fixed-bottom  m-3">
 
-    {% include "hub/modules/modalButton.html" with modalId="Add" buttonSymbol=" + " buttonColor="success" %}
+    {% if add %}
+        {% include "hub/modules/modalButton.html" with modalId="Add" buttonSymbol=" + " buttonColor="success" %}
+    {% endif %}
 
-    {% include "hub/modules/modalButton.html" with modalId="Del" buttonSymbol=" - " buttonColor="danger" %}
+    {% if del %}
+        {% include "hub/modules/modalButton.html" with modalId="Del" buttonSymbol=" - " buttonColor="danger" %}
+    {% endif %}
 
-    {% include "hub/modules/modalButton.html" with modalId="Export" buttonSymbol=" Export " buttonColor="primary" %}
+    {% if export %}
+        {% include "hub/modules/modalButton.html" with modalId="Export" buttonSymbol=" Export " buttonColor="primary" %}
+    {% endif %}
 
 </div>
 

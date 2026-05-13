@@ -7,4 +7,5 @@ urlpatterns = [
     path("movement/request/", views.movementCodeInfo, name="request"),
     path("movement/store/", views.movementStore, name="store"),
     path("movement/remove/", views.movementRemove, name="remove"),
+    path("movement/search/", views.movementSearch, name="search"),
 ]
