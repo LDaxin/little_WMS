@@ -1,138 +1,142 @@
-# Agents — KI-Agenten für little_WMS
+# Agents — AI Agents for little_WMS
 
-Dieses Dokument beschreibt, welche opencode-Agenten für die Arbeit an **little_WMS** zur Verfügung stehen und wie sie projektbezogen eingesetzt werden.
+This document describes which opencode agents are available for work on **little_WMS** and how they are used in the context of the project.
 
 ---
 
-## Projektkontext
+## Project Context
 
-| Eigenschaft | Wert |
+| Property | Value |
 |---|---|
 | **Name** | little_WMS |
-| **Zweck** | Persönliches Warehouse Management System – so einfach, dass man es benutzt |
-| **Stack** | Django 6.0, Django REST Framework 3.14, Gunicorn, SQLite, Docker |
-| **Sprache** | Python 3.12 |
-| **Django-Apps** | `article`, `codeSystem`, `export`, `hub`, `little_wms`, `location`, `movement`, `softdelete`, `space`, `storage`, `tag` |
-| **Entwicklung** | Docker-basiert via `docker compose up`, Dev-Entrypoint unter `scripts/entrypoint-dev.sh` |
+| **Purpose** | Personal Warehouse Management System – simple enough that you actually use it |
+| **Stack** | Django 6.0.3, Django REST Framework 3.14, Gunicorn, SQLite, Docker |
+| **Language** | Python 3.12 |
+| **Django Apps** | `article`, `codeSystem`, `export`, `hub`, `little_wms`, `location`, `movement`, `softdelete`, `space`, `storage`, `tag` |
+| **Development** | Docker-based via `docker compose up`, dev entrypoint at `scripts/entrypoint-dev.sh` |
 
 ---
 
-## Verfügbare Agenten & Einsatzzweck
+## Available Agents & Use Cases
 
-### Entwicklung
+### Development
 
-| Agent | Wann einsetzen |
+| Agent | When to Use |
 |---|---|
-| **implementierer** | Neue Features umsetzen: Django-Models, Views, Templates, REST-Endpoints, Formulare. Immer mit Verweis auf bestehende Patterns in der Codebase. |
-| **bug-fixer** | Fehler beheben. Beschreibe das erwartete vs. tatsächliche Verhalten, relevante Logs und betroffene Django-App. |
-| **refactorer** | Code-Struktur verbessern ohne Verhaltensänderung. Z. B. Duplikate in Views beseitigen, Querysets optimieren, Template-Struktur vereinheitlichen. |
-| **tester** | Tests schreiben oder ausführen. Das Projekt hat aktuell minimale Testabdeckung – vor jedem Refactoring sollten Tests ergänzt werden. Siehe `docs/developer/testing.md` für die manuelle Test-Checkliste. |
+| **implementierer** | Implement new features: Django models, views, templates, REST endpoints, forms. Always referencing existing patterns in the codebase. |
+| **bug-fixer** | Fix bugs. Describe the expected vs. actual behavior, relevant logs, and the affected Django app. |
+| **refactorer** | Improve code structure without changing behavior, e.g. eliminate duplication in views, optimize querysets, unify template structure. |
+| **tester** | Write or run tests. The project currently has minimal test coverage – tests should be added before any refactoring. See `docs/developer/testing.md` for the manual test checklist. |
 
-### Qualitätssicherung
+### Quality Assurance
 
-| Agent | Wann einsetzen |
+| Agent | When to Use |
 |---|---|
-| **code-reviewer** | PRs oder Diffs auf Codequalität, Django-Best-Practices und Projektkonventionen prüfen. |
-| **security** | Sicherheitsanalyse: Secrets in Code/Config, unsichere Querysets, fehlende Permission-Checks, Dependency-Schwachstellen. |
+| **code-reviewer** | Review PRs or diffs for code quality, Django best practices, and project conventions. |
+| **security** | Security analysis: secrets in code/config, insecure querysets, missing permission checks, dependency vulnerabilities. |
 
-### Planung & Recherche
+### Planning & Research
 
-| Agent | Wann einsetzen |
+| Agent | When to Use |
 |---|---|
-| **explore** | Codebase erkunden: Dateien finden, Abhängigkeiten zwischen Django-Apps verstehen, bestehende Patterns identifizieren. |
-| **planer** | Ausführungsplan für komplexe Features erstellen, der Aufgaben auf die passenden Agenten verteilt. |
-| **dirigent** | Komplexe, parallelisierbare Aufgaben orchestrieren und an Sub-Agenten delegieren. |
-| **rechercheur** | Externe Recherche (Django-Docs, DRF, Deployment-Fragen). |
-| **bewerter** | Technische Entscheidungen vergleichen und bewerten (z. B. Library-Wahl, Architekturansätze). |
+| **explore** | Explore the codebase: find files, understand dependencies between Django apps, identify existing patterns. |
+| **planer** | Create an execution plan for complex features that distributes tasks to the appropriate agents. |
+| **dirigent** | Orchestrate complex, parallelizable tasks and delegate them to sub-agents. |
+| **rechercheur** | External research (Django docs, DRF, deployment questions). |
+| **bewerter** | Compare and evaluate technical decisions (e.g. library choice, architectural approaches). |
 
-### Infrastruktur & Betrieb
+### Infrastructure & Operations
 
-| Agent | Wann einsetzen |
+| Agent | When to Use |
 |---|---|
-| **devops** | Docker, docker-compose, CI/CD, Deployment-Konfiguration. |
-| **dependency-manager** | `requirements.txt` prüfen und aktualisieren. |
-| **scaffolder** | Neue Django-App innerhalb des Projekts anlegen (Models, Admin, Views, URLs, Templates-Grundgerüst). |
+| **devops** | Docker, docker-compose, CI/CD, deployment configuration. |
+| **dependency-manager** | Check and update `requirements.txt`. |
+| **scaffolder** | Create a new Django app within the project (models, admin, views, URLs, template scaffold). |
 
-### Dokumentation
+### Documentation
 
-| Agent | Wann einsetzen |
+| Agent | When to Use |
 |---|---|
-| **dokumentierer** | README, Docs unter `docs/`, Inline-Docstrings, API-Dokumentation. |
+| **dokumentierer** | README, docs under `docs/`, inline docstrings, API documentation. |
 
 ---
 
-## Projektspezifische Konventionen
+## Project-Specific Conventions
 
-Diese Konventionen müssen jedem Agenten-Prompt mitgegeben werden, wenn sie relevant sind:
+These conventions must be included in every agent prompt when relevant:
+
+### Language
+
+- **English only**: The project is conducted entirely in English — code, documentation, commit messages, branch names, and issues are all written in English. Avoid German terms.
 
 ### Git
 
-- **Commit-Namespace**: `type: what` — Typen sind `fix`, `add`, `clean`, `refactor`, `delete` (siehe `docs/git commit namespace.md`)
-- **Branch-Naming**: `typ/kanban-id/kurzerName` — z. B. `feat/42/ArticleCalendar`, `bug/67/MultiSelectError`
-- **Base-Branch**: `dev` (nicht `main`)
-- **Mergen**: Merges werden **nicht** von Agenten durchgeführt. Das Zusammenführen von Branches (z. B. nach `dev` oder `main`) ist ausschließlich Aufgabe des menschlichen Maintainers. Agenten erstellen und committen auf ihren Feature-Branches, führen aber keine Merge- oder Rebase-Operationen durch.
+- **Commit Namespace**: `type: what` — types are `fix`, `add`, `clean`, `refactor`, `delete` (see `docs/git commit namespace.md`)
+- **Branch Naming**: `typ/kanban-id/shortName` — e.g. `feat/42/ArticleCalendar`, `bug/67/MultiSelectError`
+- **Base Branch**: `dev` (not `main`)
+- **Merging**: Merges are **not** performed by agents. Merging branches (e.g. into `dev` or `main`) is exclusively the responsibility of the human maintainer. Agents create and commit on their feature branches, but do not perform merge or rebase operations.
 
 ### Django
 
-- **App-Struktur**: Jede Django-App liegt direkt unter `src/` (z. B. `src/article/`, `src/storage/`)
-- **Templates**: Pro App unter `templates/<app>/`, Module unter `templates/<app>/modules/` (kein `extends header.html`)
-- **Settings**: Zentrale Konfiguration in `src/little_wms/settings.py`
-- **URLs**: Pro App eine `urls.py`, eingehängt in `src/little_wms/urls.py`
-- **Soft-Delete**: Die App `softdelete` stellt übergreifende Soft-Delete-Logik bereit
+- **App Structure**: Each Django app lives directly under `src/` (e.g. `src/article/`, `src/storage/`)
+- **Templates**: Per app under `templates/<app>/`, modules under `templates/<app>/modules/` (no `extends header.html`)
+- **Settings**: Central configuration in `src/little_wms/settings.py`
+- **URLs**: One `urls.py` per app, included in `src/little_wms/urls.py`
+- **Soft Delete**: The app `softdelete` provides cross-app soft-delete logic
 
-### Docker-Entwicklung
+### Docker Development
 
-- Dev-Entrypoint: `scripts/entrypoint-dev.sh` (mit Livereload)
-- Bei neuen Abhängigkeiten: Image mit `./scripts/build.sh` neu bauen, dann `docker compose up`
-- Datenbank-Persistenz: `./data/` wird als Volume gemountet
+- Dev entrypoint: `scripts/entrypoint-dev.sh` (with live reload)
+- For new dependencies: rebuild the image with `./scripts/build.sh`, then `docker compose up`
+- Database persistence: `./data/` is mounted as a volume
 
 ---
 
-## Prompt-Bausteine
+## Prompt Building Blocks
 
-Diese Abschnitte können in Agenten-Prompts wiederverwendet werden:
+These sections can be reused in agent prompts:
 
-### Django-Kontext (immer mitgeben bei Code-Aufgaben)
+### Django Context (always include for code tasks)
 
 ```
-Das Projekt ist ein Django 6.0 WMS mit Django REST Framework 3.14.
-Arbeitsverzeichnis: src/
-Django-Apps: article, codeSystem, export, hub, little_wms, location, movement, softdelete, space, storage, tag
-Templates liegen unter templates/<app>/, Module unter templates/<app>/modules/.
+The project is a Django 6.0.3 WMS with Django REST Framework 3.14.
+Working directory: src/
+Django apps: article, codeSystem, export, hub, little_wms, location, movement, softdelete, space, storage, tag
+Templates live under templates/<app>/, modules under templates/<app>/modules/.
 Settings: src/little_wms/settings.py
-URLs: src/little_wms/urls.py (Root) + pro App eine urls.py
+URLs: src/little_wms/urls.py (root) + one urls.py per app
 ```
 
-### Docker-Dev-Kontext
+### Docker Dev Context
 
 ```
-Entwicklungsumgebung: Docker via docker compose up.
-Dev-Entrypoint: scripts/entrypoint-dev.sh (mit Livereload).
-Bei neuen Abhängigkeiten: requirements.txt aktualisieren, dann Image mit ./scripts/build.sh neu bauen.
-Daten persistieren in ./data/ (als Volume gemountet).
+Development environment: Docker via docker compose up.
+Dev entrypoint: scripts/entrypoint-dev.sh (with live reload).
+For new dependencies: update requirements.txt, then rebuild the image with ./scripts/build.sh.
+Data persists in ./data/ (mounted as a volume).
 ```
 
 ---
 
-## Typische Workflows
+## Typical Workflows
 
-### Neues Feature entwickeln
+### Develop a New Feature
 
-1. **planer** → Plan erstellen lassen
-2. **explore** → Betroffene Dateien und Patterns identifizieren
-3. **implementierer** → Feature umsetzen (mit Django-Kontext-Prompt)
-4. **tester** → Tests schreiben/ausführen
-5. **code-reviewer** → Diff prüfen lassen
+1. **planer** → create a plan
+2. **explore** → identify affected files and patterns
+3. **implementierer** → implement the feature (with Django context prompt)
+4. **tester** → write/run tests
+5. **code-reviewer** → have the diff reviewed
 
-### Bug fixen
+### Fix a Bug
 
-1. **explore** → Fehlerquelle eingrenzen
-2. **bug-fixer** → Fix umsetzen
-3. **tester** → Regression prüfen
+1. **explore** → narrow down the source of the error
+2. **bug-fixer** → implement the fix
+3. **tester** → check for regressions
 
 ### Refactoring
 
-1. **explore** → Betroffenen Code kartieren
-2. **tester** → Vorher Tests schreiben (Absicherung)
-3. **refactorer** → Refactoring durchführen
-4. **tester** → Nachher Tests ausführen
+1. **explore** → map the affected code
+2. **tester** → write tests beforehand (safety net)
+3. **refactorer** → perform the refactoring
+4. **tester** → run tests afterwards
