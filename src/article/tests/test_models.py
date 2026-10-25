@@ -84,3 +84,27 @@ class ArticleModelTest(TestCase):
 
     def test_soft_delete_and_undelete(self):
         assert_soft_delete_cycle(self, self.article, Article)
+
+
+class ArticleGlobalFieldsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.article_base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.article_base)
+
+    def test_article_defaults(self):
+        self.assertEqual(self.article.zustand, "gut")
+        self.assertFalse(self.article.ist_verbrauchsartikel)
+        self.assertIsNone(self.article.menge)
+        self.assertIsNone(self.article.anschaffungswert)
+        self.assertIsNone(self.article.standard_lagerplatz)
+        self.assertEqual(self.article.notiz, "")
+
+    def test_article_base_catalog_defaults(self):
+        self.assertEqual(self.article_base.attributes, {})
+        self.assertIsNone(self.article_base.outer_length_mm)
+        self.assertIsNone(self.article_base.size_class)
+
+    def test_article_type_allow_merge_split_default(self):
+        self.assertFalse(self.article_type.allow_merge_split)

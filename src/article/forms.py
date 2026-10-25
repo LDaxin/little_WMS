@@ -36,7 +36,7 @@ class FormArticleBase(forms.ModelForm):
 
     class Meta:
         model = ArticleBase
-        exclude = ('organisation', 'pType', 'code')
+        exclude = ('organisation', 'pType', 'code', 'attributes')
 
     def __init__(self, *args, **kwargs):
         super(FormArticleBase, self).__init__(*args, **kwargs)

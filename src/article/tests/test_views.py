@@ -37,7 +37,13 @@ class ArticleViewTest(TestCase):
     def test_add_article(self):
         response = self.client.post(
             "/article/werkzeug/add",
-            {"base-name": "Zange", "article-amount": "", "article-stored": "", "article-code": ""},
+            {
+                "base-name": "Zange",
+                "article-amount": "",
+                "article-stored": "",
+                "article-code": "",
+                "article-zustand": "gut",
+            },
         )
         self.assertEqual(response.status_code, 200)
         self.assertTrue(ArticleBase.objects.filter(name="Zange").exists())
@@ -45,7 +51,12 @@ class ArticleViewTest(TestCase):
     def test_update_article(self):
         response = self.client.post(
             f"/article/werkzeug/{self.article.pk}/update",
-            {"base-name": "Hammer XL", "article-amount": "3", "article-stored": ""},
+            {
+                "base-name": "Hammer XL",
+                "article-amount": "3",
+                "article-stored": "",
+                "article-zustand": "gut",
+            },
         )
         self.assertEqual(response.status_code, 200)
         self.article_base.refresh_from_db()
