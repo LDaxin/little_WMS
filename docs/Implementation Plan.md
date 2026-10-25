@@ -146,7 +146,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 0 | 0.1 Model characterization tests | ✅ done |
 | 0 | 0.2 View characterization tests | ✅ done |
 | 0 | 0.3 Movement tests | ✅ done |
-| 0 | 0.4 Migration workflow | ⬜ open |
+| 0 | 0.4 Migration workflow | ✅ done |
 | 1 | 1.1 organisation field | ⬜ open |
 | 1 | 1.2 Data migration | ⬜ open |
 | 1 | 1.3 Article Model | ⬜ open |
