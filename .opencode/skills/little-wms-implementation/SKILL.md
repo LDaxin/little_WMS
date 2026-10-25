@@ -60,13 +60,39 @@ English only — code, docs, commits, branches.
 - Are the commits clean?
 - Is it revertible?
 
+## Testing via Docker
+
+All tests and manual verification run through **Docker** — never rely on a
+locally installed Python/Django.
+
+- Run the full test suite (must be green before reporting):
+  ```bash
+  docker compose run --rm --no-deps --entrypoint python web manage.py test
+  ```
+- The image bakes in `src/`; the running container only mounts `./data`.
+  After code changes you must rebuild so the app serves the new code:
+  ```bash
+  docker compose build
+  docker compose up -d
+  ```
+- Migrations on the dev DB:
+  ```bash
+  docker compose run --rm --no-deps --entrypoint python web manage.py migrate
+  ```
+- If your shell has no docker-group access, prefix with `sg docker -c "..."`.
+
 ## Per-Step Flow
 
 ```
 1. Branch off `ki`: type/step/name
 2. Work
 3. Commits
-4. Report
-5. Human reviews and approves
-6. Agent merges into `ki` (only after approval)
+4. Run the full test suite in Docker (must be green)
+5. `docker compose build && docker compose up -d` — so the owner can test
+6. Report: what was done + how to test it (URL, credentials)
+7. Human reviews and approves
+8. Agent merges into `ki` (only after approval)
 ```
+
+**Always rebuild Docker before asking for the merge** — the owner tests the
+running container, not the working tree.

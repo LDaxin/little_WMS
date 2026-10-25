@@ -91,6 +91,14 @@ These conventions must be included in every agent prompt when relevant:
 - Dev entrypoint: `scripts/entrypoint-dev.sh` (with live reload)
 - For new dependencies: rebuild the image with `./scripts/build.sh`, then `docker compose up`
 - Database persistence: `./data/` is mounted as a volume
+- **All testing runs through Docker** — never rely on a local Python/Django:
+  - Tests: `docker compose run --rm --no-deps --entrypoint python web manage.py test`
+  - Migrations: `docker compose run --rm --no-deps --entrypoint python web manage.py migrate`
+- `src/` is **baked into the image** (only `./data` is mounted). After code
+  changes, rebuild so the app serves the new code:
+  `docker compose build && docker compose up -d`
+- **Rebuild Docker before asking for a merge** — the maintainer tests the
+  running container, not the working tree.
 
 ---
 

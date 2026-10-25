@@ -6,8 +6,17 @@ description: Use when fixing a bug, recording a defect, or working through docs/
 # little_WMS Bugfix
 
 Workflow for defects in little_WMS. Conventions (branch naming, commit types,
-ponytail, merge rules) come from the `little-wms-implementation` skill — this
-skill only adds the bug-specific parts.
+ponytail, merge rules, Docker testing) come from the `little-wms-implementation`
+skill — this skill only adds the bug-specific parts.
+
+## Testing
+
+Run tests and manual verification in Docker (see `little-wms-implementation`):
+
+```bash
+docker compose run --rm --no-deps --entrypoint python web manage.py test
+docker compose build && docker compose up -d   # before asking for the merge
+```
 
 ## Register
 
