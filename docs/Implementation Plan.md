@@ -156,7 +156,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.3 Article Model | ✅ done |
 | 1 | 1.4 Dynamic Article Types | ✅ done |
 | 1 | 1.5 Code System | ✅ done |
-| 1 | 1.6 Storage Integrity | ⬜ open |
+| 1 | 1.6 Storage Integrity | ✅ done |
 | 1 | 1.7 Tags | ⬜ open |
 | 1 | 1.8 Locations | ⬜ open |
 | 1 | 1.9 Article form (field_config + custom fields) | ⬜ open |
