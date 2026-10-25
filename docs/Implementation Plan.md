@@ -150,7 +150,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 0 | 0.4 Migration workflow | ✅ done |
 | 0 | 0.5 Demo seed + migration dry-run | ✅ done |
 | 1 | 1.1 organisation field | ✅ done |
-| 1 | 1.2 Data migration | ⬜ open |
+| 1 | 1.2 Data migration | ⏭️ skipped |
 | 1 | 1.3 Article Model | ⬜ open |
 | 1 | 1.4 Dynamic Article Types | ⬜ open |
 | 1 | 1.5 Code System | ⬜ open |
@@ -186,7 +186,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 7 | 7.4 Loans & Shared Pools | ⬜ open |
 | 7 | 7.5 Power Functions | ⬜ open |
 
-**Legend:** ⬜ open · 🟡 in progress · ✅ done
+**Legend:** ⬜ open · 🟡 in progress · ✅ done · ⏭️ skipped
 
 ---
 
