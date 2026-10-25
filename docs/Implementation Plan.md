@@ -154,7 +154,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.2 Data migration | ⏭️ skipped |
 | 1 | 1.3 Article Model | ✅ done |
 | 1 | 1.4 Dynamic Article Types | ✅ done |
-| 1 | 1.5 Code System | ⬜ open |
+| 1 | 1.5 Code System | ✅ done |
 | 1 | 1.6 Storage Integrity | ⬜ open |
 | 1 | 1.7 Tags | ⬜ open |
 | 1 | 1.8 Locations | ⬜ open |
