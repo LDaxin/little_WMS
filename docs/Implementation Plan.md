@@ -79,6 +79,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **0.2** View characterization tests (all pages return 200, CRUD works)
 - **0.3** Movement tests (store/remove, space validation)
 - **0.4** Migration workflow documented → [`docs/developer/migrations.md`](developer/migrations.md)
+- **0.5** Demo seed + migration dry-run
 
 ### Phase 1 – Data Foundation
 
@@ -147,6 +148,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 0 | 0.2 View characterization tests | ✅ done |
 | 0 | 0.3 Movement tests | ✅ done |
 | 0 | 0.4 Migration workflow | ✅ done |
+| 0 | 0.5 Demo seed + migration dry-run | ⬜ open |
 | 1 | 1.1 organisation field | ⬜ open |
 | 1 | 1.2 Data migration | ⬜ open |
 | 1 | 1.3 Article Model | ⬜ open |
