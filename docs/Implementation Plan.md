@@ -78,7 +78,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **0.1** Model characterization tests (Article, Storage, Location, Tag)
 - **0.2** View characterization tests (all pages return 200, CRUD works)
 - **0.3** Movement tests (store/remove, space validation)
-- **0.4** Migration workflow documented
+- **0.4** Migration workflow documented → [`docs/developer/migrations.md`](developer/migrations.md)
 
 ### Phase 1 – Data Foundation
 
