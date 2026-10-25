@@ -21,7 +21,9 @@ def storage(request, typ, storageId):
                 "form":[instancedStorageForum],
                 "typ":typ,
                 "actionType":"update",
-                "id":storageId
+                "id":storageId,
+                "code":storageObject.code.code if storageObject.code else "",
+                "link":("/s/" + storageObject.code.code) if storageObject.code else "",
             }
             return render(request, "hub/modules/item.html", context=context)
         else:

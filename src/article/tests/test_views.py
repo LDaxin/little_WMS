@@ -34,6 +34,12 @@ class ArticleViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response["Location"])
 
+    def test_detail_shows_canonical_link(self):
+        response = self.client.get(f"/article/werkzeug/{self.article.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.article.code.code)
+        self.assertContains(response, "/a/" + self.article.code.code)
+
     def test_add_article(self):
         response = self.client.post(
             "/article/werkzeug/add",

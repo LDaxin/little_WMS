@@ -28,7 +28,9 @@ def article(request, typ, articleId):
             "modalId":"single",
             "actionType":"update",
             "form":[bpar,par],
-            "typ":typ
+            "typ":typ,
+            "code":p.code.code if p.code else "",
+            "link":("/a/" + p.code.code) if p.code else "",
         }
         return render(request, "hub/modules/item.html", context=context)
     else:
