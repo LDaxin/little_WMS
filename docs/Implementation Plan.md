@@ -91,6 +91,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **1.6** Storage Integrity: cycle prevention, depth limit (§21)
 - **1.7** Tags (§13)
 - **1.8** Locations: django-address, Plus Codes (§28)
+- **1.9** Article form: show only `field_config`-relevant fields, render custom fields (§4a–c)
 
 ### Phase 2 – Core Operations
 
@@ -157,6 +158,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.6 Storage Integrity | ⬜ open |
 | 1 | 1.7 Tags | ⬜ open |
 | 1 | 1.8 Locations | ⬜ open |
+| 1 | 1.9 Article form (field_config + custom fields) | ⬜ open |
 | 2 | 2.1 Movement Redesign | ⬜ open |
 | 2 | 2.2 QR Workflow | ⬜ open |
 | 2 | 2.3 Sets / Bundles | ⬜ open |
