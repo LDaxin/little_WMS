@@ -100,6 +100,7 @@ These conventions must be included in every agent prompt when relevant:
 |---|---|
 | `docs/Lastenheft.md` | Requirements specification (37 sections, all confirmed) |
 | `docs/Implementation Plan.md` | Phased implementation plan (8 phases, 40 steps) |
+| `docs/Known Issues.md` | Central register of defects found in the codebase |
 | `docs/Structure.md` | Data model definitions (Articles, Storages, Locations) |
 | `docs/Development Workflow.md` | Kanban-based workflow (human contributors) |
 | `docs/git commit namespace.md` | Commit types |
@@ -109,6 +110,7 @@ These conventions must be included in every agent prompt when relevant:
 | Skill | Purpose |
 |---|---|
 | `little-wms-implementation` | Enforces the implementation workflow (branch off `ki`, small steps, never merge, ponytail) |
+| `little-wms-bugfix` | Bug workflow (record findings in the register, root-cause fix, regression test, register upkeep) |
 | `requirements-collaboration` | Working style for requirements/planning (discuss before writing, small steps, user decides) |
 
 ### Kanban

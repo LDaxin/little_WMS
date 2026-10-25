@@ -1,7 +1,7 @@
 # Implementation Plan – little_WMS v2
 
 > **Reference:** [Requirements Specification](Lastenheft.md) · [Known Issues](Known%20Issues.md)
-> **Status:** Phase 0 not started
+> **Status:** Phase 0 in progress
 
 This plan describes the phased implementation of little_WMS v2. Each step is small, reviewable, and merged by the project owner.
 
@@ -143,9 +143,9 @@ Format: `type: what` (e.g. `add: article model tests`)
 
 | Phase | Step | Status |
 |---|---|---|
-| 0 | 0.1 Model characterization tests | ⬜ open |
-| 0 | 0.2 View characterization tests | ⬜ open |
-| 0 | 0.3 Movement tests | ⬜ open |
+| 0 | 0.1 Model characterization tests | ✅ done |
+| 0 | 0.2 View characterization tests | ✅ done |
+| 0 | 0.3 Movement tests | ✅ done |
 | 0 | 0.4 Migration workflow | ⬜ open |
 | 1 | 1.1 organisation field | ⬜ open |
 | 1 | 1.2 Data migration | ⬜ open |

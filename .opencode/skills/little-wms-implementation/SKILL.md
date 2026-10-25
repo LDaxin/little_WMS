@@ -12,8 +12,18 @@ little_WMS v2 plan.
 
 - `docs/Implementation Plan.md` — the phased step plan.
 - `docs/Lastenheft.md` — the requirements.
+- `docs/Known Issues.md` — central register of defects found in the codebase.
 - `Agents.md` — project conventions (language, commit namespace, branch
   naming, merges by humans only).
+
+## Known Issues
+
+- Before touching a view/model, check `docs/Known Issues.md` for related
+  entries.
+- When you find a defect, add an entry (ID, location, symptom, status, test)
+  instead of only mentioning it in chat.
+- When you fix a defect, set its status to ✅ and update the pinned test.
+- Bug-specific workflow: see the `little-wms-bugfix` skill.
 
 ## Workflow
 
