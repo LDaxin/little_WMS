@@ -18,7 +18,7 @@ class FormStorage(forms.ModelForm):
 class FormChangeStorage(forms.ModelForm):
     class Meta:
         model = Storage
-        exclude = ('typ', 'space', 'code')
+        exclude = ('organisation', 'typ', 'space', 'code')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeStorage, self).__init__(*args, **kwargs)

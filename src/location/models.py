@@ -5,6 +5,7 @@ from hub.fields import SelfForeignKey
 
 # Create your models here.
 class Location(SoftDeleteObject, models.Model):
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     traditionalLand = models.CharField(max_length=50)
     traditionalCountry = models.CharField(max_length=50)
     traditionalCity = models.CharField(max_length=50)

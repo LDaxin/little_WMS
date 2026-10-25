@@ -7,6 +7,7 @@ from hub.fields import SelfForeignKey
 
 
 class Tag(SoftDeleteObject, models.Model):
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     name = models.CharField(max_length=20)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
 

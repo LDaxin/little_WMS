@@ -9,7 +9,7 @@ class  FormArticle(forms.ModelForm):
 
     class Meta:
         model = Article
-        exclude = ('pType', 'space', 'code', 'stored', 'base')
+        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base')
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
@@ -23,7 +23,7 @@ class FormChangeArticle(forms.ModelForm):
     stored = forms.CharField(max_length=34, required=False)
     class Meta:
         model = Article
-        exclude = ('pType', 'space', 'code', 'stored', 'base')
+        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)
@@ -36,7 +36,7 @@ class FormArticleBase(forms.ModelForm):
 
     class Meta:
         model = ArticleBase
-        exclude = ('pType', 'code')
+        exclude = ('organisation', 'pType', 'code')
 
     def __init__(self, *args, **kwargs):
         super(FormArticleBase, self).__init__(*args, **kwargs)

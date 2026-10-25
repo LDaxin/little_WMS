@@ -18,6 +18,7 @@ In der class Article is the unice Data is space
 
 class ArticleType(SoftDeleteObject, models.Model):
 
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     name = models.CharField(max_length=20)
     symbol = models.CharField(max_length=20)
 
@@ -39,6 +40,7 @@ class ArticleType(SoftDeleteObject, models.Model):
 
 class ArticleBase(SoftDeleteObject, models.Model):
 
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     name = models.CharField(max_length=20)
 
     pType = models.ForeignKey(ArticleType, on_delete=models.CASCADE, blank=True , null = False)
@@ -58,6 +60,7 @@ class ArticleBase(SoftDeleteObject, models.Model):
 
 class Article(SoftDeleteObject, models.Model):
 
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     base = models.ForeignKey(ArticleBase, on_delete=models.CASCADE, blank=True, null=False)
     #The place where the article is stored
     stored = models.ForeignKey(Space, related_name= "space", on_delete = models.SET_NULL, null=True, blank=True)

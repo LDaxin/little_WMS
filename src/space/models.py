@@ -6,6 +6,7 @@ from softdelete.models import SoftDeleteObject
 #TODO test if the query will return all stored things even the Container wenn the input is ready
 class Space(SoftDeleteObject, models.Model):
 
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     active = models.BooleanField(default = True)
 
     prefix = models.CharField(max_length = 2, editable = False)

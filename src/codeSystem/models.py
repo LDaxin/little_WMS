@@ -5,6 +5,7 @@ from softdelete.models import SoftDeleteObject
 # Create your models here.
 
 class UuidCode(SoftDeleteObject, models.Model):
+   organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
    uuidCode = models.UUIDField(default = uuid.uuid4, editable = False, unique = True)
    code = models.CharField(max_length = 34, editable = False, unique = True, blank=True)
    prefix = models.CharField(max_length = 2, editable = False)
