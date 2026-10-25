@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
@@ -39,6 +40,14 @@ class ArticleType(SoftDeleteObject, models.Model):
     article_toggle_space = models.BooleanField(default=False)
     allow_merge_split = models.BooleanField(default=False)
 
+    # Visibility/required of the global fields (§4a-c), e.g.
+    # {"zustand": {"visible": true, "required": false}}
+    field_config = models.JSONField(default=dict)
+    # Type-specific field definitions (§4a-c, §25), e.g.
+    # {"fields": [{"name": "personenzahl", "type": "integer", "label": "Personenzahl",
+    #              "required": true, "visible": true, "min": 1, "max": 20, "level": "base"}]}
+    custom_fields_schema = models.JSONField(default=dict)
+
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
@@ -49,6 +58,59 @@ class ArticleType(SoftDeleteObject, models.Model):
             self.code = uCode
             uCode.save()
         super().save(*args, **kwargs)
+
+    def fields_for_level(self, level):
+        """Return the custom field definitions for a level ("base" or "article")."""
+        return [
+            field
+            for field in self.custom_fields_schema.get("fields", [])
+            if field.get("level", "base") == level
+        ]
+
+    def validate_attributes(self, attributes):
+        """Validate custom field values against custom_fields_schema (§4a-c).
+
+        Raises ValidationError with {field_name: [messages]} on failure.
+        """
+        attributes = attributes or {}
+        errors = {}
+        for field in self.custom_fields_schema.get("fields", []):
+            name = field.get("name")
+            value = attributes.get(name)
+            if value in (None, ""):
+                if field.get("required"):
+                    errors.setdefault(name, []).append("This field is required.")
+                continue
+            message = self._validate_value(field, value)
+            if message:
+                errors.setdefault(name, []).append(message)
+        if errors:
+            raise ValidationError(errors)
+
+    @staticmethod
+    def _validate_value(field, value):
+        ftype = field.get("type", "text")
+        if ftype == "integer":
+            if isinstance(value, bool) or not isinstance(value, int):
+                return "Must be an integer."
+        elif ftype in ("decimal", "number", "float"):
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                return "Must be a number."
+        elif ftype == "boolean":
+            if not isinstance(value, bool):
+                return "Must be a boolean."
+        elif ftype == "choice":
+            if value not in field.get("options", []):
+                return "Not a valid choice."
+        elif ftype == "text":
+            if not isinstance(value, str):
+                return "Must be text."
+        if ftype in ("integer", "decimal", "number", "float"):
+            if "min" in field and value < field["min"]:
+                return "Must be at least %s." % field["min"]
+            if "max" in field and value > field["max"]:
+                return "Must be at most %s." % field["max"]
+        return None
 
     def __str__(self, *args, **kwargs):
         return self.name
