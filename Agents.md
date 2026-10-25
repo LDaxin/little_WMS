@@ -74,7 +74,7 @@ These conventions must be included in every agent prompt when relevant:
 - **Commit Namespace**: `type: what` — types are `fix`, `add`, `clean`, `refactor`, `delete` (see `docs/git commit namespace.md`)
 - **Branch Naming**: `type/step/name` — e.g. `feat/0.1/CharacterizationTests`, `doc/0.0/RequirementsSpec`
 - **Base Branch**: `ki` (branched off `dev`). Work branches off `ki`, never directly off `dev`.
-- **Merging**: Merges are **not** performed by agents. Merging branches (e.g. into `ki`, `dev`, or `main`) is exclusively the responsibility of the human maintainer. Agents create and commit on their feature branches, but do not perform merge or rebase operations.
+- **Merging**: Agents may merge **only after explicit approval** from the human maintainer. The maintainer reviews the branch and gives the go-ahead; the agent then performs the merge. Without approval, agents never merge or rebase.
 - **Co-Author**: Commits made by AI agents include a co-author trailer:
   `Co-authored-by: opencode <noreply@opencode.ai>`
 

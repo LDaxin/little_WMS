@@ -21,8 +21,8 @@ little_WMS v2 plan.
 - Branch naming: `type/step/name` (e.g. `feat/0.1/CharacterizationTests`).
 - Keep steps small: one coherent unit, reviewable in ~15–30 min.
 - Add tests per step where sensible.
-- **Never merge.** The human maintainer merges. Agents only create branches
-  and commits.
+- **Merge only after approval.** The human maintainer reviews and approves;
+  the agent then performs the merge. Never merge without explicit approval.
 - After each step, report: "done, here is what I did".
 
 ## Commit Convention
@@ -57,6 +57,6 @@ English only — code, docs, commits, branches.
 2. Work
 3. Commits
 4. Report
-5. Human reviews
-6. Human merges into `ki`
+5. Human reviews and approves
+6. Agent merges into `ki` (only after approval)
 ```

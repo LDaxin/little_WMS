@@ -39,7 +39,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 
 1. **Small steps** – one coherent unit per step, reviewable in ~15–30 min
 2. **Tests per step** – where sensible
-3. **Never merge** – the project owner merges; agents only create branches and commits
+3. **Merge only after approval** – the project owner reviews and approves; the agent then performs the merge
 4. **Review before merge** – the owner checks each step
 5. **No over-engineering** – ponytail principles apply
 6. **Follow existing conventions** – code style, structure
@@ -51,8 +51,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 2. Work (via sub-agents)
 3. Commits
 4. Report: "done, here is what I did"
-5. Owner reviews
-6. Owner merges into `ki`
+5. Owner reviews and approves
+6. Agent merges into `ki` (only after approval)
 7. At the end: owner merges `ki` → `dev`
 ```
 
