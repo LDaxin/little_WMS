@@ -42,11 +42,11 @@ class ArticleType(SoftDeleteObject, models.Model):
 
     # Visibility/required of the global fields (§4a-c), e.g.
     # {"zustand": {"visible": true, "required": false}}
-    field_config = models.JSONField(default=dict)
+    field_config = models.JSONField(default=dict, blank=True)
     # Type-specific field definitions (§4a-c, §25), e.g.
     # {"fields": [{"name": "personenzahl", "type": "integer", "label": "Personenzahl",
     #              "required": true, "visible": true, "min": 1, "max": 20, "level": "base"}]}
-    custom_fields_schema = models.JSONField(default=dict)
+    custom_fields_schema = models.JSONField(default=dict, blank=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -127,7 +127,7 @@ class ArticleBase(SoftDeleteObject, models.Model):
     outer_width_mm = models.IntegerField(null=True, blank=True)
     outer_height_mm = models.IntegerField(null=True, blank=True)
     size_class = models.CharField(max_length=2, choices=SIZE_CLASS_CHOICES, null=True, blank=True)
-    attributes = models.JSONField(default=dict)
+    attributes = models.JSONField(default=dict, blank=True)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 

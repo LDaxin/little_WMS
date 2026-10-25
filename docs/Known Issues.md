@@ -48,6 +48,7 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-014 | `article/views.py` `updateArticle` | Error branch uses bare names (`toastName:`) → `NameError`; branch is unreachable dead code | 🔴 open | 0.2 | – |
+| KI-019 | `ArticleType.field_config` / `custom_fields_schema`, `ArticleBase.attributes` | `JSONField(default=dict)` without `blank=True` → required in forms/admin despite having a default | ✅ fixed | 1.6 | `article/tests/test_schema.py` |
 
 ## Migrations
 

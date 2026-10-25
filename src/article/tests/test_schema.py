@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.forms import modelform_factory
 from django.test import TestCase
 
 from article.models import ArticleType
@@ -77,3 +78,13 @@ class ArticleTypeSchemaTest(TestCase):
                 {"personenzahl": 8, "saison": "Winter"}
             )
         self.assertIn("saison", ctx.exception.message_dict)
+
+
+class ArticleTypeFormTest(TestCase):
+    def test_json_fields_are_optional(self):
+        Form = modelform_factory(
+            ArticleType,
+            fields=["name", "symbol", "field_config", "custom_fields_schema"],
+        )
+        form = Form(data={"name": "Werkzeug", "symbol": "WZ"})
+        self.assertTrue(form.is_valid(), form.errors)
