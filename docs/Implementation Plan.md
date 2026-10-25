@@ -1,6 +1,6 @@
 # Implementation Plan – little_WMS v2
 
-> **Reference:** [Requirements Specification](Lastenheft.md)
+> **Reference:** [Requirements Specification](Lastenheft.md) · [Known Issues](Known%20Issues.md)
 > **Status:** Phase 0 not started
 
 This plan describes the phased implementation of little_WMS v2. Each step is small, reviewable, and merged by the project owner.
