@@ -50,6 +50,12 @@ will make that test fail and force it to be updated.
 | KI-014 | `article/views.py` `updateArticle` | Error branch uses bare names (`toastName:`) → `NameError`; branch is unreachable dead code | 🔴 open | 0.2 | – |
 | KI-019 | `ArticleType.field_config` / `custom_fields_schema`, `ArticleBase.attributes` | `JSONField(default=dict)` without `blank=True` → required in forms/admin despite having a default | ✅ fixed | 1.6 | `article/tests/test_schema.py` |
 
+## Storage
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-018 | `Article.stored` / `hub/fields.py` `SelfForeignKey` | Cycles between articles/spaces were possible; `SelfForeignKey` silently set the value to `None` on a cycle; `Settings.storageDepth` was unused | ✅ fixed | 1.6 | `space/tests/test_services.py`, `hub/tests/test_fields.py` |
+
 ## Migrations
 
 | ID | Location | Symptom | Status | Found in | Test |

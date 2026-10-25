@@ -5,5 +5,5 @@ from hub.fields import SelfForeignKey
 
 # Create your models here.
 class Settings(SoftDeleteObject, models.Model):
-    storageDepth = models.IntegerField(default = 5)
+    storageDepth = models.IntegerField(default = 7)
 
