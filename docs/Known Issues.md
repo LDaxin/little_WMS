@@ -47,3 +47,15 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-014 | `article/views.py` `updateArticle` | Error branch uses bare names (`toastName:`) → `NameError`; branch is unreachable dead code | 🔴 open | 0.2 | – |
+
+## Migrations
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-015 | `article/migrations/0003_restruckture_article.py` | `RunPython(dataTransfer)` has no `reverse_code` → the migration is irreversible and blocks any rollback that would unapply it | 🔴 open | 0.5 | – |
+
+## Database / Environment
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-016 | `data/wms.sqlite3` | Dev DB had a `codeSystem_uuidcode.shortCode` column (`NOT NULL`) that no model or migration defines → every INSERT into `codeSystem_uuidcode` failed. DB was rebuilt from migrations. | ✅ fixed | 0.5 | – |

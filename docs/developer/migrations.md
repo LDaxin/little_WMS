@@ -96,3 +96,46 @@ class Migration(migrations.Migration):
 - Forward + backward + forward again must run without errors.
 - Existing data must still be readable after the migration.
 - Run the characterization tests after every migration (§7b).
+
+## Worked example (dry-run)
+
+A full forward → backward → forward cycle, run against a **copy** of the
+database so the live data is never touched:
+
+```bash
+# 0. Copy the database
+cp data/wms.sqlite3 data/migrate_dryrun.sqlite3
+
+# 1. Add a nullable field to a model, then create the migration
+docker compose exec web python manage.py makemigrations tag --name demo_add_tag_note
+#   Migrations for 'tag':
+#     tag/migrations/0002_demo_add_tag_note.py
+#       + Add field demo_note to tag
+
+# 2. Forward
+docker compose exec -e SQL_DATABASE=/app/data/migrate_dryrun.sqlite3 web \
+  python manage.py migrate
+#   Applying tag.0002_demo_add_tag_note... OK
+
+# 3. Backward
+docker compose exec -e SQL_DATABASE=/app/data/migrate_dryrun.sqlite3 web \
+  python manage.py migrate tag 0001_initial
+#   Unapplying tag.0002_demo_add_tag_note... OK
+
+# 4. Forward again
+docker compose exec -e SQL_DATABASE=/app/data/migrate_dryrun.sqlite3 web \
+  python manage.py migrate
+#   Applying tag.0002_demo_add_tag_note... OK
+
+# 5. Data is still readable after every step
+docker compose exec -e SQL_DATABASE=/app/data/migrate_dryrun.sqlite3 web \
+  python manage.py shell -c "from tag.models import Tag; print(Tag.objects.count())"
+#   3
+```
+
+The container must see the new migration file (mounted source or rebuilt
+image). Remove the demo migration and the model change afterwards.
+
+> **Note:** `article/0003_restruckture_article` is currently **irreversible**
+> (`RunPython` without `reverse_code`), so it blocks any rollback that would
+> unapply it. See `docs/Known Issues.md` (KI-015).
