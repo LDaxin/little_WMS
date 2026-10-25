@@ -26,7 +26,7 @@ class LocationModelTest(TestCase):
         )
 
     def test_code_prefix(self):
-        self.assertEqual(self.location.code.prefix, "at")
+        self.assertEqual(self.location.code.prefix, "l0")
 
     def test_modern_fields_default_null(self):
         self.assertIsNone(self.location.modernCoordinatesLongitude)

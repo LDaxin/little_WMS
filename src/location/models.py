@@ -24,7 +24,7 @@ class Location(SoftDeleteObject, models.Model):
     def save(self, *args, **kwargs):
         if not self.code:
             uCode = UuidCode()
-            uCode.prefix = "at" 
+            uCode.prefix = "l0"
             self.code = uCode
             uCode.save()
         super().save(*args, **kwargs)

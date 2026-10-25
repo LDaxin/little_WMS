@@ -1,5 +1,5 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseNotFound
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
@@ -66,6 +66,28 @@ def searchCodes(request):
         else:
             r = UuidCode.objects.filter(Q(prefix__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
         return render(request, "hub/modules/results.html", context={"results":r, "type":"code"})
+
+@login_required(login_url='/accounts/login/')
+def resolve_code(request, kind, code):
+    """Canonical link by code (§26): /a/<code>, /s/<code>, /l/<code>."""
+    from article.models import Article
+    from storage.models import Storage
+    from location.models import Location
+
+    if kind == "a":
+        article = Article.objects.filter(code__code=code).first()
+        if article:
+            return redirect("/article/%s/%s" % (article.base.pType.name, article.pk))
+    elif kind == "s":
+        storage = Storage.objects.filter(code__code=code).first()
+        if storage:
+            return redirect("/storage/%s/%s" % (storage.typ.name, storage.pk))
+    elif kind == "l":
+        location = Location.objects.filter(code__code=code).first()
+        if location:
+            return redirect("/location/%s" % location.pk)
+    raise Http404("no object with code %s" % code)
+
 
 @login_required(login_url='/accounts/login/')
 def codesExport(request):
