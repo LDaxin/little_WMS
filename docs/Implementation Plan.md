@@ -151,7 +151,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 0 | 0.5 Demo seed + migration dry-run | ✅ done |
 | 1 | 1.1 organisation field | ✅ done |
 | 1 | 1.2 Data migration | ⏭️ skipped |
-| 1 | 1.3 Article Model | ⬜ open |
+| 1 | 1.3 Article Model | ✅ done |
 | 1 | 1.4 Dynamic Article Types | ⬜ open |
 | 1 | 1.5 Code System | ⬜ open |
 | 1 | 1.6 Storage Integrity | ⬜ open |
