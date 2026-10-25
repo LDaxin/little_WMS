@@ -1,7 +1,7 @@
 # Implementation Plan – little_WMS v2
 
 > **Reference:** [Requirements Specification](Lastenheft.md) · [Known Issues](Known%20Issues.md)
-> **Status:** Phase 0 done
+> **Status:** Phase 1 in progress
 
 This plan describes the phased implementation of little_WMS v2. Each step is small, reviewable, and merged by the project owner.
 
@@ -149,7 +149,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 0 | 0.3 Movement tests | ✅ done |
 | 0 | 0.4 Migration workflow | ✅ done |
 | 0 | 0.5 Demo seed + migration dry-run | ✅ done |
-| 1 | 1.1 organisation field | ⬜ open |
+| 1 | 1.1 organisation field | ✅ done |
 | 1 | 1.2 Data migration | ⬜ open |
 | 1 | 1.3 Article Model | ⬜ open |
 | 1 | 1.4 Dynamic Article Types | ⬜ open |
