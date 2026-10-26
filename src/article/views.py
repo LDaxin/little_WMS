@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
 from storage.models import *
+from tag.models import Tag
 from movement.services import MovementService, resolve_space
 
 
@@ -35,6 +36,11 @@ def article(request, typ, articleId):
             "location":p.stored,
             "storeUrl":"./%s/store" % articleId,
             "removeUrl":"./%s/remove" % articleId,
+            "tagChips":True,
+            "tags":p.tags.all(),
+            "allTags":Tag.objects.all(),
+            "tagAddUrl":"./%s/tags/add" % articleId,
+            "tagRemoveUrl":"./%s/tags/remove" % articleId,
         }
         return render(request, "hub/modules/item.html", context=context)
     else:
@@ -338,6 +344,46 @@ def removeArticle(request, typ, articleId):
         MovementService.remove_article(article, request.user)
         return render(request, "hub/modules/storeActions.html",
                       context=_store_actions_context(article, storeUrl, removeUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
+    return {
+        "tags": obj.tags.all(),
+        "allTags": Tag.objects.all(),
+        "tagAddUrl": tagAddUrl,
+        "tagRemoveUrl": tagRemoveUrl,
+        "tagError": error,
+    }
+
+
+@login_required(login_url='/accounts/login/')
+def addArticleTag(request, typ, articleId):
+    article = Article.objects.get(pk=articleId)
+    tagAddUrl = "./%s/tags/add" % articleId
+    tagRemoveUrl = "./%s/tags/remove" % articleId
+    if request.method == "POST":
+        name = request.POST.get("tag", "").strip()
+        tag = Tag.objects.filter(name__iexact=name).first()
+        if tag is None:
+            error = "No tag named %s" % name
+        else:
+            article.tags.add(tag)
+            error = ""
+        return render(request, "hub/modules/tagChips.html",
+                      context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl, error))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def removeArticleTag(request, typ, articleId, tagId):
+    article = Article.objects.get(pk=articleId)
+    tagAddUrl = "./%s/tags/add" % articleId
+    tagRemoveUrl = "./%s/tags/remove" % articleId
+    if request.method == "POST":
+        article.tags.remove(Tag.objects.get(pk=tagId))
+        return render(request, "hub/modules/tagChips.html",
+                      context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 

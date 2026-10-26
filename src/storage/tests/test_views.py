@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
 from storage.models import Storage, StorageType
+from tag.models import Tag
 
 
 class StorageViewTest(TestCase):
@@ -106,3 +107,38 @@ class StorageContentsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.article.refresh_from_db()
         self.assertIsNone(self.article.stored)
+
+
+class StorageTagTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.storage_type = StorageType.objects.create(name="Regal", symbol="RG")
+        cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
+        cls.tag = Tag.objects.create(name="summer", color="#ff0000")
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_add_tag(self):
+        response = self.client.post(
+            f"/storage/regal/{self.storage.pk}/tags/add", {"tag": "summer"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.tag, self.storage.tags.all())
+
+    def test_add_unknown_tag(self):
+        response = self.client.post(
+            f"/storage/regal/{self.storage.pk}/tags/add", {"tag": "nope"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No tag named")
+        self.assertEqual(self.storage.tags.count(), 0)
+
+    def test_remove_tag(self):
+        self.storage.tags.add(self.tag)
+        response = self.client.post(
+            f"/storage/regal/{self.storage.pk}/tags/remove/{self.tag.pk}"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.storage.tags.count(), 0)

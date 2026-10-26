@@ -1,0 +1,27 @@
+<div id="tagChips" class="p-2 border rounded mb-2">
+    <div class="d-flex flex-wrap gap-1 align-items-center">
+        {% for tag in tags %}
+        <span class="badge d-inline-flex align-items-center gap-1" style="background-color: {{ tag.color }}">
+            {% if tag.icon %}{{ tag.icon }}{% endif %}{{ tag.name }}
+            <button type="button" class="btn-close btn-close-white" style="font-size:0.6rem" aria-label="Remove"
+                    hx-post="{{ tagRemoveUrl }}/{{ tag.pk }}"
+                    hx-target="#tagChips" hx-swap="outerHTML"></button>
+        </span>
+        {% empty %}
+        <span class="text-muted small">No tags</span>
+        {% endfor %}
+    </div>
+    {% if tagError %}
+    <div class="text-danger small mt-1">{{ tagError }}</div>
+    {% endif %}
+    <form class="mt-2" hx-post="{{ tagAddUrl }}" hx-target="#tagChips" hx-swap="outerHTML">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+            <input name="tag" class="form-control" list="tagOptions" placeholder="Add tag...">
+            <datalist id="tagOptions">
+                {% for tag in allTags %}<option value="{{ tag.name }}"></option>{% endfor %}
+            </datalist>
+            <button type="submit" class="btn btn-success">Add</button>
+        </div>
+    </form>
+</div>

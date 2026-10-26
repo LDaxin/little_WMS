@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
 from storage.models import Storage, StorageType
+from tag.models import Tag
 
 
 class ArticleViewTest(TestCase):
@@ -180,3 +181,39 @@ class ArticleStoreRemoveTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Unknown code")
         self.assertFalse(Article.objects.filter(base__name="Zange").exists())
+
+
+class ArticleTagTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.article_base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.article_base)
+        cls.tag = Tag.objects.create(name="summer", color="#ff0000")
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_add_tag(self):
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/tags/add", {"tag": "summer"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(self.tag, self.article.tags.all())
+
+    def test_add_unknown_tag(self):
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/tags/add", {"tag": "nope"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No tag named")
+        self.assertEqual(self.article.tags.count(), 0)
+
+    def test_remove_tag(self):
+        self.article.tags.add(self.tag)
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/tags/remove/{self.tag.pk}"
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.article.tags.count(), 0)

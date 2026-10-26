@@ -87,7 +87,7 @@ class FormArticle(CustomFieldsMixin, forms.ModelForm):
 
     class Meta:
         model = Article
-        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes')
+        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes', 'tags')
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
@@ -101,7 +101,7 @@ class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
     class Meta:
         model = Article
-        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes')
+        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes', 'tags')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)

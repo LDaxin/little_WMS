@@ -4,6 +4,7 @@ from .forms import *
 from .models import *
 from codeSystem.models import *
 from article.models import Article
+from tag.models import Tag
 from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
@@ -31,6 +32,11 @@ def storage(request, typ, storageId):
                 "contents":Article.objects.filter(stored=storageObject.space),
                 "storeUrl":"./%s/store" % storageId,
                 "removeUrl":"./%s/remove" % storageId,
+                "tagChips":True,
+                "tags":storageObject.tags.all(),
+                "allTags":Tag.objects.all(),
+                "tagAddUrl":"./%s/tags/add" % storageId,
+                "tagRemoveUrl":"./%s/tags/remove" % storageId,
             }
             return render(request, "hub/modules/item.html", context=context)
         else:
@@ -258,6 +264,46 @@ def removeFromStorage(request, typ, storageId, articleId):
         MovementService.remove_article(article, request.user)
         return render(request, "hub/modules/storageContents.html",
                       context=_storage_contents_context(storage, storeUrl, removeUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
+    return {
+        "tags": obj.tags.all(),
+        "allTags": Tag.objects.all(),
+        "tagAddUrl": tagAddUrl,
+        "tagRemoveUrl": tagRemoveUrl,
+        "tagError": error,
+    }
+
+
+@login_required(login_url='/accounts/login/')
+def addStorageTag(request, typ, storageId):
+    storage = Storage.objects.get(pk=storageId)
+    tagAddUrl = "./%s/tags/add" % storageId
+    tagRemoveUrl = "./%s/tags/remove" % storageId
+    if request.method == "POST":
+        name = request.POST.get("tag", "").strip()
+        tag = Tag.objects.filter(name__iexact=name).first()
+        if tag is None:
+            error = "No tag named %s" % name
+        else:
+            storage.tags.add(tag)
+            error = ""
+        return render(request, "hub/modules/tagChips.html",
+                      context=_tag_chips_context(storage, tagAddUrl, tagRemoveUrl, error))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def removeStorageTag(request, typ, storageId, tagId):
+    storage = Storage.objects.get(pk=storageId)
+    tagAddUrl = "./%s/tags/add" % storageId
+    tagRemoveUrl = "./%s/tags/remove" % storageId
+    if request.method == "POST":
+        storage.tags.remove(Tag.objects.get(pk=tagId))
+        return render(request, "hub/modules/tagChips.html",
+                      context=_tag_chips_context(storage, tagAddUrl, tagRemoveUrl))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
