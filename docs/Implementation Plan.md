@@ -1,7 +1,7 @@
 # Implementation Plan – little_WMS v2
 
 > **Reference:** [Requirements Specification](Lastenheft.md) · [Known Issues](Known%20Issues.md)
-> **Status:** Phase 1 in progress
+> **Status:** Phase 2 in progress
 
 This plan describes the phased implementation of little_WMS v2. Each step is small, reviewable, and merged by the project owner.
 
@@ -101,6 +101,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **2.2** QR Workflow + Sheet Printing (§5)
 - **2.3** Sets / Bundles (§4d)
 - **2.4** Audit Log (§32)
+- **2.5** Inventory Mode (§5c)
 
 ### Phase 3 – Users & Organisations
 
@@ -163,10 +164,11 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.9 Article form (field_config + custom fields) | ✅ done |
 | 1 | 1.10 Store/Remove service + UI (discuss first) | ✅ done |
 | 1 | 1.11 Tag UI (chips, colors, add/remove) | ✅ done |
-| 2 | 2.1 Movement Redesign | 🟡 in progress |
-| 2 | 2.2 QR Workflow | ⬜ open |
+| 2 | 2.1 Movement Redesign | ✅ done |
+| 2 | 2.2 QR Workflow + Sheet Printing | ✅ done |
 | 2 | 2.3 Sets / Bundles | ⬜ open |
 | 2 | 2.4 Audit Log | ⬜ open |
+| 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
 | 3 | 3.2 Multi-Org Membership | ⬜ open |
 | 3 | 3.3 Registration & Invitations | ⬜ open |
@@ -201,3 +203,5 @@ Format: `type: what` (e.g. `add: article model tests`)
 - Model tiers are intentionally excluded from this plan for now.
 - Step sizes may change as we learn how the process runs.
 - The existing system is already in use – Phase 0 protects it.
+- **2.1** covers the core Movement redesign (service layer, HTMX, two modes, location-first, smart container default, quick actions, atomic store/remove). The remaining §11 features – Undo (two levels), session list, sound/haptic feedback and their settings – are deferred: they build on `AuditLog` (§32, step **2.4**) and the settings work in later phases.
+- **2.2** covers QR sheet printing (§5a: format, size, label, QR content, sorting, printable HTML, storage sheets) and the "Where is...?" / "Where should it go?" workflow (§5b). Deferred: live preview, PDF download, sorting by location/type and selection via Query Builder (§9); "last movement" info needs `AuditLog` (§32). Inventory mode (§5c) is split out into step **2.5**.
