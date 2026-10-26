@@ -11,5 +11,7 @@
         <a class="btn btn-sm btn-outline-secondary" href="{{ link }}">Open</a>
     </div>
     {% endif %}
+    {% if storeActions %}{% include "hub/modules/storeActions.html" %}{% endif %}
+    {% if storageContents %}{% include "hub/modules/storageContents.html" %}{% endif %}
     {% include "hub/modules/itemForm.html" %}
 {% endblock %}

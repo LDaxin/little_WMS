@@ -82,7 +82,6 @@ class CustomFieldsMixin:
 
 class FormArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
-    stored = forms.CharField(max_length=34, required=False)
     code = forms.CharField(max_length=34, required=False)
 
     class Meta:
@@ -94,12 +93,10 @@ class FormArticle(CustomFieldsMixin, forms.ModelForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
         self.fields['code'].queryset = UuidCode.objects.filter(prefix="a0", used=False)
-        self.fields['stored'].queryset = Space.objects.filter(active=True)
 
 
 class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
-    stored = forms.CharField(max_length=34, required=False)
     class Meta:
         model = Article
         exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes')
@@ -108,7 +105,6 @@ class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
         super(FormChangeArticle, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
-        self.fields['stored'].queryset = Space.objects.filter(active=True)
         #self.fields['Space'].widget.attrs['id'] = 'id_space_change'
 
 class FormArticleBase(CustomFieldsMixin, forms.ModelForm):

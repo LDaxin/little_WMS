@@ -1,0 +1,17 @@
+<div id="storeActions" class="p-2 border rounded mb-2">
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge text-bg-secondary">Location: {{ location|default:"—" }}</span>
+        {% if location %}
+        <button type="button" class="btn btn-sm btn-danger"
+                hx-post="{{ removeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Remove</button>
+        {% endif %}
+    </div>
+    {% if storeError %}
+    <div class="text-danger small mt-1">{{ storeError }}</div>
+    {% endif %}
+    <form class="d-flex gap-2 mt-2" hx-post="{{ storeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">
+        {% csrf_token %}
+        <input name="code" class="form-control form-control-sm" placeholder="Scan or enter target code">
+        <button type="submit" class="btn btn-sm btn-success">Store</button>
+    </form>
+</div>

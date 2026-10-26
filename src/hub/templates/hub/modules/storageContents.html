@@ -1,0 +1,23 @@
+<div id="storageContents" class="p-2 border rounded mb-2">
+    <h6>Contents ({{ contents|length }})</h6>
+    <ul class="list-group">
+        {% for article in contents %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            {{ article.base.name }}
+            <button type="button" class="btn btn-sm btn-danger"
+                    hx-post="{{ removeUrl }}/{{ article.pk }}"
+                    hx-target="#storageContents" hx-swap="outerHTML">Remove</button>
+        </li>
+        {% empty %}
+        <li class="list-group-item">Empty</li>
+        {% endfor %}
+    </ul>
+    {% if storeError %}
+    <div class="text-danger small mt-1">{{ storeError }}</div>
+    {% endif %}
+    <form class="d-flex gap-2 mt-2" hx-post="{{ storeUrl }}" hx-target="#storageContents" hx-swap="outerHTML">
+        {% csrf_token %}
+        <input name="code" class="form-control form-control-sm" placeholder="Scan or enter article code">
+        <button type="submit" class="btn btn-sm btn-success">Store here</button>
+    </form>
+</div>

@@ -4,6 +4,8 @@ from . import views
 
 urlpatterns = [
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/update', views.updateArticle, name="update article"),
+    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store', views.storeArticle, name="store article"),
+    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/remove', views.removeArticle, name="remove article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/i', views.articleIncert, name="article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)', views.article, name="article"),
     re_path(r"^article/(?P<typ>\w+)/add/modal", views.addModal, name="add Article Modal"),

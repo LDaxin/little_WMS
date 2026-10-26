@@ -4,11 +4,12 @@ from .models import *
 from codeSystem.models import *
 from .forms import *
 from space.models import Space
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 import csv
 from storage.models import *
+from movement.services import MovementService, resolve_space
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -20,7 +21,6 @@ def article(request, typ, articleId):
         bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
         par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
 
-        par.fields["stored"].initial = p.stored
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -31,6 +31,10 @@ def article(request, typ, articleId):
             "typ":typ,
             "code":p.code.code if p.code else "",
             "link":("/a/" + p.code.code) if p.code else "",
+            "storeActions":True,
+            "location":p.stored,
+            "storeUrl":"./%s/store" % articleId,
+            "removeUrl":"./%s/remove" % articleId,
         }
         return render(request, "hub/modules/item.html", context=context)
     else:
@@ -152,50 +156,6 @@ def addArticle(request, typ):
                         return render(request, "hub/modules/toast.html", context=context)
 
 
-                if p["stored"].value().startswith("a0"):
-                    try:
-                        container = Article.objects.get(code__code=p["stored"].value())
-                        if container.space.active == False:
-                            context = {
-                                "toastName":"Error",
-                                "toastId":"errorToast",
-                                "toastText":"no active space with code " + p["stored"].value(),
-                                "toastType":"alert"
-                            }
-                            return render(request, "hub/modules/toast.html", context=context)
-                        pa.stored = container.space
-                    except:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"no article with code " + p["stored"].value(),
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
-                elif p["stored"].value().startswith("s0"):
-                    try:
-                        storage = Storage.objects.get(code__code=p["stored"].value())
-                        pa.stored = storage.space
-                    except:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"no space with code " + p["stored"].value(),
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
-                elif p["stored"].value() == "":
-                    pass
-                else:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":"code" + p["stored"].value() + " not found",
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
-
-
                 if p["code"].value() != "":
                     code.used = True
                     code.save()
@@ -227,7 +187,7 @@ def addArticle(request, typ):
         context = {
                 "toastName":"Error",
                 "toastId":"errorToast",
-                "toastText":"no article type named " + typ + str(request.POST["stored"]),
+                "toastText":"article not valid " + str(p.errors),
                 "toastType":"alert"
         }
         return render(request, "hub/modules/toast.html", context=context)
@@ -297,7 +257,7 @@ def updateArticle(request, typ, articleId):
     else:
         if request.method == "POST":
             articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base", article_type=articleTypeObject)
-            articleForm =  FormArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
+            articleForm =  FormChangeArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
 
             if articleBaseForm.is_valid():
                 articleBaseForm.save()
@@ -311,41 +271,6 @@ def updateArticle(request, typ, articleId):
                 return render(request, "hub/modules/toast.html", context=context)
 
             if articleForm.is_valid():
-                try:
-                    if articleForm.cleaned_data["stored"].startswith("s0"):
-                        space = Storage.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
-                        articleObject.stored = space
-                    elif articleForm.cleaned_data["stored"].startswith("a0"):
-                        space = Article.objects.get(code__code=str(articleForm.cleaned_data["stored"])).space
-                        if space.active == False:
-                            context = {
-                                "toastName":"Error",
-                                "toastId":"errorToast",
-                                "toastText":"article code has no space",
-                                "toastType":"alert"
-                            }
-                            return render(request, "hub/modules/toast.html", context=context)
-                        articleObject.stored = space
-                    elif articleForm.cleaned_data["stored"]=="":
-                        pass
-                    else:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"no valide code",
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
-
-                except:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":"no valide code",
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
-
                 articleForm.save()
 
             context = {
@@ -362,6 +287,44 @@ def updateArticle(request, typ, articleId):
             "toastType":"alert"
         }
         return render(request, "hub/modules/toast.html", context=context)
+
+def _store_actions_context(article, storeUrl, removeUrl, error=""):
+    return {
+        "location": article.stored,
+        "storeUrl": storeUrl,
+        "removeUrl": removeUrl,
+        "storeError": error,
+    }
+
+
+@login_required(login_url='/accounts/login/')
+def storeArticle(request, typ, articleId):
+    article = Article.objects.get(pk=articleId)
+    storeUrl = "./%s/store" % articleId
+    removeUrl = "./%s/remove" % articleId
+    if request.method == "POST":
+        try:
+            target = resolve_space(request.POST.get("code", ""))
+            MovementService.store_article(article, target, request.user)
+            error = ""
+        except ValidationError as e:
+            error = e.messages[0] if e.messages else str(e)
+        return render(request, "hub/modules/storeActions.html",
+                      context=_store_actions_context(article, storeUrl, removeUrl, error))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def removeArticle(request, typ, articleId):
+    article = Article.objects.get(pk=articleId)
+    storeUrl = "./%s/store" % articleId
+    removeUrl = "./%s/remove" % articleId
+    if request.method == "POST":
+        MovementService.remove_article(article, request.user)
+        return render(request, "hub/modules/storeActions.html",
+                      context=_store_actions_context(article, storeUrl, removeUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
 
 @login_required(login_url='/accounts/login/')
 def searchArticle(request, typ):

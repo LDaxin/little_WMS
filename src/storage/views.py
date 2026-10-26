@@ -3,7 +3,10 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
 from codeSystem.models import *
+from article.models import Article
+from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 import csv
 from time import sleep
@@ -24,6 +27,10 @@ def storage(request, typ, storageId):
                 "id":storageId,
                 "code":storageObject.code.code if storageObject.code else "",
                 "link":("/s/" + storageObject.code.code) if storageObject.code else "",
+                "storageContents":True,
+                "contents":Article.objects.filter(stored=storageObject.space),
+                "storeUrl":"./%s/store" % storageId,
+                "removeUrl":"./%s/remove" % storageId,
             }
             return render(request, "hub/modules/item.html", context=context)
         else:
@@ -211,6 +218,47 @@ def updateStorage(request, storageId, typ):
             "toastType":"alert"
         }
         return render(request, "hub/modules/toast.html", context=context)
+
+
+def _storage_contents_context(storage, storeUrl, removeUrl, error=""):
+    return {
+        "contents": Article.objects.filter(stored=storage.space),
+        "storeUrl": storeUrl,
+        "removeUrl": removeUrl,
+        "storeError": error,
+    }
+
+
+@login_required(login_url='/accounts/login/')
+def storeInStorage(request, typ, storageId):
+    storage = Storage.objects.get(pk=storageId)
+    storeUrl = "./%s/store" % storageId
+    removeUrl = "./%s/remove" % storageId
+    if request.method == "POST":
+        try:
+            article = Article.objects.get(code__code=request.POST.get("code", ""))
+            MovementService.store_article(article, storage.space, request.user)
+            error = ""
+        except Article.DoesNotExist:
+            error = "No article with that code"
+        except ValidationError as e:
+            error = e.messages[0] if e.messages else str(e)
+        return render(request, "hub/modules/storageContents.html",
+                      context=_storage_contents_context(storage, storeUrl, removeUrl, error))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def removeFromStorage(request, typ, storageId, articleId):
+    storage = Storage.objects.get(pk=storageId)
+    storeUrl = "./%s/store" % storageId
+    removeUrl = "./%s/remove" % storageId
+    if request.method == "POST":
+        article = Article.objects.get(pk=articleId)
+        MovementService.remove_article(article, request.user)
+        return render(request, "hub/modules/storageContents.html",
+                      context=_storage_contents_context(storage, storeUrl, removeUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
 @login_required(login_url='/accounts/login/')
