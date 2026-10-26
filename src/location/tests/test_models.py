@@ -17,25 +17,23 @@ class LocationModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.location = Location.objects.create(
-            traditionalLand="Deutschland",
-            traditionalCountry="DE",
-            traditionalCity="Berlin",
-            traditionalZipcode="10115",
-            traditionalStreet="Invalidenstr.",
-            traditionalStreetNumber="1",
+            line1="Invalidenstr. 1",
+            postal_code="10115",
+            city="Berlin",
+            state="Berlin",
+            country="DE",
         )
 
     def test_code_prefix(self):
         self.assertEqual(self.location.code.prefix, "l0")
 
-    def test_modern_fields_default_null(self):
-        self.assertIsNone(self.location.modernCoordinatesLongitude)
-        self.assertIsNone(self.location.modernCoordinatesLatitude)
-        self.assertIsNone(self.location.modernWhat3Words)
-        self.assertIsNone(self.location.modernWhat3WordsLang)
+    def test_coordinates_default_null(self):
+        self.assertIsNone(self.location.latitude)
+        self.assertIsNone(self.location.longitude)
+        self.assertEqual(self.location.plus_code, "")
 
     def test_str(self):
-        self.assertEqual(str(self.location), "Deutschland DE 10115 Invalidenstr. 1")
+        self.assertEqual(str(self.location), "Invalidenstr. 1, 10115 Berlin, Berlin, DE")
 
     def test_soft_delete_and_undelete(self):
         assert_soft_delete_cycle(self, self.location, Location)

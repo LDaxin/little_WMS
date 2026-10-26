@@ -73,8 +73,11 @@ def updateLocation(request, locationId):
 @login_required(login_url='/accounts/login/')
 def searchLocations(request):
     if request.method == "GET":
-        if request.GET['search'] == "":
+        search = request.GET.get("search", "")
+        if search == "":
             r = Location.objects.all()
         else:
-            r = Location.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
+            r = Location.objects.filter(
+                Q(line1__contains=search) | Q(city__contains=search) | Q(code__code__contains=search)
+            )
         return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})

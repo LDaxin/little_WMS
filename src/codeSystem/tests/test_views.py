@@ -58,12 +58,11 @@ class CanonicalLinkTest(TestCase):
         cls.storage_type = StorageType.objects.create(name="Regal", symbol="RG")
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
         cls.location = Location.objects.create(
-            traditionalLand="Deutschland",
-            traditionalCountry="DE",
-            traditionalCity="Berlin",
-            traditionalZipcode="10115",
-            traditionalStreet="Invalidenstr.",
-            traditionalStreetNumber="1",
+            line1="Invalidenstr. 1",
+            postal_code="10115",
+            city="Berlin",
+            state="Berlin",
+            country="DE",
         )
 
     def setUp(self):

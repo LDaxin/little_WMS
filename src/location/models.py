@@ -4,20 +4,24 @@ from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
 
 # Create your models here.
+
+
 class Location(SoftDeleteObject, models.Model):
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
-    traditionalLand = models.CharField(max_length=50)
-    traditionalCountry = models.CharField(max_length=50)
-    traditionalCity = models.CharField(max_length=50)
-    traditionalZipcode = models.CharField(max_length=15)
-    traditionalStreet = models.CharField(max_length=200)
-    traditionalStreetNumber = models.CharField(max_length=4)
 
-    modernCoordinatesLongitude = models.FloatField(null=True)
-    modernCoordinatesLatitude = models.FloatField(null=True)
+    # Address – free-form lines for the variable part, optional structured
+    # fields for filtering/sorting. Works for international formats (§28).
+    line1 = models.CharField(max_length=200, blank=True)
+    line2 = models.CharField(max_length=200, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    country = models.CharField(max_length=2, blank=True)  # ISO 3166-1 alpha-2
 
-    modernWhat3Words = models.CharField(max_length=100, null=True)
-    modernWhat3WordsLang = models.CharField(max_length=50, null=True)
+    # Coordinates (for the map, §15)
+    latitude = models.FloatField(null=True, blank=True)
+    longitude = models.FloatField(null=True, blank=True)
+    plus_code = models.CharField(max_length=20, blank=True)  # Open Location Code
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -30,4 +34,11 @@ class Location(SoftDeleteObject, models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.traditionalLand + " " + self.traditionalCountry + " " + self.traditionalZipcode  + " " + self.traditionalStreet  + " " + self.traditionalStreetNumber
+        parts = [
+            self.line1,
+            self.line2,
+            " ".join(p for p in [self.postal_code, self.city] if p),
+            self.state,
+            self.country,
+        ]
+        return ", ".join(p for p in parts if p)
