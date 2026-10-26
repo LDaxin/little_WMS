@@ -1,6 +1,6 @@
 <div id="scannerDiv{{input}}">
     {% if state == 'on' %}
-        {% include 'hub/modules/scanner.html' %}
+        {% include 'hub/modules/scanner.html' with scan=scan %}
     {% endif %}
 </div>
 

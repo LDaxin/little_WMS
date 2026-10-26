@@ -1,0 +1,14 @@
+{% for r in resultsA %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{% url 'movement scan' %}" hx-vals='{"code": "{{ r.code.code }}"}'
+        hx-target="#movementBuffer" hx-swap="outerHTML">
+    {{ r.base.name }}
+</button>
+{% endfor %}
+{% for r in resultsS %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{% url 'movement scan' %}" hx-vals='{"code": "{{ r.code.code }}"}'
+        hx-target="#movementBuffer" hx-swap="outerHTML">
+    {{ r }}
+</button>
+{% endfor %}

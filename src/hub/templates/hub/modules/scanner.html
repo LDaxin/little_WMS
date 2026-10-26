@@ -16,6 +16,9 @@
         if(decodedResult.result.format.formatName == "QR_CODE"){
             {% if move == 'true' %}
             lResults(decodedResult.decodedText);
+            {% elif scan == 'true' %}
+            $("#{{input}}").val(decodedText);
+            htmx.trigger("#{{input}}Form", "submit");
             {% else %}
             $("#{{input}}").val(decodedText);
             htmx.trigger("#QRButton{{input}}", "click");

@@ -1,123 +1,204 @@
 from django.shortcuts import render
-from django.template.loader import render_to_string
-from storage.models import Storage
-from article.models import Article
+from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
+from article.models import Article
+from storage.models import Storage
 from movement.services import MovementService, resolve_space
+from movement.session import get_state, save_state, reset
 
 # Create your views here.
 
 
-def _toast(request, name, text, toast_type, toast_id):
-    return render(request, "hub/modules/toast.html", context={
-        "toastName": name, "toastId": toast_id, "toastText": text, "toastType": toast_type,
-    })
+def _resolve_target(code):
+    """The Storage/Article behind a target code, for display."""
+    if not code:
+        return None
+    if code.startswith("s0"):
+        return Storage.objects.filter(code__code=code).first()
+    if code.startswith("a0"):
+        return Article.objects.filter(code__code=code).first()
+    return None
 
 
-def _error_toast(request, text):
-    return _toast(request, "Error", text, "alert", "errorToast")
-
-
-def _success_toast(request, text):
-    return _toast(request, "Success", text, "success", "successToast")
-
-
-def _json_error(message):
-    return JsonResponse({
-        "error": message,
-        "errorToast": render_to_string("hub/modules/toast.html", context={
-            "toastName": "Error", "toastId": "errorToast", "toastText": message, "toastType": "alert",
-        }),
-    })
-
-
-def _articles_from_post(request):
-    """Collect the buffered articles from the ``articleCode*`` POST fields."""
+def _articles_from_codes(codes):
+    by_code = {a.code.code: a for a in Article.objects.filter(code__code__in=codes)}
     articles = []
-    for key, value in request.POST.items():
-        if key.startswith("articleCode"):
-            try:
-                articles.append(Article.objects.get(code__code=value))
-            except Article.DoesNotExist:
-                raise ValidationError("No article with code %s" % value)
+    for code in codes:
+        if code not in by_code:
+            raise ValidationError("No article with code %s" % code)
+        articles.append(by_code[code])
     return articles
+
+
+def _buffer_context(request, error="", success=""):
+    state = get_state(request.session)
+    by_code = {a.code.code: a for a in Article.objects.filter(code__code__in=state["buffer"])}
+    buffered = [by_code[c] for c in state["buffer"] if c in by_code]
+    return {
+        "mode": state["mode"],
+        "buffer": buffered,
+        "target": _resolve_target(state["target"]),
+        "target_smart": state["target_smart"],
+        "error": error,
+        "success": success,
+    }
+
+
+def _render_buffer(request, error="", success=""):
+    return render(request, "movement/buffer.html",
+                  context=_buffer_context(request, error=error, success=success))
 
 
 @login_required(login_url='/accounts/login/')
 def movement(request):
-
-    return render(request, "movement/movement.html")
+    return render(request, "movement/movement.html", context=_buffer_context(request))
 
 
 @login_required(login_url='/accounts/login/')
-def movementRemove(request):
-    if request.method == "POST":
-        try:
-            articles = _articles_from_post(request)
-            for article in articles:
-                MovementService.remove_article(article, request.user)
-        except ValidationError as e:
-            return _error_toast(request, e.messages[0] if e.messages else str(e))
-        return _success_toast(request, "Removed %s article(s)" % len(articles))
+def movementScan(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    return _error_toast(request, "what are you trying to do")
+    state = get_state(request.session)
+    code = request.POST.get("code", "").strip()
+    error = ""
+    try:
+        if code.startswith("s0"):
+            Storage.objects.get(code__code=code)
+            state["target"] = code
+            state["target_smart"] = False
+        elif code.startswith("a0"):
+            article = Article.objects.get(code__code=code)
+            if article.space and article.space.active and not state["target"]:
+                # smart default: a container becomes the target
+                state["target"] = code
+                state["target_smart"] = True
+            elif code not in state["buffer"]:
+                state["buffer"].append(code)
+        else:
+            raise ValidationError("Unknown code %s" % code)
+    except (Storage.DoesNotExist, Article.DoesNotExist):
+        error = "No object with code %s" % code
+    except ValidationError as e:
+        error = e.messages[0] if e.messages else str(e)
+
+    save_state(request.session, state)
+    return _render_buffer(request, error=error)
+
+
+@login_required(login_url='/accounts/login/')
+def movementMode(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = get_state(request.session)
+    mode = request.POST.get("mode", "store")
+    if mode in ("store", "remove"):
+        state["mode"] = mode
+        reset(request.session)
+    return _render_buffer(request)
+
+
+@login_required(login_url='/accounts/login/')
+def movementClear(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    reset(request.session)
+    return _render_buffer(request)
+
+
+@login_required(login_url='/accounts/login/')
+def movementBufferRemove(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = get_state(request.session)
+    code = request.POST.get("code", "")
+    if code in state["buffer"]:
+        state["buffer"].remove(code)
+    save_state(request.session, state)
+    return _render_buffer(request)
+
+
+@login_required(login_url='/accounts/login/')
+def movementTargetClear(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = get_state(request.session)
+    state["target"] = None
+    state["target_smart"] = False
+    save_state(request.session, state)
+    return _render_buffer(request)
+
+
+@login_required(login_url='/accounts/login/')
+def movementTreatAsArticle(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = get_state(request.session)
+    if state["target"] and state["target"] not in state["buffer"]:
+        state["buffer"].append(state["target"])
+    state["target"] = None
+    state["target_smart"] = False
+    save_state(request.session, state)
+    return _render_buffer(request)
+
+
+@login_required(login_url='/accounts/login/')
+def movementSetTarget(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = get_state(request.session)
+    code = request.POST.get("code", "")
+    if code in state["buffer"]:
+        state["buffer"].remove(code)
+        state["target"] = code
+        state["target_smart"] = False
+    save_state(request.session, state)
+    return _render_buffer(request)
 
 
 @login_required(login_url='/accounts/login/')
 def movementStore(request):
-    if request.method == "POST":
-        try:
-            target = resolve_space(request.POST.get("storageCode", ""))
-            articles = _articles_from_post(request)
-            MovementService.store_articles(articles, target, request.user)
-        except ValidationError as e:
-            return _error_toast(request, e.messages[0] if e.messages else str(e))
-        return _success_toast(request, "Stored %s article(s)" % len(articles))
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    return _error_toast(request, "what are you trying to do")
+    state = get_state(request.session)
+    try:
+        target = resolve_space(state["target"] or "")
+        articles = _articles_from_codes(state["buffer"])
+        MovementService.store_articles(articles, target, request.user)
+    except ValidationError as e:
+        return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
+
+    count = len(articles)
+    reset(request.session)
+    return _render_buffer(request, success="Stored %s article(s)" % count)
 
 
 @login_required(login_url='/accounts/login/')
-def movementCodeInfo(request):
-    if request.method == "GET":
-        code = request.GET.get("code", "")
-        if code.startswith("a0"):
-            try:
-                article = Article.objects.get(code__code=code)
-            except Article.DoesNotExist:
-                return _json_error("no such a article in the System")
+def movementRemove(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
-            return JsonResponse({
-                "error": "",
-                "name": article.base.name,
-                "code": article.code.code,
-                "storable": True,
-                "storage": False,
-                "space": article.space.active if article.space else False,
-            })
+    state = get_state(request.session)
+    try:
+        articles = _articles_from_codes(state["buffer"])
+        for article in articles:
+            MovementService.remove_article(article, request.user)
+    except ValidationError as e:
+        return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
 
-        elif code.startswith("s0"):
-            try:
-                storage = Storage.objects.get(code__code=code)
-            except Storage.DoesNotExist:
-                return _json_error("no such a storage in the System")
-
-            return JsonResponse({
-                "error": "",
-                "name": storage.name,
-                "code": storage.code.code,
-                "storable": False,
-                "storage": True,
-                "space": True,
-            })
-
-        return _json_error("not a valide code")
-
-    return _json_error("what are you trying to do?")
+    count = len(articles)
+    reset(request.session)
+    return _render_buffer(request, success="Removed %s article(s)" % count)
 
 
 @login_required(login_url='/accounts/login/')
@@ -125,11 +206,25 @@ def movementSearch(request):
     if request.method == "GET":
         search = request.GET.get("search", "")
         if search == "":
-            ra = Article.objects.filter(base__name__exact="")
-            rs = Storage.objects.filter(name__exact="")
+            ra = Article.objects.none()
+            rs = Storage.objects.none()
         else:
             ra = Article.objects.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
             rs = Storage.objects.filter(Q(name__contains=search) | Q(code__code__contains=search))
-        return render(request, "hub/modules/quickResults.html", context={"resultsA": ra, "resultsS": rs})
+        return render(request, "movement/searchResults.html", context={"resultsA": ra, "resultsS": rs})
 
-    return _json_error("what are you trying to do?")
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def movementScanner(request, scannerId, state):
+    if state == "toggle":
+        if request.POST["active_scanner"] == scannerId:
+            context = {"activeInput": "", "input": scannerId, "state": "off"}
+        elif request.POST["active_scanner"] == "":
+            context = {"activeInput": "", "input": scannerId, "state": "on", "scan": True}
+        else:
+            context = {"activeInput": request.POST["active_scanner"], "input": scannerId, "state": "on", "scan": True}
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+
+    return HttpResponseNotFound('<h1>Page not found</h1>')
