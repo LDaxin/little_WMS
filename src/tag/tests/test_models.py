@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from tag.models import Tag
+from tag.models import Tag, TagCategory
 
 
 def assert_soft_delete_cycle(testcase, obj, model):
@@ -30,3 +30,14 @@ class TagModelTest(TestCase):
 
     def test_soft_delete_and_undelete(self):
         assert_soft_delete_cycle(self, self.tag, Tag)
+
+    def test_defaults(self):
+        self.assertEqual(self.tag.color, "#6c757d")
+        self.assertEqual(self.tag.icon, "")
+        self.assertIsNone(self.tag.category)
+
+    def test_category(self):
+        category = TagCategory.objects.create(name="Group")
+        tag = Tag.objects.create(name="Sommer", category=category)
+        self.assertEqual(tag.category, category)
+        self.assertEqual(str(category), "Group")

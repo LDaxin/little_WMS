@@ -28,11 +28,11 @@ def can_store(owner_space, target_space, max_depth):
             return False, "Maximum storage depth (%s) exceeded" % max_depth
         if owner_space is not None and space.pk == owner_space.pk:
             return False, "Cycle detected"
-        space = _parent_space(space)
+        space = parent_space(space)
     return True, ""
 
 
-def _parent_space(space):
+def parent_space(space):
     """The Space that contains `space` (via its owning article/storage), or None."""
     owner = getattr(space, "itemArticle", None) or getattr(space, "itemStorage", None)
     return getattr(owner, "stored", None)

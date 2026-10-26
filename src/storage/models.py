@@ -6,6 +6,7 @@ from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from django import forms
 from space.models import Space
+from tag.models import Tag
 # Create your models here.
 
 
@@ -36,6 +37,8 @@ class Storage(SoftDeleteObject, models.Model):
     parent = SelfForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
 
     space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
+
+    tags = models.ManyToManyField(Tag, blank=True, related_name="storages")
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = True, blank = True, null = True)
 

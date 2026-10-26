@@ -168,6 +168,8 @@ class Article(SoftDeleteObject, models.Model):
     menge = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     mengeneinheit = models.CharField(max_length=20, blank=True)
 
+    tags = models.ManyToManyField(Tag, blank=True, related_name="articles")
+
     # here the code gets the prefix for the article
     def save(self, *args, **kwargs):
         if not self.code:
