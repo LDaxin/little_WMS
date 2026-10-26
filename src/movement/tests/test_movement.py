@@ -14,7 +14,7 @@ def make_article(name, article_type, space_active):
 
 
 class MovementCodeInfoTest(TestCase):
-    """Characterizes the "space validation" info returned for a scanned code."""
+    """The info returned for a scanned code (space validation)."""
 
     @classmethod
     def setUpTestData(cls):
@@ -55,18 +55,16 @@ class MovementCodeInfoTest(TestCase):
         data = self.client.get("/movement/request/", {"code": "xx123"}).json()
         self.assertNotEqual(data["error"], "")
 
-    def test_article_without_space_raises(self):
-        # Characterization: an article without a Space makes movementCodeInfo
-        # raise AttributeError (HTTP 500).
+    def test_article_without_space(self):
         base = ArticleBase.objects.create(name="Hammer", pType=self.article_type)
         article = Article.objects.create(base=base)
-        with self.assertRaises(AttributeError), self.assertLogs("django.request", level="ERROR"):
-            self.client.get("/movement/request/", {"code": article.code.code})
+        data = self.client.get("/movement/request/", {"code": article.code.code}).json()
+        self.assertEqual(data["error"], "")
+        self.assertFalse(data["space"])
 
-    def test_missing_code_param_raises(self):
-        # Characterization: `request.GET['code']` without `.get()` -> KeyError.
-        with self.assertRaises(KeyError), self.assertLogs("django.request", level="ERROR"):
-            self.client.get("/movement/request/")
+    def test_missing_code_param(self):
+        data = self.client.get("/movement/request/").json()
+        self.assertNotEqual(data["error"], "")
 
 
 class MovementStoreTest(TestCase):
@@ -121,29 +119,37 @@ class MovementStoreTest(TestCase):
         self.assertEqual(first.stored, self.storage.space)
         self.assertEqual(second.stored, self.storage.space)
 
-    def test_store_unknown_storage_code_raises(self):
+    def test_store_unknown_storage_code(self):
         article = make_article("Hammer", self.article_type, space_active=False)
-        with self.assertRaises(Storage.DoesNotExist), self.assertLogs(
-            "django.request", level="ERROR"
-        ):
-            self.client.post(
-                "/movement/store/",
-                {"storageCode": "s0doesnotexist", "articleCode1": article.code.code},
-            )
+        response = self.client.post(
+            "/movement/store/",
+            {"storageCode": "s0doesnotexist", "articleCode1": article.code.code},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No storage with code")
+        article.refresh_from_db()
+        self.assertIsNone(article.stored)
 
-    def test_store_unknown_prefix_raises(self):
+    def test_store_unknown_prefix(self):
         article = make_article("Hammer", self.article_type, space_active=False)
-        with self.assertRaises(UnboundLocalError), self.assertLogs(
-            "django.request", level="ERROR"
-        ):
-            self.client.post(
-                "/movement/store/",
-                {"storageCode": "xx123", "articleCode1": article.code.code},
-            )
+        response = self.client.post(
+            "/movement/store/",
+            {"storageCode": "xx123", "articleCode1": article.code.code},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Unknown code")
+        article.refresh_from_db()
+        self.assertIsNone(article.stored)
 
-    def test_store_into_inactive_space_is_not_validated(self):
-        # Characterization: movementStore does not check whether the target
-        # space is active; the article is stored anyway.
+    def test_store_unknown_article_code(self):
+        response = self.client.post(
+            "/movement/store/",
+            {"storageCode": self.storage.code.code, "articleCode1": "a0doesnotexist"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No article with code")
+
+    def test_store_into_inactive_space_rejected(self):
         inactive = Storage.objects.create(name="Regal B", typ=self.storage_type)
         inactive.space.active = False
         inactive.space.save()
@@ -153,19 +159,35 @@ class MovementStoreTest(TestCase):
             {"storageCode": inactive.code.code, "articleCode1": article.code.code},
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "not active")
         article.refresh_from_db()
-        self.assertEqual(article.stored, inactive.space)
+        self.assertIsNone(article.stored)
 
-    def test_store_article_into_own_space_is_not_validated(self):
-        # Characterization: self-storage is not prevented.
+    def test_store_article_into_own_space_rejected(self):
         container = make_article("Box A", self.container_type, space_active=True)
         response = self.client.post(
             "/movement/store/",
             {"storageCode": container.code.code, "articleCode1": container.code.code},
         )
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "itself")
         container.refresh_from_db()
-        self.assertEqual(container.stored, container.space)
+        self.assertIsNone(container.stored)
+
+    def test_store_is_atomic(self):
+        good = make_article("Hammer", self.article_type, space_active=False)
+        bad = make_article("Box", self.container_type, space_active=True)
+        response = self.client.post(
+            "/movement/store/",
+            {
+                "storageCode": bad.code.code,
+                "articleCode1": good.code.code,
+                "articleCode2": bad.code.code,
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        good.refresh_from_db()
+        self.assertIsNone(good.stored)
 
 
 class MovementRemoveTest(TestCase):
@@ -188,9 +210,7 @@ class MovementRemoveTest(TestCase):
         article.refresh_from_db()
         self.assertIsNone(article.stored)
 
-    def test_remove_only_reads_first_article(self):
-        # Characterization: movementRemove only reads `articleCode1`; a second
-        # buffered article is ignored.
+    def test_remove_multiple_articles(self):
         first = make_article("Hammer", self.article_type, space_active=False)
         second = make_article("Zange", self.article_type, space_active=False)
         first.stored = self.storage.space
@@ -205,10 +225,9 @@ class MovementRemoveTest(TestCase):
         first.refresh_from_db()
         second.refresh_from_db()
         self.assertIsNone(first.stored)
-        self.assertEqual(second.stored, self.storage.space)
+        self.assertIsNone(second.stored)
 
-    def test_remove_unknown_code_raises(self):
-        with self.assertRaises(Article.DoesNotExist), self.assertLogs(
-            "django.request", level="ERROR"
-        ):
-            self.client.post("/movement/remove/", {"articleCode1": "a0doesnotexist"})
+    def test_remove_unknown_code(self):
+        response = self.client.post("/movement/remove/", {"articleCode1": "a0doesnotexist"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No article with code")

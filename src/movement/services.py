@@ -38,6 +38,8 @@ class MovementService:
         """Store/move an article into ``target_space``."""
         if target_space is None:
             raise ValidationError("No target space")
+        if not target_space.active:
+            raise ValidationError("Target space is not active")
         ok, reason = can_store(article.space, target_space, max_storage_depth())
         if not ok:
             raise ValidationError(reason)
