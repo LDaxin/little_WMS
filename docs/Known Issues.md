@@ -34,7 +34,7 @@ will make that test fail and force it to be updated.
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-012 | `location/views.py` `searchLocations` | Filters on `name__contains`, but `Location` has no `name` field → `FieldError` (500) for any non-empty search | 🔴 open | 0.2 | `location/tests/test_views.py` |
+| KI-012 | `location/views.py` `searchLocations` | Filters on `name__contains`, but `Location` has no `name` field → `FieldError` (500) for any non-empty search | ✅ fixed | 0.2 | `location/tests/test_views.py` |
 | KI-017 | `location/models.py` `Location.save` | Used the `ArticleType` prefix `at` instead of `l0`, so Location codes collided with ArticleType codes | ✅ fixed | 1.5 | `location/tests/test_models.py` |
 
 ## Tag

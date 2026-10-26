@@ -159,7 +159,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.5 Code System | ✅ done |
 | 1 | 1.6 Storage Integrity | ✅ done |
 | 1 | 1.7 Tags | ✅ done |
-| 1 | 1.8 Locations | ⬜ open |
+| 1 | 1.8 Locations | ✅ done |
 | 1 | 1.9 Article form (field_config + custom fields) | ⬜ open |
 | 1 | 1.10 Store/Remove service + UI (discuss first) | ⬜ open |
 | 1 | 1.11 Tag UI (chips, colors, add/remove) | ⬜ open |

@@ -3118,6 +3118,12 @@ class Location(models.Model):
 - International address formats (adapts to the country)
 - Replaces the rigid "traditional" fields (Land, City, Zipcode, Street, ...)
 
+> **Implementation note (1.8):** Instead of the `django-address` library, the
+> address is stored in free-form fields (`line1`, `line2`, `postal_code`,
+> `city`, `state`, `country`). This avoids an extra dependency while still
+> supporting international formats. Coordinates and Plus Code are stored
+> separately as specified below.
+
 ### Coordinates (separate)
 
 ```python
