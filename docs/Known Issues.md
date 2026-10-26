@@ -13,15 +13,15 @@ will make that test fail and force it to be updated.
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-001 | `movement/views.py` `movementStore` | No error handling: unknown code → `DoesNotExist` (500); unknown prefix → `UnboundLocalError` (500) | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
-| KI-002 | `movement/views.py` `movementStore` | Toast always "Error" with `str(hallo)` (debug leftover) | 🔴 open | 0.3 | – |
-| KI-003 | `movement/views.py` `movementStore` | No validation: target space active? article storable? self-storage? | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
-| KI-004 | `movement/views.py` `movementStore` | No transaction: partial state on mid-loop failure | 🔴 open | 0.3 | – |
-| KI-005 | `movement/views.py` `movementRemove` | No error handling: unknown code → `DoesNotExist` (500) | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
-| KI-006 | `movement/views.py` `movementRemove` | Only reads `articleCode1`; further buffered articles are ignored | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
-| KI-007 | `movement/views.py` `movementCodeInfo` | `request.GET['code']` without `.get()` → `KeyError` (500) | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
-| KI-008 | `movement/views.py` `movementSearch` | `request.GET['search']` without `.get()` → `KeyError` (500) | 🔴 open | 0.3 | – |
-| KI-009 | `movement/views.py` `movementCodeInfo` | Article without a `Space` → `AttributeError` (500) | 🔴 open | 0.3 | `movement/tests/test_movement.py` |
+| KI-001 | `movement/views.py` `movementStore` | No error handling: unknown code → `DoesNotExist` (500); unknown prefix → `UnboundLocalError` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-002 | `movement/views.py` `movementStore` | Toast always "Error" with `str(hallo)` (debug leftover) | ✅ fixed | 0.3 | – |
+| KI-003 | `movement/views.py` `movementStore` | No validation: target space active? article storable? self-storage? | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-004 | `movement/views.py` `movementStore` | No transaction: partial state on mid-loop failure | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-005 | `movement/views.py` `movementRemove` | No error handling: unknown code → `DoesNotExist` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-006 | `movement/views.py` `movementRemove` | Only reads `articleCode1`; further buffered articles are ignored | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-007 | `movement/views.py` `movementCodeInfo` | `request.GET['code']` without `.get()` → `KeyError` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
+| KI-008 | `movement/views.py` `movementSearch` | `request.GET['search']` without `.get()` → `KeyError` (500) | ✅ fixed | 0.3 | – |
+| KI-009 | `movement/views.py` `movementCodeInfo` | Article without a `Space` → `AttributeError` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
 | KI-010 | movement (all) | No audit trail (planned in §32) | 🔴 open | 0.3 | – |
 
 ## Code System
