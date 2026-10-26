@@ -9,6 +9,7 @@
         <input id="scan" name="code" class="form-control" placeholder="Scan or enter code..." autofocus autocomplete="off">
         {% include "hub/modules/qrScanner.html" with input="scan" scannerUrl="/movement/scanner/scan/toggle" %}
     </div>
+    <div id="scannerDivscan"></div>
 </form>
 
 <input id="movementSearch" name="search" class="form-control mb-2" placeholder="Search..."

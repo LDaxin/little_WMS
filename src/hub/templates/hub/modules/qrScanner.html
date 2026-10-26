@@ -1,6 +1,4 @@
-{# Reusable QR scanner: button + hidden active_scanner + container.
-   Params: input (element id), scannerUrl (toggle endpoint). #}
+{# Reusable QR scanner button + hidden active_scanner. Params: input (id), scannerUrl. Add <div id="scannerDiv{{ input }}"></div> outside the input-group. #}
 <button type="button" id="QRButton{{ input }}" class="btn btn-primary scanner"
         hx-post="{{ scannerUrl }}" hx-swap="outerHTML" hx-target="#scannerDiv{{ input }}" hx-trigger="click">QR</button>
 <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
-<div id="scannerDiv{{ input }}" class="w-100"></div>
