@@ -11,11 +11,12 @@ skill — this skill only adds the bug-specific parts.
 
 ## Testing
 
-Run tests and manual verification in Docker (see `little-wms-implementation`):
+Run tests and manual verification in Docker (see `little-wms-implementation`).
+Always wrap Docker in `sg docker`:
 
 ```bash
-docker compose run --rm --no-deps --entrypoint python web manage.py test
-docker compose build && docker compose up -d   # before asking for the merge
+sg docker -c "docker compose run --rm --no-deps --entrypoint python web manage.py test"
+sg docker -c "docker compose build" && sg docker -c "docker compose up -d"   # before asking for the merge
 ```
 
 ## Register

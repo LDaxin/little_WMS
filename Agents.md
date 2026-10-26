@@ -13,7 +13,7 @@ This document describes which opencode agents are available for work on **little
 | **Stack** | Django 6.0.3, Django REST Framework 3.14, Gunicorn, SQLite, Docker |
 | **Language** | Python 3.12 |
 | **Django Apps** | `article`, `codeSystem`, `export`, `hub`, `little_wms`, `location`, `movement`, `softdelete`, `space`, `storage`, `tag` |
-| **Development** | Docker-based via `docker compose up`, dev entrypoint at `scripts/entrypoint-dev.sh` |
+| **Development** | Docker-based via `sg docker -c "docker compose up"`, dev entrypoint at `scripts/entrypoint-dev.sh` |
 
 ---
 
@@ -89,14 +89,18 @@ These conventions must be included in every agent prompt when relevant:
 ### Docker Development
 
 - Dev entrypoint: `scripts/entrypoint-dev.sh` (with live reload)
-- For new dependencies: rebuild the image with `./scripts/build.sh`, then `docker compose up`
+- **Always run Docker via `sg docker`** — the shell has no direct docker-group
+  access, so every `docker` / `docker compose` command must be wrapped:
+  `sg docker -c "docker compose <args>"`
+- For new dependencies: rebuild the image with `./scripts/build.sh`, then
+  `sg docker -c "docker compose up"`
 - Database persistence: `./data/` is mounted as a volume
 - **All testing runs through Docker** — never rely on a local Python/Django:
-  - Tests: `docker compose run --rm --no-deps --entrypoint python web manage.py test`
-  - Migrations: `docker compose run --rm --no-deps --entrypoint python web manage.py migrate`
+  - Tests: `sg docker -c "docker compose run --rm --no-deps --entrypoint python web manage.py test"`
+  - Migrations: `sg docker -c "docker compose run --rm --no-deps --entrypoint python web manage.py migrate"`
 - `src/` is **baked into the image** (only `./data` is mounted). After code
   changes, rebuild so the app serves the new code:
-  `docker compose build && docker compose up -d`
+  `sg docker -c "docker compose build" && sg docker -c "docker compose up -d"`
 - **Rebuild Docker before asking for a merge** — the maintainer tests the
   running container, not the working tree.
 
@@ -145,10 +149,12 @@ URLs: src/little_wms/urls.py (root) + one urls.py per app
 ### Docker Dev Context
 
 ```
-Development environment: Docker via docker compose up.
+Development environment: Docker via `sg docker -c "docker compose up"`.
+Always run Docker through `sg docker` (no direct docker-group access).
 Dev entrypoint: scripts/entrypoint-dev.sh (with live reload).
 For new dependencies: update requirements.txt, then rebuild the image with ./scripts/build.sh.
 Data persists in ./data/ (mounted as a volume).
+Never write `rtk` — opencode prepends it to shell commands automatically.
 ```
 
 ---

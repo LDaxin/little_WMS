@@ -22,6 +22,10 @@ Reference: Lastenheft §7c (Migrations – Safe Handling) and §18 (Data Migrati
 
 All commands run inside the container (`docker compose exec web ...`).
 
+> **Agents:** run Docker via `sg docker` — wrap each command, e.g.
+> `sg docker -c "docker compose exec web python manage.py migrate"`.
+> The examples below show the bare command for readability.
+
 ```bash
 # 1. Back up the database
 cp data/wms.sqlite3 data/wms.sqlite3.backup_$(date +%Y%m%d_%H%M%S)

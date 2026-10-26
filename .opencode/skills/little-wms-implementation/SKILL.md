@@ -65,21 +65,33 @@ English only — code, docs, commits, branches.
 All tests and manual verification run through **Docker** — never rely on a
 locally installed Python/Django.
 
+**Always run Docker via `sg docker`.** The shell has no direct docker-group
+access, so every `docker` / `docker compose` command must be wrapped:
+
+```bash
+sg docker -c "docker compose <args>"
+```
+
 - Run the full test suite (must be green before reporting):
   ```bash
-  docker compose run --rm --no-deps --entrypoint python web manage.py test
+  sg docker -c "docker compose run --rm --no-deps --entrypoint python web manage.py test"
   ```
 - The image bakes in `src/`; the running container only mounts `./data`.
   After code changes you must rebuild so the app serves the new code:
   ```bash
-  docker compose build
-  docker compose up -d
+  sg docker -c "docker compose build"
+  sg docker -c "docker compose up -d"
   ```
 - Migrations on the dev DB:
   ```bash
-  docker compose run --rm --no-deps --entrypoint python web manage.py migrate
+  sg docker -c "docker compose run --rm --no-deps --entrypoint python web manage.py migrate"
   ```
-- If your shell has no docker-group access, prefix with `sg docker -c "..."`.
+
+## Tooling
+
+- **Never write `rtk`.** opencode prepends it to shell commands automatically;
+  type plain commands (`git status`, not `rtk git status`).
+- **Docker only via `sg docker`** (see *Testing via Docker*).
 
 ## Per-Step Flow
 
@@ -88,7 +100,7 @@ locally installed Python/Django.
 2. Work
 3. Commits
 4. Run the full test suite in Docker (must be green)
-5. `docker compose build && docker compose up -d` — so the owner can test
+5. `sg docker -c "docker compose build" && sg docker -c "docker compose up -d"` — so the owner can test
 6. Report: what was done + how to test it (URL, credentials)
 7. Human reviews and approves
 8. Agent merges into `ki` (only after approval)
