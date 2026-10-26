@@ -82,7 +82,8 @@ def storages(request, typ):
             "typ":typ,
             "add":True,
             "del":True,
-            "export":True
+            "export":True,
+            "qr":True
         }
         return render(request, "hub/modules/items.html", context=context)
 

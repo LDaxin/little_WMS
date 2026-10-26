@@ -103,6 +103,7 @@ def articles(request, typ):
             "add":True,
             "del":True,
             "export":True,
+            "qr":True,
         }
         return render(request, "hub/modules/items.html", context=context)
 

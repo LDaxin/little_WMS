@@ -18,6 +18,10 @@
         {% include "hub/modules/modalButton.html" with modalId="Export" buttonSymbol=" Export " buttonColor="primary" %}
     {% endif %}
 
+    {% if qr %}
+        {% include "hub/modules/modalButton.html" with modalId="QR" buttonSymbol=" QR " buttonColor="secondary" %}
+    {% endif %}
+
 </div>
 
 {% include "hub/modules/addModal.html" with modalId="Add"%}
@@ -25,6 +29,8 @@
 {% include "hub/modules/deleteModal.html" with modalId="Del" %}
 
 {% include "hub/modules/exportModal.html" with modalId="Export" %}
+
+{% include "hub/modules/qrModal.html" with modalId="QR" %}
 
 {% include "hub/modules/singleModal.html" with modalId="single" %}
 

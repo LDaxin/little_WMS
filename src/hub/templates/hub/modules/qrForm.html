@@ -1,0 +1,70 @@
+<div id="qrModalInner">
+    <p>Print QR codes for these items:</p>
+    <ul id="qrList"></ul>
+    <form method="POST" action="/qr/print" target="_blank" id="qrForm">
+        {% csrf_token %}
+        <input type="hidden" name="type" value="{{ type }}">
+        <div class="mb-2">
+            <label class="form-label">Format</label>
+            <select name="format" class="form-select">
+                <option value="2x4">2 × 4</option>
+                <option value="3x7" selected>3 × 7</option>
+                <option value="4x10">4 × 10</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">QR size</label>
+            <select name="size" class="form-select">
+                <option value="small">Small</option>
+                <option value="medium" selected>Medium</option>
+                <option value="large">Large</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Label</label>
+            <select name="label" class="form-select">
+                <option value="code">QR only</option>
+                <option value="name" selected>QR + name</option>
+                <option value="full">QR + name + symbol</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">QR content</label>
+            <select name="qr" class="form-select">
+                <option value="code" selected>Code (app scanner)</option>
+                <option value="link">Link (universal)</option>
+            </select>
+        </div>
+        <div class="mb-2">
+            <label class="form-label">Sort</label>
+            <select name="sort" class="form-select">
+                <option value="name" selected>Name</option>
+                <option value="code">Code</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Print</button>
+    </form>
+    <script>
+        $(document).on("change", "#checkAll", function(){
+            if(this.checked){
+                $(".checkboxlist").each(function(){
+                    $("#qrList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
+                    $("#qrForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
+                });
+            }else{
+                $(".checkboxlist").each(function(){
+                    $("."+ this.id +"_").remove();
+                });
+            }
+        });
+
+        $(document).on("change", ".checkboxlist", function(){
+            if(this.checked){
+                $("#qrList").append("<li class='"+ this.id +"_'> "+ this.value +" </li>");
+                $("#qrForm").append("<input type=\"hidden\" name='_"+ this.id +"' class='"+ this.id +"_' value="+ this.id +"> ");
+            }else{
+                $("."+ this.id +"_").remove();
+            }
+        });
+    </script>
+</div>

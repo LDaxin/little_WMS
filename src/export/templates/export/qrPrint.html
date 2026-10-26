@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>QR Sheet</title>
+    <style>
+        @page { size: A4; margin: 10mm; }
+        body { font-family: sans-serif; margin: 0; }
+        .qr-grid { display: grid; grid-template-columns: repeat({{ cols }}, 1fr); gap: 3mm; }
+        .qr-label { border: 1px dashed #ccc; padding: 2mm; text-align: center; page-break-inside: avoid; }
+        .qr-label svg { width: {{ size }}mm; height: {{ size }}mm; }
+        .qr-name { font-size: 9pt; margin-top: 1mm; word-break: break-word; }
+        .qr-symbol { width: 8mm; height: 8mm; }
+        .no-print { margin: 5mm; }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">Print</button>
+    </div>
+    <div class="qr-grid">
+        {% for item in items %}
+        <div class="qr-label">
+            {{ item.qr|safe }}
+            {% if label != 'code' %}<div class="qr-name">{{ item.name }}</div>{% endif %}
+            {% if label == 'full' %}<img class="qr-symbol" src="{% static 'hub/symbols/'|add:item.symbol|add:'.svg' %}" alt="">{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
