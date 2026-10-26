@@ -1,0 +1,3 @@
+{% for a in results %}
+<a class="list-group-item list-group-item-action" href="/where/?q={{ a.code.code }}">{{ a.base.name }}</a>
+{% endfor %}

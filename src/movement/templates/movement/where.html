@@ -2,11 +2,14 @@
 
 {% block content %}
 
-<form method="GET" action="/where/" class="mb-3">
+<form id="whereForm" method="GET" action="/where/" class="mb-3">
     <div class="input-group">
-        <input name="q" class="form-control" placeholder="Scan code or search name..." value="{{ query }}" autofocus autocomplete="off">
+        <input name="q" id="where" class="form-control" placeholder="Scan code or search name..." value="{{ query }}" autofocus autocomplete="off"
+               hx-get="/where/search" hx-target="#whereResults" hx-trigger="input changed delay:300ms">
+        {% include "hub/modules/qrScanner.html" with input="where" scannerUrl="/where/scanner/where/toggle" %}
         <button class="btn btn-primary" type="submit">Where is...?</button>
     </div>
+    <div id="whereResults" class="list-group mt-1"></div>
 </form>
 
 {% if article %}
@@ -29,9 +32,7 @@
 {% elif results %}
 <ul class="list-group">
     {% for a in results %}
-    <li class="list-group-item">
-        <a href="/where/?q={{ a.code.code }}">{{ a.base.name }}</a>
-    </li>
+    <li class="list-group-item"><a href="/where/?q={{ a.code.code }}">{{ a.base.name }}</a></li>
     {% endfor %}
 </ul>
 {% elif query %}

@@ -19,12 +19,8 @@
         {% csrf_token %}
         <div class="input-group input-group-sm">
             <input id="storeCode" name="code" class="form-control" placeholder="Scan or enter article code">
-            <button type="button" id="QRButtonstoreCode" class="btn btn-primary scanner"
-                    hx-post="./scanner/storeCode/toggle"
-                    hx-swap="outerHTML" hx-target="#scannerDivstoreCode" hx-trigger="click">QR</button>
+            {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl="./scanner/storeCode/toggle" %}
             <button type="submit" class="btn btn-success">Store here</button>
         </div>
-        <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
     </form>
-    <div id="scannerDivstoreCode"></div>
 </div>

@@ -83,6 +83,17 @@ def where(request):
 
 
 @login_required(login_url='/accounts/login/')
+def whereSearch(request):
+    search = request.GET.get("q", "").strip()
+    results = []
+    if search:
+        results = Article.objects.filter(
+            Q(base__name__contains=search) | Q(code__code__contains=search)
+        )[:20]
+    return render(request, "movement/whereResults.html", context={"results": results})
+
+
+@login_required(login_url='/accounts/login/')
 def movementScan(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -244,12 +255,13 @@ def movementSearch(request):
 @login_required(login_url='/accounts/login/')
 def movementScanner(request, scannerId, state):
     if state == "toggle":
-        if request.POST["active_scanner"] == scannerId:
+        active = request.POST.get("active_scanner", "")
+        if active == scannerId:
             context = {"activeInput": "", "input": scannerId, "state": "off"}
-        elif request.POST["active_scanner"] == "":
+        elif active == "":
             context = {"activeInput": "", "input": scannerId, "state": "on", "scan": True}
         else:
-            context = {"activeInput": request.POST["active_scanner"], "input": scannerId, "state": "on", "scan": True}
+            context = {"activeInput": active, "input": scannerId, "state": "on", "scan": True}
         return render(request, "hub/modules/toggleScanner.html", context=context)
 
     return HttpResponseNotFound('<h1>Page not found</h1>')

@@ -7,13 +7,9 @@
     {% csrf_token %}
     <div class="input-group">
         <input id="scan" name="code" class="form-control" placeholder="Scan or enter code..." autofocus autocomplete="off">
-        <button type="button" id="QRButtonscan" class="btn btn-primary scanner"
-                hx-post="{% url 'movement scanner' 'scan' 'toggle' %}"
-                hx-swap="outerHTML" hx-target="#scannerDivscan" hx-trigger="click">QR</button>
+        {% include "hub/modules/qrScanner.html" with input="scan" scannerUrl="/movement/scanner/scan/toggle" %}
     </div>
-    <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
 </form>
-<div id="scannerDivscan"></div>
 
 <input id="movementSearch" name="search" class="form-control mb-2" placeholder="Search..."
        hx-get="{% url 'movement search' %}" hx-target="#searchResults" hx-trigger="input changed delay:300ms">

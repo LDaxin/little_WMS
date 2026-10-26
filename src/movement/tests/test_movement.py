@@ -78,6 +78,12 @@ class WhereTest(MovementTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No article found")
 
+    def test_search_suggestions(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        response = self.client.get("/where/search", {"q": "Hammer"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, article.code.code)
+
 
 class MovementScanTest(MovementTestBase):
     def test_scan_storage_sets_target(self):
