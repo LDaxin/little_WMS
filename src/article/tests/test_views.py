@@ -150,3 +150,33 @@ class ArticleStoreRemoveTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.article.refresh_from_db()
         self.assertIsNone(self.article.stored)
+
+    def test_add_article_with_stored_code(self):
+        response = self.client.post(
+            "/article/werkzeug/add",
+            {
+                "base-name": "Zange",
+                "article-amount": "",
+                "article-stored": self.storage.code.code,
+                "article-code": "",
+                "article-zustand": "gut",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        article = Article.objects.get(base__name="Zange")
+        self.assertEqual(article.stored, self.storage.space)
+
+    def test_add_article_with_unknown_stored_code(self):
+        response = self.client.post(
+            "/article/werkzeug/add",
+            {
+                "base-name": "Zange",
+                "article-amount": "",
+                "article-stored": "xx123",
+                "article-code": "",
+                "article-zustand": "gut",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Unknown code")
+        self.assertFalse(Article.objects.filter(base__name="Zange").exists())

@@ -116,7 +116,21 @@ def addArticle(request, typ):
     else:
         if request.method == "POST":
             pb = FormArticleBase(request.POST, prefix="base", article_type=t)
+            p = FormArticle(request.POST, prefix="article", article_type=t)
 
+            # resolve the optional target before creating anything
+            target = None
+            if p["stored"].value():
+                try:
+                    target = resolve_space(p["stored"].value())
+                except ValidationError as e:
+                    context = {
+                        "toastName":"Error",
+                        "toastId":"errorToast",
+                        "toastText":e.messages[0] if e.messages else str(e),
+                        "toastType":"alert"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
 
             if pb.is_valid():
                 base = pb.save(commit=False)
@@ -131,9 +145,7 @@ def addArticle(request, typ):
                 }
                 return render(request, "hub/modules/toast.html", context=context)
 
-            p = FormArticle(request.POST, prefix="article", article_type=t)
             if p.is_valid():
-
                 pa = p.save(commit=False)
                 if p["code"].value() != "":
                     try:
@@ -174,6 +186,9 @@ def addArticle(request, typ):
 
 
                 pa.save()
+
+                if target is not None:
+                    MovementService.store_article(pa, target, request.user)
 
                 context = {
                     "toastName":"Add Succses",

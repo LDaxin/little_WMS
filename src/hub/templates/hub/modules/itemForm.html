@@ -39,7 +39,6 @@
                 {% endif %}
         {% endfor %}
     {% endfor %}
-    <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
     <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="./{{id}}/{{ actionType }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
 </form>
 

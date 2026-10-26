@@ -82,6 +82,7 @@ class CustomFieldsMixin:
 
 class FormArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
+    stored = forms.CharField(max_length=34, required=False)
     code = forms.CharField(max_length=34, required=False)
 
     class Meta:
@@ -93,6 +94,7 @@ class FormArticle(CustomFieldsMixin, forms.ModelForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
         self.fields['code'].queryset = UuidCode.objects.filter(prefix="a0", used=False)
+        self.fields['stored'].queryset = Space.objects.filter(active=True)
 
 
 class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
