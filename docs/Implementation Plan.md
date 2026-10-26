@@ -161,7 +161,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.7 Tags | ✅ done |
 | 1 | 1.8 Locations | ✅ done |
 | 1 | 1.9 Article form (field_config + custom fields) | ✅ done |
-| 1 | 1.10 Store/Remove service + UI (discuss first) | ⬜ open |
+| 1 | 1.10 Store/Remove service + UI (discuss first) | ✅ done |
 | 1 | 1.11 Tag UI (chips, colors, add/remove) | ⬜ open |
 | 2 | 2.1 Movement Redesign | ⬜ open |
 | 2 | 2.2 QR Workflow | ⬜ open |
