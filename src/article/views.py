@@ -17,8 +17,8 @@ from storage.models import *
 def article(request, typ, articleId):
     p = Article.objects.get(pk=articleId)
     if p.base.pType.name == typ:
-        bpar = FormArticleBase(instance=p.base, prefix="base")
-        par = FormChangeArticle(instance=p, prefix="article")
+        bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
+        par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
 
         par.fields["stored"].initial = p.stored
         context = {
@@ -38,9 +38,10 @@ def article(request, typ, articleId):
 
 @login_required(login_url='/accounts/login/')
 def addModal(request, typ):
+    t = ArticleType.objects.get(name__exact=typ)
     context = {
         "modalId":"add",
-        "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
+        "form":[FormArticleBase(prefix="base", article_type=t), FormArticle(prefix="article", article_type=t)],
         "actionType":"add",
     }
     return render(request, "hub/modules/addForm.html", context=context)
@@ -59,7 +60,7 @@ def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
         if p.base.pType.name == typ:
-            par = FormChangeArticle(instance=p)
+            par = FormChangeArticle(instance=p, article_type=p.base.pType)
             context = {
                 "symbol":p.base.pType.symbol,
                 "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -87,7 +88,7 @@ def articles(request, typ):
             "searchFieldName":"articleSearch" + t.name,
             'type':"article",
             "name":typ,
-            "form":[FormArticleBase(prefix="base"), FormArticle(prefix="article")],
+            "form":[FormArticleBase(prefix="base", article_type=t), FormArticle(prefix="article", article_type=t)],
             "typ":typ,
             "add":True,
             "del":True,
@@ -110,7 +111,7 @@ def addArticle(request, typ):
 
     else:
         if request.method == "POST":
-            pb = FormArticleBase(request.POST, prefix="base")
+            pb = FormArticleBase(request.POST, prefix="base", article_type=t)
 
 
             if pb.is_valid():
@@ -126,7 +127,7 @@ def addArticle(request, typ):
                 }
                 return render(request, "hub/modules/toast.html", context=context)
 
-            p = FormArticle(request.POST, prefix="article")
+            p = FormArticle(request.POST, prefix="article", article_type=t)
             if p.is_valid():
 
                 pa = p.save(commit=False)
@@ -295,8 +296,8 @@ def updateArticle(request, typ, articleId):
         return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
-            articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base")
-            articleForm =  FormArticle(request.POST, instance=articleObject, prefix="article")
+            articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base", article_type=articleTypeObject)
+            articleForm =  FormArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
 
             if articleBaseForm.is_valid():
                 articleBaseForm.save()

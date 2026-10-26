@@ -54,6 +54,31 @@ class ArticleViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(ArticleBase.objects.filter(name="Zange").exists())
 
+    def test_add_article_with_custom_fields(self):
+        self.article_type.custom_fields_schema = {
+            "fields": [
+                {"name": "farbe", "type": "text", "level": "base"},
+                {"name": "seriennummer", "type": "text", "level": "article"},
+            ]
+        }
+        self.article_type.save()
+        response = self.client.post(
+            "/article/werkzeug/add",
+            {
+                "base-name": "Zange",
+                "base-farbe": "rot",
+                "article-seriennummer": "SN-9",
+                "article-amount": "",
+                "article-stored": "",
+                "article-code": "",
+                "article-zustand": "gut",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        base = ArticleBase.objects.get(name="Zange")
+        self.assertEqual(base.attributes, {"farbe": "rot"})
+        self.assertEqual(base.article_set.first().attributes, {"seriennummer": "SN-9"})
+
     def test_update_article(self):
         response = self.client.post(
             f"/article/werkzeug/{self.article.pk}/update",
