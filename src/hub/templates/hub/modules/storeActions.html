@@ -9,6 +9,14 @@
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}
+    {% if defaultLocation %}
+    <div class="small mt-1">Default: {{ defaultLocation }}
+        {% if location != defaultLocation %}
+        <button type="button" class="btn btn-sm btn-outline-success"
+                hx-post="{{ storeDefaultUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Store to default</button>
+        {% endif %}
+    </div>
+    {% endif %}
     <form class="mt-2" hx-post="{{ storeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">
         {% csrf_token %}
         <div class="input-group input-group-sm">

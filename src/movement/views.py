@@ -6,6 +6,7 @@ from django.db.models import Q
 
 from article.models import Article
 from storage.models import Storage
+from space.services import space_path
 from movement.services import MovementService, resolve_space
 from movement.session import get_state, save_state, reset
 
@@ -55,6 +56,30 @@ def _render_buffer(request, error="", success=""):
 @login_required(login_url='/accounts/login/')
 def movement(request):
     return render(request, "movement/movement.html", context=_buffer_context(request))
+
+
+@login_required(login_url='/accounts/login/')
+def where(request):
+    """'Where is...?' – current and default location of an article (§5b)."""
+    query = request.GET.get("q", "").strip()
+    article = None
+    results = []
+    if query:
+        if query.startswith("a0"):
+            article = Article.objects.filter(code__code=query).first()
+        else:
+            results = Article.objects.filter(
+                Q(base__name__contains=query) | Q(code__code__contains=query)
+            )[:20]
+
+    context = {
+        "query": query,
+        "article": article,
+        "results": results,
+        "current_path": space_path(article.stored) if article else "",
+        "default_path": space_path(article.standard_lagerplatz) if article and article.standard_lagerplatz else "",
+    }
+    return render(request, "movement/where.html", context=context)
 
 
 @login_required(login_url='/accounts/login/')

@@ -36,3 +36,26 @@ def parent_space(space):
     """The Space that contains `space` (via its owning article/storage), or None."""
     owner = getattr(space, "itemArticle", None) or getattr(space, "itemStorage", None)
     return getattr(owner, "stored", None)
+
+
+def storage_chain(storage):
+    """Names from the top-level storage down to `storage`."""
+    parts = []
+    while storage is not None:
+        parts.append(storage.name)
+        storage = storage.parent
+    return list(reversed(parts))
+
+
+def space_path(space):
+    """Human-readable breadcrumb for a Space, e.g. "Building A > Room 2 > Shelf 3"."""
+    articles = []
+    while space is not None:
+        owner = getattr(space, "itemArticle", None) or getattr(space, "itemStorage", None)
+        if owner is None:
+            break
+        if hasattr(owner, "parent"):  # Storage
+            return " > ".join(storage_chain(owner) + list(reversed(articles)))
+        articles.append(owner.base.name)
+        space = owner.stored
+    return " > ".join(reversed(articles))

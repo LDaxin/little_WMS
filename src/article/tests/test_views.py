@@ -183,6 +183,38 @@ class ArticleStoreRemoveTest(TestCase):
         self.assertFalse(Article.objects.filter(base__name="Zange").exists())
 
 
+class ArticleStoreToDefaultTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.article_base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.article_base)
+        cls.storage_type = StorageType.objects.create(name="Regal", symbol="RG")
+        cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_store_to_default(self):
+        self.article.standard_lagerplatz = self.storage.space
+        self.article.save()
+        response = self.client.post(f"/article/werkzeug/{self.article.pk}/store-default")
+        self.assertEqual(response.status_code, 200)
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.stored, self.storage.space)
+
+    def test_store_to_default_redirects(self):
+        self.article.standard_lagerplatz = self.storage.space
+        self.article.save()
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/store-default",
+            {"next": "/where/?q=" + self.article.code.code},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "/where/?q=" + self.article.code.code)
+
+
 class ArticleTagTest(TestCase):
     @classmethod
     def setUpTestData(cls):

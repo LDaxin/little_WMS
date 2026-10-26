@@ -54,6 +54,31 @@ class MovementViewTest(MovementTestBase):
         self.assertEqual(self.client.get("/movement/search/").status_code, 200)
 
 
+class WhereTest(MovementTestBase):
+    def test_page_returns_200(self):
+        self.assertEqual(self.client.get("/where/").status_code, 200)
+
+    def test_by_code(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        article.stored = self.storage.space
+        article.save()
+        response = self.client.get("/where/", {"q": article.code.code})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hammer")
+        self.assertContains(response, "Regal A")
+
+    def test_by_name(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        response = self.client.get("/where/", {"q": "Hammer"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, article.code.code)
+
+    def test_unknown(self):
+        response = self.client.get("/where/", {"q": "nope"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No article found")
+
+
 class MovementScanTest(MovementTestBase):
     def test_scan_storage_sets_target(self):
         self.scan(self.storage.code.code)

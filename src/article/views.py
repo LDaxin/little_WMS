@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from codeSystem.models import *
@@ -33,9 +33,7 @@ def article(request, typ, articleId):
             "code":p.code.code if p.code else "",
             "link":("/a/" + p.code.code) if p.code else "",
             "storeActions":True,
-            "location":p.stored,
-            "storeUrl":"./%s/store" % articleId,
-            "removeUrl":"./%s/remove" % articleId,
+            **_store_actions_context(p, "./%s/store" % articleId, "./%s/remove" % articleId),
             "tagChips":True,
             "tags":p.tags.all(),
             "allTags":Tag.objects.all(),
@@ -316,6 +314,8 @@ def _store_actions_context(article, storeUrl, removeUrl, error=""):
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
+        "defaultLocation": article.standard_lagerplatz,
+        "storeDefaultUrl": "./%s/store-default" % article.pk,
     }
 
 
@@ -345,6 +345,24 @@ def removeArticle(request, typ, articleId):
         MovementService.remove_article(article, request.user)
         return render(request, "hub/modules/storeActions.html",
                       context=_store_actions_context(article, storeUrl, removeUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def storeToDefault(request, typ, articleId):
+    article = Article.objects.get(pk=articleId)
+    storeUrl = "./%s/store" % articleId
+    removeUrl = "./%s/remove" % articleId
+    if request.method == "POST":
+        try:
+            MovementService.store_article(article, article.standard_lagerplatz, request.user)
+            error = ""
+        except ValidationError as e:
+            error = e.messages[0] if e.messages else str(e)
+        if request.POST.get("next"):
+            return redirect(request.POST["next"])
+        return render(request, "hub/modules/storeActions.html",
+                      context=_store_actions_context(article, storeUrl, removeUrl, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 

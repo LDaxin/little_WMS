@@ -4,6 +4,7 @@ from . import views
 
 urlpatterns = [
     path("movement/", views.movement, name="movement"),
+    path("where/", views.where, name="where"),
     path("movement/scan/", views.movementScan, name="movement scan"),
     path("movement/mode/", views.movementMode, name="movement mode"),
     path("movement/clear/", views.movementClear, name="movement clear"),
