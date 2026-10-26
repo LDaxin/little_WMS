@@ -93,6 +93,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **1.8** Locations: django-address, Plus Codes (§28)
 - **1.9** Article form: show only `field_config`-relevant fields, render custom fields (§4a–c)
 - **1.10** Store/Remove service + UI in article & storage views — **discuss in detail before implementing**
+- **1.11** Tag UI: chips with color/icon, add/remove in article & storage views
 
 ### Phase 2 – Core Operations
 
@@ -161,6 +162,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.8 Locations | ⬜ open |
 | 1 | 1.9 Article form (field_config + custom fields) | ⬜ open |
 | 1 | 1.10 Store/Remove service + UI (discuss first) | ⬜ open |
+| 1 | 1.11 Tag UI (chips, colors, add/remove) | ⬜ open |
 | 2 | 2.1 Movement Redesign | ⬜ open |
 | 2 | 2.2 QR Workflow | ⬜ open |
 | 2 | 2.3 Sets / Bundles | ⬜ open |
