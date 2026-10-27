@@ -254,7 +254,9 @@ def storeInStorage(request, typ, storageId):
                 return render(request, "hub/modules/storageContents.html",
                               context=_storage_contents_context(storage, storeUrl, removeUrl,
                                                                 warning=warning, forceCode=code))
-            MovementService.store_article(article, storage.space, request.user)
+            amount = request.POST.get("amount", "").strip()
+            amount = int(amount) if amount.isdigit() else None
+            MovementService.store_article(article, storage.space, request.user, amount=amount)
             error = ""
         except Article.DoesNotExist:
             error = "No article with that code"

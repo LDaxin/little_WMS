@@ -330,6 +330,7 @@ def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", f
         "storeError": error,
         "storeWarning": warning,
         "forceCode": forceCode,
+        "mergeable": article.base.pType.allow_merge_split,
         "defaultLocations": default_locations(article.base),
         "storeDefaultUrl": "./%s/store-default" % article.pk,
     }
@@ -349,7 +350,8 @@ def storeArticle(request, typ, articleId):
                 return render(request, "hub/modules/storeActions.html",
                               context=_store_actions_context(article, storeUrl, removeUrl,
                                                              warning=warning, forceCode=code))
-            MovementService.store_article(article, target, request.user)
+            amount = _int_or_none(request.POST.get("amount"))
+            MovementService.store_article(article, target, request.user, amount=amount)
             error = ""
         except ValidationError as e:
             error = e.messages[0] if e.messages else str(e)

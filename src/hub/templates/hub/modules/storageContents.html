@@ -26,6 +26,7 @@
         {% csrf_token %}
         <div class="input-group input-group-sm">
             <input id="storeCode" name="code" class="form-control" placeholder="Scan or enter article code">
+            <input name="amount" type="number" min="1" class="form-control" style="max-width:5rem" placeholder="Qty">
             {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl="./scanner/storeCode/toggle" %}
             <button type="submit" class="btn btn-success">Store here</button>
         </div>

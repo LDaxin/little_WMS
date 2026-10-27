@@ -98,3 +98,35 @@ class MovementServiceTest(TestCase):
         incoming.refresh_from_db()
         self.assertEqual(incoming.stored, self.storage.space)
         self.assertEqual(existing.menge, 1)
+
+    def test_store_partial_merges_into_existing(self):
+        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
+        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
+        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
+        source = Article.objects.create(base=base, menge=100)
+        MovementService.store_article(source, self.storage.space, amount=30)
+        existing.refresh_from_db()
+        source.refresh_from_db()
+        self.assertEqual(existing.menge, 80)
+        self.assertEqual(source.menge, 70)
+
+    def test_store_partial_creates_new_article(self):
+        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
+        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
+        source = Article.objects.create(base=base, menge=100)
+        MovementService.store_article(source, self.storage.space, amount=30)
+        source.refresh_from_db()
+        self.assertEqual(source.menge, 70)
+        part = Article.objects.get(stored=self.storage.space, base=base)
+        self.assertEqual(part.menge, 30)
+        self.assertNotEqual(part.pk, source.pk)
+
+    def test_store_full_amount_merges_all(self):
+        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
+        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
+        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
+        source = Article.objects.create(base=base, menge=30)
+        MovementService.store_article(source, self.storage.space, amount=30)
+        existing.refresh_from_db()
+        self.assertEqual(existing.menge, 80)
+        self.assertFalse(Article.objects.all().filter(pk=source.pk).exists())

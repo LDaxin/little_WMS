@@ -34,12 +34,28 @@ class MovementService:
     """Storing and removing articles – shared by views and (later) the API."""
 
     @staticmethod
-    def store_article(article, target_space, user=None):
+    def _split_off(article, target_space, amount):
+        """Create a copy of ``article`` holding ``amount`` in ``target_space``."""
+        from article.models import Article
+
+        part = Article.objects.get(pk=article.pk)
+        part.pk = None
+        part.code = None
+        part.space = None
+        part.stored = target_space
+        part.menge = amount
+        part.save()
+        part.tags.set(article.tags.all())
+        return part
+
+    @staticmethod
+    def store_article(article, target_space, user=None, amount=None):
         """Store/move an article into ``target_space``.
 
         A merge/split article (§4d) merges with an article of the same base that
         is already in the target: quantities add up, the incoming article is
-        soft-deleted.
+        soft-deleted. With ``amount`` a partial quantity is stored: the stored
+        part merges into the target, the rest stays with the article.
         """
         from article.models import Article
 
@@ -51,12 +67,28 @@ class MovementService:
         if not ok:
             raise ValidationError(reason)
 
-        if article.base.pType.allow_merge_split:
+        mergeable = article.base.pType.allow_merge_split
+        total = article.menge or 1
+
+        if mergeable and amount is not None and 0 < amount < total:
+            # split: keep the rest, store `amount`
+            article.menge = total - amount
+            article.save()
             existing = Article.objects.filter(
                 stored=target_space, base=article.base
             ).exclude(pk=article.pk).first()
             if existing is not None:
-                existing.menge = (existing.menge or 1) + (article.menge or 1)
+                existing.menge = (existing.menge or 1) + amount
+                existing.save()
+                return existing
+            return MovementService._split_off(article, target_space, amount)
+
+        if mergeable:
+            existing = Article.objects.filter(
+                stored=target_space, base=article.base
+            ).exclude(pk=article.pk).first()
+            if existing is not None:
+                existing.menge = (existing.menge or 1) + total
                 existing.save()
                 article.delete()
                 return existing
