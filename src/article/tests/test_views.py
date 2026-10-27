@@ -414,6 +414,10 @@ class ArticleConsumeTest(TestCase):
         self.user = User.objects.create_user(username="tester", password="pw")
         self.client.login(username="tester", password="pw")
 
+    def test_mergeable_article_shows_amount_input(self):
+        response = self.client.get(f"/article/perlen/{self.article.pk}")
+        self.assertContains(response, 'name="amount"')
+
     def test_update_article_menge_zero_deletes(self):
         response = self.client.post(
             f"/article/perlen/{self.article.pk}/update",
