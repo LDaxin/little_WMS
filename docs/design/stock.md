@@ -68,9 +68,9 @@ migration then moves `Article.stored`/`menge` into `Stock`.
 ## Decisions
 
 - `Article.amount` (legacy `CharField`) — **removed**.
-- `mindestbestand` — **global** on `Article`, plus **per location** via the
-  composition (`mindestmenge`). The two hint each other; a button sets the global
-  minimum to the sum of the location minima.
+- `mindestbestand` — **global on `ArticleBase`** (a property of the kind), plus
+  **per location** via the composition (`mindestmenge`). The two hint each other;
+  a button sets the global minimum to the sum of the location minima.
 - The movement buffer holds `Article`s (identity); the store resolves the `Stock`.
 - "Not stored" — a `Stock` with `stored = None` (not "no row"), and it triggers
   the hints.
