@@ -176,7 +176,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.3c Composition UI | ✅ done |
 | 2 | 2.3d Consume + menge=0 | ✅ done |
 | 2 | 2.3e Merge on store | ✅ done |
-| 2 | 2.3f Partial store / split | ⬜ open |
+| 2 | 2.3f Partial store / split | ✅ done |
 | 2 | 2.4 Audit Log | ⬜ open |
 | 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
