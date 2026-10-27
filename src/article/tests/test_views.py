@@ -447,3 +447,43 @@ class ArticleConsumeTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.article.stocks.get(stored=None).menge, 3)
+
+
+class GlobalMinimumViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(
+            name="Box", symbol="BX", article_toggle_space=True
+        )
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="a0", active=True)
+        cls.other = Space.objects.create(prefix="s0")
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_set_global_minimum_from_locations(self):
+        item = CompositionItem.objects.create(space=self.space, base=self.base, mindestmenge=3)
+        CompositionItem.objects.create(space=self.other, base=self.base, mindestmenge=4)
+        response = self.client.post(f"/composition/{self.space.pk}/set-global/{item.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.base.refresh_from_db()
+        self.assertEqual(self.base.mindestbestand, 7)
+
+
+class NotStoredTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.base)
+        Stock.objects.create(article=cls.article, stored=None, menge=2)
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_not_stored_hint(self):
+        response = self.client.get(f"/article/werkzeug/{self.article.pk}")
+        self.assertContains(response, "Not stored: 2")

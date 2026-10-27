@@ -7,9 +7,17 @@
             <span class="small">
                 {% if row.soll is not None %}Soll {{ row.soll }}{% else %}any{% endif %} / Ist {{ row.ist }}
                 {% if row.min is not None %}· min {{ row.min }}{% endif %}
+                {% if row.min_sum %}· Σ min {{ row.min_sum }}{% endif %}
+                {% if row.global is not None %}· global {{ row.global }}{% endif %}
                 {% if row.over %}<span class="text-danger">· over-allocated ({{ row.available }} available)</span>{% endif %}
                 {% if row.refill %}<span class="text-danger">· refill</span>{% endif %}
             </span>
+            {% if row.min_sum and row.global != row.min_sum %}
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    hx-post="{{ compositionGlobalUrl }}/{{ row.item.pk }}"
+                    hx-target="#composition" hx-swap="outerHTML"
+                    title="Set the global minimum to the sum of the location minimums">Σ min → global</button>
+            {% endif %}
             <button type="button" class="btn-close" aria-label="Remove"
                     hx-post="{{ compositionRemoveUrl }}/{{ row.item.pk }}"
                     hx-confirm="Remove {{ row.item.base.name }} from the composition?"

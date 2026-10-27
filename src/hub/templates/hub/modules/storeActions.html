@@ -13,6 +13,9 @@
     {% else %}
     <span class="badge text-bg-secondary">Not stored</span>
     {% endif %}
+    {% if not_stored %}
+    <div class="small text-warning mt-1">Not stored: {{ not_stored }} — no location assigned.</div>
+    {% endif %}
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}

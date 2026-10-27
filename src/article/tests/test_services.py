@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, CompositionItem, Stock
-from article.services import actual_quantity, allocation, composition_status, consume, default_locations
+from article.services import actual_quantity, allocation, composition_status, consume, default_locations, location_minimum_sum
 from space.models import Space
 
 
@@ -86,6 +86,28 @@ class DefaultLocationsTest(TestCase):
         CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
         CompositionItem.objects.create(space=other, base=self.base, soll_menge=12)
         self.assertEqual(set(default_locations(self.base)), {self.space, other})
+
+
+class MinimumTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="s0")
+        cls.other = Space.objects.create(prefix="s0")
+
+    def test_location_minimum_sum(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, mindestmenge=3)
+        CompositionItem.objects.create(space=self.other, base=self.base, mindestmenge=4)
+        self.assertEqual(location_minimum_sum(self.base), 7)
+
+    def test_status_reports_global_and_min_sum(self):
+        self.base.mindestbestand = 5
+        self.base.save()
+        CompositionItem.objects.create(space=self.space, base=self.base, mindestmenge=3)
+        row = composition_status(self.space)[0]
+        self.assertEqual(row["global"], 5)
+        self.assertEqual(row["min_sum"], 3)
 
 
 class AllocationTest(TestCase):

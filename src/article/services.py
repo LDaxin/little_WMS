@@ -25,7 +25,8 @@ def composition_status(space):
     candidate for storing more. ``refill`` – below the minimum
     (``mindestmenge``). ``over`` – the base is over-allocated across all
     locations (more target than articles exist). All are False when the
-    respective value is blank.
+    respective value is blank. ``global`` is the base's global minimum,
+    ``min_sum`` the sum of all its per-location minimums.
     """
     status = []
     for item in space.composition.select_related("base"):
@@ -36,12 +37,21 @@ def composition_status(space):
             "ist": ist,
             "soll": item.soll_menge,
             "min": item.mindestmenge,
+            "global": item.base.mindestbestand,
+            "min_sum": location_minimum_sum(item.base),
             "available": alloc["available"],
             "over": alloc["over"],
             "underfilled": item.soll_menge is not None and ist < item.soll_menge,
             "refill": item.mindestmenge is not None and ist < item.mindestmenge,
         })
     return status
+
+
+def location_minimum_sum(base):
+    """Sum of the per-location minimums declared for ``base`` (§4d)."""
+    from article.models import CompositionItem
+
+    return sum(item.mindestmenge or 0 for item in CompositionItem.objects.filter(base=base))
 
 
 def allocation(base):

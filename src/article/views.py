@@ -12,7 +12,7 @@ import csv
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
-from article.services import default_locations, composition_status, actual_quantity
+from article.services import default_locations, composition_status, actual_quantity, location_minimum_sum
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -337,6 +337,7 @@ def updateArticle(request, typ, articleId):
 def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {
         "stocks": article.stocks.exclude(stored=None),
+        "not_stored": sum(s.menge for s in article.stocks.filter(stored=None)),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
@@ -474,6 +475,7 @@ def composition_context(space, error="", warning="", forceBase="", forceSoll="",
         "compositionStatus": composition_status(space),
         "compositionAddUrl": "/composition/%s/add" % space.pk,
         "compositionRemoveUrl": "/composition/%s/remove" % space.pk,
+        "compositionGlobalUrl": "/composition/%s/set-global" % space.pk,
         "compositionError": error,
         "compositionWarning": warning,
         "forceBase": forceBase,
@@ -538,6 +540,20 @@ def removeCompositionItem(request, spaceId, itemId):
     space = Space.objects.get(pk=spaceId)
     if request.method == "POST":
         CompositionItem.objects.filter(pk=itemId, space=space).delete()
+        return render(request, "hub/modules/composition.html",
+                      context=composition_context(space))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def setGlobalMinimum(request, spaceId, itemId):
+    """Set a base's global minimum to the sum of its per-location minimums (§4d)."""
+    space = Space.objects.get(pk=spaceId)
+    if request.method == "POST":
+        item = CompositionItem.objects.filter(pk=itemId, space=space).first()
+        if item is not None:
+            item.base.mindestbestand = location_minimum_sum(item.base)
+            item.base.save()
         return render(request, "hub/modules/composition.html",
                       context=composition_context(space))
     return HttpResponseNotFound('<h1>Page not found</h1>')

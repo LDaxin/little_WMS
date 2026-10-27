@@ -137,6 +137,9 @@ class ArticleBase(SoftDeleteObject, models.Model):
     size_class = models.CharField(max_length=2, choices=SIZE_CLASS_CHOICES, null=True, blank=True)
     attributes = models.JSONField(default=dict, blank=True)
 
+    # Global minimum for this kind of thing, independent of location (§4d).
+    mindestbestand = models.IntegerField(null=True, blank=True)
+
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
@@ -165,7 +168,6 @@ class Article(SoftDeleteObject, models.Model):
     kaufdatum = models.DateField(null=True, blank=True)
     ablaufdatum = models.DateField(null=True, blank=True)
     gewicht_gramm = models.IntegerField(null=True, blank=True)
-    mindestbestand = models.IntegerField(null=True, blank=True)
     notiz = models.TextField(blank=True)
     ist_verbrauchsartikel = models.BooleanField(default=False)
     mengeneinheit = models.CharField(max_length=20, blank=True)

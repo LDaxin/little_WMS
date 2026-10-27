@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     re_path(r'^composition/(?P<spaceId>[0-9]+)/add', views.addCompositionItem, name="add composition item"),
     re_path(r'^composition/(?P<spaceId>[0-9]+)/remove/(?P<itemId>[0-9]+)', views.removeCompositionItem, name="remove composition item"),
+    re_path(r'^composition/(?P<spaceId>[0-9]+)/set-global/(?P<itemId>[0-9]+)', views.setGlobalMinimum, name="set global minimum"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/update', views.updateArticle, name="update article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store-default', views.storeToDefault, name="store article to default"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store', views.storeArticle, name="store article"),
