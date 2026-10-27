@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, CompositionItem
-from article.services import actual_quantity, composition_status
+from article.services import actual_quantity, composition_status, default_locations
 from space.models import Space
 
 
@@ -56,3 +56,30 @@ class CompositionStatusTest(TestCase):
     def test_status_blank_min_no_refill(self):
         CompositionItem.objects.create(space=self.space, base=self.base)
         self.assertFalse(composition_status(self.space)[0]["refill"])
+
+
+class DefaultLocationsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="s0")
+
+    def test_underfilled_location_is_suggested(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
+        self.assertEqual(default_locations(self.base), [self.space])
+
+    def test_full_location_not_suggested(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base, stored=self.space)
+        self.assertEqual(default_locations(self.base), [])
+
+    def test_blank_soll_not_suggested(self):
+        CompositionItem.objects.create(space=self.space, base=self.base)
+        self.assertEqual(default_locations(self.base), [])
+
+    def test_multiple_underfilled_locations(self):
+        other = Space.objects.create(prefix="s0")
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
+        CompositionItem.objects.create(space=other, base=self.base, soll_menge=12)
+        self.assertEqual(set(default_locations(self.base)), {self.space, other})

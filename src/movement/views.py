@@ -9,6 +9,7 @@ from storage.models import Storage
 from space.services import space_path
 from movement.services import MovementService, resolve_space
 from movement.session import get_state, save_state, reset
+from article.services import default_locations
 
 # Create your views here.
 
@@ -77,7 +78,7 @@ def where(request):
         "article": article,
         "results": results,
         "current_path": space_path(article.stored) if article else "",
-        "default_path": space_path(article.standard_lagerplatz) if article and article.standard_lagerplatz else "",
+        "default_paths": [space_path(loc) for loc in default_locations(article.base)] if article else [],
     }
     return render(request, "movement/where.html", context=context)
 

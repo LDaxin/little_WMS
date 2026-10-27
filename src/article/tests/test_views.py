@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, CompositionItem
 from storage.models import Storage, StorageType
 from tag.models import Tag
 
@@ -197,22 +197,27 @@ class ArticleStoreToDefaultTest(TestCase):
         self.client.login(username="tester", password="pw")
 
     def test_store_to_default(self):
-        self.article.standard_lagerplatz = self.storage.space
-        self.article.save()
+        CompositionItem.objects.create(space=self.storage.space, base=self.article_base, soll_menge=1)
         response = self.client.post(f"/article/werkzeug/{self.article.pk}/store-default")
         self.assertEqual(response.status_code, 200)
         self.article.refresh_from_db()
         self.assertEqual(self.article.stored, self.storage.space)
 
     def test_store_to_default_redirects(self):
-        self.article.standard_lagerplatz = self.storage.space
-        self.article.save()
+        CompositionItem.objects.create(space=self.storage.space, base=self.article_base, soll_menge=1)
         response = self.client.post(
             f"/article/werkzeug/{self.article.pk}/store-default",
             {"next": "/where/?q=" + self.article.code.code},
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], "/where/?q=" + self.article.code.code)
+
+    def test_store_to_default_without_composition(self):
+        response = self.client.post(f"/article/werkzeug/{self.article.pk}/store-default")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No default location")
+        self.article.refresh_from_db()
+        self.assertIsNone(self.article.stored)
 
 
 class ArticleTagTest(TestCase):

@@ -31,3 +31,21 @@ def composition_status(space):
             "refill": item.mindestmenge is not None and ist < item.mindestmenge,
         })
     return status
+
+
+def default_locations(base):
+    """Locations whose composition mentions ``base`` and are underfilled.
+
+    Replaces ``Article.standard_lagerplatz``: the default location is derived
+    from the composition. A location with a blank ``soll_menge`` ("any amount")
+    is never suggested.
+    """
+    from article.models import CompositionItem
+
+    result = []
+    for item in CompositionItem.objects.filter(base=base).select_related("space"):
+        if item.soll_menge is None:
+            continue
+        if actual_quantity(item.space, base) < item.soll_menge:
+            result.append(item.space)
+    return result

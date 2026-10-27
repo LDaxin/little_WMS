@@ -100,7 +100,6 @@ class ArticleGlobalFieldsTest(TestCase):
         self.assertFalse(self.article.ist_verbrauchsartikel)
         self.assertIsNone(self.article.menge)
         self.assertIsNone(self.article.anschaffungswert)
-        self.assertIsNone(self.article.standard_lagerplatz)
         self.assertEqual(self.article.notiz, "")
 
     def test_article_base_catalog_defaults(self):

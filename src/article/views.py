@@ -11,6 +11,7 @@ import csv
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
+from article.services import default_locations
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -314,7 +315,7 @@ def _store_actions_context(article, storeUrl, removeUrl, error=""):
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
-        "defaultLocation": article.standard_lagerplatz,
+        "defaultLocations": default_locations(article.base),
         "storeDefaultUrl": "./%s/store-default" % article.pk,
     }
 
@@ -354,11 +355,15 @@ def storeToDefault(request, typ, articleId):
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
-        try:
-            MovementService.store_article(article, article.standard_lagerplatz, request.user)
-            error = ""
-        except ValidationError as e:
-            error = e.messages[0] if e.messages else str(e)
+        targets = default_locations(article.base)
+        if not targets:
+            error = "No default location"
+        else:
+            try:
+                MovementService.store_article(article, targets[0], request.user)
+                error = ""
+            except ValidationError as e:
+                error = e.messages[0] if e.messages else str(e)
         if request.POST.get("next"):
             return redirect(request.POST["next"])
         return render(request, "hub/modules/storeActions.html",

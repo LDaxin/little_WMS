@@ -9,9 +9,10 @@
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}
-    {% if defaultLocation %}
-    <div class="small mt-1">Default: {{ defaultLocation }}
-        {% if location != defaultLocation %}
+    {% if defaultLocations %}
+    <div class="small mt-1">Default:
+        {% for loc in defaultLocations %}{{ loc }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        {% if location not in defaultLocations %}
         <button type="button" class="btn btn-sm btn-outline-success"
                 hx-post="{{ storeDefaultUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Store to default</button>
         {% endif %}
