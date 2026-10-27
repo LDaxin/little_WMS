@@ -103,7 +103,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **2.3b** Default location via composition (§5b)
 - **2.3c** Composition UI (§4d)
 - **2.3d** Consume + `menge=0` (§4d)
-- **2.3e** Merge articles (§4d)
+- **2.3e** Merge on store (§4d)
+- **2.3f** Partial store / split (§4d)
 - **2.4** Audit Log (§32)
 - **2.5** Inventory Mode (§5c)
 
@@ -174,7 +175,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.3b Default location via composition | ✅ done |
 | 2 | 2.3c Composition UI | ✅ done |
 | 2 | 2.3d Consume + menge=0 | ✅ done |
-| 2 | 2.3e Merge articles | ⬜ open |
+| 2 | 2.3e Merge on store | ✅ done |
+| 2 | 2.3f Partial store / split | ⬜ open |
 | 2 | 2.4 Audit Log | ⬜ open |
 | 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
