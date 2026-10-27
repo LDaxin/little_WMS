@@ -1,6 +1,8 @@
+from django.db import IntegrityError
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, CompositionItem
+from space.models import Space
 
 
 def assert_soft_delete_cycle(testcase, obj, model):
@@ -108,3 +110,21 @@ class ArticleGlobalFieldsTest(TestCase):
 
     def test_article_type_allow_merge_split_default(self):
         self.assertFalse(self.article_type.allow_merge_split)
+
+
+class CompositionItemModelTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="s0")
+
+    def test_creation(self):
+        item = CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
+        self.assertEqual(item.soll_menge, 12)
+        self.assertIsNone(item.mindestmenge)
+
+    def test_unique_together(self):
+        CompositionItem.objects.create(space=self.space, base=self.base)
+        with self.assertRaises(IntegrityError):
+            CompositionItem.objects.create(space=self.space, base=self.base)

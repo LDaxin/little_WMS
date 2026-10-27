@@ -185,4 +185,22 @@ class Article(SoftDeleteObject, models.Model):
 
     def __str__(self, *args, **kwargs):
         return self.base.name + " " + self.code.code
-    
+
+
+class CompositionItem(models.Model):
+    """What a storage location should contain (§4d, docs/design/composition.md).
+
+    ``soll_menge`` blank means "any amount" (no check); ``mindestmenge`` blank
+    means "no minimum" (never a refill hint).
+    """
+
+    space = models.ForeignKey(Space, on_delete=models.CASCADE, related_name="composition")
+    base = models.ForeignKey(ArticleBase, on_delete=models.CASCADE, related_name="composition_items")
+    soll_menge = models.IntegerField(null=True, blank=True)
+    mindestmenge = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("space", "base")
+
+    def __str__(self):
+        return "%s in %s" % (self.base.name, self.space)
