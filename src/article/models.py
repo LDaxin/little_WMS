@@ -154,14 +154,10 @@ class Article(SoftDeleteObject, models.Model):
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
     base = models.ForeignKey(ArticleBase, on_delete=models.CASCADE, blank=True, null=False)
-    #The place where the article is stored
-    stored = models.ForeignKey(Space, related_name= "space", on_delete = models.SET_NULL, null=True, blank=True)
     #the storage space where other articles can be stored in the Article
     space = models.OneToOneField(Space, on_delete = models.CASCADE, related_name = "itemArticle", null=True, blank=True)
     #the unique code for the article
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
-
-    amount = models.CharField(max_length=20, null = True, blank = True)
 
     # Global fields (every article has them)
     zustand = models.CharField(max_length=20, choices=ZUSTAND_CHOICES, default="gut")
@@ -172,7 +168,6 @@ class Article(SoftDeleteObject, models.Model):
     mindestbestand = models.IntegerField(null=True, blank=True)
     notiz = models.TextField(blank=True)
     ist_verbrauchsartikel = models.BooleanField(default=False)
-    menge = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     mengeneinheit = models.CharField(max_length=20, blank=True)
 
     # Custom field values for article-level fields (§25)
@@ -192,6 +187,24 @@ class Article(SoftDeleteObject, models.Model):
 
     def __str__(self, *args, **kwargs):
         return self.base.name + " " + self.code.code
+
+
+class Stock(models.Model):
+    """A quantity of an ``Article`` at a location (docs/design/stock.md).
+
+    An ``Article`` is the identity; a ``Stock`` is how much of it sits where.
+    ``stored`` is ``None`` for the "not stored" pile. One line per location.
+    """
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="stocks")
+    stored = models.ForeignKey(Space, on_delete=models.SET_NULL, null=True, blank=True, related_name="stocks")
+    menge = models.DecimalField(max_digits=10, decimal_places=2, default=1)
+
+    class Meta:
+        unique_together = ("article", "stored")
+
+    def __str__(self):
+        return "%s @ %s x%s" % (self.article, self.stored or "—", self.menge)
 
 
 class CompositionItem(models.Model):
