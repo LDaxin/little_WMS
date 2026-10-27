@@ -37,6 +37,7 @@ LOGIN_REDIRECT_URL = "/"
 
 INSTALLED_APPS = [
     "organisation.apps.OrganisationConfig",
+    "audit.apps.AuditConfig",
     "hub.apps.HubConfig",
     "location.apps.LocationConfig",
     "article.apps.ArticleConfig",

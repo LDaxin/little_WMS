@@ -13,6 +13,10 @@ from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
 from article.services import default_locations, composition_status, actual_quantity, location_minimum_sum
+from django.contrib.contenttypes.models import ContentType
+from django.forms.models import model_to_dict
+from audit.models import AuditLog
+from audit.services import log as audit_log
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -41,6 +45,10 @@ def article(request, typ, articleId):
             "allTags":Tag.objects.all(),
             "tagAddUrl":"./%s/tags/add" % articleId,
             "tagRemoveUrl":"./%s/tags/remove" % articleId,
+            "auditTimeline":True,
+            "auditLogs":AuditLog.objects.filter(
+                content_type=ContentType.objects.get_for_model(Article),
+                object_id=p.pk)[:20],
         }
         if p.space and p.space.active:
             context.update(composition_context(p.space))
@@ -200,6 +208,7 @@ def addArticle(request, typ):
                 Stock.objects.create(
                     article=pa, stored=None, menge=_decimal(p.cleaned_data.get("menge")) or 1
                 )
+                audit_log("created", pa, request.user, {"name": base.name})
 
                 if target is not None:
                     MovementService.store_article(pa, target, request.user)
@@ -252,6 +261,7 @@ def delArticle(request, typ):
                         return render(request, "hub/modules/toast.html", context=context)
             for i in delList:
                 delListReturn = delListReturn + i.__str__() + " "
+                audit_log("deleted", i, request.user)
                 i.delete()
 
             context = {
@@ -285,6 +295,7 @@ def updateArticle(request, typ, articleId):
         return render(request, "hub/modules/toast.html", context=context)
     else:
         if request.method == "POST":
+            old_values = _snapshot(articleObject)
             articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base", article_type=articleTypeObject)
             articleForm =  FormChangeArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
 
@@ -304,6 +315,7 @@ def updateArticle(request, typ, articleId):
                 menge = _decimal(articleForm.cleaned_data.get("menge"))
                 if menge is not None and menge <= 0:
                     # menge 0 means "used up" (§4d)
+                    audit_log("deleted", article, request.user, {"reason": "menge 0"})
                     article.delete()
                     context = {
                         "toastName":"Delete",
@@ -313,6 +325,7 @@ def updateArticle(request, typ, articleId):
                     }
                     return render(request, "hub/modules/toast.html", context=context)
                 article.save()
+                audit_log("updated", article, request.user, _diff(old_values, _snapshot(article)))
                 if menge is not None:
                     stock, _ = Stock.objects.get_or_create(
                         article=article, stored=None, defaults={"menge": menge})
@@ -466,6 +479,15 @@ def _decimal(value):
         return Decimal(str(value))
     except (InvalidOperation, ValueError):
         return None
+
+
+def _snapshot(obj):
+    """Editable field values as strings, for change tracking (§32)."""
+    return {k: (None if v is None else str(v)) for k, v in model_to_dict(obj).items()}
+
+
+def _diff(old, new):
+    return {k: {"old": old.get(k), "new": v} for k, v in new.items() if old.get(k) != v}
 
 
 def composition_context(space, error="", warning="", forceBase="", forceSoll="", forceMin=""):

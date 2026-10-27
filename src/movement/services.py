@@ -7,6 +7,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
+from audit.services import log
 from space.services import can_store, max_storage_depth
 
 
@@ -72,6 +73,7 @@ class MovementService:
                     source.delete()
                 else:
                     source.save()
+            log("moved", article, user, {"to": str(target_space), "amount": float(qty)})
         else:
             stock = article.stocks.first()
             if stock is None:
@@ -80,6 +82,7 @@ class MovementService:
                 stock.stored = target_space
                 stock.menge = 1
                 stock.save()
+            log("moved", article, user, {"to": str(target_space)})
         return article
 
     @staticmethod
@@ -106,6 +109,8 @@ class MovementService:
         )
         source.menge += stock.menge
         source.save()
+        changes = {"from": str(stock.stored), "amount": float(stock.menge)}
         stock.delete()
+        log("removed", article, user, changes)
         return article
 
