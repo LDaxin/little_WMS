@@ -99,7 +99,10 @@ Format: `type: what` (e.g. `add: article model tests`)
 
 - **2.1** Movement Redesign (§11)
 - **2.2** QR Workflow + Sheet Printing (§5)
-- **2.3** Sets / Bundles (§4d)
+- **2.3a** Composition model + status (§4d)
+- **2.3b** Default location via composition (§5b)
+- **2.3c** Composition UI (§4d)
+- **2.3d** Merge / consume + `menge=0` (§4d)
 - **2.4** Audit Log (§32)
 - **2.5** Inventory Mode (§5c)
 
@@ -166,7 +169,10 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 1 | 1.11 Tag UI (chips, colors, add/remove) | ✅ done |
 | 2 | 2.1 Movement Redesign | ✅ done |
 | 2 | 2.2 QR Workflow + Sheet Printing | ✅ done |
-| 2 | 2.3 Sets / Bundles | ⬜ open |
+| 2 | 2.3a Composition model + status | ⬜ open |
+| 2 | 2.3b Default location via composition | ⬜ open |
+| 2 | 2.3c Composition UI | ⬜ open |
+| 2 | 2.3d Merge / consume + menge=0 | ⬜ open |
 | 2 | 2.4 Audit Log | ⬜ open |
 | 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
@@ -205,3 +211,4 @@ Format: `type: what` (e.g. `add: article model tests`)
 - The existing system is already in use – Phase 0 protects it.
 - **2.1** covers the core Movement redesign (service layer, HTMX, two modes, location-first, smart container default, quick actions, atomic store/remove). The remaining §11 features – Undo (two levels), session list, sound/haptic feedback and their settings – are deferred: they build on `AuditLog` (§32, step **2.4**) and the settings work in later phases.
 - **2.2** covers QR sheet printing (§5a: format, size, label, QR content, sorting, printable HTML, storage sheets) and the "Where is...?" / "Where should it go?" workflow (§5b). Deferred: live preview, PDF download, sorting by location/type and selection via Query Builder (§9); "last movement" info needs `AuditLog` (§32). Inventory mode (§5c) is split out into step **2.5**.
+- **2.3** is reworked around a **composition** on the storage location instead of a separate set model: a `Space` declares `(ArticleBase, soll_menge, mindestmenge)`. This replaces `standard_lagerplatz` (default location becomes a reverse lookup) and models sets as containers with a composition. See [`docs/design/composition.md`](design/composition.md).
