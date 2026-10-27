@@ -4,6 +4,7 @@ from .forms import *
 from .models import *
 from codeSystem.models import *
 from article.models import Article
+from article.views import composition_context, composition_warning
 from tag.models import Tag
 from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
@@ -38,6 +39,7 @@ def storage(request, typ, storageId):
                 "tagAddUrl":"./%s/tags/add" % storageId,
                 "tagRemoveUrl":"./%s/tags/remove" % storageId,
             }
+            context.update(composition_context(storageObject.space))
             return render(request, "hub/modules/item.html", context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
@@ -227,12 +229,14 @@ def updateStorage(request, storageId, typ):
         return render(request, "hub/modules/toast.html", context=context)
 
 
-def _storage_contents_context(storage, storeUrl, removeUrl, error=""):
+def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {
         "contents": Article.objects.filter(stored=storage.space),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
+        "storeWarning": warning,
+        "forceCode": forceCode,
     }
 
 
@@ -242,8 +246,14 @@ def storeInStorage(request, typ, storageId):
     storeUrl = "./%s/store" % storageId
     removeUrl = "./%s/remove" % storageId
     if request.method == "POST":
+        code = request.POST.get("code", "")
         try:
-            article = Article.objects.get(code__code=request.POST.get("code", ""))
+            article = Article.objects.get(code__code=code)
+            warning = composition_warning(storage.space, article)
+            if warning and not request.POST.get("force"):
+                return render(request, "hub/modules/storageContents.html",
+                              context=_storage_contents_context(storage, storeUrl, removeUrl,
+                                                                warning=warning, forceCode=code))
             MovementService.store_article(article, storage.space, request.user)
             error = ""
         except Article.DoesNotExist:

@@ -11,7 +11,7 @@ import csv
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
-from article.services import default_locations
+from article.services import default_locations, composition_status, actual_quantity
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -41,6 +41,8 @@ def article(request, typ, articleId):
             "tagAddUrl":"./%s/tags/add" % articleId,
             "tagRemoveUrl":"./%s/tags/remove" % articleId,
         }
+        if p.space and p.space.active:
+            context.update(composition_context(p.space))
         return render(request, "hub/modules/item.html", context=context)
     else:
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
@@ -309,12 +311,14 @@ def updateArticle(request, typ, articleId):
         }
         return render(request, "hub/modules/toast.html", context=context)
 
-def _store_actions_context(article, storeUrl, removeUrl, error=""):
+def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {
         "location": article.stored,
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
+        "storeWarning": warning,
+        "forceCode": forceCode,
         "defaultLocations": default_locations(article.base),
         "storeDefaultUrl": "./%s/store-default" % article.pk,
     }
@@ -326,8 +330,14 @@ def storeArticle(request, typ, articleId):
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
+        code = request.POST.get("code", "")
         try:
-            target = resolve_space(request.POST.get("code", ""))
+            target = resolve_space(code)
+            warning = composition_warning(target, article)
+            if warning and not request.POST.get("force"):
+                return render(request, "hub/modules/storeActions.html",
+                              context=_store_actions_context(article, storeUrl, removeUrl,
+                                                             warning=warning, forceCode=code))
             MovementService.store_article(article, target, request.user)
             error = ""
         except ValidationError as e:
@@ -408,6 +418,70 @@ def removeArticleTag(request, typ, articleId, tagId):
         article.tags.remove(Tag.objects.get(pk=tagId))
         return render(request, "hub/modules/tagChips.html",
                       context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def _int_or_none(value):
+    value = (value or "").strip()
+    if value == "":
+        return None
+    try:
+        return int(value)
+    except ValueError:
+        return None
+
+
+def composition_context(space, error=""):
+    """Context for the composition editor (§4d)."""
+    return {
+        "showComposition": True,
+        "compositionStatus": composition_status(space),
+        "compositionAddUrl": "/composition/%s/add" % space.pk,
+        "compositionRemoveUrl": "/composition/%s/remove" % space.pk,
+        "compositionError": error,
+        "allBases": ArticleBase.objects.all(),
+    }
+
+
+def composition_warning(target_space, article):
+    """Warning when the target already holds enough of the article's base (§4d)."""
+    item = CompositionItem.objects.filter(space=target_space, base=article.base).first()
+    if item is None or item.soll_menge is None:
+        return ""
+    ist = actual_quantity(target_space, article.base)
+    if ist >= item.soll_menge:
+        return "Already enough %s here (Soll %s / Ist %s)" % (article.base.name, item.soll_menge, ist)
+    return ""
+
+
+@login_required(login_url='/accounts/login/')
+def addCompositionItem(request, spaceId):
+    space = Space.objects.get(pk=spaceId)
+    if request.method == "POST":
+        name = request.POST.get("base", "").strip()
+        base = ArticleBase.objects.filter(name__iexact=name).first()
+        error = ""
+        if base is None:
+            error = "No article base named %s" % name
+        else:
+            CompositionItem.objects.update_or_create(
+                space=space, base=base,
+                defaults={
+                    "soll_menge": _int_or_none(request.POST.get("soll")),
+                    "mindestmenge": _int_or_none(request.POST.get("min")),
+                })
+        return render(request, "hub/modules/composition.html",
+                      context=composition_context(space, error))
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+def removeCompositionItem(request, spaceId, itemId):
+    space = Space.objects.get(pk=spaceId)
+    if request.method == "POST":
+        CompositionItem.objects.filter(pk=itemId, space=space).delete()
+        return render(request, "hub/modules/composition.html",
+                      context=composition_context(space))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 

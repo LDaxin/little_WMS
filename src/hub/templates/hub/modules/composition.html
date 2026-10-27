@@ -1,0 +1,35 @@
+<div id="composition" class="p-2 border rounded mb-2">
+    <h6>Composition</h6>
+    <ul class="list-group list-group-flush">
+        {% for row in compositionStatus %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>{{ row.item.base.name }}</span>
+            <span class="small">
+                {% if row.soll is not None %}Soll {{ row.soll }}{% else %}any{% endif %} / Ist {{ row.ist }}
+                {% if row.min is not None %}· min {{ row.min }}{% endif %}
+                {% if row.refill %}<span class="text-danger">refill</span>{% endif %}
+            </span>
+            <button type="button" class="btn-close" aria-label="Remove"
+                    hx-post="{{ compositionRemoveUrl }}/{{ row.item.pk }}"
+                    hx-target="#composition" hx-swap="outerHTML"></button>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No composition</li>
+        {% endfor %}
+    </ul>
+    {% if compositionError %}
+    <div class="text-danger small mt-1">{{ compositionError }}</div>
+    {% endif %}
+    <form class="mt-2" hx-post="{{ compositionAddUrl }}" hx-target="#composition" hx-swap="outerHTML">
+        {% csrf_token %}
+        <div class="input-group input-group-sm">
+            <input name="base" class="form-control" list="baseOptions" placeholder="Article base">
+            <datalist id="baseOptions">
+                {% for b in allBases %}<option value="{{ b.name }}"></option>{% endfor %}
+            </datalist>
+            <input name="soll" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="Soll">
+            <input name="min" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="Min">
+            <button type="submit" class="btn btn-success">Add</button>
+        </div>
+    </form>
+</div>

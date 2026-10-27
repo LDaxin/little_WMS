@@ -9,6 +9,13 @@
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}
+    {% if storeWarning %}
+    <div class="text-warning small mt-1">{{ storeWarning }}
+        <button type="button" class="btn btn-sm btn-outline-warning"
+                hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ forceCode }}", "force": "1"}'
+                hx-target="#storeActions" hx-swap="outerHTML">Store anyway</button>
+    </div>
+    {% endif %}
     {% if defaultLocations %}
     <div class="small mt-1">Default:
         {% for loc in defaultLocations %}{{ loc }}{% if not forloop.last %}, {% endif %}{% endfor %}

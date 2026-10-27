@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, CompositionItem
+from space.models import Space
 from storage.models import Storage, StorageType
 from tag.models import Tag
 
@@ -254,3 +255,97 @@ class ArticleTagTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.article.tags.count(), 0)
+
+
+class CompositionViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="s0")
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_add_composition_item(self):
+        response = self.client.post(
+            f"/composition/{self.space.pk}/add",
+            {"base": "Hering", "soll": "12", "min": "3"},
+        )
+        self.assertEqual(response.status_code, 200)
+        item = CompositionItem.objects.get(space=self.space, base=self.base)
+        self.assertEqual(item.soll_menge, 12)
+        self.assertEqual(item.mindestmenge, 3)
+
+    def test_add_composition_item_blank_values(self):
+        response = self.client.post(
+            f"/composition/{self.space.pk}/add",
+            {"base": "Hering", "soll": "", "min": ""},
+        )
+        self.assertEqual(response.status_code, 200)
+        item = CompositionItem.objects.get(space=self.space, base=self.base)
+        self.assertIsNone(item.soll_menge)
+        self.assertIsNone(item.mindestmenge)
+
+    def test_add_composition_item_unknown_base(self):
+        response = self.client.post(
+            f"/composition/{self.space.pk}/add",
+            {"base": "nope", "soll": "1", "min": ""},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No article base named")
+        self.assertEqual(self.space.composition.count(), 0)
+
+    def test_remove_composition_item(self):
+        item = CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
+        response = self.client.post(f"/composition/{self.space.pk}/remove/{item.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.space.composition.count(), 0)
+
+
+class CompositionWarningTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.base)
+        cls.storage_type = StorageType.objects.create(name="Regal", symbol="RG")
+        cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_store_into_full_location_warns(self):
+        CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base, stored=self.storage.space)
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/store",
+            {"code": self.storage.code.code},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Already enough")
+        self.article.refresh_from_db()
+        self.assertIsNone(self.article.stored)
+
+    def test_store_into_full_location_forced(self):
+        CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base, stored=self.storage.space)
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/store",
+            {"code": self.storage.code.code, "force": "1"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.stored, self.storage.space)
+
+    def test_store_into_underfilled_location_no_warning(self):
+        CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=12)
+        response = self.client.post(
+            f"/article/werkzeug/{self.article.pk}/store",
+            {"code": self.storage.code.code},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.stored, self.storage.space)

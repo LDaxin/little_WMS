@@ -15,6 +15,13 @@
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}
+    {% if storeWarning %}
+    <div class="text-warning small mt-1">{{ storeWarning }}
+        <button type="button" class="btn btn-sm btn-outline-warning"
+                hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ forceCode }}", "force": "1"}'
+                hx-target="#storageContents" hx-swap="outerHTML">Store anyway</button>
+    </div>
+    {% endif %}
     <form class="mt-2" hx-post="{{ storeUrl }}" hx-target="#storageContents" hx-swap="outerHTML">
         {% csrf_token %}
         <div class="input-group input-group-sm">
