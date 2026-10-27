@@ -294,7 +294,18 @@ def updateArticle(request, typ, articleId):
                 return render(request, "hub/modules/toast.html", context=context)
 
             if articleForm.is_valid():
-                articleForm.save()
+                article = articleForm.save(commit=False)
+                if article.menge == 0:
+                    # menge 0 means "used up" (§4d)
+                    article.delete()
+                    context = {
+                        "toastName":"Delete",
+                        "toastId":"successToast",
+                        "toastText":"article was deleted (menge 0)",
+                        "toastType":"status"
+                    }
+                    return render(request, "hub/modules/toast.html", context=context)
+                article.save()
 
             context = {
                 "toastName":"Update",

@@ -374,3 +374,46 @@ class CompositionWarningTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.article.refresh_from_db()
         self.assertEqual(self.article.stored, self.storage.space)
+
+
+class ArticleConsumeTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(
+            name="Perlen", symbol="PR", allow_merge_split=True
+        )
+        cls.article_base = ArticleBase.objects.create(name="Bügelperle", pType=cls.article_type)
+        cls.article = Article.objects.create(base=cls.article_base, menge=5)
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_update_article_menge_zero_deletes(self):
+        response = self.client.post(
+            f"/article/perlen/{self.article.pk}/update",
+            {
+                "base-name": "Bügelperle",
+                "article-amount": "",
+                "article-stored": "",
+                "article-zustand": "gut",
+                "article-menge": "0",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Article.objects.all().filter(pk=self.article.pk).exists())
+
+    def test_update_article_menge_kept(self):
+        response = self.client.post(
+            f"/article/perlen/{self.article.pk}/update",
+            {
+                "base-name": "Bügelperle",
+                "article-amount": "",
+                "article-stored": "",
+                "article-zustand": "gut",
+                "article-menge": "3",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.menge, 3)

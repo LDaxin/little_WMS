@@ -61,4 +61,12 @@
         width: "100%",
         placeholder: "Select patent"
     });
+    document.body.addEventListener("htmx:confirm", function (e) {
+        if (e.detail.elt && e.detail.elt.id === "{{actionType}}Button") {
+            var menge = document.querySelector("[name$='-menge']");
+            if (menge && menge.value === "0" && !confirm("Setting menge to 0 deletes the article. Continue?")) {
+                e.preventDefault();
+            }
+        }
+    });
 </script>

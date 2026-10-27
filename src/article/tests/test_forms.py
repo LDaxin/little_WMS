@@ -124,3 +124,29 @@ class ArticleFormTest(TestCase):
         form.save()
         self.article_base.refresh_from_db()
         self.assertNotIn("farbe", self.article_base.attributes)
+
+
+class MergeSplitFormTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.no_merge = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.merge = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.no_merge)
+
+    def test_menge_hidden_without_merge_split(self):
+        self.assertNotIn("menge", FormArticle(article_type=self.no_merge).fields)
+
+    def test_menge_visible_with_merge_split(self):
+        self.assertIn("menge", FormArticle(article_type=self.merge).fields)
+
+    def test_menge_forced_to_one_without_merge_split(self):
+        article = Article.objects.create(base=self.base, menge=5)
+        form = FormArticle(
+            {"zustand": "gut", "notiz": "", "menge": "5"},
+            instance=article,
+            article_type=self.no_merge,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+        article.refresh_from_db()
+        self.assertEqual(article.menge, 1)

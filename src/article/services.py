@@ -51,6 +51,19 @@ def allocation(base):
     return {"soll": total_soll, "available": available, "over": total_soll > available}
 
 
+def consume(article, amount=1):
+    """Reduce an article's quantity; soft-delete it when it reaches 0 (§4d).
+
+    The single choke point for consuming a consumable.
+    """
+    article.menge = (article.menge or 1) - amount
+    if article.menge <= 0:
+        article.delete()
+    else:
+        article.save()
+    return article
+
+
 def default_locations(base):
     """Locations whose composition mentions ``base`` and are underfilled.
 

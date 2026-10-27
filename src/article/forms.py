@@ -44,6 +44,10 @@ class CustomFieldsMixin:
         if article_type is None:
             return
 
+        # merge/split: without it an article is always a single item (§4d)
+        if not article_type.allow_merge_split:
+            self.fields.pop("menge", None)
+
         # field_config: hide/require global fields for this article type
         for name, config in (article_type.field_config or {}).items():
             if name not in self.fields:
@@ -66,6 +70,8 @@ class CustomFieldsMixin:
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        if self.article_type is not None and not self.article_type.allow_merge_split and hasattr(instance, "menge"):
+            instance.menge = 1
         if self.custom_field_names:
             attributes = dict(instance.attributes or {})
             for name in self.custom_field_names:
