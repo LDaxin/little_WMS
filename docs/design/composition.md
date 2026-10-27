@@ -52,6 +52,18 @@ free of `article` imports.
 | Ist >= Soll | **"already enough"** → info + decision when storing anyway |
 | Ist < Min | **"should be refilled"** hint |
 
+## Over-allocation
+
+The targets of all locations are compared against the articles that exist:
+`sum(soll_menge)` for a base vs the number of articles of that base. If more is
+allocated than exists, not every location can be filled.
+
+- **Editing (A):** setting a target that over-allocates shows a warning and asks
+  for confirmation ("Add anyway").
+- **Display (C):** an over-allocated row is marked ("over-allocated (N available)").
+
+Removing a composition item asks for confirmation.
+
 ## Default location (replaces `standard_lagerplatz`)
 
 `Article.standard_lagerplatz` is removed. The default location of an article is
