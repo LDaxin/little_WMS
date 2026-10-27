@@ -105,7 +105,11 @@ Format: `type: what` (e.g. `add: article model tests`)
 - **2.3d** Consume + `menge=0` (§4d)
 - **2.3e** Merge on store (§4d)
 - **2.3f** Partial store / split (§4d)
-- **2.4** Audit Log (§32)
+- **2.3g** Stock: separate identity from quantity (§4d)
+- **2.3h** Minimums (per location + global) + not-stored hints (§4d)
+- **2.4a** AuditLog model + logging (§32, §4e)
+- **2.4b** Movement session / undo (§11)
+- **2.4c** Admin log, filters, retention (§32)
 - **2.5** Inventory Mode (§5c)
 
 ### Phase 3 – Users & Organisations
@@ -177,7 +181,11 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.3d Consume + menge=0 | ✅ done |
 | 2 | 2.3e Merge on store | ✅ done |
 | 2 | 2.3f Partial store / split | ✅ done |
-| 2 | 2.4 Audit Log | ⬜ open |
+| 2 | 2.3g Stock (identity vs. quantity) | ✅ done |
+| 2 | 2.3h Minimums + not stored | ✅ done |
+| 2 | 2.4a AuditLog model + logging | ✅ done |
+| 2 | 2.4b Movement session / undo | ⬜ open |
+| 2 | 2.4c Admin log, filters, retention | ⬜ open |
 | 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
 | 3 | 3.2 Multi-Org Membership | ⬜ open |
