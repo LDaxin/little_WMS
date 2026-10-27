@@ -3,13 +3,19 @@
 A storage location declares what should be in it; these helpers compare the
 declared target against what is actually stored there.
 """
+from decimal import Decimal
+
+from django.db.models import Sum
 
 
 def actual_quantity(space, base):
-    """Sum of ``menge`` (or 1) of articles of ``base`` stored in ``space``."""
-    from article.models import Article
+    """Sum of ``Stock.menge`` of ``base`` stored in ``space``."""
+    from article.models import Stock
 
-    return sum((article.menge or 1) for article in Article.objects.filter(stored=space, base=base))
+    total = Stock.objects.filter(stored=space, article__base=base).aggregate(
+        total=Sum("menge")
+    )["total"]
+    return total or 0
 
 
 def composition_status(space):
@@ -52,15 +58,24 @@ def allocation(base):
 
 
 def consume(article, amount=1):
-    """Reduce an article's quantity; soft-delete it when it reaches 0 (§4d).
+    """Reduce the article's quantity; soft-delete it when nothing is left (§4d).
 
-    The single choke point for consuming a consumable.
+    The single choke point for consuming a consumable: it takes ``amount`` from
+    the article's stock lines and deletes the article once they are empty.
     """
-    article.menge = (article.menge or 1) - amount
-    if article.menge <= 0:
+    remaining = Decimal(amount)
+    for stock in article.stocks.order_by("id"):
+        if remaining <= 0:
+            break
+        take = min(stock.menge, remaining)
+        stock.menge -= take
+        remaining -= take
+        if stock.menge <= 0:
+            stock.delete()
+        else:
+            stock.save()
+    if not article.stocks.exists():
         article.delete()
-    else:
-        article.save()
     return article
 
 

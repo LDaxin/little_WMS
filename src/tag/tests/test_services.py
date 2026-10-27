@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from space.models import Space
 from tag.models import Tag, TagCategory
 from tag.services import effective_tags
@@ -30,8 +30,7 @@ class EffectiveTagsTest(TestCase):
         tag = Tag.objects.create(name="Sommer", category=self.group)
         box.tags.add(tag)
         article = make_article("Hammer", self.article_type)
-        article.stored = box.space
-        article.save()
+        Stock.objects.create(article=article, stored=box.space, menge=1)
         self.assertIn(tag, effective_tags(article))
 
     def test_not_inherited_when_category_off(self):
@@ -39,8 +38,7 @@ class EffectiveTagsTest(TestCase):
         tag = Tag.objects.create(name="defekt", category=self.status)
         box.tags.add(tag)
         article = make_article("Hammer", self.article_type)
-        article.stored = box.space
-        article.save()
+        Stock.objects.create(article=article, stored=box.space, menge=1)
         self.assertNotIn(tag, effective_tags(article))
 
     def test_inherited_tag_disappears_when_removed(self):
@@ -48,9 +46,7 @@ class EffectiveTagsTest(TestCase):
         tag = Tag.objects.create(name="Sommer", category=self.group)
         box.tags.add(tag)
         article = make_article("Hammer", self.article_type)
-        article.stored = box.space
-        article.save()
+        stock = Stock.objects.create(article=article, stored=box.space, menge=1)
         self.assertIn(tag, effective_tags(article))
-        article.stored = None
-        article.save()
+        stock.delete()
         self.assertNotIn(tag, effective_tags(article))

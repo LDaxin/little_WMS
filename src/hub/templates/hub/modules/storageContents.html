@@ -1,11 +1,11 @@
 <div id="storageContents" class="p-2 border rounded mb-2">
     <h6>Contents ({{ contents|length }})</h6>
     <ul class="list-group">
-        {% for article in contents %}
+        {% for stock in contents %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
-            {{ article.base.name }}
+            {{ stock.article.base.name }} · {{ stock.menge }}
             <button type="button" class="btn btn-sm btn-danger"
-                    hx-post="{{ removeUrl }}/{{ article.pk }}"
+                    hx-post="{{ removeUrl }}/{{ stock.article.pk }}"
                     hx-target="#storageContents" hx-swap="outerHTML">Remove</button>
         </li>
         {% empty %}

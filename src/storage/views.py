@@ -3,7 +3,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
 from codeSystem.models import *
-from article.models import Article
+from article.models import Article, Stock
 from article.views import composition_context, composition_warning
 from tag.models import Tag
 from movement.services import MovementService
@@ -30,7 +30,7 @@ def storage(request, typ, storageId):
                 "code":storageObject.code.code if storageObject.code else "",
                 "link":("/s/" + storageObject.code.code) if storageObject.code else "",
                 "storageContents":True,
-                "contents":Article.objects.filter(stored=storageObject.space),
+                "contents":Stock.objects.filter(stored=storageObject.space),
                 "storeUrl":"./%s/store" % storageId,
                 "removeUrl":"./%s/remove" % storageId,
                 "tagChips":True,
@@ -231,7 +231,7 @@ def updateStorage(request, storageId, typ):
 
 def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {
-        "contents": Article.objects.filter(stored=storage.space),
+        "contents": Stock.objects.filter(stored=storage.space).select_related("article__base"),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
@@ -274,7 +274,7 @@ def removeFromStorage(request, typ, storageId, articleId):
     removeUrl = "./%s/remove" % storageId
     if request.method == "POST":
         article = Article.objects.get(pk=articleId)
-        MovementService.remove_article(article, request.user)
+        MovementService.remove_article(article, space=storage.space, user=request.user)
         return render(request, "hub/modules/storageContents.html",
                       context=_storage_contents_context(storage, storeUrl, removeUrl))
     return HttpResponseNotFound('<h1>Page not found</h1>')

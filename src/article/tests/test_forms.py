@@ -138,15 +138,3 @@ class MergeSplitFormTest(TestCase):
 
     def test_menge_visible_with_merge_split(self):
         self.assertIn("menge", FormArticle(article_type=self.merge).fields)
-
-    def test_menge_forced_to_one_without_merge_split(self):
-        article = Article.objects.create(base=self.base, menge=5)
-        form = FormArticle(
-            {"zustand": "gut", "notiz": "", "menge": "5"},
-            instance=article,
-            article_type=self.no_merge,
-        )
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-        article.refresh_from_db()
-        self.assertEqual(article.menge, 1)

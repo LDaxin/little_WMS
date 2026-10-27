@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType, CompositionItem
+from article.models import Article, ArticleBase, ArticleType, CompositionItem, Stock
 from space.models import Space
 
 
@@ -78,9 +78,8 @@ class ArticleModelTest(TestCase):
         self.assertEqual(self.article.code.prefix, "a0")
 
     def test_optional_fields_default_null(self):
-        self.assertIsNone(self.article.stored)
         self.assertIsNone(self.article.space)
-        self.assertIsNone(self.article.amount)
+        self.assertFalse(self.article.stocks.exists())
 
     def test_str(self):
         self.assertEqual(str(self.article), "Hammer " + self.article.code.code)
@@ -99,7 +98,6 @@ class ArticleGlobalFieldsTest(TestCase):
     def test_article_defaults(self):
         self.assertEqual(self.article.zustand, "gut")
         self.assertFalse(self.article.ist_verbrauchsartikel)
-        self.assertEqual(self.article.menge, 1)
         self.assertIsNone(self.article.anschaffungswert)
         self.assertEqual(self.article.notiz, "")
 

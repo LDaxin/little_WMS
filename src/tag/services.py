@@ -12,7 +12,8 @@ def effective_tags(obj):
     from space.services import parent_space
 
     tags = set(obj.tags.all())
-    space = getattr(obj, "stored", None)
+    stock = obj.stocks.exclude(stored=None).first() if hasattr(obj, "stocks") else None
+    space = stock.stored if stock else None
     while space is not None:
         owner = getattr(space, "itemArticle", None) or getattr(space, "itemStorage", None)
         if owner is not None:

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType, CompositionItem
+from article.models import Article, ArticleBase, ArticleType, CompositionItem, Stock
 from article.services import actual_quantity, allocation, composition_status, consume, default_locations
 from space.models import Space
 
@@ -13,7 +13,9 @@ class CompositionStatusTest(TestCase):
         cls.space = Space.objects.create(prefix="s0")
 
     def make_article(self, menge=1, stored=None):
-        return Article.objects.create(base=self.base, stored=stored, menge=menge)
+        article = Article.objects.create(base=self.base)
+        Stock.objects.create(article=article, stored=stored, menge=menge)
+        return article
 
     def test_actual_quantity_empty(self):
         self.assertEqual(actual_quantity(self.space, self.base), 0)
@@ -71,7 +73,8 @@ class DefaultLocationsTest(TestCase):
 
     def test_full_location_not_suggested(self):
         CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=1)
-        Article.objects.create(base=self.base, stored=self.space)
+        article = Article.objects.create(base=self.base)
+        Stock.objects.create(article=article, stored=self.space, menge=1)
         self.assertEqual(default_locations(self.base), [])
 
     def test_blank_soll_not_suggested(self):
@@ -124,19 +127,23 @@ class ConsumeTest(TestCase):
         )
         cls.base = ArticleBase.objects.create(name="Bügelperle", pType=cls.article_type)
 
+    def make(self, menge):
+        article = Article.objects.create(base=self.base)
+        Stock.objects.create(article=article, stored=None, menge=menge)
+        return article
+
     def test_consume_decrements(self):
-        article = Article.objects.create(base=self.base, menge=5)
+        article = self.make(5)
         consume(article, 2)
-        article.refresh_from_db()
-        self.assertEqual(article.menge, 3)
+        self.assertEqual(article.stocks.get(stored=None).menge, 3)
 
     def test_consume_to_zero_deletes(self):
-        article = Article.objects.create(base=self.base, menge=2)
+        article = self.make(2)
         consume(article, 2)
         self.assertFalse(Article.objects.all().filter(pk=article.pk).exists())
         self.assertTrue(Article.objects.all_with_deleted().filter(pk=article.pk).exists())
 
     def test_consume_below_zero_deletes(self):
-        article = Article.objects.create(base=self.base, menge=1)
+        article = self.make(1)
         consume(article, 5)
         self.assertFalse(Article.objects.all().filter(pk=article.pk).exists())

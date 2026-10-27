@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from storage.models import Storage, StorageType
 from tag.models import Tag
 
@@ -87,8 +87,8 @@ class StorageContentsTest(TestCase):
             {"code": self.article.code.code},
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.stored, self.storage.space)
+        self.assertTrue(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_in_storage_unknown_code(self):
         response = self.client.post(
@@ -99,14 +99,13 @@ class StorageContentsTest(TestCase):
         self.assertContains(response, "No article with that code")
 
     def test_remove_from_storage(self):
-        self.article.stored = self.storage.space
-        self.article.save()
+        Stock.objects.create(article=self.article, stored=self.storage.space, menge=1)
         response = self.client.post(
             f"/storage/regal/{self.storage.pk}/remove/{self.article.pk}"
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertIsNone(self.article.stored)
+        self.assertFalse(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
 
 class StorageTagTest(TestCase):

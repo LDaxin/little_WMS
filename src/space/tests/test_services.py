@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from space.models import Space
 from space.services import can_store, max_storage_depth
 
@@ -33,10 +33,8 @@ class CanStoreTest(TestCase):
         # A is stored in B's space and B in A's space -> cycle.
         a = make_article("A", self.article_type)
         b = make_article("B", self.article_type)
-        a.stored = b.space
-        a.save()
-        b.stored = a.space
-        b.save()
+        Stock.objects.create(article=a, stored=b.space, menge=1)
+        Stock.objects.create(article=b, stored=a.space, menge=1)
         ok, reason = can_store(a.space, b.space, 7)
         self.assertFalse(ok)
         self.assertIn("Cycle", reason)
@@ -47,8 +45,7 @@ class CanStoreTest(TestCase):
         for i in range(8):
             article = make_article("N%d" % i, self.article_type)
             if prev is not None:
-                article.stored = prev.space
-                article.save()
+                Stock.objects.create(article=article, stored=prev.space, menge=1)
             prev = article
         ok, reason = can_store(None, prev.space, 3)
         self.assertFalse(ok)

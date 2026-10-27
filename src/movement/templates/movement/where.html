@@ -17,16 +17,14 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">{{ article.base.name }} <small class="text-muted">{{ article.code.code }}</small></h5>
-        <p class="mb-1"><strong>Current:</strong> {{ current_path|default:"—" }}</p>
+        <p class="mb-1"><strong>Current:</strong> {% if current_paths %}{{ current_paths|join:", " }}{% else %}—{% endif %}</p>
         {% if default_paths %}
         <p class="mb-1"><strong>Default:</strong> {{ default_paths|join:", " }}</p>
-        {% if current_path not in default_paths %}
         <form method="POST" action="/article/{{ article.base.pType.name }}/{{ article.pk }}/store-default">
             {% csrf_token %}
             <input type="hidden" name="next" value="/where/?q={{ article.code.code }}">
             <button class="btn btn-success" type="submit">Store to default</button>
         </form>
-        {% endif %}
         {% endif %}
     </div>
 </div>

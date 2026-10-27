@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
+from decimal import Decimal, InvalidOperation
 from .models import *
 from codeSystem.models import *
 from .forms import *
@@ -195,6 +196,11 @@ def addArticle(request, typ):
 
                 pa.save()
 
+                # quantity lives on Stock; start "not stored" (stored=None)
+                Stock.objects.create(
+                    article=pa, stored=None, menge=_decimal(p.cleaned_data.get("menge")) or 1
+                )
+
                 if target is not None:
                     MovementService.store_article(pa, target, request.user)
 
@@ -295,7 +301,8 @@ def updateArticle(request, typ, articleId):
 
             if articleForm.is_valid():
                 article = articleForm.save(commit=False)
-                if article.menge == 0:
+                menge = _decimal(articleForm.cleaned_data.get("menge"))
+                if menge is not None and menge <= 0:
                     # menge 0 means "used up" (§4d)
                     article.delete()
                     context = {
@@ -306,6 +313,11 @@ def updateArticle(request, typ, articleId):
                     }
                     return render(request, "hub/modules/toast.html", context=context)
                 article.save()
+                if menge is not None:
+                    stock, _ = Stock.objects.get_or_create(
+                        article=article, stored=None, defaults={"menge": menge})
+                    stock.menge = menge
+                    stock.save()
 
             context = {
                 "toastName":"Update",
@@ -324,7 +336,7 @@ def updateArticle(request, typ, articleId):
 
 def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {
-        "location": article.stored,
+        "stocks": article.stocks.exclude(stored=None),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
         "storeError": error,
@@ -366,7 +378,9 @@ def removeArticle(request, typ, articleId):
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
-        MovementService.remove_article(article, request.user)
+        stock = Stock.objects.filter(pk=request.POST.get("stock"), article=article).first()
+        MovementService.remove_article(
+            article, space=stock.stored if stock else None, user=request.user)
         return render(request, "hub/modules/storeActions.html",
                       context=_store_actions_context(article, storeUrl, removeUrl))
     return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -441,6 +455,15 @@ def _int_or_none(value):
     try:
         return int(value)
     except ValueError:
+        return None
+
+
+def _decimal(value):
+    if value in (None, ""):
+        return None
+    try:
+        return Decimal(str(value))
+    except (InvalidOperation, ValueError):
         return None
 
 

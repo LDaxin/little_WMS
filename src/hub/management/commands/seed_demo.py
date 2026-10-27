@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from space.models import Space
 from storage.models import Storage, StorageType
 from tag.models import Tag
@@ -105,6 +105,10 @@ class Command(BaseCommand):
                         prefix="a0", active=article_type.article_toggle_space
                     )
                     article.space = space
-                    article.stored = targets[index % len(targets)].space
                     article.save()
+                    Stock.objects.create(
+                        article=article,
+                        stored=targets[index % len(targets)].space,
+                        menge=1,
+                    )
                 index += 1

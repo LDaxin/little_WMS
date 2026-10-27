@@ -33,9 +33,12 @@ def can_store(owner_space, target_space, max_depth):
 
 
 def parent_space(space):
-    """The Space that contains `space` (via its owning article/storage), or None."""
-    owner = getattr(space, "itemArticle", None) or getattr(space, "itemStorage", None)
-    return getattr(owner, "stored", None)
+    """The Space that contains `space` (via its owning container article), or None."""
+    owner = getattr(space, "itemArticle", None)
+    if owner is None:
+        return None
+    stock = owner.stocks.exclude(stored=None).first()
+    return stock.stored if stock else None
 
 
 def storage_chain(storage):
@@ -57,5 +60,6 @@ def space_path(space):
         if hasattr(owner, "parent"):  # Storage
             return " > ".join(storage_chain(owner) + list(reversed(articles)))
         articles.append(owner.base.name)
-        space = owner.stored
+        stock = owner.stocks.exclude(stored=None).first()
+        space = stock.stored if stock else None
     return " > ".join(reversed(articles))

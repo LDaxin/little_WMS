@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from space.models import Space
 from storage.models import Storage, StorageType
 
@@ -60,8 +60,7 @@ class WhereTest(MovementTestBase):
 
     def test_by_code(self):
         article = make_article("Hammer", self.article_type, space_active=False)
-        article.stored = self.storage.space
-        article.save()
+        Stock.objects.create(article=article, stored=self.storage.space, menge=1)
         response = self.client.get("/where/", {"q": article.code.code})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hammer")
@@ -126,8 +125,7 @@ class MovementStoreTest(MovementTestBase):
         self.scan(article.code.code)
         response = self.client.post("/movement/store/")
         self.assertEqual(response.status_code, 200)
-        article.refresh_from_db()
-        self.assertEqual(article.stored, self.storage.space)
+        self.assertTrue(article.stocks.filter(stored=self.storage.space).exists())
         self.assertEqual(self.state()["buffer"], [])
 
     def test_store_without_target(self):
@@ -136,8 +134,7 @@ class MovementStoreTest(MovementTestBase):
         response = self.client.post("/movement/store/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Unknown code")
-        article.refresh_from_db()
-        self.assertIsNone(article.stored)
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_into_inactive_space(self):
         inactive = Storage.objects.create(name="Regal B", typ=self.storage_type)
@@ -149,20 +146,17 @@ class MovementStoreTest(MovementTestBase):
         response = self.client.post("/movement/store/")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "not active")
-        article.refresh_from_db()
-        self.assertIsNone(article.stored)
+        self.assertFalse(article.stocks.filter(stored=inactive.space).exists())
 
 
 class MovementRemoveTest(MovementTestBase):
     def test_remove_buffered_articles(self):
         article = make_article("Hammer", self.article_type, space_active=False)
-        article.stored = self.storage.space
-        article.save()
+        Stock.objects.create(article=article, stored=self.storage.space, menge=1)
         self.scan(article.code.code)
         response = self.client.post("/movement/remove/")
         self.assertEqual(response.status_code, 200)
-        article.refresh_from_db()
-        self.assertIsNone(article.stored)
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
         self.assertEqual(self.state()["buffer"], [])
 
 

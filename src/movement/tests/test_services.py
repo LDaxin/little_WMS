@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from movement.services import MovementService, resolve_space
 from movement.tests.test_movement import make_article
 from storage.models import Storage, StorageType
@@ -41,15 +41,13 @@ class MovementServiceTest(TestCase):
     def test_store_article(self):
         article = make_article("Hammer", self.article_type, space_active=False)
         MovementService.store_article(article, self.storage.space)
-        article.refresh_from_db()
-        self.assertEqual(article.stored, self.storage.space)
+        self.assertTrue(article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_article_in_container(self):
         container = make_article("Box A", self.container_type, space_active=True)
         article = make_article("Hammer", self.article_type, space_active=False)
         MovementService.store_article(article, container.space)
-        article.refresh_from_db()
-        self.assertEqual(article.stored, container.space)
+        self.assertTrue(article.stocks.filter(stored=container.space).exists())
 
     def test_store_article_in_itself_raises(self):
         container = make_article("Box A", self.container_type, space_active=True)
@@ -68,65 +66,48 @@ class MovementServiceTest(TestCase):
         bad = make_article("Box", self.container_type, space_active=True)
         with self.assertRaises(ValidationError):
             MovementService.store_articles([good, bad], bad.space)
-        good.refresh_from_db()
-        self.assertIsNone(good.stored)
+        self.assertFalse(good.stocks.filter(stored=bad.space).exists())
 
     def test_remove_article(self):
         article = make_article("Hammer", self.article_type, space_active=False)
-        article.stored = self.storage.space
-        article.save()
+        Stock.objects.create(article=article, stored=self.storage.space, menge=1)
         MovementService.remove_article(article)
-        article.refresh_from_db()
-        self.assertIsNone(article.stored)
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
 
-    def test_store_merges_same_base(self):
-        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
-        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
-        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
-        incoming = Article.objects.create(base=base, menge=30)
-        result = MovementService.store_article(incoming, self.storage.space)
-        existing.refresh_from_db()
-        self.assertEqual(existing.menge, 80)
-        self.assertEqual(result, existing)
-        self.assertFalse(Article.objects.all().filter(pk=incoming.pk).exists())
+    def _mergeable(self, menge):
+        merge_type, _ = ArticleType.objects.get_or_create(
+            name="Perlen", defaults={"symbol": "PR", "allow_merge_split": True}
+        )
+        base, _ = ArticleBase.objects.get_or_create(name="Bügelperle", pType=merge_type)
+        article = Article.objects.create(base=base)
+        Stock.objects.create(article=article, stored=None, menge=menge)
+        return article
 
-    def test_store_does_not_merge_without_flag(self):
+    def test_store_mergeable_moves_all(self):
+        article = self._mergeable(30)
+        MovementService.store_article(article, self.storage.space)
+        self.assertEqual(article.stocks.get(stored=self.storage.space).menge, 30)
+        self.assertFalse(article.stocks.filter(stored=None).exists())
+
+    def test_store_mergeable_partial(self):
+        article = self._mergeable(100)
+        MovementService.store_article(article, self.storage.space, amount=30)
+        self.assertEqual(article.stocks.get(stored=self.storage.space).menge, 30)
+        self.assertEqual(article.stocks.get(stored=None).menge, 70)
+
+    def test_store_non_mergeable_moves_single_stock(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        Stock.objects.create(article=article, stored=None, menge=1)
+        MovementService.store_article(article, self.storage.space)
+        self.assertEqual(article.stocks.count(), 1)
+        self.assertEqual(article.stocks.first().stored, self.storage.space)
+
+    def test_store_does_not_merge_other_article(self):
         base = ArticleBase.objects.create(name="Hering", pType=self.article_type)
-        existing = Article.objects.create(base=base, stored=self.storage.space, menge=1)
-        incoming = Article.objects.create(base=base, menge=1)
-        MovementService.store_article(incoming, self.storage.space)
-        incoming.refresh_from_db()
-        self.assertEqual(incoming.stored, self.storage.space)
-        self.assertEqual(existing.menge, 1)
-
-    def test_store_partial_merges_into_existing(self):
-        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
-        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
-        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
-        source = Article.objects.create(base=base, menge=100)
-        MovementService.store_article(source, self.storage.space, amount=30)
-        existing.refresh_from_db()
-        source.refresh_from_db()
-        self.assertEqual(existing.menge, 80)
-        self.assertEqual(source.menge, 70)
-
-    def test_store_partial_creates_new_article(self):
-        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
-        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
-        source = Article.objects.create(base=base, menge=100)
-        MovementService.store_article(source, self.storage.space, amount=30)
-        source.refresh_from_db()
-        self.assertEqual(source.menge, 70)
-        part = Article.objects.get(stored=self.storage.space, base=base)
-        self.assertEqual(part.menge, 30)
-        self.assertNotEqual(part.pk, source.pk)
-
-    def test_store_full_amount_merges_all(self):
-        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
-        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
-        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
-        source = Article.objects.create(base=base, menge=30)
-        MovementService.store_article(source, self.storage.space, amount=30)
-        existing.refresh_from_db()
-        self.assertEqual(existing.menge, 80)
-        self.assertFalse(Article.objects.all().filter(pk=source.pk).exists())
+        first = Article.objects.create(base=base)
+        Stock.objects.create(article=first, stored=self.storage.space, menge=1)
+        second = Article.objects.create(base=base)
+        MovementService.store_article(second, self.storage.space)
+        self.assertEqual(
+            Stock.objects.filter(stored=self.storage.space, article__base=base).count(), 2
+        )

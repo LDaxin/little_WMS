@@ -70,8 +70,6 @@ class CustomFieldsMixin:
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        if self.article_type is not None and not self.article_type.allow_merge_split and hasattr(instance, "menge"):
-            instance.menge = 1
         if self.custom_field_names:
             attributes = dict(instance.attributes or {})
             for name in self.custom_field_names:
@@ -89,25 +87,27 @@ class CustomFieldsMixin:
 class FormArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
     stored = forms.CharField(max_length=34, required=False)
+    menge = forms.DecimalField(required=False, min_value=0, max_digits=10, decimal_places=2)
     code = forms.CharField(max_length=34, required=False)
 
     class Meta:
         model = Article
-        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes', 'tags')
+        exclude = ('organisation', 'pType', 'space', 'code', 'base', 'attributes', 'tags')
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
         self.fields['code'].queryset = UuidCode.objects.filter(prefix="a0", used=False)
-        self.fields['stored'].queryset = Space.objects.filter(active=True)
 
 
 class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
     level = "article"
+    menge = forms.DecimalField(required=False, min_value=0, max_digits=10, decimal_places=2)
+
     class Meta:
         model = Article
-        exclude = ('organisation', 'pType', 'space', 'code', 'stored', 'base', 'attributes', 'tags')
+        exclude = ('organisation', 'pType', 'space', 'code', 'base', 'attributes', 'tags')
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)

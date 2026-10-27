@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType, CompositionItem
+from article.models import Article, ArticleBase, ArticleType, CompositionItem, Stock
 from space.models import Space
 from storage.models import Storage, StorageType
 from tag.models import Tag
@@ -132,8 +132,8 @@ class ArticleStoreRemoveTest(TestCase):
             {"code": self.storage.code.code},
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.stored, self.storage.space)
+        self.assertTrue(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_article_unknown_code(self):
         response = self.client.post(
@@ -142,16 +142,15 @@ class ArticleStoreRemoveTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Unknown code")
-        self.article.refresh_from_db()
-        self.assertIsNone(self.article.stored)
+        self.assertFalse(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_remove_article(self):
-        self.article.stored = self.storage.space
-        self.article.save()
+        Stock.objects.create(article=self.article, stored=self.storage.space, menge=1)
         response = self.client.post(f"/article/werkzeug/{self.article.pk}/remove")
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertIsNone(self.article.stored)
+        self.assertFalse(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_add_article_with_stored_code(self):
         response = self.client.post(
@@ -166,7 +165,7 @@ class ArticleStoreRemoveTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         article = Article.objects.get(base__name="Zange")
-        self.assertEqual(article.stored, self.storage.space)
+        self.assertTrue(article.stocks.filter(stored=self.storage.space).exists())
 
     def test_add_article_with_unknown_stored_code(self):
         response = self.client.post(
@@ -201,8 +200,8 @@ class ArticleStoreToDefaultTest(TestCase):
         CompositionItem.objects.create(space=self.storage.space, base=self.article_base, soll_menge=1)
         response = self.client.post(f"/article/werkzeug/{self.article.pk}/store-default")
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.stored, self.storage.space)
+        self.assertTrue(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_to_default_redirects(self):
         CompositionItem.objects.create(space=self.storage.space, base=self.article_base, soll_menge=1)
@@ -217,8 +216,8 @@ class ArticleStoreToDefaultTest(TestCase):
         response = self.client.post(f"/article/werkzeug/{self.article.pk}/store-default")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No default location")
-        self.article.refresh_from_db()
-        self.assertIsNone(self.article.stored)
+        self.assertFalse(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
 
 class ArticleTagTest(TestCase):
@@ -344,26 +343,28 @@ class CompositionWarningTest(TestCase):
 
     def test_store_into_full_location_warns(self):
         CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=1)
-        Article.objects.create(base=self.base, stored=self.storage.space)
+        other = Article.objects.create(base=self.base)
+        Stock.objects.create(article=other, stored=self.storage.space, menge=1)
         response = self.client.post(
             f"/article/werkzeug/{self.article.pk}/store",
             {"code": self.storage.code.code},
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Already enough")
-        self.article.refresh_from_db()
-        self.assertIsNone(self.article.stored)
+        self.assertFalse(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_into_full_location_forced(self):
         CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=1)
-        Article.objects.create(base=self.base, stored=self.storage.space)
+        other = Article.objects.create(base=self.base)
+        Stock.objects.create(article=other, stored=self.storage.space, menge=1)
         response = self.client.post(
             f"/article/werkzeug/{self.article.pk}/store",
             {"code": self.storage.code.code, "force": "1"},
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.stored, self.storage.space)
+        self.assertTrue(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
     def test_store_into_underfilled_location_no_warning(self):
         CompositionItem.objects.create(space=self.storage.space, base=self.base, soll_menge=12)
@@ -372,8 +373,8 @@ class CompositionWarningTest(TestCase):
             {"code": self.storage.code.code},
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.stored, self.storage.space)
+        self.assertTrue(
+            self.article.stocks.filter(stored=self.storage.space).exists())
 
 
 class CompositionRenderTest(TestCase):
@@ -408,7 +409,8 @@ class ArticleConsumeTest(TestCase):
             name="Perlen", symbol="PR", allow_merge_split=True
         )
         cls.article_base = ArticleBase.objects.create(name="Bügelperle", pType=cls.article_type)
-        cls.article = Article.objects.create(base=cls.article_base, menge=5)
+        cls.article = Article.objects.create(base=cls.article_base)
+        Stock.objects.create(article=cls.article, stored=None, menge=5)
 
     def setUp(self):
         self.user = User.objects.create_user(username="tester", password="pw")
@@ -444,5 +446,4 @@ class ArticleConsumeTest(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
-        self.article.refresh_from_db()
-        self.assertEqual(self.article.menge, 3)
+        self.assertEqual(self.article.stocks.get(stored=None).menge, 3)

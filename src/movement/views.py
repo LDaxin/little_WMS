@@ -77,7 +77,7 @@ def where(request):
         "query": query,
         "article": article,
         "results": results,
-        "current_path": space_path(article.stored) if article else "",
+        "current_paths": [space_path(s.stored) for s in article.stocks.exclude(stored=None)] if article else [],
         "default_paths": [space_path(loc) for loc in default_locations(article.base)] if article else [],
     }
     return render(request, "movement/where.html", context=context)
@@ -229,7 +229,7 @@ def movementRemove(request):
     try:
         articles = _articles_from_codes(state["buffer"])
         for article in articles:
-            MovementService.remove_article(article, request.user)
+            MovementService.remove_article(article, user=request.user)
     except ValidationError as e:
         return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
 

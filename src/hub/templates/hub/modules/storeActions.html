@@ -1,11 +1,18 @@
 <div id="storeActions" class="p-2 border rounded mb-2">
-    <div class="d-flex align-items-center gap-2">
-        <span class="badge text-bg-secondary">Location: {{ location|default:"—" }}</span>
-        {% if location %}
-        <button type="button" class="btn btn-sm btn-danger"
-                hx-post="{{ removeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Remove</button>
-        {% endif %}
-    </div>
+    {% if stocks %}
+    <ul class="list-group list-group-flush mb-1">
+        {% for stock in stocks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center py-1">
+            <span class="badge text-bg-secondary">{{ stock.stored }} · {{ stock.menge }}</span>
+            <button type="button" class="btn btn-sm btn-danger"
+                    hx-post="{{ removeUrl }}" hx-vals='{"stock": "{{ stock.pk }}"}'
+                    hx-target="#storeActions" hx-swap="outerHTML">Remove</button>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <span class="badge text-bg-secondary">Not stored</span>
+    {% endif %}
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
     {% endif %}
@@ -19,10 +26,8 @@
     {% if defaultLocations %}
     <div class="small mt-1">Default:
         {% for loc in defaultLocations %}{{ loc }}{% if not forloop.last %}, {% endif %}{% endfor %}
-        {% if location not in defaultLocations %}
         <button type="button" class="btn btn-sm btn-outline-success"
                 hx-post="{{ storeDefaultUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Store to default</button>
-        {% endif %}
     </div>
     {% endif %}
     <form class="mt-2" hx-post="{{ storeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">

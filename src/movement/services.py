@@ -2,6 +2,8 @@
 
 Used by the article/storage views now; the movement view follows in §2.1.
 """
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
@@ -31,33 +33,22 @@ def resolve_space(code):
 
 
 class MovementService:
-    """Storing and removing articles – shared by views and (later) the API."""
+    """Storing and removing articles – shared by views and (later) the API.
 
-    @staticmethod
-    def _split_off(article, target_space, amount):
-        """Create a copy of ``article`` holding ``amount`` in ``target_space``."""
-        from article.models import Article
-
-        part = Article.objects.get(pk=article.pk)
-        part.pk = None
-        part.code = None
-        part.space = None
-        part.stored = target_space
-        part.menge = amount
-        part.save()
-        part.tags.set(article.tags.all())
-        return part
+    Quantity lives on ``Stock`` (article, location); store/remove move it between
+    the target location and the article's "not stored" line (``stored=None``).
+    """
 
     @staticmethod
     def store_article(article, target_space, user=None, amount=None):
-        """Store/move an article into ``target_space``.
+        """Store (part of) an article into ``target_space``.
 
-        A merge/split article (§4d) merges with an article of the same base that
-        is already in the target: quantities add up, the incoming article is
-        soft-deleted. With ``amount`` a partial quantity is stored: the stored
-        part merges into the target, the rest stays with the article.
+        A merge/split article (§4d) moves ``amount`` (default: all) from its
+        "not stored" line onto the target line, adding to any line already there.
+        A non-mergeable article is a single object (``menge=1``) that is simply
+        moved to the target.
         """
-        from article.models import Article
+        from article.models import Stock
 
         if target_space is None:
             raise ValidationError("No target space")
@@ -67,34 +58,28 @@ class MovementService:
         if not ok:
             raise ValidationError(reason)
 
-        mergeable = article.base.pType.allow_merge_split
-        total = article.menge or 1
-
-        if mergeable and amount is not None and 0 < amount < total:
-            # split: keep the rest, store `amount`
-            article.menge = total - amount
-            article.save()
-            existing = Article.objects.filter(
-                stored=target_space, base=article.base
-            ).exclude(pk=article.pk).first()
-            if existing is not None:
-                existing.menge = (existing.menge or 1) + amount
-                existing.save()
-                return existing
-            return MovementService._split_off(article, target_space, amount)
-
-        if mergeable:
-            existing = Article.objects.filter(
-                stored=target_space, base=article.base
-            ).exclude(pk=article.pk).first()
-            if existing is not None:
-                existing.menge = (existing.menge or 1) + total
-                existing.save()
-                article.delete()
-                return existing
-
-        article.stored = target_space
-        article.save()
+        if article.base.pType.allow_merge_split:
+            source = article.stocks.filter(stored=None).first()
+            qty = Decimal(amount) if amount is not None else (source.menge if source else Decimal(1))
+            target, _ = Stock.objects.get_or_create(
+                article=article, stored=target_space, defaults={"menge": 0}
+            )
+            target.menge += qty
+            target.save()
+            if source is not None:
+                source.menge -= qty
+                if source.menge <= 0:
+                    source.delete()
+                else:
+                    source.save()
+        else:
+            stock = article.stocks.first()
+            if stock is None:
+                Stock.objects.create(article=article, stored=target_space, menge=1)
+            else:
+                stock.stored = target_space
+                stock.menge = 1
+                stock.save()
         return article
 
     @staticmethod
@@ -106,8 +91,21 @@ class MovementService:
         return articles
 
     @staticmethod
-    def remove_article(article, user=None):
-        """Remove an article from its storage."""
-        article.stored = None
-        article.save()
+    def remove_article(article, space=None, user=None):
+        """Remove an article's quantity back to its "not stored" line."""
+        from article.models import Stock
+
+        if space is None:
+            stock = article.stocks.exclude(stored=None).first()
+        else:
+            stock = article.stocks.filter(stored=space).first()
+        if stock is None:
+            return article
+        source, _ = Stock.objects.get_or_create(
+            article=article, stored=None, defaults={"menge": 0}
+        )
+        source.menge += stock.menge
+        source.save()
+        stock.delete()
         return article
+
