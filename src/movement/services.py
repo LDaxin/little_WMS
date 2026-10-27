@@ -35,7 +35,14 @@ class MovementService:
 
     @staticmethod
     def store_article(article, target_space, user=None):
-        """Store/move an article into ``target_space``."""
+        """Store/move an article into ``target_space``.
+
+        A merge/split article (§4d) merges with an article of the same base that
+        is already in the target: quantities add up, the incoming article is
+        soft-deleted.
+        """
+        from article.models import Article
+
         if target_space is None:
             raise ValidationError("No target space")
         if not target_space.active:
@@ -43,6 +50,17 @@ class MovementService:
         ok, reason = can_store(article.space, target_space, max_storage_depth())
         if not ok:
             raise ValidationError(reason)
+
+        if article.base.pType.allow_merge_split:
+            existing = Article.objects.filter(
+                stored=target_space, base=article.base
+            ).exclude(pk=article.pk).first()
+            if existing is not None:
+                existing.menge = (existing.menge or 1) + (article.menge or 1)
+                existing.save()
+                article.delete()
+                return existing
+
         article.stored = target_space
         article.save()
         return article

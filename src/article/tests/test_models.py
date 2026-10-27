@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
@@ -98,7 +99,7 @@ class ArticleGlobalFieldsTest(TestCase):
     def test_article_defaults(self):
         self.assertEqual(self.article.zustand, "gut")
         self.assertFalse(self.article.ist_verbrauchsartikel)
-        self.assertIsNone(self.article.menge)
+        self.assertEqual(self.article.menge, 1)
         self.assertIsNone(self.article.anschaffungswert)
         self.assertEqual(self.article.notiz, "")
 
@@ -109,6 +110,13 @@ class ArticleGlobalFieldsTest(TestCase):
 
     def test_article_type_allow_merge_split_default(self):
         self.assertFalse(self.article_type.allow_merge_split)
+
+    def test_container_and_merge_split_mutually_exclusive(self):
+        article_type = ArticleType(
+            name="X", symbol="X", article_toggle_space=True, allow_merge_split=True
+        )
+        with self.assertRaises(ValidationError):
+            article_type.full_clean()
 
 
 class CompositionItemModelTest(TestCase):

@@ -126,3 +126,14 @@ class FormArticleBase(CustomFieldsMixin, forms.ModelForm):
         super(FormArticleBase, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs["class"]= "form-control"
+
+
+class ArticleTypeForm(forms.ModelForm):
+    """Admin form for ArticleType; disables the mutually exclusive flags (§4d)."""
+
+    class Meta:
+        model = ArticleType
+        fields = "__all__"
+
+    class Media:
+        js = ("article/articletype.js",)

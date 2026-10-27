@@ -59,6 +59,14 @@ class ArticleType(SoftDeleteObject, models.Model):
             uCode.save()
         super().save(*args, **kwargs)
 
+    def clean(self):
+        # a container holds other articles; a merge/split article is a quantity
+        # of one thing — the two are mutually exclusive (§4d)
+        if self.article_toggle_space and self.allow_merge_split:
+            raise ValidationError(
+                "An article type cannot be a container and merge/split at the same time."
+            )
+
     def fields_for_level(self, level):
         """Return the custom field definitions for a level ("base" or "article")."""
         return [
@@ -164,7 +172,7 @@ class Article(SoftDeleteObject, models.Model):
     mindestbestand = models.IntegerField(null=True, blank=True)
     notiz = models.TextField(blank=True)
     ist_verbrauchsartikel = models.BooleanField(default=False)
-    menge = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    menge = models.DecimalField(max_digits=10, decimal_places=2, default=1)
     mengeneinheit = models.CharField(max_length=20, blank=True)
 
     # Custom field values for article-level fields (§25)

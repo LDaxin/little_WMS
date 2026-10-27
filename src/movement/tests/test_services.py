@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from article.models import ArticleType
+from article.models import Article, ArticleBase, ArticleType
 from movement.services import MovementService, resolve_space
 from movement.tests.test_movement import make_article
 from storage.models import Storage, StorageType
@@ -78,3 +78,23 @@ class MovementServiceTest(TestCase):
         MovementService.remove_article(article)
         article.refresh_from_db()
         self.assertIsNone(article.stored)
+
+    def test_store_merges_same_base(self):
+        merge_type = ArticleType.objects.create(name="Perlen", symbol="PR", allow_merge_split=True)
+        base = ArticleBase.objects.create(name="Bügelperle", pType=merge_type)
+        existing = Article.objects.create(base=base, stored=self.storage.space, menge=50)
+        incoming = Article.objects.create(base=base, menge=30)
+        result = MovementService.store_article(incoming, self.storage.space)
+        existing.refresh_from_db()
+        self.assertEqual(existing.menge, 80)
+        self.assertEqual(result, existing)
+        self.assertFalse(Article.objects.all().filter(pk=incoming.pk).exists())
+
+    def test_store_does_not_merge_without_flag(self):
+        base = ArticleBase.objects.create(name="Hering", pType=self.article_type)
+        existing = Article.objects.create(base=base, stored=self.storage.space, menge=1)
+        incoming = Article.objects.create(base=base, menge=1)
+        MovementService.store_article(incoming, self.storage.space)
+        incoming.refresh_from_db()
+        self.assertEqual(incoming.stored, self.storage.space)
+        self.assertEqual(existing.menge, 1)

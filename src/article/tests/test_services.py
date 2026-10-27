@@ -12,7 +12,7 @@ class CompositionStatusTest(TestCase):
         cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
         cls.space = Space.objects.create(prefix="s0")
 
-    def make_article(self, menge=None, stored=None):
+    def make_article(self, menge=1, stored=None):
         return Article.objects.create(base=self.base, stored=stored, menge=menge)
 
     def test_actual_quantity_empty(self):
