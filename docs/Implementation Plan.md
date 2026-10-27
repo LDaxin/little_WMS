@@ -171,7 +171,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.2 QR Workflow + Sheet Printing | ✅ done |
 | 2 | 2.3a Composition model + status | ✅ done |
 | 2 | 2.3b Default location via composition | ✅ done |
-| 2 | 2.3c Composition UI | ⬜ open |
+| 2 | 2.3c Composition UI | ✅ done |
 | 2 | 2.3d Merge / consume + menge=0 | ⬜ open |
 | 2 | 2.4 Audit Log | ⬜ open |
 | 2 | 2.5 Inventory Mode | ⬜ open |
