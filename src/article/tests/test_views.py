@@ -376,6 +376,31 @@ class CompositionWarningTest(TestCase):
         self.assertEqual(self.article.stored, self.storage.space)
 
 
+class CompositionRenderTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(
+            name="Box", symbol="BX", article_toggle_space=True
+        )
+        cls.article_base = ArticleBase.objects.create(name="Box A", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="a0", active=True)
+        cls.article = Article.objects.create(base=cls.article_base, space=cls.space)
+        cls.storage_type = StorageType.objects.create(name="Regal", symbol="RG")
+        cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
+
+    def setUp(self):
+        self.user = User.objects.create_user(username="tester", password="pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_container_detail_shows_composition(self):
+        response = self.client.get(f"/article/box/{self.article.pk}")
+        self.assertContains(response, "Composition")
+
+    def test_storage_detail_shows_composition(self):
+        response = self.client.get(f"/storage/regal/{self.storage.pk}")
+        self.assertContains(response, "Composition")
+
+
 class ArticleConsumeTest(TestCase):
     @classmethod
     def setUpTestData(cls):
