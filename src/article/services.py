@@ -17,20 +17,38 @@ def composition_status(space):
 
     ``underfilled`` – below the target (``soll_menge``), so the location is a
     candidate for storing more. ``refill`` – below the minimum
-    (``mindestmenge``). Both are False when the respective value is blank.
+    (``mindestmenge``). ``over`` – the base is over-allocated across all
+    locations (more target than articles exist). All are False when the
+    respective value is blank.
     """
     status = []
     for item in space.composition.select_related("base"):
         ist = actual_quantity(space, item.base)
+        alloc = allocation(item.base)
         status.append({
             "item": item,
             "ist": ist,
             "soll": item.soll_menge,
             "min": item.mindestmenge,
+            "available": alloc["available"],
+            "over": alloc["over"],
             "underfilled": item.soll_menge is not None and ist < item.soll_menge,
             "refill": item.mindestmenge is not None and ist < item.mindestmenge,
         })
     return status
+
+
+def allocation(base):
+    """Total target across all locations vs available articles of ``base``.
+
+    ``over`` is True when more is allocated (sum of ``soll_menge``) than there
+    are articles of that base — then not every location can be filled.
+    """
+    from article.models import Article, CompositionItem
+
+    total_soll = sum(item.soll_menge or 0 for item in CompositionItem.objects.filter(base=base))
+    available = Article.objects.filter(base=base).count()
+    return {"soll": total_soll, "available": available, "over": total_soll > available}
 
 
 def default_locations(base):

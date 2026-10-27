@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, CompositionItem
-from article.services import actual_quantity, composition_status, default_locations
+from article.services import actual_quantity, allocation, composition_status, default_locations
 from space.models import Space
 
 
@@ -83,3 +83,34 @@ class DefaultLocationsTest(TestCase):
         CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=12)
         CompositionItem.objects.create(space=other, base=self.base, soll_menge=12)
         self.assertEqual(set(default_locations(self.base)), {self.space, other})
+
+
+class AllocationTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        cls.base = ArticleBase.objects.create(name="Hering", pType=cls.article_type)
+        cls.space = Space.objects.create(prefix="s0")
+        cls.other = Space.objects.create(prefix="s0")
+
+    def test_not_over_when_enough_articles(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=1)
+        CompositionItem.objects.create(space=self.other, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base)
+        Article.objects.create(base=self.base)
+        self.assertFalse(allocation(self.base)["over"])
+
+    def test_over_when_too_few_articles(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=1)
+        CompositionItem.objects.create(space=self.other, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base)
+        alloc = allocation(self.base)
+        self.assertTrue(alloc["over"])
+        self.assertEqual(alloc["soll"], 2)
+        self.assertEqual(alloc["available"], 1)
+
+    def test_status_over_flag(self):
+        CompositionItem.objects.create(space=self.space, base=self.base, soll_menge=1)
+        CompositionItem.objects.create(space=self.other, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base)
+        self.assertTrue(composition_status(self.space)[0]["over"])

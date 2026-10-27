@@ -431,7 +431,7 @@ def _int_or_none(value):
         return None
 
 
-def composition_context(space, error=""):
+def composition_context(space, error="", warning="", forceBase="", forceSoll="", forceMin=""):
     """Context for the composition editor (§4d)."""
     return {
         "showComposition": True,
@@ -439,6 +439,10 @@ def composition_context(space, error=""):
         "compositionAddUrl": "/composition/%s/add" % space.pk,
         "compositionRemoveUrl": "/composition/%s/remove" % space.pk,
         "compositionError": error,
+        "compositionWarning": warning,
+        "forceBase": forceBase,
+        "forceSoll": forceSoll,
+        "forceMin": forceMin,
         "allBases": ArticleBase.objects.all(),
     }
 
@@ -454,6 +458,18 @@ def composition_warning(target_space, article):
     return ""
 
 
+def _allocation_warning(base, soll, space):
+    """Warning when setting ``soll`` for ``base`` over-commits the articles (§4d)."""
+    if soll is None:
+        return ""
+    others = CompositionItem.objects.filter(base=base).exclude(space=space)
+    total = sum(item.soll_menge or 0 for item in others) + soll
+    available = Article.objects.filter(base=base).count()
+    if total > available:
+        return "Only %s %s available, but %s allocated" % (available, base.name, total)
+    return ""
+
+
 @login_required(login_url='/accounts/login/')
 def addCompositionItem(request, spaceId):
     space = Space.objects.get(pk=spaceId)
@@ -464,12 +480,18 @@ def addCompositionItem(request, spaceId):
         if base is None:
             error = "No article base named %s" % name
         else:
+            soll = _int_or_none(request.POST.get("soll"))
+            min_ = _int_or_none(request.POST.get("min"))
+            warning = _allocation_warning(base, soll, space)
+            if warning and not request.POST.get("force"):
+                return render(request, "hub/modules/composition.html",
+                              context=composition_context(
+                                  space, warning=warning, forceBase=name,
+                                  forceSoll=request.POST.get("soll", ""),
+                                  forceMin=request.POST.get("min", "")))
             CompositionItem.objects.update_or_create(
                 space=space, base=base,
-                defaults={
-                    "soll_menge": _int_or_none(request.POST.get("soll")),
-                    "mindestmenge": _int_or_none(request.POST.get("min")),
-                })
+                defaults={"soll_menge": soll, "mindestmenge": min_})
         return render(request, "hub/modules/composition.html",
                       context=composition_context(space, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')

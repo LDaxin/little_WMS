@@ -7,10 +7,12 @@
             <span class="small">
                 {% if row.soll is not None %}Soll {{ row.soll }}{% else %}any{% endif %} / Ist {{ row.ist }}
                 {% if row.min is not None %}· min {{ row.min }}{% endif %}
-                {% if row.refill %}<span class="text-danger">refill</span>{% endif %}
+                {% if row.over %}<span class="text-danger">· over-allocated ({{ row.available }} available)</span>{% endif %}
+                {% if row.refill %}<span class="text-danger">· refill</span>{% endif %}
             </span>
             <button type="button" class="btn-close" aria-label="Remove"
                     hx-post="{{ compositionRemoveUrl }}/{{ row.item.pk }}"
+                    hx-confirm="Remove {{ row.item.base.name }} from the composition?"
                     hx-target="#composition" hx-swap="outerHTML"></button>
         </li>
         {% empty %}
@@ -19,6 +21,14 @@
     </ul>
     {% if compositionError %}
     <div class="text-danger small mt-1">{{ compositionError }}</div>
+    {% endif %}
+    {% if compositionWarning %}
+    <div class="text-warning small mt-1">{{ compositionWarning }}
+        <button type="button" class="btn btn-sm btn-outline-warning"
+                hx-post="{{ compositionAddUrl }}"
+                hx-vals='{"base": "{{ forceBase }}", "soll": "{{ forceSoll }}", "min": "{{ forceMin }}", "force": "1"}'
+                hx-target="#composition" hx-swap="outerHTML">Add anyway</button>
+    </div>
     {% endif %}
     <form class="mt-2" hx-post="{{ compositionAddUrl }}" hx-target="#composition" hx-swap="outerHTML">
         {% csrf_token %}

@@ -269,6 +269,8 @@ class CompositionViewTest(TestCase):
         self.client.login(username="tester", password="pw")
 
     def test_add_composition_item(self):
+        for _ in range(12):
+            Article.objects.create(base=self.base)
         response = self.client.post(
             f"/composition/{self.space.pk}/add",
             {"base": "Hering", "soll": "12", "min": "3"},
@@ -302,6 +304,29 @@ class CompositionViewTest(TestCase):
         response = self.client.post(f"/composition/{self.space.pk}/remove/{item.pk}")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.space.composition.count(), 0)
+
+    def test_add_composition_item_over_allocated_warns(self):
+        other = Space.objects.create(prefix="s0")
+        CompositionItem.objects.create(space=other, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base)
+        response = self.client.post(
+            f"/composition/{self.space.pk}/add",
+            {"base": "Hering", "soll": "1", "min": ""},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Only 1 Hering available")
+        self.assertEqual(self.space.composition.count(), 0)
+
+    def test_add_composition_item_over_allocated_forced(self):
+        other = Space.objects.create(prefix="s0")
+        CompositionItem.objects.create(space=other, base=self.base, soll_menge=1)
+        Article.objects.create(base=self.base)
+        response = self.client.post(
+            f"/composition/{self.space.pk}/add",
+            {"base": "Hering", "soll": "1", "min": "", "force": "1"},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.space.composition.count(), 1)
 
 
 class CompositionWarningTest(TestCase):
