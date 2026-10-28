@@ -5,6 +5,8 @@ from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
 from tag.models import Tag
 from space.models import Space
+from organisation.current import current_organisation_id
+from organisation.managers import SoftDeleteOrganisationManager
 
 # Create your models here.
 
@@ -33,7 +35,9 @@ In der class Article is the unice Data is space
 
 class ArticleType(SoftDeleteObject, models.Model):
 
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=20)
     symbol = models.CharField(max_length=20)
 
@@ -125,7 +129,9 @@ class ArticleType(SoftDeleteObject, models.Model):
 
 class ArticleBase(SoftDeleteObject, models.Model):
 
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=20)
 
     pType = models.ForeignKey(ArticleType, on_delete=models.CASCADE, blank=True , null = False)
@@ -155,7 +161,9 @@ class ArticleBase(SoftDeleteObject, models.Model):
 
 class Article(SoftDeleteObject, models.Model):
 
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     base = models.ForeignKey(ArticleBase, on_delete=models.CASCADE, blank=True, null=False)
     #the storage space where other articles can be stored in the Article
     space = models.OneToOneField(Space, on_delete = models.CASCADE, related_name = "itemArticle", null=True, blank=True)

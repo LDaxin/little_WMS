@@ -2,6 +2,9 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
+from organisation.current import current_organisation_id
+from organisation.managers import OrganisationManager
+
 
 class AuditLog(models.Model):
     """Unified audit log for all objects (§32).
@@ -11,8 +14,10 @@ class AuditLog(models.Model):
     links a movement to its ``MovementSession`` (§11) for the session list/undo.
     """
 
+    objects = OrganisationManager()
+
     user = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     timestamp = models.DateTimeField(auto_now_add=True)
     action = models.CharField(max_length=30)
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)

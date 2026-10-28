@@ -2,12 +2,15 @@ from django.db import models
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
+from organisation.current import current_organisation_id
+from organisation.managers import SoftDeleteOrganisationManager
 
 # Create your models here.
 
 
 class TagCategory(SoftDeleteObject, models.Model):
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=50)
     color = models.CharField(max_length=7, default="#6c757d")
     allow_multiple = models.BooleanField(default=True)
@@ -18,7 +21,8 @@ class TagCategory(SoftDeleteObject, models.Model):
 
 
 class Tag(SoftDeleteObject, models.Model):
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=20)
     parent = SelfForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
     category = models.ForeignKey(TagCategory, on_delete=models.SET_NULL, blank=True, null=True)

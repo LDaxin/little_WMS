@@ -3,6 +3,8 @@ from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 
+from organisation.current import current_organisation_id
+
 
 class Organisation(models.Model):
     name = models.CharField(max_length=100)
@@ -31,7 +33,7 @@ class Role(models.Model):
     ``{"article": ["view_all", "move_assigned"]}``.
     """
 
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="roles")
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="roles", default=current_organisation_id)
     name = models.CharField(max_length=50)
     is_template = models.BooleanField(default=False)
     permissions = models.JSONField(default=dict, blank=True)
@@ -52,7 +54,7 @@ class UserProfile(models.Model):
 
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="profiles")
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=1)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=current_organisation_id)
 
     class Meta:
         unique_together = ("user", "organisation")

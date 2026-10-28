@@ -2,12 +2,15 @@ from django.db import models
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
+from organisation.current import current_organisation_id
+from organisation.managers import SoftDeleteOrganisationManager
 
 # Create your models here.
 
 
 class Location(SoftDeleteObject, models.Model):
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
 
     # Address – free-form lines for the variable part, optional structured
     # fields for filtering/sorting. Works for international formats (§28).

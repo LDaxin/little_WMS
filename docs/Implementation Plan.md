@@ -192,7 +192,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 3 | 3.1a Roles & Permissions (models, catalog, templates) | ✅ done |
 | 3 | 3.1b Roles & Permissions UI | ✅ done |
 | 3 | 3.2a Multi-Org Membership (profiles, active org, switcher) | ✅ done |
-| 3 | 3.2b Query filtering by active organisation | ⬜ open |
+| 3 | 3.2b Query filtering by active organisation | ✅ done |
 | 3 | 3.3 Registration & Invitations | ⬜ open |
 | 3 | 3.4 Onboarding | ⬜ open |
 | 4 | 4.1 Occasions | ⬜ open |

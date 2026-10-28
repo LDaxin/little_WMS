@@ -7,12 +7,15 @@ from codeSystem.models import UuidCode
 from django import forms
 from space.models import Space
 from tag.models import Tag
+from organisation.current import current_organisation_id
+from organisation.managers import SoftDeleteOrganisationManager
 # Create your models here.
 
 
 
 class StorageType(SoftDeleteObject, models.Model):
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=200)
     symbol = models.CharField(max_length=20)
 
@@ -31,7 +34,8 @@ class StorageType(SoftDeleteObject, models.Model):
         return self.name
 
 class Storage(SoftDeleteObject, models.Model):
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=1)
+    objects = SoftDeleteOrganisationManager()
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     name = models.CharField(max_length=200)
     typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
     parent = SelfForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
