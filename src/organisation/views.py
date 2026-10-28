@@ -1,4 +1,4 @@
-"""Roles & Permissions UI (§3)."""
+"""Roles & Permissions UI (§3) and organisation selection (§22)."""
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotFound
@@ -6,14 +6,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from organisation.models import Organisation, Role, UserProfile
 from organisation.permissions import PERMISSIONS
+from organisation.services import active_organisation, set_active_organisation
 
 
 def _organisation(request):
-    """The user's organisation, falling back to the default one (§3)."""
-    profile = getattr(request.user, "profile", None)
-    if profile is not None:
-        return profile.organisation
-    return Organisation.objects.get(pk=1)
+    """The active organisation of the request (§22)."""
+    return active_organisation(request)
 
 
 def _matrix(role):
@@ -105,8 +103,10 @@ def roleDelete(request, roleId):
 @login_required(login_url='/accounts/login/')
 def users(request):
     organisation = _organisation(request)
-    profiles = {p.user_id: p for p in UserProfile.objects.filter(organisation=organisation)}
-    rows = [{"user": user, "profile": profiles.get(user.pk)} for user in User.objects.all()]
+    rows = [
+        {"user": p.user, "profile": p}
+        for p in UserProfile.objects.filter(organisation=organisation).select_related("user")
+    ]
     return render(request, "organisation/users.html", {
         "rows": rows,
         "roles": organisation.roles.filter(is_template=False),
@@ -122,8 +122,36 @@ def userRole(request, userId):
     user = get_object_or_404(User, pk=userId)
     role_id = request.POST.get("role") or None
     role = organisation.roles.filter(pk=role_id).first() if role_id else None
-    profile, _ = UserProfile.objects.get_or_create(user=user, defaults={"organisation": organisation})
+    profile, _ = UserProfile.objects.get_or_create(user=user, organisation=organisation)
     profile.role = role
-    profile.organisation = organisation
     profile.save()
     return redirect("users")
+
+
+@login_required(login_url='/accounts/login/')
+def selectOrganisation(request):
+    """Pick the active organisation after login (§22)."""
+    profiles = request.user.profiles.select_related("organisation")
+    if profiles.count() == 1:
+        set_active_organisation(request, profiles.first().organisation)
+        return redirect("hub")
+    if not profiles.exists():
+        profile = UserProfile.objects.create(user=request.user, organisation_id=1)
+        set_active_organisation(request, profile.organisation)
+        return redirect("hub")
+    return render(request, "organisation/selectOrganisation.html", {"profiles": profiles})
+
+
+@login_required(login_url='/accounts/login/')
+def switchOrganisation(request):
+    """Switch the active organisation (§22)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    organisation = get_object_or_404(Organisation, pk=request.POST.get("organisation"))
+    if not request.user.is_superuser and not request.user.profiles.filter(
+        organisation=organisation
+    ).exists():
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    set_active_organisation(request, organisation)
+    return redirect(request.POST.get("next") or "hub")

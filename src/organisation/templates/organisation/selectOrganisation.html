@@ -1,0 +1,18 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Which organisation?</h4>
+
+<form method="post" action="{% url 'switch organisation' %}">
+    {% csrf_token %}
+    <ul class="list-group">
+        {% for profile in profiles %}
+        <li class="list-group-item">
+            <button class="btn btn-link p-0" name="organisation" value="{{ profile.organisation.pk }}">
+                {{ profile.organisation.name }}
+            </button>
+        </li>
+        {% endfor %}
+    </ul>
+</form>
+{% endblock %}

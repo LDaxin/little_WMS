@@ -31,7 +31,7 @@ CSRF_TRUSTED_ORIGINS = os.environ.get("CSRF_TRUSTED_ORIGINS").split(" ")
 DEBUG = bool(os.environ.get("DEBUG", default=False))
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-LOGIN_REDIRECT_URL = "/"
+LOGIN_REDIRECT_URL = "/select-organisation/"
 
 # Application definition
 
@@ -85,6 +85,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "organisation.context_processors.active_organisation",
             ],
         },
     },

@@ -35,6 +35,19 @@
 
                 {% if request.user.is_authenticated %}
 
+                {% if user_organisations %}
+                <form method="post" action="{% url 'switch organisation' %}" class="d-flex align-items-center">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    <select name="organisation" class="form-select form-select-sm" onchange="this.form.submit()">
+                        {% for org in user_organisations %}
+                        <option value="{{ org.pk }}"
+                                {% if active_organisation and org.pk == active_organisation.pk %}selected{% endif %}>{{ org.name }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                {% endif %}
+
                 <form method="post" action="/accounts/logout/" style="display: inline;">
                     {% csrf_token %}
                     <button class="btn btn-light" type="submit">

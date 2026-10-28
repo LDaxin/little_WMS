@@ -45,11 +45,17 @@ class Role(models.Model):
 
 
 class UserProfile(models.Model):
-    """Links a user to their organisation and role (§3)."""
+    """A user's membership in one organisation, with their role there (§3, §22).
 
-    user = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="profile")
+    A user can belong to several organisations — one profile per organisation.
+    """
+
+    user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="profiles")
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=1)
+
+    class Meta:
+        unique_together = ("user", "organisation")
 
     def __str__(self):
         return "%s (%s)" % (self.user, self.role or "no role")

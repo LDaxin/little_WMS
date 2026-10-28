@@ -116,7 +116,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 
 - **3.1a** Roles & Permissions: models, catalog, templates (§3)
 - **3.1b** Roles & Permissions UI (§3)
-- **3.2** Multi-Organisation Membership (§22)
+- **3.2a** Multi-Organisation Membership: profiles, active org, switcher (§22)
+- **3.2b** Query filtering by active organisation (§22)
 - **3.3** Registration & Invitations (§23)
 - **3.4** Onboarding (server, organisation, user) (§8, §23)
 
@@ -190,7 +191,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.5 Inventory Mode | ✅ done |
 | 3 | 3.1a Roles & Permissions (models, catalog, templates) | ✅ done |
 | 3 | 3.1b Roles & Permissions UI | ✅ done |
-| 3 | 3.2 Multi-Org Membership | ⬜ open |
+| 3 | 3.2a Multi-Org Membership (profiles, active org, switcher) | ✅ done |
+| 3 | 3.2b Query filtering by active organisation | ⬜ open |
 | 3 | 3.3 Registration & Invitations | ⬜ open |
 | 3 | 3.4 Onboarding | ⬜ open |
 | 4 | 4.1 Occasions | ⬜ open |

@@ -32,13 +32,25 @@ def all_permissions():
     return ["%s.%s" % (obj, perm) for obj in PERMISSIONS for perm in all_for(obj)]
 
 
-def has_perm(user, perm):
-    """Check a permission string like ``article.view_all`` (§3)."""
+def _profile(user, organisation=None):
+    """The user's membership profile, optionally for a specific organisation."""
+    profiles = user.profiles.all()
+    if organisation is not None:
+        return profiles.filter(organisation=organisation).first()
+    return profiles.first()
+
+
+def has_perm(user, perm, organisation=None):
+    """Check a permission string like ``article.view_all`` (§3).
+
+    Evaluated against the user's role in ``organisation`` (or their first
+    membership when none is given).
+    """
     if user is None or not getattr(user, "is_authenticated", False):
         return False
     if user.is_superuser:
         return True
-    profile = getattr(user, "profile", None)
+    profile = _profile(user, organisation)
     if profile is None or profile.role is None:
         return False
     obj, _, action = perm.partition(".")
