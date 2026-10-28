@@ -9,6 +9,7 @@ import csv
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import render
 
@@ -124,6 +125,24 @@ def inventoryClear(request):
 
     _save_state(request.session, {"space": None, "scanned": []})
     return _render(request)
+
+
+@login_required(login_url='/accounts/login/')
+def inventorySearch(request):
+    """Live suggestions for the combined code/name field (§5c)."""
+    search = request.GET.get("code", "").strip()
+    if search == "":
+        articles = Article.objects.none()
+        storages = Storage.objects.none()
+    else:
+        articles = Article.objects.filter(
+            Q(base__name__contains=search) | Q(code__code__contains=search)
+        )[:20]
+        storages = Storage.objects.filter(
+            Q(name__contains=search) | Q(code__code__contains=search)
+        )[:20]
+    return render(request, "movement/inventoryResults.html",
+                  context={"resultsA": articles, "resultsS": storages})
 
 
 @login_required(login_url='/accounts/login/')

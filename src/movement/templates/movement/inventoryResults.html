@@ -1,0 +1,16 @@
+{% for a in resultsA %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{% url 'inventory scan' %}" hx-vals='{"code": "{{ a.code.code }}"}'
+        hx-target="#inventoryBody" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('invResults').innerHTML='';document.getElementById('invScan').value='';">
+    {{ a.base.name }} <small class="text-muted">{{ a.code.code }}</small>
+</button>
+{% endfor %}
+{% for s in resultsS %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{% url 'inventory scan' %}" hx-vals='{"code": "{{ s.code.code }}"}'
+        hx-target="#inventoryBody" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('invResults').innerHTML='';document.getElementById('invScan').value='';">
+    {{ s }} <small class="text-muted">{{ s.code.code }}</small>
+</button>
+{% endfor %}

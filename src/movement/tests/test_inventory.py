@@ -72,3 +72,12 @@ class InventoryViewTest(InventoryTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("text/csv", response["Content-Type"])
         self.assertIn("Hammer", response.content.decode())
+
+    def test_search_by_name(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        response = self.client.get("/inventory/search/", {"code": "Hammer"})
+        self.assertContains(response, article.code.code)
+
+    def test_search_empty(self):
+        response = self.client.get("/inventory/search/", {"code": ""})
+        self.assertEqual(response.status_code, 200)

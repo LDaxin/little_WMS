@@ -6,6 +6,7 @@ urlpatterns = [
     path("movement/", views.movement, name="movement"),
     path("inventory/", inventory.inventory, name="inventory"),
     path("inventory/scan/", inventory.inventoryScan, name="inventory scan"),
+    path("inventory/search/", inventory.inventorySearch, name="inventory search"),
     path("inventory/clear/", inventory.inventoryClear, name="inventory clear"),
     path("inventory/export/", inventory.inventoryExport, name="inventory export"),
     path("where/", views.where, name="where"),
