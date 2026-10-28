@@ -1,0 +1,152 @@
+"""Inventory mode (§5c).
+
+Scan a location to set the scope, then scan the articles found there. The
+expected list is the current ``Stock`` in that location; scanned articles that
+belong elsewhere are flagged as deviations. State lives in the user's session,
+like the movement buffer.
+"""
+import csv
+
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+from django.http import HttpResponse, HttpResponseNotFound
+from django.shortcuts import render
+
+from article.models import Article, Stock
+from storage.models import Storage
+from space.services import space_path
+
+
+def _get_state(session):
+    state = session.get("inventory")
+    if not state:
+        state = {"space": None, "scanned": []}
+        session["inventory"] = state
+    return state
+
+
+def _save_state(session, state):
+    session["inventory"] = state
+    session.modified = True
+
+
+def _resolve_location(code):
+    """The Storage/Article behind a location code, for display."""
+    if not code:
+        return None
+    if code.startswith("s0"):
+        return Storage.objects.filter(code__code=code).first()
+    if code.startswith("a0"):
+        return Article.objects.filter(code__code=code).first()
+    return None
+
+
+def _context(request, error="", success=""):
+    state = _get_state(request.session)
+    location = _resolve_location(state["space"])
+    scanned = set(state["scanned"])
+
+    expected = []
+    if location is not None:
+        stocks = Stock.objects.filter(stored=location.space).select_related("article__base")
+        for stock in stocks:
+            code = stock.article.code.code
+            expected.append({"article": stock.article, "found": code in scanned})
+    expected_codes = {e["article"].code.code for e in expected}
+
+    deviations = []
+    for code in state["scanned"]:
+        if code in expected_codes:
+            continue
+        article = Article.objects.filter(code__code=code).first()
+        if article is None:
+            continue
+        deviations.append({
+            "article": article,
+            "locations": [space_path(s.stored) for s in article.stocks.exclude(stored=None)],
+        })
+
+    return {
+        "location": location,
+        "expected": expected,
+        "deviations": deviations,
+        "scanned_count": len(state["scanned"]),
+        "expected_count": len(expected),
+        "found_count": sum(1 for e in expected if e["found"]),
+        "error": error,
+        "success": success,
+    }
+
+
+def _render(request, error="", success=""):
+    return render(request, "movement/inventoryBody.html",
+                  context=_context(request, error=error, success=success))
+
+
+@login_required(login_url='/accounts/login/')
+def inventory(request):
+    return render(request, "movement/inventory.html", context=_context(request))
+
+
+@login_required(login_url='/accounts/login/')
+def inventoryScan(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    state = _get_state(request.session)
+    code = request.POST.get("code", "").strip()
+    error = ""
+    try:
+        if code.startswith("s0"):
+            Storage.objects.get(code__code=code)
+            state["space"] = code
+        elif code.startswith("a0"):
+            if not state["space"]:
+                raise ValidationError("Scan a location first")
+            Article.objects.get(code__code=code)
+            if code not in state["scanned"]:
+                state["scanned"].append(code)
+        else:
+            raise ValidationError("Unknown code %s" % code)
+    except (Storage.DoesNotExist, Article.DoesNotExist):
+        error = "No object with code %s" % code
+    except ValidationError as e:
+        error = e.messages[0] if e.messages else str(e)
+
+    _save_state(request.session, state)
+    return _render(request, error=error)
+
+
+@login_required(login_url='/accounts/login/')
+def inventoryClear(request):
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    _save_state(request.session, {"space": None, "scanned": []})
+    return _render(request)
+
+
+@login_required(login_url='/accounts/login/')
+def inventoryExport(request):
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="inventory.csv"'
+    writer = csv.writer(response, dialect="excel")
+    writer.writerow(["name", "code", "status", "location"])
+
+    context = _context(request)
+    location = str(context["location"]) if context["location"] else ""
+    for entry in context["expected"]:
+        writer.writerow([
+            entry["article"].base.name,
+            entry["article"].code.code,
+            "found" if entry["found"] else "not found",
+            location,
+        ])
+    for deviation in context["deviations"]:
+        writer.writerow([
+            deviation["article"].base.name,
+            deviation["article"].code.code,
+            "deviation",
+            "; ".join(deviation["locations"]),
+        ])
+    return response

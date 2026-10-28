@@ -1,9 +1,13 @@
 from django.urls import path, re_path
-from . import views
+from . import views, inventory
 
 
 urlpatterns = [
     path("movement/", views.movement, name="movement"),
+    path("inventory/", inventory.inventory, name="inventory"),
+    path("inventory/scan/", inventory.inventoryScan, name="inventory scan"),
+    path("inventory/clear/", inventory.inventoryClear, name="inventory clear"),
+    path("inventory/export/", inventory.inventoryExport, name="inventory export"),
     path("where/", views.where, name="where"),
     path("where/search", views.whereSearch, name="where search"),
     path("where/scanner/<str:scannerId>/<str:state>", views.movementScanner, name="where scanner"),

@@ -16,6 +16,8 @@
        hx-get="{% url 'movement search' %}" hx-target="#searchResults" hx-trigger="input changed delay:300ms">
 <div id="searchResults" class="list-group mb-2"></div>
 
+<a class="btn btn-outline-primary mb-2" href="{% url 'inventory' %}">Start inventory</a>
+
 {% include "movement/buffer.html" %}
 
 {% endblock %}

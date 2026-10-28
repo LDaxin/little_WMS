@@ -1,0 +1,17 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+
+<form id="invScanForm" class="mb-2" hx-post="{% url 'inventory scan' %}" hx-target="#inventoryBody" hx-swap="outerHTML"
+      hx-on::after-request="document.getElementById('invScan').value=''">
+    {% csrf_token %}
+    <div class="input-group">
+        <input id="invScan" name="code" class="form-control" placeholder="Scan location or article..." autofocus autocomplete="off">
+        {% include "hub/modules/qrScanner.html" with input="invScan" scannerUrl="/movement/scanner/invScan/toggle" %}
+    </div>
+    <div id="scannerDivinvScan"></div>
+</form>
+
+{% include "movement/inventoryBody.html" %}
+
+{% endblock %}
