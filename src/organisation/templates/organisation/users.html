@@ -1,0 +1,33 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Users</h4>
+
+<table class="table">
+    <thead>
+        <tr><th>User</th><th>Role</th></tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row.user }}</td>
+            <td>
+                <form method="post" action="{% url 'user role' row.user.pk %}" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <select name="role" class="form-select form-select-sm" style="max-width:16rem">
+                        <option value="">&mdash; none &mdash;</option>
+                        {% for r in roles %}
+                        <option value="{{ r.pk }}"
+                                {% if row.profile and row.profile.role_id == r.pk %}selected{% endif %}>{{ r.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-primary">Save</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a class="btn btn-outline-secondary" href="{% url 'roles' %}">Back to roles</a>
+{% endblock %}
