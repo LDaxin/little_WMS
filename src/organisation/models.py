@@ -22,3 +22,33 @@ class Organisation(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Role(models.Model):
+    """A named collection of permissions, per organisation (§3).
+
+    ``permissions`` maps an object to a list of ``action_scope`` strings, e.g.
+    ``{"article": ["view_all", "move_assigned"]}``.
+    """
+
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="roles")
+    name = models.CharField(max_length=50)
+    is_template = models.BooleanField(default=False)
+    permissions = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        unique_together = ("organisation", "name")
+
+    def __str__(self):
+        return self.name
+
+
+class UserProfile(models.Model):
+    """Links a user to their organisation and role (§3)."""
+
+    user = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="profile")
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=1)
+
+    def __str__(self):
+        return "%s (%s)" % (self.user, self.role or "no role")

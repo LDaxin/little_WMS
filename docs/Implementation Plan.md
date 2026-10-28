@@ -114,7 +114,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 
 ### Phase 3 – Users & Organisations
 
-- **3.1** Roles & Permissions (§3)
+- **3.1a** Roles & Permissions: models, catalog, templates (§3)
+- **3.1b** Roles & Permissions UI (§3)
 - **3.2** Multi-Organisation Membership (§22)
 - **3.3** Registration & Invitations (§23)
 - **3.4** Onboarding (server, organisation, user) (§8, §23)
@@ -187,7 +188,8 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.4b Movement session / undo | ✅ done |
 | 2 | 2.4c Admin log, filters, retention | ✅ done |
 | 2 | 2.5 Inventory Mode | ✅ done |
-| 3 | 3.1 Roles & Permissions | ⬜ open |
+| 3 | 3.1a Roles & Permissions (models, catalog, templates) | ✅ done |
+| 3 | 3.1b Roles & Permissions UI | ⬜ open |
 | 3 | 3.2 Multi-Org Membership | ⬜ open |
 | 3 | 3.3 Registration & Invitations | ⬜ open |
 | 3 | 3.4 Onboarding | ⬜ open |
