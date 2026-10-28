@@ -37,7 +37,8 @@ class Role(models.Model):
     permissions = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        unique_together = ("organisation", "name")
+        # templates and real roles may share a name (KI-020)
+        unique_together = ("organisation", "name", "is_template")
 
     def __str__(self):
         return self.name

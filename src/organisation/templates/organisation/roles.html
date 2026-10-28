@@ -3,6 +3,8 @@
 {% block content %}
 <h4>Roles &amp; Permissions</h4>
 
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+
 <h6 class="mt-3">Templates</h6>
 <div class="row">
     {% for t in templates %}
@@ -13,6 +15,7 @@
             <div class="card h-100">
                 <div class="card-body">
                     <strong>{{ t.name }}</strong>
+                    {% if t.name in role_names %}<span class="badge text-bg-success">&#10003; created</span>{% endif %}
                     <input name="name" class="form-control form-control-sm my-2" value="{{ t.name }}">
                     <button class="btn btn-sm btn-primary">Create</button>
                 </div>

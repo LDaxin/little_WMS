@@ -22,6 +22,19 @@ class RolesViewTest(TestCase):
         self.assertFalse(role.is_template)
         self.assertIn("view_all", role.permissions["article"])
 
+    def test_create_from_template_with_default_name(self):
+        # KI-020: the default name equals the template name and used to collide
+        response = self.client.post("/roles/create/", {"template": "Read Only", "name": "Read Only"})
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Role.objects.filter(name="Read Only", is_template=False).exists())
+
+    def test_create_duplicate_role_shows_error(self):
+        Role.objects.create(organisation_id=1, name="Praktikant", permissions={})
+        response = self.client.post("/roles/create/", {"template": "Read Only", "name": "Praktikant"})
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "already exists")
+        self.assertEqual(Role.objects.filter(name="Praktikant", is_template=False).count(), 1)
+
     def test_role_detail_shows_matrix(self):
         role = Role.objects.create(organisation_id=1, name="Tester", permissions={})
         response = self.client.get(f"/roles/{role.pk}/")

@@ -43,11 +43,14 @@ def _group(perms):
 
 
 @login_required(login_url='/accounts/login/')
-def roles(request):
+def roles(request, error=""):
     organisation = _organisation(request)
+    roles = organisation.roles.filter(is_template=False)
     return render(request, "organisation/roles.html", {
         "templates": organisation.roles.filter(is_template=True),
-        "roles": organisation.roles.filter(is_template=False),
+        "roles": roles,
+        "role_names": set(roles.values_list("name", flat=True)),
+        "error": error,
     })
 
 
@@ -61,6 +64,8 @@ def roleCreate(request):
         Role, organisation=organisation, name=request.POST.get("template", ""), is_template=True
     )
     name = request.POST.get("name", "").strip() or template.name
+    if Role.objects.filter(organisation=organisation, name=name, is_template=False).exists():
+        return roles(request, error="A role named '%s' already exists." % name)
     Role.objects.create(
         organisation=organisation, name=name, is_template=False, permissions=template.permissions
     )
