@@ -185,7 +185,7 @@ Format: `type: what` (e.g. `add: article model tests`)
 | 2 | 2.3h Minimums + not stored | ✅ done |
 | 2 | 2.4a AuditLog model + logging | ✅ done |
 | 2 | 2.4b Movement session / undo | ✅ done |
-| 2 | 2.4c Admin log, filters, retention | ⬜ open |
+| 2 | 2.4c Admin log, filters, retention | ✅ done |
 | 2 | 2.5 Inventory Mode | ⬜ open |
 | 3 | 3.1 Roles & Permissions | ⬜ open |
 | 3 | 3.2 Multi-Org Membership | ⬜ open |
