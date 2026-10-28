@@ -7,8 +7,8 @@ class AuditLog(models.Model):
     """Unified audit log for all objects (§32).
 
     One entry per action; ``content_object`` is the affected object (an Article
-    for movements, since quantity lives on its ``Stock`` lines). The ``session``
-    link (§11) is added once ``MovementSession`` exists.
+    for movements, since quantity lives on its ``Stock`` lines). ``session``
+    links a movement to its ``MovementSession`` (§11) for the session list/undo.
     """
 
     user = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
@@ -19,6 +19,9 @@ class AuditLog(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey("content_type", "object_id")
     changes = models.JSONField(default=dict, blank=True)
+    session = models.ForeignKey(
+        "movement.MovementSession", null=True, blank=True, on_delete=models.SET_NULL
+    )
     undone = models.BooleanField(default=False)
 
     class Meta:

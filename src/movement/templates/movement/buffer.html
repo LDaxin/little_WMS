@@ -83,4 +83,26 @@
         <button type="button" class="btn btn-outline-secondary"
                 hx-post="{% url 'movement clear' %}" hx-target="#movementBuffer" hx-swap="outerHTML">Clear</button>
     </div>
+
+    {% if session_entries %}
+    <div class="card mt-2">
+        <div class="card-body">
+            <strong>Session</strong>
+            <ul class="list-group list-group-flush">
+                {% for entry in session_entries %}
+                <li class="list-group-item d-flex justify-content-between align-items-center {% if entry.undone %}text-muted text-decoration-line-through{% endif %}">
+                    <span>{{ entry.timestamp|date:"H:i" }} {{ entry.action }} {{ entry.content_object }}</span>
+                    {% if not entry.undone %}
+                    <button type="button" class="btn btn-sm btn-outline-secondary"
+                            hx-post="{% url 'movement undo entry' %}" hx-vals='{"entry": "{{ entry.pk }}"}'
+                            hx-target="#movementBuffer" hx-swap="outerHTML">&#8630;</button>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                    hx-post="{% url 'movement undo' %}" hx-target="#movementBuffer" hx-swap="outerHTML">&#8630; Undo last action</button>
+        </div>
+    </div>
+    {% endif %}
 </div>

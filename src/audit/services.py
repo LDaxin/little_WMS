@@ -6,7 +6,7 @@ that matter are logged, with the caller's ``user``.
 from django.contrib.contenttypes.models import ContentType
 
 
-def log(action, obj, user=None, changes=None):
+def log(action, obj, user=None, changes=None, session=None):
     """Write one audit entry for ``obj`` and return it."""
     from audit.models import AuditLog
 
@@ -19,4 +19,5 @@ def log(action, obj, user=None, changes=None):
         content_type=ContentType.objects.get_for_model(obj),
         object_id=obj.pk,
         changes=changes or {},
+        session=session,
     )

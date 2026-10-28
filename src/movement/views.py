@@ -7,9 +7,10 @@ from django.db.models import Q
 from article.models import Article
 from storage.models import Storage
 from space.services import space_path
-from movement.services import MovementService, resolve_space
-from movement.session import get_state, save_state, reset
+from movement.services import MovementService, resolve_space, undo
+from movement.session import get_state, save_state, reset, get_open_session, end_open_session
 from article.services import default_locations
+from audit.models import AuditLog
 
 # Create your views here.
 
@@ -39,11 +40,16 @@ def _buffer_context(request, error="", success=""):
     state = get_state(request.session)
     by_code = {a.code.code: a for a in Article.objects.filter(code__code__in=state["buffer"])}
     buffered = [by_code[c] for c in state["buffer"] if c in by_code]
+    session = get_open_session(request.user, create=False)
+    entries = (
+        AuditLog.objects.filter(session=session)[:20] if session is not None else []
+    )
     return {
         "mode": state["mode"],
         "buffer": buffered,
         "target": _resolve_target(state["target"]),
         "target_smart": state["target_smart"],
+        "session_entries": entries,
         "error": error,
         "success": success,
     }
@@ -135,7 +141,7 @@ def movementMode(request):
     mode = request.POST.get("mode", "store")
     if mode in ("store", "remove"):
         state["mode"] = mode
-        reset(request.session)
+    reset(request.session)
     return _render_buffer(request)
 
 
@@ -145,6 +151,7 @@ def movementClear(request):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
     reset(request.session)
+    end_open_session(request.user)
     return _render_buffer(request)
 
 
@@ -211,7 +218,8 @@ def movementStore(request):
     try:
         target = resolve_space(state["target"] or "")
         articles = _articles_from_codes(state["buffer"])
-        MovementService.store_articles(articles, target, request.user)
+        MovementService.store_articles(
+            articles, target, request.user, session=get_open_session(request.user))
     except ValidationError as e:
         return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
 
@@ -228,14 +236,54 @@ def movementRemove(request):
     state = get_state(request.session)
     try:
         articles = _articles_from_codes(state["buffer"])
+        session = get_open_session(request.user)
         for article in articles:
-            MovementService.remove_article(article, user=request.user)
+            MovementService.remove_article(article, user=request.user, session=session)
     except ValidationError as e:
         return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
 
     count = len(articles)
     reset(request.session)
     return _render_buffer(request, success="Removed %s article(s)" % count)
+
+
+@login_required(login_url='/accounts/login/')
+def movementUndo(request):
+    """Undo the most recent (not yet undone) action of the open session (§11)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    session = get_open_session(request.user)
+    entry = (
+        AuditLog.objects.filter(session=session, undone=False).first()
+        if session is not None else None
+    )
+    if entry is None:
+        return _render_buffer(request, error="Nothing to undo")
+    try:
+        undo(entry, request.user)
+    except ValidationError as e:
+        return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
+    return _render_buffer(request, success="Undone")
+
+
+@login_required(login_url='/accounts/login/')
+def movementUndoEntry(request):
+    """Undo one specific session entry (§11)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    session = get_open_session(request.user)
+    entry = AuditLog.objects.filter(
+        pk=request.POST.get("entry"), session=session
+    ).first()
+    if entry is None:
+        return _render_buffer(request, error="Entry not found")
+    try:
+        undo(entry, request.user)
+    except ValidationError as e:
+        return _render_buffer(request, error=e.messages[0] if e.messages else str(e))
+    return _render_buffer(request, success="Undone")
 
 
 @login_required(login_url='/accounts/login/')

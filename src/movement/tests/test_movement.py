@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, Stock
+from audit.models import AuditLog
+from movement.models import MovementSession
 from space.models import Space
 from storage.models import Storage, StorageType
 
@@ -194,3 +196,60 @@ class MovementBufferActionsTest(MovementTestBase):
         self.client.post("/movement/set-target/", {"code": container.code.code})
         self.assertEqual(self.state()["target"], container.code.code)
         self.assertNotIn(container.code.code, self.state()["buffer"])
+
+
+class MovementSessionUndoTest(MovementTestBase):
+    def store(self, article):
+        self.scan(self.storage.code.code)
+        self.scan(article.code.code)
+        return self.client.post("/movement/store/")
+
+    def test_store_creates_session_and_links_entry(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        self.store(article)
+        session = MovementSession.objects.get(user=self.user, ended_at=None)
+        entry = AuditLog.objects.get(action="moved")
+        self.assertEqual(entry.session, session)
+
+    def test_undo_moved_returns_article(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        self.store(article)
+        self.assertTrue(article.stocks.filter(stored=self.storage.space).exists())
+        response = self.client.post("/movement/undo/")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
+        self.assertTrue(article.stocks.filter(stored=None).exists())
+        self.assertTrue(AuditLog.objects.get(action="moved").undone)
+
+    def test_undo_removed_stores_article_back(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        Stock.objects.create(article=article, stored=self.storage.space, menge=1)
+        self.scan(article.code.code)
+        self.client.post("/movement/remove/")
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
+        self.client.post("/movement/undo/")
+        self.assertTrue(article.stocks.filter(stored=self.storage.space).exists())
+
+    def test_undo_entry_by_id(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        self.store(article)
+        entry = AuditLog.objects.get(action="moved")
+        self.client.post("/movement/undo/entry/", {"entry": entry.pk})
+        self.assertFalse(article.stocks.filter(stored=self.storage.space).exists())
+
+    def test_undo_without_session_shows_error(self):
+        response = self.client.post("/movement/undo/")
+        self.assertContains(response, "Nothing to undo")
+
+    def test_session_list_rendered(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        self.store(article)
+        response = self.client.get("/movement/")
+        self.assertContains(response, "Session")
+        self.assertContains(response, "Undo last action")
+
+    def test_clear_ends_session(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        self.store(article)
+        self.client.post("/movement/clear/")
+        self.assertFalse(MovementSession.objects.filter(user=self.user, ended_at=None).exists())

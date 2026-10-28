@@ -16,6 +16,8 @@ urlpatterns = [
     path("movement/set-target/", views.movementSetTarget, name="movement set target"),
     path("movement/store/", views.movementStore, name="movement store"),
     path("movement/remove/", views.movementRemove, name="movement remove"),
+    path("movement/undo/", views.movementUndo, name="movement undo"),
+    path("movement/undo/entry/", views.movementUndoEntry, name="movement undo entry"),
     path("movement/search/", views.movementSearch, name="movement search"),
     re_path(r"^movement/scanner/(?P<scannerId>\w+)/(?P<state>\w+)", views.movementScanner, name="movement scanner"),
 ]
