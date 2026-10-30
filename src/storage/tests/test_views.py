@@ -13,7 +13,7 @@ class StorageViewTest(TestCase):
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_pages_return_200(self):
@@ -78,7 +78,7 @@ class StorageContentsTest(TestCase):
         cls.article = Article.objects.create(base=cls.article_base)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_store_in_storage(self):
@@ -116,7 +116,7 @@ class StorageTagTest(TestCase):
         cls.tag = Tag.objects.create(name="summer", color="#ff0000")
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_add_tag(self):

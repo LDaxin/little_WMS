@@ -3,12 +3,14 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.db.models import Q
 import csv
 
 
 # Create your views here.
 @login_required(login_url='/accounts/login/')
+@require_perm("code.create_all")
 def addCode(request):
     if request.method == "POST":
         form = FormCode(request.POST)
@@ -36,6 +38,7 @@ def addCode(request):
     return render(request, "hub/modules/itemAdd.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("code.view_all")
 def addModal(request):
     context = {
         "modalId":"add",
@@ -45,6 +48,7 @@ def addModal(request):
     return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("code.view_all")
 def codes(request):
     context = {
         "symbol":"Code",
@@ -59,6 +63,7 @@ def codes(request):
     return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("code.view_all")
 def searchCodes(request):
     if request.method == "GET":
         if request.GET['search'] == "":
@@ -68,6 +73,7 @@ def searchCodes(request):
         return render(request, "hub/modules/results.html", context={"results":r, "type":"code"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("code.view_all")
 def resolve_code(request, kind, code):
     """Canonical link by code (§26): /a/<code>, /s/<code>, /l/<code>."""
     from article.models import Article
@@ -90,6 +96,7 @@ def resolve_code(request, kind, code):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("code.export_all")
 def codesExport(request):
     response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="codes.csv"'

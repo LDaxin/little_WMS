@@ -15,7 +15,7 @@ class ArticleViewTest(TestCase):
         cls.article = Article.objects.create(base=cls.article_base)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_pages_return_200(self):
@@ -123,7 +123,7 @@ class ArticleStoreRemoveTest(TestCase):
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_store_article(self):
@@ -193,7 +193,7 @@ class ArticleStoreToDefaultTest(TestCase):
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_store_to_default(self):
@@ -229,7 +229,7 @@ class ArticleTagTest(TestCase):
         cls.tag = Tag.objects.create(name="summer", color="#ff0000")
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_add_tag(self):
@@ -264,7 +264,7 @@ class CompositionViewTest(TestCase):
         cls.space = Space.objects.create(prefix="s0")
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_add_composition_item(self):
@@ -338,7 +338,7 @@ class CompositionWarningTest(TestCase):
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_store_into_full_location_warns(self):
@@ -390,7 +390,7 @@ class CompositionRenderTest(TestCase):
         cls.storage = Storage.objects.create(name="Regal A", typ=cls.storage_type)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_container_detail_shows_composition(self):
@@ -413,7 +413,7 @@ class ArticleConsumeTest(TestCase):
         Stock.objects.create(article=cls.article, stored=None, menge=5)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_mergeable_article_shows_amount_input(self):
@@ -460,7 +460,7 @@ class GlobalMinimumViewTest(TestCase):
         cls.other = Space.objects.create(prefix="s0")
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_set_global_minimum_from_locations(self):
@@ -481,7 +481,7 @@ class NotStoredTest(TestCase):
         Stock.objects.create(article=cls.article, stored=None, menge=2)
 
     def setUp(self):
-        self.user = User.objects.create_user(username="tester", password="pw")
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
         self.client.login(username="tester", password="pw")
 
     def test_not_stored_hint(self):

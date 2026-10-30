@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from .models import *
 from .forms import *
 from django.db.models import Q
@@ -7,6 +8,7 @@ from django.db.models import Q
 # Create your views here.
 
 @login_required(login_url='/accounts/login/')
+@require_perm("tag.view_all")
 def tag(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
@@ -16,6 +18,8 @@ def tag(request, tagId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
     
 
+@login_required(login_url='/accounts/login/')
+@require_perm("tag.edit_all")
 def tagIncert(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
@@ -24,9 +28,13 @@ def tagIncert(request, tagId):
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+@login_required(login_url='/accounts/login/')
+@require_perm("tag.view_all")
 def tags(request):
     return render(request, "hub/modules/items.html", context={"symbol":"Tag", "searchFieldName":"tagSearch", 'type':"tag", "name":"tag", "form":[FormTag], "modalId":"add"})
 
+@login_required(login_url='/accounts/login/')
+@require_perm("tag.create_all")
 def addTag(request):
     if request.method == "POST":
         tagForm = FormTag(request.POST)
@@ -35,6 +43,8 @@ def addTag(request):
             tag.save()
             return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(tag) + " was added to your system.", "toastType":"status"})
 
+@login_required(login_url='/accounts/login/')
+@require_perm("tag.delete_all")
 def delTag(request):
     if request.method == "POST":
         delList = []
@@ -58,6 +68,8 @@ def delTag(request):
 
 
 
+@login_required(login_url='/accounts/login/')
+@require_perm("tag.edit_all")
 def updateTag(request, tagId):
     tagObject = Tag.objects.get(pk=tagId)
 
@@ -68,6 +80,7 @@ def updateTag(request, tagId):
             return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":"Tag was updated.", "toastType":"status"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("tag.view_all")
 def searchTags(request):
     if request.method == "GET":
         if request.GET['search'] == "":

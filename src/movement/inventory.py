@@ -8,6 +8,7 @@ like the movement buffer.
 import csv
 
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import HttpResponse, HttpResponseNotFound
@@ -85,11 +86,13 @@ def _render(request, error="", success=""):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def inventory(request):
     return render(request, "movement/inventory.html", context=_context(request))
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def inventoryScan(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -119,6 +122,7 @@ def inventoryScan(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def inventoryClear(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -128,6 +132,7 @@ def inventoryClear(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def inventorySearch(request):
     """Live suggestions for the combined code/name field (§5c)."""
     search = request.GET.get("code", "").strip()
@@ -146,6 +151,7 @@ def inventorySearch(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def inventoryExport(request):
     response = HttpResponse(content_type="text/csv; charset=utf-8")
     response["Content-Disposition"] = 'attachment; filename="inventory.csv"'

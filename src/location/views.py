@@ -2,12 +2,14 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from .forms import *
 from django.db.models import Q
 
 # Create your views here.
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.view_all")
 def location(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
@@ -17,6 +19,7 @@ def location(request, locationId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.edit_all")
 def locationIncert(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
@@ -27,10 +30,12 @@ def locationIncert(request, locationId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.view_all")
 def locations(request):
     return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "modalId":"single", "name":"location", "type":"location", "form":[FormLocation]})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.create_all")
 def addLocation(request):
     if request.method == "POST":
         l = FormLocation(request.POST)
@@ -41,6 +46,7 @@ def addLocation(request):
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.delete_all")
 def delLocation(request):
     if request.method == "POST":
         delList = []
@@ -60,6 +66,7 @@ def delLocation(request):
     return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.edit_all")
 def updateLocation(request, locationId):
     locationObject = Location.objects.get(pk=locationId)
     
@@ -71,6 +78,7 @@ def updateLocation(request, locationId):
         return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thething went wrong", "toastType":"alert"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.view_all")
 def searchLocations(request):
     if request.method == "GET":
         search = request.GET.get("search", "")

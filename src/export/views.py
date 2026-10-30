@@ -3,6 +3,7 @@ import io
 import qrcode
 import qrcode.image.svg
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
@@ -35,6 +36,7 @@ def qr_svg(data):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("export.qr_sheet_all")
 def qrPrint(request):
     """Printable QR sheet for the selected articles/storages (§5a)."""
     if request.method != "POST":

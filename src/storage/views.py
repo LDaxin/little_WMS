@@ -8,12 +8,14 @@ from article.views import composition_context, composition_warning
 from tag.models import Tag
 from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 import csv
 from time import sleep
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
 def storage(request, typ, storageId):
         storageObject = Storage.objects.get(pk=storageId)
 
@@ -46,6 +48,7 @@ def storage(request, typ, storageId):
     
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def storageIncert(request, typ, storageId):
     try:
         storageObject = Storage.objects.get(pk=storageId)
@@ -68,6 +71,7 @@ def storageIncert(request, typ, storageId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
 def storages(request, typ):
 
     storageTypeObject = StorageType.objects.get(name__exact=typ)
@@ -90,6 +94,7 @@ def storages(request, typ):
         return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.create_all")
 def addModal(request, typ):
     context = {
         "modalId":"add",
@@ -99,6 +104,7 @@ def addModal(request, typ):
     return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.delete_all")
 def delModal(request, typ):
     context = {
         "modalId":"del",
@@ -108,6 +114,7 @@ def delModal(request, typ):
     return render(request, "hub/modules/delForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.create_all")
 def addStorage(request, typ):
 
     t = StorageType.objects.get(name__exact=typ)
@@ -166,6 +173,7 @@ def addStorage(request, typ):
     return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.delete_all")
 def delStorage(request, typ):
     if request.method == "POST":
         delList = []
@@ -206,6 +214,7 @@ def delStorage(request, typ):
     return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def updateStorage(request, storageId, typ):
     storageObject = Storage.objects.get(pk=storageId)
 
@@ -241,6 +250,7 @@ def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning=""
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def storeInStorage(request, typ, storageId):
     storage = Storage.objects.get(pk=storageId)
     storeUrl = "./%s/store" % storageId
@@ -268,6 +278,7 @@ def storeInStorage(request, typ, storageId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def removeFromStorage(request, typ, storageId, articleId):
     storage = Storage.objects.get(pk=storageId)
     storeUrl = "./%s/store" % storageId
@@ -291,6 +302,7 @@ def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def addStorageTag(request, typ, storageId):
     storage = Storage.objects.get(pk=storageId)
     tagAddUrl = "./%s/tags/add" % storageId
@@ -309,6 +321,7 @@ def addStorageTag(request, typ, storageId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def removeStorageTag(request, typ, storageId, tagId):
     storage = Storage.objects.get(pk=storageId)
     tagAddUrl = "./%s/tags/add" % storageId
@@ -321,6 +334,7 @@ def removeStorageTag(request, typ, storageId, tagId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
 def searchStorages(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
@@ -331,6 +345,7 @@ def searchStorages(request, typ):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("export.csv_all")
 def exportStorages(request, typ):
     response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="storages.csv"'
@@ -348,6 +363,7 @@ def exportStorages(request, typ):
     return response
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
 def storageScanner(request, typ, scannerId, state):
     if state == "toggle":
         print(request.POST)

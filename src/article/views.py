@@ -7,6 +7,7 @@ from .forms import *
 from space.models import Space
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.db.models import Q
 import csv
 from storage.models import *
@@ -22,6 +23,7 @@ from audit.services import log as audit_log
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def article(request, typ, articleId):
     p = Article.objects.get(pk=articleId)
     if p.base.pType.name == typ:
@@ -57,6 +59,7 @@ def article(request, typ, articleId):
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
 def addModal(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     context = {
@@ -67,6 +70,7 @@ def addModal(request, typ):
     return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.delete_all")
 def delModal(request, typ):
     context = {
         "modalId":"del",
@@ -76,6 +80,7 @@ def delModal(request, typ):
     return render(request, "hub/modules/delForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.edit_all")
 def articleIncert(request, typ, articleId):
     try:
         p = Article.objects.get(pk=articleId)
@@ -97,6 +102,7 @@ def articleIncert(request, typ, articleId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def articles(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
 
@@ -118,6 +124,7 @@ def articles(request, typ):
         return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
 def addArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
@@ -231,6 +238,7 @@ def addArticle(request, typ):
         return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.delete_all")
 def delArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
@@ -281,6 +289,7 @@ def delArticle(request, typ):
         return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.edit_all")
 def updateArticle(request, typ, articleId):
     articleTypeObject = ArticleType.objects.get(name__exact=typ)
     articleObject = Article.objects.get(pk=articleId)
@@ -363,6 +372,7 @@ def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", f
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def storeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     storeUrl = "./%s/store" % articleId
@@ -387,6 +397,7 @@ def storeArticle(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def removeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     storeUrl = "./%s/store" % articleId
@@ -401,6 +412,7 @@ def removeArticle(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def storeToDefault(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     storeUrl = "./%s/store" % articleId
@@ -433,6 +445,7 @@ def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.edit_all")
 def addArticleTag(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     tagAddUrl = "./%s/tags/add" % articleId
@@ -451,6 +464,7 @@ def addArticleTag(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.edit_all")
 def removeArticleTag(request, typ, articleId, tagId):
     article = Article.objects.get(pk=articleId)
     tagAddUrl = "./%s/tags/add" % articleId
@@ -531,6 +545,7 @@ def _allocation_warning(base, soll, space):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def addCompositionItem(request, spaceId):
     space = Space.objects.get(pk=spaceId)
     if request.method == "POST":
@@ -558,6 +573,7 @@ def addCompositionItem(request, spaceId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def removeCompositionItem(request, spaceId, itemId):
     space = Space.objects.get(pk=spaceId)
     if request.method == "POST":
@@ -568,6 +584,7 @@ def removeCompositionItem(request, spaceId, itemId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
 def setGlobalMinimum(request, spaceId, itemId):
     """Set a base's global minimum to the sum of its per-location minimums (§4d)."""
     space = Space.objects.get(pk=spaceId)
@@ -582,6 +599,7 @@ def setGlobalMinimum(request, spaceId, itemId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def searchArticle(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
@@ -591,6 +609,7 @@ def searchArticle(request, typ):
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("export.csv_all")
 def exportArticles(request, typ):
     response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
     response['Content-Disposition'] = 'attachment; filename="articles.csv"'
@@ -608,6 +627,7 @@ def exportArticles(request, typ):
     return response
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def articleScanner(request, typ, scannerId, state):
     if state == "toggle":
         print(request.POST)

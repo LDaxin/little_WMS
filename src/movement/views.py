@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required
+from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 
@@ -61,11 +62,13 @@ def _render_buffer(request, error="", success=""):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movement(request):
     return render(request, "movement/movement.html", context=_buffer_context(request))
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def where(request):
     """'Where is...?' – current and default location of an article (§5b)."""
     query = request.GET.get("q", "").strip()
@@ -90,6 +93,7 @@ def where(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.view_all")
 def whereSearch(request):
     search = request.GET.get("q", "").strip()
     results = []
@@ -101,6 +105,7 @@ def whereSearch(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementScan(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -133,6 +138,7 @@ def movementScan(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementMode(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -146,6 +152,7 @@ def movementMode(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementClear(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -156,6 +163,7 @@ def movementClear(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementBufferRemove(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -169,6 +177,7 @@ def movementBufferRemove(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementTargetClear(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -181,6 +190,7 @@ def movementTargetClear(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementTreatAsArticle(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -195,6 +205,7 @@ def movementTreatAsArticle(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementSetTarget(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -210,6 +221,7 @@ def movementSetTarget(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementStore(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -229,6 +241,7 @@ def movementStore(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementRemove(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -248,6 +261,7 @@ def movementRemove(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementUndo(request):
     """Undo the most recent (not yet undone) action of the open session (§11)."""
     if request.method != "POST":
@@ -268,6 +282,7 @@ def movementUndo(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementUndoEntry(request):
     """Undo one specific session entry (§11)."""
     if request.method != "POST":
@@ -287,6 +302,7 @@ def movementUndoEntry(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementSearch(request):
     if request.method == "GET":
         search = request.GET.get("search", "")
@@ -302,6 +318,7 @@ def movementSearch(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
 def movementScanner(request, scannerId, state):
     if state == "toggle":
         active = request.POST.get("active_scanner", "")
