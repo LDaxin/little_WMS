@@ -6,9 +6,7 @@ Move articles between storage locations and the "not stored" state: scan
 articles into a buffer, pick a target location or container, confirm, and undo
 mistakes. Every movement is written to the audit log and grouped in a movement
 session.
-
 ## Requirements
-
 ### Requirement: Scanning codes fills the buffer and target
 
 The system SHALL accept scanned codes and classify them: a storage code sets the
@@ -138,3 +136,19 @@ undo the last action or one specific entry.
 
 - **WHEN** the user undoes with no undoable session entry
 - **THEN** the system shows "Nothing to undo"
+
+### Requirement: Store target field finds by code or name
+
+The store-target field on an article SHALL find the target storage or container
+by code OR by name (live suggestions), and SHALL offer the QR scanner.
+
+#### Scenario: Search by name
+
+- **WHEN** the user types a name in the store-target field
+- **THEN** matching storages or containers are suggested and can be picked to store there
+
+#### Scenario: Scan a target code
+
+- **WHEN** the user scans a target code
+- **THEN** the field accepts it and the article can be stored
+
