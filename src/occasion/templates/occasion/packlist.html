@@ -28,7 +28,7 @@
             <div class="input-group input-group-sm">
                 <input id="packlistCode" name="code" class="form-control" placeholder="Scan or search article..."
                        autocomplete="off"
-                       hx-get="{% url 'packlist search' occasion.pk %}" hx-target="#packlistResults"
+                       hx-get="{% url 'packlist search' occasion.pk %}" hx-target="#packlistResults" hx-swap="innerHTML"
                        hx-trigger="input changed delay:300ms">
                 <input name="quantity" type="number" min="1" value="1" class="form-control" style="max-width:6rem">
                 {% include "hub/modules/qrScanner.html" with input="packlistCode" scannerUrl="/occasions/scanner/packlistCode/toggle" %}

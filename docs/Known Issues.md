@@ -74,3 +74,9 @@ will make that test fail and force it to be updated.
 |---|---|---|---|---|---|
 | KI-020 | `organisation/models.py` `Role` / `organisation/views.py` `roleCreate` | `unique_together = ("organisation", "name")` made a role created from a template collide with the template row of the same name → `IntegrityError` (500) on `/roles/create/` with the prefilled name | ✅ fixed | 3.1b | `organisation/tests/test_views.py` |
 | KI-021 | `organisation/views.py` `roles`/`users` (all) | Roles & Permissions pages had only `@login_required` → every logged-in user could view/edit roles and assign them | ✅ fixed | 3.1c | `organisation/tests/test_views.py` |
+
+## Store / Packlist search (§ code-input)
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-022 | `hub/modules/storeActions.html`, `hub/modules/storageContents.html`, `occasion/packlist.html` | The live-search input had no own `hx-swap`, so it inherited `hx-swap="outerHTML"` from the surrounding `<form>` → the first search **replaced** `#storeResults`/`#packlistResults` instead of filling it, so every later keystroke found no target and the dropdown stopped updating ("works only once") | ✅ fixed | 3.2 | `article/tests/test_store_search.py`, `storage/tests/test_store_search.py`, `occasion/tests/test_occasions.py` |

@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/update", views.updateStorage, name="update Storage"),
+    re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/store-search", views.storeArticleSearch, name="store article search"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/store", views.storeInStorage, name="store in Storage"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/remove/(?P<articleId>[0-9]+)", views.removeFromStorage, name="remove from Storage"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/tags/add", views.addStorageTag, name="add storage tag"),

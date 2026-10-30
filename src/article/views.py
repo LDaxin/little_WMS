@@ -390,6 +390,7 @@ def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", f
         "not_stored": sum(s.menge for s in article.stocks.filter(stored=None)),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
+        "storeSearchUrl": storeUrl + "-search",
         "storeError": error,
         "storeWarning": warning,
         "forceCode": forceCode,
@@ -463,6 +464,29 @@ def storeToDefault(request, typ, articleId):
         return render(request, "hub/modules/storeActions.html",
                       context=_store_actions_context(article, storeUrl, removeUrl, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "move")
+def storeTargetSearch(request, typ, articleId):
+    """Live suggestions for the store-target field (code or name, § code-input)."""
+    query = request.GET.get("code", "").strip()
+    if query:
+        storages = Storage.objects.filter(
+            Q(name__contains=query) | Q(code__code__contains=query)
+        )[:10]
+        containers = Article.objects.filter(
+            Q(base__name__contains=query) | Q(code__code__contains=query),
+            space__active=True,
+        )[:10]
+    else:
+        storages = Storage.objects.none()
+        containers = Article.objects.none()
+    return render(request, "hub/modules/storeTargetResults.html", {
+        "storages": storages,
+        "containers": containers,
+        "storeUrl": "./%s/store" % articleId,
+    })
 
 
 def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):

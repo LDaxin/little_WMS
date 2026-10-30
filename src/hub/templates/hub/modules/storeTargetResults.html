@@ -1,0 +1,16 @@
+{% for s in storages %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ s.code.code }}"}'
+        hx-target="#storeActions" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('storeResults').innerHTML='';document.getElementById('storeCode').value='';">
+    {{ s }} <small class="text-muted">{{ s.code.code }}</small>
+</button>
+{% endfor %}
+{% for a in containers %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ a.code.code }}"}'
+        hx-target="#storeActions" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('storeResults').innerHTML='';document.getElementById('storeCode').value='';">
+    {{ a.base.name }} <small class="text-muted">{{ a.code.code }}</small>
+</button>
+{% endfor %}
