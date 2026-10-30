@@ -5,9 +5,7 @@
 Manage articles: dynamic article types with type-specific fields, a shared
 catalog (base) and individual instances, global and custom fields, codes, and
 create/update/delete with audit logging.
-
 ## Requirements
-
 ### Requirement: Article types define their fields
 
 The system SHALL let an administrator define article types, each with a
@@ -84,3 +82,19 @@ its quantity is set to zero, and soft-delete on explicit delete.
 
 - **WHEN** the user deletes an article
 - **THEN** the article is soft-deleted and the deletion is logged
+
+### Requirement: Articles can be assigned to users
+
+The system SHALL let a user assign an article to one or more users and SHALL
+show the assignees on the article.
+
+#### Scenario: Assign an article
+
+- **WHEN** a user assigns an article to another user
+- **THEN** the article is listed as assigned to that user
+
+#### Scenario: Unassign an article
+
+- **WHEN** a user removes an assignee from an article
+- **THEN** the article is no longer assigned to that user
+
