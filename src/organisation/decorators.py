@@ -3,7 +3,7 @@ from functools import wraps
 
 from django.core.exceptions import PermissionDenied
 
-from organisation.permissions import has_perm
+from organisation.permissions import has_perm, has_scope
 from organisation.services import active_organisation
 
 
@@ -14,6 +14,21 @@ def require_perm(perm):
         @wraps(view)
         def wrapper(request, *args, **kwargs):
             if not has_perm(request.user, perm, active_organisation(request)):
+                raise PermissionDenied
+            return view(request, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def require_scope(area, action):
+    """403 unless the user holds the ``_all`` or ``_assigned`` scope (§3)."""
+
+    def decorator(view):
+        @wraps(view)
+        def wrapper(request, *args, **kwargs):
+            if not has_scope(request.user, area, action, active_organisation(request)):
                 raise PermissionDenied
             return view(request, *args, **kwargs)
 

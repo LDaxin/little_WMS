@@ -185,6 +185,9 @@ class Article(SoftDeleteObject, models.Model):
 
     tags = models.ManyToManyField(Tag, blank=True, related_name="articles")
 
+    # Users this article is assigned to (§3 assigned scope)
+    assigned_to = models.ManyToManyField("auth.User", blank=True, related_name="assigned_articles")
+
     # here the code gets the prefix for the article
     def save(self, *args, **kwargs):
         if not self.code:

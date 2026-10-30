@@ -77,6 +77,47 @@ def has_perm(user, perm, organisation=None):
     return profile.role.permissions.filter(codename=codename(perm)).exists()
 
 
+def role_codenames(user, organisation=None):
+    """The permission codenames granted by the user's role in ``organisation``."""
+    if user is None or not getattr(user, "is_authenticated", False):
+        return set()
+    profile = _profile(user, organisation)
+    if profile is None or profile.role is None:
+        return set()
+    return set(profile.role.permissions.values_list("codename", flat=True))
+
+
+def has_scope(user, area, action, organisation=None, obj=None):
+    """Scope-aware check (§3).
+
+    ``_all`` grants the action; ``_assigned`` grants it only when ``obj`` is
+    assigned to the user (or ``obj is None``, for list/aggregate access).
+    """
+    if user is None or not getattr(user, "is_authenticated", False):
+        return False
+    if user.is_superuser:
+        return True
+    codenames = role_codenames(user, organisation)
+    if "%s_%s_all" % (area, action) in codenames:
+        return True
+    if "%s_%s_assigned" % (area, action) in codenames:
+        return obj is None or user in obj.assigned_to.all()
+    return False
+
+
+def is_assigned_only(user, area, action, organisation=None):
+    """True when the role has the ``_assigned`` scope but not ``_all``."""
+    if user is None or not getattr(user, "is_authenticated", False):
+        return False
+    if user.is_superuser:
+        return False
+    codenames = role_codenames(user, organisation)
+    return (
+        "%s_%s_assigned" % (area, action) in codenames
+        and "%s_%s_all" % (area, action) not in codenames
+    )
+
+
 # Pre-configured role templates (§3). Not active, just suggestions.
 ROLE_TEMPLATES = {
     "Full Access": {obj: all_for(obj) for obj in PERMISSIONS},

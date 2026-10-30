@@ -5,9 +5,12 @@ from .models import *
 from codeSystem.models import *
 from .forms import *
 from space.models import Space
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.contrib.auth.decorators import login_required
-from organisation.decorators import require_perm
+from django.contrib.auth.models import User
+from organisation.decorators import require_perm, require_scope
+from organisation.permissions import has_scope, is_assigned_only
+from organisation.services import active_organisation
 from django.db.models import Q
 import csv
 from storage.models import *
@@ -22,10 +25,29 @@ from audit.services import log as audit_log
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
 
+
+def _can_article(request, action, article):
+    """Scope check for a specific article (§3)."""
+    return has_scope(request.user, "article", action, active_organisation(request), article)
+
+
+def _require_article(request, action, article):
+    if not _can_article(request, action, article):
+        raise PermissionDenied
+
+
+def _scoped_articles(qs, request):
+    """Filter to assigned articles for `_assigned`-only users (§3)."""
+    if is_assigned_only(request.user, "article", "view", active_organisation(request)):
+        qs = qs.filter(assigned_to=request.user)
+    return qs
+
+
 @login_required(login_url='/accounts/login/')
-@require_perm("article.view_all")
+@require_scope("article", "view")
 def article(request, typ, articleId):
     p = Article.objects.get(pk=articleId)
+    _require_article(request, "view", p)
     if p.base.pType.name == typ:
         bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
         par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
@@ -47,6 +69,11 @@ def article(request, typ, articleId):
             "allTags":Tag.objects.all(),
             "tagAddUrl":"./%s/tags/add" % articleId,
             "tagRemoveUrl":"./%s/tags/remove" % articleId,
+            "assignedTo":True,
+            "assignees":p.assigned_to.all(),
+            "allUsers":User.objects.all(),
+            "assignUrl":"./%s/assign" % articleId,
+            "unassignUrl":"./%s/unassign" % articleId,
             "auditTimeline":True,
             "auditLogs":AuditLog.objects.filter(
                 content_type=ContentType.objects.get_for_model(Article),
@@ -59,7 +86,7 @@ def article(request, typ, articleId):
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.create_all")
+@require_scope("article", "create")
 def addModal(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     context = {
@@ -70,7 +97,7 @@ def addModal(request, typ):
     return render(request, "hub/modules/addForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.delete_all")
+@require_scope("article", "delete")
 def delModal(request, typ):
     context = {
         "modalId":"del",
@@ -80,29 +107,28 @@ def delModal(request, typ):
     return render(request, "hub/modules/delForm.html", context=context)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.edit_all")
+@require_scope("article", "edit")
 def articleIncert(request, typ, articleId):
-    try:
-        p = Article.objects.get(pk=articleId)
-        if p.base.pType.name == typ:
-            par = FormChangeArticle(instance=p, article_type=p.base.pType)
-            context = {
-                "symbol":p.base.pType.symbol,
-                "searchFieldName":"articleSearch" + p.base.pType.name,
-                "id":articleId,
-                "modalId":"single",
-                "form":[par],
-                "actionType":"update",
-                "typ":typ,
-            }
-            return render(request, "hub/modules/itemForm.html", context=context)
-        else:
-            return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
-    except:
+    p = Article.objects.filter(pk=articleId).first()
+    if p is None:
         return HttpResponseNotFound('<h1>Page not found</h1>')
+    _require_article(request, "edit", p)
+    if p.base.pType.name == typ:
+        par = FormChangeArticle(instance=p, article_type=p.base.pType)
+        context = {
+            "symbol":p.base.pType.symbol,
+            "searchFieldName":"articleSearch" + p.base.pType.name,
+            "id":articleId,
+            "modalId":"single",
+            "form":[par],
+            "actionType":"update",
+            "typ":typ,
+        }
+        return render(request, "hub/modules/itemForm.html", context=context)
+    return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.view_all")
+@require_scope("article", "view")
 def articles(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
 
@@ -124,7 +150,7 @@ def articles(request, typ):
         return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.create_all")
+@require_scope("article", "create")
 def addArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
@@ -238,7 +264,7 @@ def addArticle(request, typ):
         return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.delete_all")
+@require_scope("article", "delete")
 def delArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
@@ -268,6 +294,7 @@ def delArticle(request, typ):
                         }
                         return render(request, "hub/modules/toast.html", context=context)
             for i in delList:
+                _require_article(request, "delete", i)
                 delListReturn = delListReturn + i.__str__() + " "
                 audit_log("deleted", i, request.user)
                 i.delete()
@@ -289,10 +316,11 @@ def delArticle(request, typ):
         return render(request, "hub/modules/toast.html", context=context)
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.edit_all")
+@require_scope("article", "edit")
 def updateArticle(request, typ, articleId):
     articleTypeObject = ArticleType.objects.get(name__exact=typ)
     articleObject = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", articleObject)
 
     if articleTypeObject == None:
         context = {
@@ -372,9 +400,10 @@ def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", f
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.move_all")
+@require_scope("article", "move")
 def storeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
+    _require_article(request, "move", article)
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
@@ -397,9 +426,10 @@ def storeArticle(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.move_all")
+@require_scope("article", "move")
 def removeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
+    _require_article(request, "move", article)
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
@@ -412,9 +442,10 @@ def removeArticle(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.move_all")
+@require_scope("article", "move")
 def storeToDefault(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
+    _require_article(request, "move", article)
     storeUrl = "./%s/store" % articleId
     removeUrl = "./%s/remove" % articleId
     if request.method == "POST":
@@ -445,9 +476,10 @@ def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.edit_all")
+@require_scope("article", "edit")
 def addArticleTag(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
     tagAddUrl = "./%s/tags/add" % articleId
     tagRemoveUrl = "./%s/tags/remove" % articleId
     if request.method == "POST":
@@ -464,9 +496,10 @@ def addArticleTag(request, typ, articleId):
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.edit_all")
+@require_scope("article", "edit")
 def removeArticleTag(request, typ, articleId, tagId):
     article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
     tagAddUrl = "./%s/tags/add" % articleId
     tagRemoveUrl = "./%s/tags/remove" % articleId
     if request.method == "POST":
@@ -474,6 +507,39 @@ def removeArticleTag(request, typ, articleId, tagId):
         return render(request, "hub/modules/tagChips.html",
                       context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl))
     return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def _assigned_context(article):
+    return {
+        "assignees": article.assigned_to.all(),
+        "allUsers": User.objects.all(),
+        "assignUrl": "./%s/assign" % article.pk,
+        "unassignUrl": "./%s/unassign" % article.pk,
+    }
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def assignArticle(request, typ, articleId):
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST":
+        user = User.objects.filter(pk=request.POST.get("user")).first()
+        if user is not None:
+            article.assigned_to.add(user)
+    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article))
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def unassignArticle(request, typ, articleId, userId):
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST":
+        user = User.objects.filter(pk=userId).first()
+        if user is not None:
+            article.assigned_to.remove(user)
+    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article))
 
 
 def _int_or_none(value):
@@ -599,13 +665,14 @@ def setGlobalMinimum(request, spaceId, itemId):
 
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.view_all")
+@require_scope("article", "view")
 def searchArticle(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
             r = Article.objects.filter(base__pType__name__exact=typ)
         else:
             r = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), base__pType__name__exact=typ)
+        r = _scoped_articles(r, request)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
 @login_required(login_url='/accounts/login/')
@@ -618,16 +685,19 @@ def exportArticles(request, typ):
 
     writer = csv.writer(response, dialect="excel")
     writer.writerow(['name', 'code', 'type'])
+    assigned_only = is_assigned_only(request.user, "article", "view", active_organisation(request))
     for key, value in request.POST.items():
         if key.startswith("_"):
             article = Article.objects.get(pk=value)
+            if assigned_only and request.user not in article.assigned_to.all():
+                continue
             if article.base.pType.name == typ:
                 thereIsOne = True
                 writer.writerow([article.base.name, article.code.code, article.base.pType.name])
     return response
 
 @login_required(login_url='/accounts/login/')
-@require_perm("article.view_all")
+@require_scope("article", "view")
 def articleScanner(request, typ, scannerId, state):
     if state == "toggle":
         print(request.POST)
