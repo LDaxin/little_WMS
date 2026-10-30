@@ -1,0 +1,7 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<div class="alert alert-warning">
+    This invitation is no longer valid ({{ invitation.get_status_display|lower }}).
+</div>
+{% endblock %}

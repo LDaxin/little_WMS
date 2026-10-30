@@ -1,0 +1,25 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Join {{ invitation.organisation.name }}</h4>
+
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-2">
+        <input name="username" class="form-control" placeholder="Username" autofocus autocomplete="username">
+    </div>
+    <div class="mb-2">
+        <input name="email" type="email" class="form-control" placeholder="Email (optional)" autocomplete="email">
+    </div>
+    <div class="mb-2">
+        <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password">
+    </div>
+    <button class="btn btn-primary">Create account &amp; join</button>
+</form>
+
+<p class="mt-2">
+    <a href="/accounts/login/?next=/invite/{{ invitation.token }}/">Already have an account? Log in</a>
+</p>
+{% endblock %}

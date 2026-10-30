@@ -1,11 +1,15 @@
-"""Roles & Permissions UI (§3) and organisation selection (§22)."""
+"""Roles & Permissions UI (§3), organisation selection (§22) and invitations (§23)."""
+from datetime import timedelta
+
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from organisation.decorators import require_perm
-from organisation.models import Organisation, Role, UserProfile
+from organisation.models import Invitation, Organisation, Role, UserProfile
 from organisation.permissions import PERMISSIONS
 from organisation.services import active_organisation, set_active_organisation
 
@@ -108,6 +112,7 @@ def users(request):
     return render(request, "organisation/users.html", {
         "rows": rows,
         "roles": organisation.roles.filter(is_template=False),
+        "invitations": organisation.invitations.filter(status="pending"),
     })
 
 
@@ -154,3 +159,83 @@ def switchOrganisation(request):
         return HttpResponseNotFound('<h1>Page not found</h1>')
     set_active_organisation(request, organisation)
     return redirect(request.POST.get("next") or "hub")
+
+
+def _accept_invitation(invitation, user):
+    """Create the membership for ``user`` and mark the invitation accepted."""
+    profile, created = UserProfile.objects.get_or_create(
+        user=user,
+        organisation=invitation.organisation,
+        defaults={"role": invitation.role},
+    )
+    if not created and profile.role is None:
+        profile.role = invitation.role
+        profile.save()
+    invitation.status = "accepted"
+    invitation.accepted_at = timezone.now()
+    invitation.save()
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("user.invite_all")
+def inviteCreate(request):
+    """Create an invitation link for the active organisation (§23)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    organisation = _organisation(request)
+    role_id = request.POST.get("role") or None
+    role = organisation.roles.filter(pk=role_id).first() if role_id else None
+    days = request.POST.get("days", "").strip()
+    expires_at = timezone.now() + timedelta(days=int(days)) if days.isdigit() else None
+    Invitation.objects.create(
+        organisation=organisation,
+        email=request.POST.get("email", "").strip(),
+        role=role,
+        invited_by=request.user,
+        expires_at=expires_at,
+    )
+    return redirect("users")
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("user.invite_all")
+def inviteRevoke(request, invitationId):
+    """Revoke a pending invitation (§23)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    organisation = _organisation(request)
+    invitation = get_object_or_404(Invitation, pk=invitationId, organisation=organisation)
+    invitation.status = "revoked"
+    invitation.save()
+    return redirect("users")
+
+
+def inviteAccept(request, token):
+    """Public accept page: register or log in, then join the organisation (§23)."""
+    invitation = get_object_or_404(Invitation, token=token)
+    if not invitation.is_valid():
+        return render(request, "organisation/inviteInvalid.html", {"invitation": invitation})
+
+    if request.user.is_authenticated:
+        _accept_invitation(invitation, request.user)
+        set_active_organisation(request, invitation.organisation)
+        return redirect("hub")
+
+    error = ""
+    if request.method == "POST":
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
+        if not username or not password:
+            error = "Username and password are required."
+        elif User.objects.filter(username=username).exists():
+            error = "That username is already taken."
+        else:
+            user = User.objects.create_user(username, request.POST.get("email", ""), password)
+            login(request, user)
+            _accept_invitation(invitation, user)
+            set_active_organisation(request, invitation.organisation)
+            return redirect("hub")
+    return render(request, "organisation/inviteAccept.html",
+                  {"invitation": invitation, "error": error})

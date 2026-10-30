@@ -30,4 +30,36 @@
 </table>
 
 <a class="btn btn-outline-secondary" href="{% url 'roles' %}">Back to roles</a>
+
+<h5 class="mt-4">Invite</h5>
+<form method="post" action="{% url 'invite create' %}" class="d-flex gap-2 mb-3">
+    {% csrf_token %}
+    <select name="role" class="form-select form-select-sm" style="max-width:16rem">
+        <option value="">&mdash; no role &mdash;</option>
+        {% for r in roles %}
+        <option value="{{ r.pk }}">{{ r.name }}</option>
+        {% endfor %}
+    </select>
+    <input name="email" type="email" class="form-control form-control-sm" placeholder="Email (optional)" style="max-width:16rem">
+    <input name="days" type="number" min="1" class="form-control form-control-sm" placeholder="Days" style="max-width:6rem">
+    <button class="btn btn-sm btn-primary">Create link</button>
+</form>
+
+{% if invitations %}
+<ul class="list-group">
+    {% for invitation in invitations %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            <code>/invite/{{ invitation.token }}/</code>
+            {% if invitation.role %}<span class="badge text-bg-secondary">{{ invitation.role.name }}</span>{% endif %}
+            <span class="text-muted small">expires {{ invitation.expires_at|date:"Y-m-d" }}</span>
+        </span>
+        <form method="post" action="{% url 'invite revoke' invitation.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-danger">Revoke</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}

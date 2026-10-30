@@ -1,4 +1,5 @@
 from datetime import timedelta
+import secrets
 
 from django.db import models
 from django.utils import timezone
@@ -87,3 +88,41 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return "%s (%s)" % (self.user, self.role or "no role")
+
+
+class Invitation(models.Model):
+    """An invitation to join an organisation with a pre-set role (§23).
+
+    Link-based: the token is shareable; accepting creates a membership.
+    """
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("accepted", "Accepted"),
+        ("expired", "Expired"),
+        ("revoked", "Revoked"),
+    ]
+
+    organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="invitations")
+    email = models.EmailField(blank=True)
+    role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
+    token = models.CharField(max_length=64, unique=True)
+    invited_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(days=7)
+        super().save(*args, **kwargs)
+
+    def is_valid(self):
+        """A pending invitation that has not expired."""
+        return self.status == "pending" and self.expires_at > timezone.now()
+
+    def __str__(self):
+        return "Invitation to %s" % self.organisation

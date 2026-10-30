@@ -13,4 +13,7 @@ urlpatterns = [
     path("users/<int:userId>/role/", views.userRole, name="user role"),
     path("select-organisation/", views.selectOrganisation, name="select organisation"),
     path("switch-organisation/", views.switchOrganisation, name="switch organisation"),
+    path("invitations/create/", views.inviteCreate, name="invite create"),
+    path("invitations/<int:invitationId>/revoke/", views.inviteRevoke, name="invite revoke"),
+    path("invite/<str:token>/", views.inviteAccept, name="invite accept"),
 ]
