@@ -54,10 +54,16 @@
             {% if invitation.role %}<span class="badge text-bg-secondary">{{ invitation.role.name }}</span>{% endif %}
             <span class="text-muted small">expires {{ invitation.expires_at|date:"Y-m-d" }}</span>
         </span>
-        <form method="post" action="{% url 'invite revoke' invitation.pk %}">
-            {% csrf_token %}
-            <button class="btn btn-sm btn-outline-danger">Revoke</button>
-        </form>
+        <span class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="navigator.clipboard.writeText(window.location.origin + '/invite/{{ invitation.token }}/');">
+                Copy link
+            </button>
+            <form method="post" action="{% url 'invite revoke' invitation.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">Revoke</button>
+            </form>
+        </span>
     </li>
     {% endfor %}
 </ul>
