@@ -123,7 +123,7 @@ These conventions must be included in every agent prompt when relevant:
 
 | Skill | Purpose |
 |---|---|
-| `little-wms-implementation` | Enforces the implementation workflow (branch off `ki`, small steps, never merge, ponytail) |
+| `little-wms-implementation` | Enforces the OpenSpec workflow (specs = truth, changes = work; branch off `ki`, small steps, never merge, ponytail) |
 | `little-wms-bugfix` | Bug workflow (record findings in the register, root-cause fix, regression test, register upkeep) |
 | `requirements-collaboration` | Working style for requirements/planning (discuss before writing, small steps, user decides) |
 
