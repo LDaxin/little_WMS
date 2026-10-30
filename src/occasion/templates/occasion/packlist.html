@@ -1,0 +1,35 @@
+<div id="packlist" class="card mb-3">
+    <div class="card-body">
+        <strong>Packlist</strong>
+        {% if error %}<div class="alert alert-danger py-1 mt-1">{{ error }}</div>{% endif %}
+        <ul class="list-group list-group-flush">
+            {% for entry in packlist %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ entry.article.base.name }} <small class="text-muted">x{{ entry.quantity }}</small></span>
+                <span class="d-flex gap-2">
+                    <select name="status" class="form-select form-select-sm" style="max-width:12rem"
+                            hx-post="{% url 'packlist status' occasion.pk entry.pk %}"
+                            hx-target="#packlist" hx-swap="outerHTML" hx-trigger="change">
+                        {% for value, label in statusChoices %}
+                        <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" class="btn-close" aria-label="Remove"
+                            hx-post="{% url 'packlist remove' occasion.pk entry.pk %}"
+                            hx-target="#packlist" hx-swap="outerHTML"></button>
+                </span>
+            </li>
+            {% empty %}
+            <li class="list-group-item text-muted">Empty</li>
+            {% endfor %}
+        </ul>
+        <form class="mt-2" hx-post="{% url 'packlist add' occasion.pk %}" hx-target="#packlist" hx-swap="outerHTML">
+            {% csrf_token %}
+            <div class="input-group input-group-sm">
+                <input name="code" class="form-control" placeholder="Article code (a0&hellip;)">
+                <input name="quantity" type="number" min="1" value="1" class="form-control" style="max-width:6rem">
+                <button class="btn btn-success">Add</button>
+            </div>
+        </form>
+    </div>
+</div>

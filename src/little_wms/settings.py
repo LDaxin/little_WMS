@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "space.apps.SpaceConfig",
     "export.apps.ExportConfig",
     "movement.apps.MovementConfig",
+    "occasion.apps.OccasionConfig",
     "softdelete",
     "django.contrib.admin",
     "django.contrib.auth",

@@ -1,0 +1,25 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h4>Occasions</h4>
+    <span>
+        <a class="btn btn-sm btn-primary" href="{% url 'add occasion' %}">Add occasion</a>
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'occasion types' %}">Types</a>
+    </span>
+</div>
+
+<ul class="list-group mt-2">
+    {% for occ in occasions %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <a href="{% url 'occasion' occ.pk %}">{{ occ }}</a>
+        <span class="text-muted small">
+            {{ occ.calendar_entry.start_date }}{% if occ.calendar_entry.end_date %} &ndash; {{ occ.calendar_entry.end_date }}{% endif %}
+            &middot; {{ occ.occasion_type.name }}
+        </span>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No occasions yet</li>
+    {% endfor %}
+</ul>
+{% endblock %}
