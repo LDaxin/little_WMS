@@ -14,6 +14,10 @@ def _int_or_none(value):
     return int(value) if value.isdigit() else None
 
 
+def _location(value):
+    return Location.objects.filter(pk=value).first() if value else None
+
+
 def _packlist_context(occasion, error=""):
     return {
         "occasion": occasion,
@@ -43,27 +47,32 @@ def occasion(request, occasionId):
 @login_required(login_url='/accounts/login/')
 @require_perm("occasion.create_all")
 def addOccasion(request):
+    error = ""
     if request.method == "POST":
-        occasion_type = get_object_or_404(OccasionType, pk=request.POST.get("type"))
+        occasion_type = OccasionType.objects.filter(pk=request.POST.get("type") or None).first()
         name = request.POST.get("name", "").strip()
         start_date = request.POST.get("start_date", "")
-        entry = CalendarEntry.objects.create(
-            entry_type="occasion",
-            title=name,
-            start_date=start_date,
-            end_date=request.POST.get("end_date") or None,
-            responsible_user=request.user,
-        )
-        occ = Occasion.objects.create(
-            calendar_entry=entry,
-            occasion_type=occasion_type,
-            location=Location.objects.filter(pk=request.POST.get("location")).first(),
-            participant_count=_int_or_none(request.POST.get("participants")),
-        )
-        return redirect("occasion", occasionId=occ.pk)
+        if occasion_type is None or not name or not start_date:
+            error = "Name, type, and start date are required."
+        else:
+            entry = CalendarEntry.objects.create(
+                entry_type="occasion",
+                title=name,
+                start_date=start_date,
+                end_date=request.POST.get("end_date") or None,
+                responsible_user=request.user,
+            )
+            occ = Occasion.objects.create(
+                calendar_entry=entry,
+                occasion_type=occasion_type,
+                location=_location(request.POST.get("location")),
+                participant_count=_int_or_none(request.POST.get("participants")),
+            )
+            return redirect("occasion", occasionId=occ.pk)
     return render(request, "occasion/occasionForm.html", {
         "types": OccasionType.objects.all(),
         "locations": Location.objects.all(),
+        "error": error,
     })
 
 
@@ -73,11 +82,11 @@ def updateOccasion(request, occasionId):
     occ = get_object_or_404(Occasion, pk=occasionId)
     if request.method == "POST":
         occ.calendar_entry.title = request.POST.get("name", occ.calendar_entry.title).strip()
-        occ.calendar_entry.start_date = request.POST.get("start_date", occ.calendar_entry.start_date)
+        occ.calendar_entry.start_date = request.POST.get("start_date") or occ.calendar_entry.start_date
         occ.calendar_entry.end_date = request.POST.get("end_date") or None
         occ.calendar_entry.save()
         occ.participant_count = _int_or_none(request.POST.get("participants"))
-        occ.location = Location.objects.filter(pk=request.POST.get("location")).first()
+        occ.location = _location(request.POST.get("location"))
         occ.save()
     return redirect("occasion", occasionId=occ.pk)
 

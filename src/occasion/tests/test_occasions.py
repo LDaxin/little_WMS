@@ -44,6 +44,15 @@ class OccasionViewTest(TestCase):
         self.assertTrue(Occasion.objects.filter(calendar_entry__title="Summer").exists())
         self.assertContains(self.client.get("/occasions/"), "Summer")
 
+    def test_add_without_location(self):
+        # the empty location select used to crash with ValueError
+        response = self.client.post(
+            "/occasions/add/",
+            {"name": "NoLoc", "type": self.occ_type.pk, "start_date": "2026-07-01", "location": ""},
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Occasion.objects.filter(calendar_entry__title="NoLoc").exists())
+
     def test_detail_and_update(self):
         occasion = make_occasion(self.occ_type)
         self.assertEqual(self.client.get("/occasions/%s/" % occasion.pk).status_code, 200)

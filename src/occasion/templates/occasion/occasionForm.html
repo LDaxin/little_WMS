@@ -3,6 +3,8 @@
 {% block content %}
 <h4>Add occasion</h4>
 
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+
 <form method="post">
     {% csrf_token %}
     <div class="mb-2"><input name="name" class="form-control" placeholder="Name" required></div>
