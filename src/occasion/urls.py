@@ -6,6 +6,7 @@ from . import views
 urlpatterns = [
     path("occasions/", views.occasions, name="occasions"),
     path("occasions/add/", views.addOccasion, name="add occasion"),
+    path("occasions/scanner/<str:scannerId>/<str:state>", views.occasionScanner, name="occasion scanner"),
     path("occasions/types/", views.occasionTypes, name="occasion types"),
     path("occasions/types/add/", views.addOccasionType, name="add occasion type"),
     path("occasions/<int:occasionId>/", views.occasion, name="occasion"),

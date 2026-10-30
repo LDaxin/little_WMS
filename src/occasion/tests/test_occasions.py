@@ -89,6 +89,12 @@ class PacklistTest(TestCase):
         User.objects.create_superuser("boss", "b@e.st", "pw")
         self.client.login(username="boss", password="pw")
 
+    def test_packlist_has_qr_scanner(self):
+        self.login_superuser()
+        response = self.client.get("/occasions/%s/" % self.occasion.pk)
+        self.assertContains(response, "QRButtonpacklistCode")
+        self.assertContains(response, "scannerDivpacklistCode")
+
     def test_packlist_permission(self):
         user_with("helper", "occasion_view_all")
         self.client.login(username="helper", password="pw")

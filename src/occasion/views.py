@@ -155,3 +155,17 @@ def packlistRemove(request, occasionId, entryId):
     if request.method == "POST":
         entry.delete()
     return render(request, "occasion/packlist.html", _packlist_context(occ))
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.manage_packlist_all")
+def occasionScanner(request, scannerId, state):
+    """QR toggle for a code input (shared pattern, see hub/modules/qrScanner.html)."""
+    if state == "toggle":
+        active = request.POST.get("active_scanner", "")
+        if active == scannerId:
+            context = {"activeInput": "", "input": scannerId, "state": "off"}
+        else:
+            context = {"activeInput": active, "input": scannerId, "state": "on", "scan": True}
+        return render(request, "hub/modules/toggleScanner.html", context=context)
+    return HttpResponseNotFound('<h1>Page not found</h1>')

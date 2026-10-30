@@ -26,10 +26,12 @@
         <form class="mt-2" hx-post="{% url 'packlist add' occasion.pk %}" hx-target="#packlist" hx-swap="outerHTML">
             {% csrf_token %}
             <div class="input-group input-group-sm">
-                <input name="code" class="form-control" placeholder="Article code (a0&hellip;)">
+                <input id="packlistCode" name="code" class="form-control" placeholder="Scan or enter article code">
                 <input name="quantity" type="number" min="1" value="1" class="form-control" style="max-width:6rem">
+                {% include "hub/modules/qrScanner.html" with input="packlistCode" scannerUrl="/occasions/scanner/packlistCode/toggle" %}
                 <button class="btn btn-success">Add</button>
             </div>
+            <div id="scannerDivpacklistCode"></div>
         </form>
     </div>
 </div>
