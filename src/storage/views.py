@@ -243,6 +243,7 @@ def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning=""
         "contents": Stock.objects.filter(stored=storage.space).select_related("article__base"),
         "storeUrl": storeUrl,
         "removeUrl": removeUrl,
+        "storeSearchUrl": storeUrl + "-search",
         "storeError": error,
         "storeWarning": warning,
         "forceCode": forceCode,
@@ -275,6 +276,23 @@ def storeInStorage(request, typ, storageId):
         return render(request, "hub/modules/storageContents.html",
                       context=_storage_contents_context(storage, storeUrl, removeUrl, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.move_all")
+def storeArticleSearch(request, typ, storageId):
+    """Live suggestions for the store-article field (code or name, § code-input)."""
+    query = request.GET.get("code", "").strip()
+    if query:
+        articles = Article.objects.filter(
+            Q(base__name__contains=query) | Q(code__code__contains=query)
+        )[:20]
+    else:
+        articles = Article.objects.none()
+    return render(request, "hub/modules/storeArticleResults.html", {
+        "articles": articles,
+        "storeUrl": "./%s/store" % storageId,
+    })
 
 
 @login_required(login_url='/accounts/login/')

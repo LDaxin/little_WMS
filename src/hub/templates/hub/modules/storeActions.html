@@ -36,11 +36,14 @@
     <form class="mt-2" hx-post="{{ storeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">
         {% csrf_token %}
         <div class="input-group input-group-sm">
-            <input id="storeCode" name="code" class="form-control" placeholder="Scan or enter target code">
+            <input id="storeCode" name="code" class="form-control" placeholder="Scan or search target..."
+                   autocomplete="off"
+                   hx-get="{{ storeSearchUrl }}" hx-target="#storeResults" hx-trigger="input changed delay:300ms">
             {% if mergeable %}<input name="amount" type="number" min="1" class="form-control" style="max-width:5rem" placeholder="Qty">{% endif %}
             {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl="./scanner/storeCode/toggle" %}
             <button type="submit" class="btn btn-success">Store</button>
         </div>
         <div id="scannerDivstoreCode"></div>
+        <div id="storeResults" class="list-group mt-1"></div>
     </form>
 </div>

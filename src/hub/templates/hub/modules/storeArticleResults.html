@@ -1,0 +1,8 @@
+{% for a in articles %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ a.code.code }}"}'
+        hx-target="#storageContents" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('storeResults').innerHTML='';document.getElementById('storeCode').value='';">
+    {{ a.base.name }} <small class="text-muted">{{ a.code.code }}</small>
+</button>
+{% endfor %}
