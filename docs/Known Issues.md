@@ -73,3 +73,4 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-020 | `organisation/models.py` `Role` / `organisation/views.py` `roleCreate` | `unique_together = ("organisation", "name")` made a role created from a template collide with the template row of the same name → `IntegrityError` (500) on `/roles/create/` with the prefilled name | ✅ fixed | 3.1b | `organisation/tests/test_views.py` |
+| KI-021 | `organisation/views.py` `roles`/`users` (all) | Roles & Permissions pages had only `@login_required` → every logged-in user could view/edit roles and assign them | ✅ fixed | 3.1c | `organisation/tests/test_views.py` |

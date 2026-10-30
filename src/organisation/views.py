@@ -4,6 +4,7 @@ from django.contrib.auth.models import Permission, User
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 
+from organisation.decorators import require_perm
 from organisation.models import Organisation, Role, UserProfile
 from organisation.permissions import PERMISSIONS
 from organisation.services import active_organisation, set_active_organisation
@@ -34,6 +35,7 @@ def _matrix(role):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def roles(request, error=""):
     organisation = _organisation(request)
     roles = organisation.roles.filter(is_template=False)
@@ -46,6 +48,7 @@ def roles(request, error=""):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def roleCreate(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -63,6 +66,7 @@ def roleCreate(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def roleDetail(request, roleId):
     organisation = _organisation(request)
     role = get_object_or_404(Role, pk=roleId, organisation=organisation)
@@ -70,6 +74,7 @@ def roleDetail(request, roleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def roleSave(request, roleId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -81,6 +86,7 @@ def roleSave(request, roleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def roleDelete(request, roleId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
@@ -92,6 +98,7 @@ def roleDelete(request, roleId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.view_all")
 def users(request):
     organisation = _organisation(request)
     rows = [
@@ -105,6 +112,7 @@ def users(request):
 
 
 @login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
 def userRole(request, userId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')

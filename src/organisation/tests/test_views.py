@@ -1,12 +1,23 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from organisation.models import Role, UserProfile
 
 
+def manager(username):
+    """A user with the permissions to view users and manage roles (§3)."""
+    user = User.objects.create_user(username, password="pw")
+    role = Role.objects.create(organisation_id=1, name="Manager " + username)
+    role.permissions.set(
+        Permission.objects.filter(codename__in=["user_view_all", "user_edit_role_all"])
+    )
+    UserProfile.objects.create(user=user, role=role, organisation_id=1)
+    return user
+
+
 class RolesViewTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user("tester", password="pw")
+        self.user = manager("tester")
         self.client.login(username="tester", password="pw")
 
     def test_roles_page_returns_200(self):
@@ -15,6 +26,12 @@ class RolesViewTest(TestCase):
     def test_requires_login(self):
         self.client.logout()
         self.assertEqual(self.client.get("/roles/").status_code, 302)
+
+    def test_requires_permission(self):
+        User.objects.create_user("other", password="pw")
+        self.client.login(username="other", password="pw")
+        self.assertEqual(self.client.get("/roles/").status_code, 403)
+        self.assertEqual(self.client.post("/roles/create/", {"template": "Read Only"}).status_code, 403)
 
     def test_create_from_template(self):
         self.client.post("/roles/create/", {"template": "Read Only", "name": "Praktikant"})
@@ -64,12 +81,17 @@ class RolesViewTest(TestCase):
 
 class UserRoleViewTest(TestCase):
     def setUp(self):
-        self.user = User.objects.create_user("tester", password="pw")
+        self.user = manager("tester")
         self.client.login(username="tester", password="pw")
         self.role = Role.objects.create(organisation_id=1, name="Tester")
 
     def test_users_page_returns_200(self):
         self.assertEqual(self.client.get("/users/").status_code, 200)
+
+    def test_requires_permission(self):
+        User.objects.create_user("other", password="pw")
+        self.client.login(username="other", password="pw")
+        self.assertEqual(self.client.get("/users/").status_code, 403)
 
     def test_assign_role(self):
         self.client.post(f"/users/{self.user.pk}/role/", {"role": self.role.pk})
@@ -77,6 +99,5 @@ class UserRoleViewTest(TestCase):
         self.assertEqual(profile.role, self.role)
 
     def test_clear_role(self):
-        UserProfile.objects.create(user=self.user, role=self.role, organisation_id=1)
         self.client.post(f"/users/{self.user.pk}/role/", {"role": ""})
         self.assertIsNone(UserProfile.objects.get(user=self.user).role)
