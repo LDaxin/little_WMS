@@ -20,7 +20,7 @@ class RolesViewTest(TestCase):
         self.client.post("/roles/create/", {"template": "Read Only", "name": "Praktikant"})
         role = Role.objects.get(name="Praktikant")
         self.assertFalse(role.is_template)
-        self.assertIn("view_all", role.permissions["article"])
+        self.assertTrue(role.permissions.filter(codename="article_view_all").exists())
 
     def test_create_from_template_with_default_name(self):
         # KI-020: the default name equals the template name and used to collide
@@ -29,27 +29,29 @@ class RolesViewTest(TestCase):
         self.assertTrue(Role.objects.filter(name="Read Only", is_template=False).exists())
 
     def test_create_duplicate_role_shows_error(self):
-        Role.objects.create(organisation_id=1, name="Praktikant", permissions={})
+        Role.objects.create(organisation_id=1, name="Praktikant")
         response = self.client.post("/roles/create/", {"template": "Read Only", "name": "Praktikant"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "already exists")
         self.assertEqual(Role.objects.filter(name="Praktikant", is_template=False).count(), 1)
 
     def test_role_detail_shows_matrix(self):
-        role = Role.objects.create(organisation_id=1, name="Tester", permissions={})
+        role = Role.objects.create(organisation_id=1, name="Tester")
         response = self.client.get(f"/roles/{role.pk}/")
         self.assertContains(response, "article")
         self.assertContains(response, "view_all")
 
     def test_role_save_updates_permissions(self):
-        role = Role.objects.create(organisation_id=1, name="Tester", permissions={})
-        self.client.post(f"/roles/{role.pk}/save/", {"perm": ["article.view_all", "storage.view_all"]})
-        role.refresh_from_db()
-        self.assertEqual(role.permissions["article"], ["view_all"])
-        self.assertEqual(role.permissions["storage"], ["view_all"])
+        role = Role.objects.create(organisation_id=1, name="Tester")
+        self.client.post(
+            f"/roles/{role.pk}/save/",
+            {"perm": ["article_view_all", "storage_view_all"]},
+        )
+        codenames = set(role.permissions.values_list("codename", flat=True))
+        self.assertEqual(codenames, {"article_view_all", "storage_view_all"})
 
     def test_role_delete(self):
-        role = Role.objects.create(organisation_id=1, name="Tester", permissions={})
+        role = Role.objects.create(organisation_id=1, name="Tester")
         self.client.post(f"/roles/{role.pk}/delete/")
         self.assertFalse(Role.objects.filter(pk=role.pk).exists())
 
@@ -64,7 +66,7 @@ class UserRoleViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("tester", password="pw")
         self.client.login(username="tester", password="pw")
-        self.role = Role.objects.create(organisation_id=1, name="Tester", permissions={})
+        self.role = Role.objects.create(organisation_id=1, name="Tester")
 
     def test_users_page_returns_200(self):
         self.assertEqual(self.client.get("/users/").status_code, 200)

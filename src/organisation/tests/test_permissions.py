@@ -1,34 +1,42 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from organisation.models import Organisation, Role, UserProfile
 from organisation.permissions import (
     PERMISSIONS,
     ROLE_TEMPLATES,
-    all_permissions,
+    all_codenames,
     ensure_role_templates,
     has_perm,
 )
 
 
-class PermissionCatalogTest(TestCase):
-    def test_all_permissions_format(self):
-        perms = all_permissions()
-        self.assertIn("article.view_all", perms)
-        self.assertIn("article.move_assigned", perms)
-        self.assertIn("export.qr_sheet_all", perms)
-        self.assertEqual(len(perms), len(set(perms)))
+def grant(role, *codenames):
+    role.permissions.set(Permission.objects.filter(codename__in=codenames))
+    return role
 
-    def test_every_object_covered(self):
-        for obj in PERMISSIONS:
-            self.assertTrue(any(p.startswith(obj + ".") for p in all_permissions()))
+
+class PermissionCatalogTest(TestCase):
+    def test_all_codenames_format(self):
+        codenames = all_codenames()
+        self.assertIn("article_view_all", codenames)
+        self.assertIn("article_move_assigned", codenames)
+        self.assertIn("export_qr_sheet_all", codenames)
+        self.assertEqual(len(codenames), len(set(codenames)))
+
+    def test_every_area_covered(self):
+        for area in PERMISSIONS:
+            self.assertTrue(any(c.startswith(area + "_") for c in all_codenames()))
+
+    def test_permissions_materialised(self):
+        self.assertTrue(Permission.objects.filter(codename="article_view_all").exists())
 
 
 class HasPermTest(TestCase):
     def setUp(self):
         self.org = Organisation.objects.get(pk=1)
-        self.role = Role.objects.create(
-            organisation=self.org, name="Tester", permissions={"article": ["view_all"]}
+        self.role = grant(
+            Role.objects.create(organisation=self.org, name="Tester"), "article_view_all"
         )
         self.user = User.objects.create_user("tester", password="pw")
         UserProfile.objects.create(user=self.user, role=self.role, organisation=self.org)
@@ -61,8 +69,9 @@ class RoleTemplateTest(TestCase):
 
     def test_full_access_has_all_permissions(self):
         role = Role.objects.get(organisation_id=1, name="Full Access")
-        self.assertIn("delete_all", role.permissions["article"])
-        self.assertIn("move_assigned", role.permissions["article"])
+        codenames = set(role.permissions.values_list("codename", flat=True))
+        self.assertIn("article_delete_all", codenames)
+        self.assertIn("article_move_assigned", codenames)
 
     def test_ensure_role_templates_idempotent(self):
         org = Organisation.objects.create(name="Neu", slug="neu")

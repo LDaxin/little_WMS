@@ -1,6 +1,6 @@
 """Roles & Permissions UI (§3) and organisation selection (§22)."""
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -15,29 +15,22 @@ def _organisation(request):
 
 
 def _matrix(role):
-    """Flat rows for the checkbox matrix (object × scope × action)."""
+    """Flat rows for the checkbox matrix (area × scope × action)."""
+    granted = set(role.permissions.values_list("codename", flat=True)) if role else set()
     rows = []
     for obj, spec in PERMISSIONS.items():
         for scope in spec["scopes"]:
             for action in spec["actions"]:
                 perm = "%s_%s" % (action, scope)
+                codename = "%s_%s" % (obj, perm)
                 rows.append({
                     "obj": obj,
                     "scope": scope,
                     "action": action,
-                    "value": "%s.%s" % (obj, perm),
-                    "checked": perm in (role.permissions.get(obj, []) if role else []),
+                    "codename": codename,
+                    "checked": codename in granted,
                 })
     return rows
-
-
-def _group(perms):
-    """Turn ["article.view_all", ...] into {"article": ["view_all"], ...}."""
-    result = {}
-    for perm in perms:
-        obj, _, action = perm.partition(".")
-        result.setdefault(obj, []).append(action)
-    return result
 
 
 @login_required(login_url='/accounts/login/')
@@ -64,9 +57,8 @@ def roleCreate(request):
     name = request.POST.get("name", "").strip() or template.name
     if Role.objects.filter(organisation=organisation, name=name, is_template=False).exists():
         return roles(request, error="A role named '%s' already exists." % name)
-    Role.objects.create(
-        organisation=organisation, name=name, is_template=False, permissions=template.permissions
-    )
+    role = Role.objects.create(organisation=organisation, name=name, is_template=False)
+    role.permissions.set(template.permissions.all())
     return redirect("roles")
 
 
@@ -84,8 +76,7 @@ def roleSave(request, roleId):
 
     organisation = _organisation(request)
     role = get_object_or_404(Role, pk=roleId, organisation=organisation)
-    role.permissions = _group(request.POST.getlist("perm"))
-    role.save()
+    role.permissions.set(Permission.objects.filter(codename__in=request.POST.getlist("perm")))
     return redirect("role detail", roleId=role.pk)
 
 

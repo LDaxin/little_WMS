@@ -1,10 +1,11 @@
 """Permission catalog and checks (§3).
 
-Permissions are ``object.action_scope`` strings, e.g. ``article.view_all``.
-A ``Role`` stores them grouped by object: ``{"article": ["view_all", ...]}``.
+The catalogue is declared here and materialised as Django ``auth.Permission``
+entries on ``organisation.PermissionArea`` (area-prefixed codenames like
+``article_view_all``). A ``Role`` links to those permissions via M2M.
 """
 
-# object -> scopes / actions, straight from the §3 table.
+# area -> scopes / actions, straight from the §3 table.
 PERMISSIONS = {
     "article": {"scopes": ["assigned", "all"], "actions": ["view", "create", "edit", "delete", "move"]},
     "storage": {"scopes": ["assigned", "all"], "actions": ["view", "create", "edit", "delete"]},
@@ -21,15 +22,35 @@ PERMISSIONS = {
 }
 
 
+def action_for(obj, action, scope):
+    """``action_scope`` string, e.g. ``view_all``."""
+    return "%s_%s" % (action, scope)
+
+
 def all_for(obj):
-    """Every ``action_scope`` string for one object."""
+    """Every ``action_scope`` string for one area."""
     spec = PERMISSIONS[obj]
-    return ["%s_%s" % (action, scope) for scope in spec["scopes"] for action in spec["actions"]]
+    return [action_for(obj, action, scope) for scope in spec["scopes"] for action in spec["actions"]]
 
 
-def all_permissions():
-    """Every permission string, e.g. ``article.view_all``."""
-    return ["%s.%s" % (obj, perm) for obj in PERMISSIONS for perm in all_for(obj)]
+def all_codenames():
+    """Every permission codename, e.g. ``article_view_all``."""
+    return ["%s_%s" % (obj, perm) for obj in PERMISSIONS for perm in all_for(obj)]
+
+
+def codename(perm):
+    """``article.view_all`` -> ``article_view_all``."""
+    area, _, action_scope = perm.partition(".")
+    return "%s_%s" % (area, action_scope)
+
+
+def template_codenames(permissions):
+    """``{"article": ["view_all"]}`` -> ``["article_view_all"]``."""
+    return [
+        "%s_%s" % (area, action_scope)
+        for area, action_scopes in permissions.items()
+        for action_scope in action_scopes
+    ]
 
 
 def _profile(user, organisation=None):
@@ -53,8 +74,7 @@ def has_perm(user, perm, organisation=None):
     profile = _profile(user, organisation)
     if profile is None or profile.role is None:
         return False
-    obj, _, action = perm.partition(".")
-    return action in profile.role.permissions.get(obj, [])
+    return profile.role.permissions.filter(codename=codename(perm)).exists()
 
 
 # Pre-configured role templates (§3). Not active, just suggestions.
@@ -90,15 +110,18 @@ ROLE_TEMPLATES = {
 
 def ensure_role_templates(organisation):
     """Create the pre-configured role templates for an organisation (§3)."""
+    from django.contrib.auth.models import Permission
+
     from organisation.models import Role
 
     created = []
     for name, permissions in ROLE_TEMPLATES.items():
         role, was_created = Role.objects.get_or_create(
-            organisation=organisation,
-            name=name,
-            defaults={"is_template": True, "permissions": permissions},
+            organisation=organisation, name=name, defaults={"is_template": True}
         )
         if was_created:
+            role.permissions.set(
+                Permission.objects.filter(codename__in=template_codenames(permissions))
+            )
             created.append(role)
     return created

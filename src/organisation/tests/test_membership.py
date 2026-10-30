@@ -1,4 +1,4 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission, User
 from django.contrib.sessions.backends.db import SessionStore
 from django.db import IntegrityError
 from django.test import RequestFactory, TestCase
@@ -89,8 +89,9 @@ class HasPermPerOrgTest(TestCase):
         self.user = User.objects.create_user("tester", password="pw")
         self.org_a = Organisation.objects.create(name="A", slug="a")
         self.org_b = Organisation.objects.create(name="B", slug="b")
-        role_a = Role.objects.create(organisation=self.org_a, name="Admin", permissions={"article": ["view_all"]})
-        role_b = Role.objects.create(organisation=self.org_b, name="Helper", permissions={})
+        role_a = Role.objects.create(organisation=self.org_a, name="Admin")
+        role_a.permissions.set(Permission.objects.filter(codename="article_view_all"))
+        role_b = Role.objects.create(organisation=self.org_b, name="Helper")
         UserProfile.objects.create(user=self.user, organisation=self.org_a, role=role_a)
         UserProfile.objects.create(user=self.user, organisation=self.org_b, role=role_b)
 

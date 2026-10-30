@@ -4,6 +4,32 @@ from django.db import models
 from django.utils import timezone
 
 from organisation.current import current_organisation_id
+from organisation.permissions import PERMISSIONS
+
+
+def _catalog_permissions():
+    """The §3 catalogue as ``auth.Permission`` entries (area-prefixed codenames)."""
+    entries = []
+    for area, spec in PERMISSIONS.items():
+        for scope in spec["scopes"]:
+            for action in spec["actions"]:
+                entries.append((
+                    "%s_%s_%s" % (area, action, scope),
+                    "%s: %s (%s)" % (area, action, scope),
+                ))
+    return entries
+
+
+class PermissionArea(models.Model):
+    """Hosts the permission catalogue in Django's ``auth.Permission`` (§3).
+
+    The areas are logical (``article``, ``storage``, ``occasion``, …) and not all
+    of them have a model yet, so every permission lives on this one content type
+    with an area-prefixed codename (``article_view_all``).
+    """
+
+    class Meta:
+        permissions = _catalog_permissions()
 
 
 class Organisation(models.Model):
@@ -29,14 +55,14 @@ class Organisation(models.Model):
 class Role(models.Model):
     """A named collection of permissions, per organisation (§3).
 
-    ``permissions`` maps an object to a list of ``action_scope`` strings, e.g.
-    ``{"article": ["view_all", "move_assigned"]}``.
+    ``permissions`` links to Django's ``auth.Permission`` entries from the
+    catalogue (see ``PermissionArea``).
     """
 
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="roles", default=current_organisation_id)
     name = models.CharField(max_length=50)
     is_template = models.BooleanField(default=False)
-    permissions = models.JSONField(default=dict, blank=True)
+    permissions = models.ManyToManyField("auth.Permission", blank=True, related_name="roles")
 
     class Meta:
         # templates and real roles may share a name (KI-020)
