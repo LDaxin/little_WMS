@@ -28,3 +28,9 @@ class StoreArticleSearchTest(TestCase):
         response = self.client.get("/storage/regal/%s" % self.storage.pk)
         self.assertContains(response, "QRButtonstoreCode")
         self.assertContains(response, "storeResults")
+
+    def test_search_input_swaps_inner(self):
+        # the input must not inherit hx-swap="outerHTML" from the form, or the
+        # results container gets replaced and the dropdown only works once
+        response = self.client.get("/storage/regal/%s" % self.storage.pk)
+        self.assertContains(response, 'hx-target="#storeResults" hx-swap="innerHTML"')

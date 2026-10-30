@@ -102,6 +102,13 @@ class PacklistTest(TestCase):
         )
         self.assertContains(response, self.article.code.code)
 
+    def test_packlist_search_input_swaps_inner(self):
+        # the input must not inherit hx-swap="outerHTML" from the form, or the
+        # results container gets replaced and the dropdown only works once
+        self.login_superuser()
+        response = self.client.get("/occasions/%s/" % self.occasion.pk)
+        self.assertContains(response, 'hx-target="#packlistResults" hx-swap="innerHTML"')
+
     def test_packlist_permission(self):
         user_with("helper", "occasion_view_all")
         self.client.login(username="helper", password="pw")
