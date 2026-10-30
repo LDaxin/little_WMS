@@ -68,7 +68,7 @@ class InviteAcceptTest(TestCase):
     def test_accept_as_new_user(self):
         response = self.client.post(
             f"/invite/{self.invitation.token}/",
-            {"username": "newbie", "password": "pw"},
+            {"username": "newbie", "email": "new@example.com", "password": "pw", "password2": "pw"},
         )
         self.assertEqual(response.status_code, 302)
         user = User.objects.get(username="newbie")
@@ -77,6 +77,22 @@ class InviteAcceptTest(TestCase):
         self.assertEqual(profile.role, self.role)
         self.invitation.refresh_from_db()
         self.assertEqual(self.invitation.status, "accepted")
+
+    def test_signup_requires_email(self):
+        response = self.client.post(
+            f"/invite/{self.invitation.token}/",
+            {"username": "newbie", "password": "pw", "password2": "pw"},
+        )
+        self.assertContains(response, "required")
+        self.assertFalse(User.objects.filter(username="newbie").exists())
+
+    def test_signup_passwords_must_match(self):
+        response = self.client.post(
+            f"/invite/{self.invitation.token}/",
+            {"username": "newbie", "email": "new@example.com", "password": "pw", "password2": "nope"},
+        )
+        self.assertContains(response, "do not match")
+        self.assertFalse(User.objects.filter(username="newbie").exists())
 
     def test_accept_as_existing_user(self):
         user = User.objects.create_user("existing", password="pw")

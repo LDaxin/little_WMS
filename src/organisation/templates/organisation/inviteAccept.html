@@ -8,13 +8,16 @@
 <form method="post">
     {% csrf_token %}
     <div class="mb-2">
-        <input name="username" class="form-control" placeholder="Username" autofocus autocomplete="username">
+        <input name="username" class="form-control" placeholder="Username" autofocus autocomplete="username" required>
     </div>
     <div class="mb-2">
-        <input name="email" type="email" class="form-control" placeholder="Email (optional)" autocomplete="email">
+        <input name="email" type="email" class="form-control" placeholder="Email" autocomplete="email" required>
     </div>
     <div class="mb-2">
-        <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password">
+        <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password" required>
+    </div>
+    <div class="mb-2">
+        <input name="password2" type="password" class="form-control" placeholder="Confirm password" autocomplete="new-password" required>
     </div>
     <button class="btn btn-primary">Create account &amp; join</button>
 </form>

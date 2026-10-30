@@ -226,13 +226,17 @@ def inviteAccept(request, token):
     error = ""
     if request.method == "POST":
         username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
-        if not username or not password:
-            error = "Username and password are required."
+        password2 = request.POST.get("password2", "")
+        if not username or not email or not password:
+            error = "Username, email, and password are required."
+        elif password != password2:
+            error = "The passwords do not match."
         elif User.objects.filter(username=username).exists():
             error = "That username is already taken."
         else:
-            user = User.objects.create_user(username, request.POST.get("email", ""), password)
+            user = User.objects.create_user(username, email, password)
             login(request, user)
             _accept_invitation(invitation, user)
             set_active_organisation(request, invitation.organisation)
