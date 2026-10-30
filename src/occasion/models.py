@@ -64,6 +64,23 @@ class Occasion(SoftDeleteObject, models.Model):
         return self.calendar_entry.title
 
 
+class OccasionTemplate(SoftDeleteObject, models.Model):
+    """A reusable occasion with a default packlist (§2).
+
+    `default_packlist` is a list of {"article": <pk>, "quantity": <int>}.
+    """
+
+    objects = SoftDeleteOrganisationManager()
+
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
+    name = models.CharField(max_length=100)
+    occasion_type = models.ForeignKey(OccasionType, on_delete=models.CASCADE)
+    default_packlist = models.JSONField(default=list, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Packlist(models.Model):
     """An article needed for an occasion, with a quantity and status (§2)."""
 
