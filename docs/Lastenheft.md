@@ -388,6 +388,22 @@ Created on first start – not active, just templates:
 5. Every role is editable afterwards: checkbox matrix (Object × Scope × Action)
 6. Optional: "Field Permissions" tab → per type, per role
 
+### Permission Sources & Future Extensions (not built yet)
+
+The role is the primary permission source. Two further mechanisms are planned
+and must fit the same model:
+
+- **`assigned` over groups and occasions**: the `assigned` scope currently
+  resolves only a *direct* assignment to the user (`Article.assigned_to`). It
+  should later also resolve over **groups** — a dedicated `UserGroup` with
+  multi-membership, kept separate from roles (roles stay pure permissions, since
+  a user has at most one role per organisation) — and over **occasions** (a user
+  who is a helper of an occasion sees that occasion's packlist articles).
+- **Share-link permissions (§10)** are a *second, independent permission source*:
+  a Share Link is a capability URL whose effective permissions **replace** the
+  user's role for the objects in the saved view. The permission check must be
+  able to take permissions from a link context, not only from the role.
+
 ---
 
 ## 4. Article Management
