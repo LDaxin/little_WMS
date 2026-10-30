@@ -55,6 +55,33 @@
 
 ---
 
+## Implementation Status
+
+This document is the **backlog / vision**. What is already built is specified in
+`openspec/specs/` (the source of truth). The sections listed below are
+implemented and their behaviour lives in the linked spec; the remaining ⚡
+sections are still to be built.
+
+| § | Section | Spec |
+|---|---|---|
+| 1 | Multi-User Preparation | `organisations` |
+| 3 | Roles & Permissions | `roles-permissions` |
+| 4a–c | Dynamic Article Types | `article-management` |
+| 4d | Sets / Bundles | `stock-composition` |
+| 4e | Article History / Audit Trail | `audit-log` |
+| 5a | QR Sheet Printing | `qr-sheet-printing` |
+| 5b–c | QR Workflow | `qr-workflow`, `inventory` |
+| 11 | Movement Redesign | `movement` |
+| 13 | Tags | `tags` |
+| 21 | Storage Integrity | `movement` (store validation) |
+| 22 | Multi-Organisation Membership | `organisations` |
+| 25 | Article Model | `article-management` |
+| 26 | Code System & Links | `code-system` |
+| 28 | Locations | `locations` |
+| 32 | Audit Log | `audit-log` |
+
+---
+
 ## 1. Multi-User Preparation ⚡
 
 ### Requirement

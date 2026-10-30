@@ -2,7 +2,7 @@
 
 > Central register of defects found while working on the codebase.
 > Entries describe the **current** behaviour (characterization), not the desired behaviour.
-> Reference: [Implementation Plan](Implementation%20Plan.md) · [Requirements Specification](Lastenheft.md)
+> Reference: [OpenSpec specs](../openspec/specs) · [Requirements Specification](Lastenheft.md)
 
 **Status:** 🔴 open · 🟡 in progress · ✅ fixed · ⚪ won't fix
 

@@ -110,12 +110,14 @@ These conventions must be included in every agent prompt when relevant:
 
 | Document | Purpose |
 |---|---|
-| `docs/Lastenheft.md` | Requirements specification (37 sections, all confirmed) |
-| `docs/Implementation Plan.md` | Phased implementation plan (8 phases, 40 steps) |
+| `openspec/specs/` | **Source of truth** — what the system does today (OpenSpec) |
+| `openspec/changes/` | Upcoming work as OpenSpec change proposals |
+| `docs/Lastenheft.md` | Requirements specification / backlog (37 sections; built ones link to their spec) |
 | `docs/Known Issues.md` | Central register of defects found in the codebase |
 | `docs/Structure.md` | Data model definitions (Articles, Storages, Locations) |
 | `docs/Development Workflow.md` | Kanban-based workflow (human contributors) |
 | `docs/git commit namespace.md` | Commit types |
+| `docs/archive/Implementation Plan.md` | Archived phased plan (superseded by OpenSpec) |
 
 ### Skills
 

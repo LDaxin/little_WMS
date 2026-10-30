@@ -1,6 +1,11 @@
 # Implementation Plan – little_WMS v2
 
-> **Reference:** [Requirements Specification](Lastenheft.md) · [Known Issues](Known%20Issues.md)
+> **ARCHIVED.** Superseded by OpenSpec: the current behaviour lives in
+> `openspec/specs/`, and upcoming work is tracked as `openspec/changes/`.
+> The unbuilt vision stays in [`docs/Lastenheft.md`](../Lastenheft.md) as the
+> backlog. Kept for history only.
+
+> **Reference:** [Requirements Specification](../Lastenheft.md) · [Known Issues](../Known%20Issues.md)
 > **Status:** Phase 2 in progress
 
 This plan describes the phased implementation of little_WMS v2. Each step is small, reviewable, and merged by the project owner.
