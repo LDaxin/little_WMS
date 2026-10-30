@@ -95,6 +95,13 @@ class PacklistTest(TestCase):
         self.assertContains(response, "QRButtonpacklistCode")
         self.assertContains(response, "scannerDivpacklistCode")
 
+    def test_packlist_search_by_name(self):
+        self.login_superuser()
+        response = self.client.get(
+            "/occasions/%s/packlist/search/" % self.occasion.pk, {"code": "Hammer"}
+        )
+        self.assertContains(response, self.article.code.code)
+
     def test_packlist_permission(self):
         user_with("helper", "occasion_view_all")
         self.client.login(username="helper", password="pw")

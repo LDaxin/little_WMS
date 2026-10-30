@@ -1,38 +1,40 @@
 ---
 name: little-wms-code-input
-description: Use when adding or reviewing a field that expects a code (article `a0…`, storage `s0…`, location `l0…`, or a target code) in little_WMS — ensures the reusable QR-scan (and code/name search) pattern is used instead of a bare text input.
+description: Use when adding or reviewing a field that expects a code (article `a0…`, storage `s0…`, location `l0…`, or a target code) in little_WMS — ensures the field finds the object by code OR name AND offers the QR scanner, instead of a bare text input.
 ---
 
-# little_WMS Code Input (QR scan + search)
+# little_WMS Code Input (code + search + scanner)
 
 Any input that expects a **code** — a scan field, a "store target" field, a
-packlist article, a form's `code`/`stored` field — MUST offer the QR scanner
-(and, where useful, code/name search). Do not ship a bare text input for codes.
+packlist article, a form's `code`/`stored` field — MUST be user-friendly:
+
+1. **Find by code OR name** (live search suggestions).
+2. **Offer the QR scanner.**
+
+Do not ship a bare text input for codes. A field that only accepts a code, or
+only has a scanner without search, is a defect.
 
 ## Why
 
-The app is built around scanning. A code field without a scanner forces manual
-typing and is a recurring defect.
+The app is built around scanning and quick lookup. Users should be able to type
+a name, pick from suggestions, or scan — without knowing the code.
 
-## The reusable template
-
-`hub/modules/qrScanner.html` renders the QR button. Include it **inside** the
-input-group and give it two variables:
+## The standard field
 
 ```django
-<input id="myCode" name="code" class="form-control" placeholder="Scan or enter code">
+<input id="myCode" name="code" class="form-control" placeholder="Scan or search …"
+       autocomplete="off"
+       hx-get="{% url 'my search' %}" hx-target="#myResults"
+       hx-trigger="input changed delay:300ms">
 {% include "hub/modules/qrScanner.html" with input="myCode" scannerUrl="/my/scanner/myCode/toggle" %}
+...
+<div id="scannerDivmyCode"></div>       {# outside the input-group #}
+<div id="myResults" class="list-group mt-1"></div>
 ```
 
-Two more rules:
-
-1. Every scanner needs its **toggle URL** (a view that returns
-   `hub/modules/toggleScanner.html`).
-2. Add the container **outside** the input-group, using the same `input` id:
-
-```django
-<div id="scannerDivmyCode"></div>
-```
+The search endpoint returns a partial of clickable suggestions that post the
+object's code back to the parent form (like `movement/inventory.html` +
+`movement/inventoryResults.html`).
 
 ## The scanner toggle view
 
@@ -60,21 +62,16 @@ URL (register it in the app's `urls.py`; include the app in
 path("my/scanner/<str:scannerId>/<str:state>", views.myScanner, name="my scanner"),
 ```
 
-## Code + name search (preferred)
+## The search view
 
-For a field that should also accept a name, add live suggestions, like
-`movement/inventory.html`:
-
-```django
-<input id="myCode" name="code" class="form-control"
-       hx-get="{% url 'my search' %}" hx-target="#myResults"
-       hx-trigger="input changed delay:300ms">
-...
-<div id="myResults" class="list-group mt-1"></div>
+```python
+def mySearch(request):
+    query = request.GET.get("code", "").strip()
+    results = Model.objects.filter(
+        Q(name__contains=query) | Q(code__code__contains=query)
+    )[:20] if query else Model.objects.none()
+    return render(request, "my/app/results.html", {"results": results})
 ```
-
-The search view returns a partial of clickable suggestions that post the scanned
-code back to the parent form.
 
 ## Django forms
 
@@ -84,18 +81,19 @@ that branch when adding new forms.
 
 ## Checklist
 
-- [ ] The code field has the QR button (`qrScanner.html` include).
-- [ ] The matching `scannerDiv<id>` container exists outside the input-group.
+- [ ] The field finds the object **by code OR name** (live search + suggestions).
+- [ ] The QR button is present (`qrScanner.html` include) with a matching
+      `scannerDiv<id>` outside the input-group.
 - [ ] A `.../scanner/<scannerId>/<state>` URL + view exist and return
       `toggleScanner.html`.
-- [ ] Where names are useful, a live search endpoint is wired.
-- [ ] The permission guard on the scanner view matches the field's action.
+- [ ] A search URL + view exist and return a clickable-suggestions partial.
+- [ ] The permission guard on both views matches the field's action.
 - [ ] Tested in Docker (`sg docker`) — see `little-wms-implementation`.
 
 ## Existing usages (copy from these)
 
-- `movement/templates/movement/movement.html` (scan)
-- `movement/templates/movement/inventory.html` (scan + search)
+- `movement/templates/movement/inventory.html` + `inventoryResults.html` (scan + search) — the reference.
 - `movement/templates/movement/where.html` (scan + search)
+- `movement/templates/movement/movement.html` (scan)
+- `occasion/templates/occasion/packlist.html` + `packlistResults.html` (scan + search)
 - `hub/modules/storeActions.html`, `hub/modules/storageContents.html` (target/article code)
-- `occasion/templates/occasion/packlist.html` (packlist article)

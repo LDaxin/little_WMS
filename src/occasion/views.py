@@ -1,5 +1,6 @@
 """Occasion system (§2): plan material for an event with a packlist."""
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -132,6 +133,22 @@ def packlistAdd(request, occasionId):
                 occasion=occ, article=article, quantity=_int_or_none(request.POST.get("quantity")) or 1
             )
     return render(request, "occasion/packlist.html", _packlist_context(occ, error))
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.manage_packlist_all")
+def packlistSearch(request, occasionId):
+    """Live suggestions for the combined code/name field (§ code-input pattern)."""
+    occ = get_object_or_404(Occasion, pk=occasionId)
+    query = request.GET.get("code", "").strip()
+    if query:
+        results = Article.objects.filter(
+            Q(base__name__contains=query) | Q(code__code__contains=query)
+        )[:20]
+    else:
+        results = Article.objects.none()
+    return render(request, "occasion/packlistResults.html",
+                  {"occasion": occ, "results": results})
 
 
 @login_required(login_url='/accounts/login/')

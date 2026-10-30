@@ -1,0 +1,8 @@
+{% for a in results %}
+<button type="button" class="list-group-item list-group-item-action"
+        hx-post="{% url 'packlist add' occasion.pk %}" hx-vals='{"code": "{{ a.code.code }}"}'
+        hx-target="#packlist" hx-swap="outerHTML"
+        hx-on::after-request="document.getElementById('packlistResults').innerHTML='';document.getElementById('packlistCode').value='';">
+    {{ a.base.name }} <small class="text-muted">{{ a.code.code }}</small>
+</button>
+{% endfor %}
