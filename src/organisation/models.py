@@ -148,6 +148,7 @@ class OrganisationRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     reviewed_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     reviewed_at = models.DateTimeField(null=True, blank=True)
+    invitation = models.ForeignKey(Invitation, null=True, blank=True, on_delete=models.SET_NULL, related_name="requests")
 
     def __str__(self):
         return self.name

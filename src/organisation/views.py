@@ -329,7 +329,7 @@ def organisationRequestReview(request, requestId):
     action = request.POST.get("action")
     if action == "approve":
         organisation = _create_organisation(organisation_request.name)
-        Invitation.objects.create(
+        organisation_request.invitation = Invitation.objects.create(
             organisation=organisation,
             email=organisation_request.email,
             role=organisation.roles.get(name="Admin"),

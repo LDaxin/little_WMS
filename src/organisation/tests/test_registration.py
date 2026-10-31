@@ -44,6 +44,16 @@ class RegistrationTest(TestCase):
         self.assertTrue(Organisation.objects.filter(name="Pfadfinder").exists())
         self.assertTrue(Invitation.objects.filter(email="a@b.st").exists())
 
+    def test_approve_links_invitation_and_shows_link(self):
+        User.objects.create_superuser("boss", "b@e.st", "pw")
+        self.client.login(username="boss", password="pw")
+        request = OrganisationRequest.objects.create(name="Pfadfinder", email="a@b.st", reason="x")
+        self.client.post("/organisation-requests/%s/review/" % request.pk, {"action": "approve"})
+        request.refresh_from_db()
+        self.assertIsNotNone(request.invitation)
+        response = self.client.get("/organisation-requests/")
+        self.assertContains(response, "/invite/%s/" % request.invitation.token)
+
     def test_reject_does_not_create_org(self):
         User.objects.create_superuser("boss", "b@e.st", "pw")
         self.client.login(username="boss", password="pw")

@@ -10,6 +10,14 @@
             <strong>{{ r.name }}</strong> <small class="text-muted">{{ r.email }}</small>
             <div class="small">{{ r.reason }}</div>
             <span class="badge text-bg-secondary">{{ r.get_status_display }}</span>
+            {% if r.invitation %}
+            <div class="small mt-1">
+                Invitation link:
+                <a href="{% url 'invite accept' r.invitation.token %}">{% url 'invite accept' r.invitation.token %}</a>
+                <button type="button" class="btn btn-sm btn-outline-secondary"
+                        onclick="navigator.clipboard.writeText(window.location.origin + '{% url 'invite accept' r.invitation.token %}');">Copy link</button>
+            </div>
+            {% endif %}
         </span>
         {% if r.status == "pending" %}
         <span class="d-flex gap-2">
