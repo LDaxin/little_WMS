@@ -20,6 +20,28 @@
 
 {% include "occasion/packlist.html" %}
 
+{% if occasion.calendar_entry.recurrence_rule %}
+<div class="small text-muted mb-3">
+    Repeats {{ occasion.calendar_entry.recurrence_rule }} &mdash; {{ occasion.calendar_entry.recurrence_rule.entries.count }} occurrence(s).
+</div>
+{% else %}
+<form method="post" action="{% url 'repeat occasion' occasion.pk %}" class="row g-2 align-items-end mb-3">
+    {% csrf_token %}
+    <div class="col-auto">
+        <select name="frequency" class="form-select">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+            <option value="yearly" selected>Yearly</option>
+        </select>
+    </div>
+    <div class="col-auto"><input name="interval" type="number" min="1" value="1" class="form-control" style="max-width:5rem" placeholder="Interval"></div>
+    <div class="col-auto"><input name="end_date" type="date" class="form-control"></div>
+    <div class="col-auto"><input name="end_after_occurrences" type="number" min="2" class="form-control" style="max-width:9rem" placeholder="Occurrences"></div>
+    <div class="col-auto"><button class="btn btn-outline-secondary">Repeat</button></div>
+</form>
+{% endif %}
+
 <form method="post" action="{% url 'save occasion as template' occasion.pk %}" class="d-flex gap-2 align-items-center mb-3">
     {% csrf_token %}
     <input name="name" class="form-control" style="max-width:16rem" placeholder="Template name" value="{{ occasion }}">

@@ -5,9 +5,11 @@ from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 
 from article.models import Article
+from planning.models import CalendarEntry, RecurrenceRule
 from location.models import Location
 from organisation.decorators import require_perm
-from occasion.models import CalendarEntry, Occasion, OccasionTemplate, OccasionType, Packlist
+from occasion.models import Occasion, OccasionTemplate, OccasionType, Packlist
+from occasion.services import repeat_occasion
 
 
 def _int_or_none(value):
@@ -174,6 +176,25 @@ def saveOccasionAsTemplate(request, occasionId):
                 for entry in occ.packlist.all()
             ],
         )
+    return redirect("occasion", occasionId=occ.pk)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.edit_all")
+def repeatOccasion(request, occasionId):
+    occ = get_object_or_404(Occasion, pk=occasionId)
+    if request.method == "POST" and occ.calendar_entry.recurrence_rule is None:
+        frequency = request.POST.get("frequency")
+        if frequency in dict(RecurrenceRule.FREQUENCY_CHOICES):
+            rule = RecurrenceRule.objects.create(
+                frequency=frequency,
+                interval=_int_or_none(request.POST.get("interval")) or 1,
+                end_date=request.POST.get("end_date") or None,
+                end_after_occurrences=_int_or_none(request.POST.get("end_after_occurrences")),
+            )
+            occ.calendar_entry.recurrence_rule = rule
+            occ.calendar_entry.save()
+            repeat_occasion(occ, rule)
     return redirect("occasion", occasionId=occ.pk)
 
 

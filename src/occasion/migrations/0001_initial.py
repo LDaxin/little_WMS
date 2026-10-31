@@ -14,27 +14,11 @@ class Migration(migrations.Migration):
         ('article', '0008_article_assigned_to'),
         ('location', '0003_alter_location_organisation'),
         ('organisation', '0010_invitation'),
+        ('planning', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
-        migrations.CreateModel(
-            name='CalendarEntry',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(blank=True, db_index=True, default=None, editable=False, null=True)),
-                ('entry_type', models.CharField(choices=[('occasion', 'Occasion'), ('maintenance', 'Maintenance'), ('purchase', 'Purchase'), ('disposal', 'Disposal'), ('inventory', 'Inventory'), ('other', 'Other')], default='occasion', max_length=20)),
-                ('title', models.CharField(max_length=200)),
-                ('start_date', models.DateField()),
-                ('end_date', models.DateField(blank=True, null=True)),
-                ('notes', models.TextField(blank=True)),
-                ('organisation', models.ForeignKey(default=organisation.current.current_organisation_id, on_delete=django.db.models.deletion.CASCADE, to='organisation.organisation')),
-                ('responsible_user', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
-            ],
-            options={
-                'ordering': ['start_date', 'id'],
-            },
-        ),
         migrations.CreateModel(
             name='OccasionType',
             fields=[
@@ -57,7 +41,7 @@ class Migration(migrations.Migration):
                 ('deleted_at', models.DateTimeField(blank=True, db_index=True, default=None, editable=False, null=True)),
                 ('participant_count', models.IntegerField(blank=True, null=True)),
                 ('attributes', models.JSONField(blank=True, default=dict)),
-                ('calendar_entry', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='occasion', to='occasion.calendarentry')),
+                ('calendar_entry', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='occasion', to='planning.calendarentry')),
                 ('location', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='location.location')),
                 ('organisation', models.ForeignKey(default=organisation.current.current_organisation_id, on_delete=django.db.models.deletion.CASCADE, to='organisation.organisation')),
                 ('occasion_type', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='occasion.occasiontype')),

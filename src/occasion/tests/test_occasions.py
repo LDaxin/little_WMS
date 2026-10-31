@@ -2,7 +2,8 @@ from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
-from occasion.models import CalendarEntry, Occasion, OccasionTemplate, OccasionType, Packlist
+from planning.models import CalendarEntry
+from occasion.models import Occasion, OccasionTemplate, OccasionType, Packlist
 from organisation.models import Role, UserProfile
 
 
