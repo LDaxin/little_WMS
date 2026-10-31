@@ -229,7 +229,7 @@ def inviteCreate(request):
         link = request.build_absolute_uri(reverse("invite accept", args=[invitation.token]))
         send(email, "Invitation to little_WMS",
              "You have been invited to join %s.\n\n%s\n" % (organisation.name, link),
-             require_verified=False)
+             require_verified=False, category="invitations")
     return redirect("users")
 
 
