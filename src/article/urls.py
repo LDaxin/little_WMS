@@ -3,6 +3,8 @@ from . import views
 
 
 urlpatterns = [
+    re_path(r'^import/$', views.importArticles, name="import articles"),
+    re_path(r'^import/template$', views.importTemplate, name="import template"),
     re_path(r'^article/search', views.searchArticlesAll, name="search articles all"),
     re_path(r'^article/$', views.articlesAll, name="articles all"),
     re_path(r'^composition/(?P<spaceId>[0-9]+)/add', views.addCompositionItem, name="add composition item"),

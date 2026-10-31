@@ -763,3 +763,34 @@ def articleScanner(request, typ, scannerId, state):
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
+def importArticles(request):
+    """CSV import of articles (§19)."""
+    import io
+
+    from article.importer import import_articles
+
+    report = None
+    if request.method == "POST":
+        upload = request.FILES.get("file")
+        if upload is None:
+            report = {"imported": 0, "errors": [(0, "no file uploaded")]}
+        else:
+            text = io.TextIOWrapper(upload.file, encoding="utf-8-sig")
+            report = import_articles(text, active_organisation(request))
+    return render(request, "article/import.html", {"report": report})
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
+def importTemplate(request):
+    """Downloadable CSV template (§19)."""
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="article-import-template.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["name", "type", "menge", "storage", "zustand"])
+    writer.writerow(["Hammer", "tool", "1", "Regal 1", "gut"])
+    return response
+
