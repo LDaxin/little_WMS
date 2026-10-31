@@ -22,13 +22,13 @@ will make that test fail and force it to be updated.
 | KI-007 | `movement/views.py` `movementCodeInfo` | `request.GET['code']` without `.get()` → `KeyError` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
 | KI-008 | `movement/views.py` `movementSearch` | `request.GET['search']` without `.get()` → `KeyError` (500) | ✅ fixed | 0.3 | – |
 | KI-009 | `movement/views.py` `movementCodeInfo` | Article without a `Space` → `AttributeError` (500) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
-| KI-010 | movement (all) | No audit trail (planned in §32) | 🔴 open | 0.3 | – |
+| KI-010 | movement (all) | No audit trail (planned in §32) | ✅ fixed | 0.3 | `movement/tests/test_movement.py` |
 
 ## Code System
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-011 | `codeSystem/urls.py` | `^code/add` is registered before `^code/add/modal`, so `addModal` is unreachable; `GET /code/add/modal` → `MultiValueDictKeyError` (500) | 🔴 open | 0.2 | `codeSystem/tests/test_views.py` |
+| KI-011 | `codeSystem/urls.py` | `^code/add` was registered before `^code/add/modal`, so `addModal` was unreachable; `GET /code/add/modal` → `MultiValueDictKeyError` (500). Fixed by anchoring `^code/add$`. | ✅ fixed | 0.2 | `codeSystem/tests/test_views.py` |
 
 ## Location
 
@@ -41,13 +41,13 @@ will make that test fail and force it to be updated.
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-013 | `tag/views.py` | `tags`, `addTag`, `delTag`, `tagIncert`, `updateTag` lack `@login_required` → reachable without login | 🔴 open | 0.2 | – |
+| KI-013 | `tag/views.py` | `tags`, `addTag`, `delTag`, `tagIncert`, `updateTag` lacked `@login_required` → reachable without login. Fixed by `add: enforce permissions on all views`. | ✅ fixed | 0.2 | – |
 
 ## Article
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-014 | `article/views.py` `updateArticle` | Error branch uses bare names (`toastName:`) → `NameError`; branch is unreachable dead code | 🔴 open | 0.2 | – |
+| KI-014 | `article/views.py` `updateArticle` | Error branch used bare names (`toastName:`) → `NameError`; branch is unreachable dead code. Fixed by `add: store/remove service and article/storage UI`. | ✅ fixed | 0.2 | – |
 | KI-019 | `ArticleType.field_config` / `custom_fields_schema`, `ArticleBase.attributes` | `JSONField(default=dict)` without `blank=True` → required in forms/admin despite having a default | ✅ fixed | 1.6 | `article/tests/test_schema.py` |
 
 ## Storage
@@ -60,7 +60,7 @@ will make that test fail and force it to be updated.
 
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
-| KI-015 | `article/migrations/0003_restruckture_article.py` | `RunPython(dataTransfer)` has no `reverse_code` → the migration is irreversible and blocks any rollback that would unapply it | 🔴 open | 0.5 | – |
+| KI-015 | `article/migrations/0003_restruckture_article.py` | `RunPython(dataTransfer)` had no `reverse_code` → the migration was irreversible and blocked any rollback that would unapply it. Fixed with `reverse_code=RunPython.noop`. | ✅ fixed | 0.5 | – |
 
 ## Database / Environment
 
