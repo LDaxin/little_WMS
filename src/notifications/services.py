@@ -9,11 +9,12 @@ from django.contrib.auth.models import User
 from notifications.models import Notification
 
 
-def notify(user, title, message="", link="", trigger_type="", dedupe_key=""):
+def notify(user, title, message="", link="", trigger_type="", dedupe_key="", email=True):
     """Create an unread notification for one user.
 
     When ``dedupe_key`` is given and the user already has an unread notification
-    with that key, nothing is created (returns ``None``).
+    with that key, nothing is created (returns ``None``). ``email`` controls
+    whether the notification is also emailed.
     """
     if dedupe_key and Notification.objects.filter(
         user=user, dedupe_key=dedupe_key, is_read=False
@@ -27,24 +28,23 @@ def notify(user, title, message="", link="", trigger_type="", dedupe_key=""):
         trigger_type=trigger_type,
         dedupe_key=dedupe_key,
     )
-    _send_email(notification)
+    if email:
+        notify_email(user, title, message, link)
     return notification
 
 
-def _send_email(notification):
-    """Email the notification to the user (subject to verification + opt-out)."""
-    user = notification.user
+def notify_email(user, title, message="", link=""):
+    """Email a notification to the user (subject to verification + opt-out)."""
     if not user.email:
-        return
+        return False
     from hub.mail import send
 
-    body = notification.message
-    link = notification.link
+    body = message
     if link and settings.SITE_URL:
         link = settings.SITE_URL + link
     if link:
         body = (body + "\n\n" if body else "") + link
-    send(user.email, notification.title, body, category="notifications")
+    return send(user.email, title, body, category="notifications")
 
 
 def notify_roles(organisation, codename, title, message="", link="", trigger_type="", dedupe_key=""):

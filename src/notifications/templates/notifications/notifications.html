@@ -4,6 +4,7 @@
 <div class="d-flex justify-content-between align-items-center">
     <h4>Notifications</h4>
     <div class="d-flex gap-2">
+        {% if can_manage_notification_rules %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rules' %}">Rules</a>{% endif %}
         <a class="btn btn-sm btn-outline-secondary" href="{% url 'email preferences' %}">Email preferences</a>
         <form method="post" action="{% url 'notifications read all' %}">
             {% csrf_token %}
