@@ -1,3 +1,4 @@
+from hub.toasts import toast
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
@@ -41,7 +42,7 @@ def addTag(request):
         if tagForm.is_valid():
             tag = tagForm.save()
             tag.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(tag) + " was added to your system.", "toastType":"status"})
+            return toast(request, "Add Succses", str(tag) + " was added to your system.", "status")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("tag.delete_all")
@@ -55,13 +56,13 @@ def delTag(request):
                     pa = Tag.objects.filter(pk=value).first()
                     delList.append(pa)
                 except Exception as e:
-                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
+                    return toast(request, "Error", e, "alert")
         for i in delList:
             delListReturn = delListReturn + i.__str__() + " "
             i.deleted = True
             i.save()
-        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+        return toast(request, "Delete", delListReturn, "alert")
+    return toast(request, "Error", "thomething went wrong", "alert")
 
 
 
@@ -77,7 +78,7 @@ def updateTag(request, tagId):
         tagForm = FormTag(request.POST, instance=tagObject)
         if tagForm.is_valid():
             tagForm.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":"Tag was updated.", "toastType":"status"})
+            return toast(request, "Update Succses", "Tag was updated.", "status")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("tag.view_all")
