@@ -7,6 +7,7 @@ urlpatterns = [
     path("manifest.json", views.manifest, name="manifest"),
     path("sw.js", views.serviceWorker, name="service worker"),
     path("onboarding/", views.onboarding, name="onboarding"),
+    path("email-preferences/", views.emailPreferences, name="email preferences"),
     path("dashboard/", views.dashboard, name="dashboard"),
     path("trash/", views.trash, name="trash"),
     path("trash/<int:contentTypeId>/<str:objectId>/restore/", views.trashRestore, name="trash restore"),
