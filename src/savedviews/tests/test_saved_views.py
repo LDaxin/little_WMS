@@ -107,3 +107,31 @@ class ShareLinkTest(TestCase):
         self.client.post("/share-links/%s/revoke/" % link.pk)
         link.refresh_from_db()
         self.assertFalse(link.is_active)
+
+    def test_borrow_via_link(self):
+        from loans.models import Loan
+
+        link = ShareLink.objects.create(
+            saved_view=self.view, permissions=["view", "borrow"], requires_confirmation=False
+        )
+        article = Article.objects.first()
+        self.client.post("/s/%s/" % link.token, {"article_%s" % article.pk: "on"})
+        self.assertEqual(Loan.objects.get().status, "active")
+
+    def test_borrow_pending(self):
+        from loans.models import Loan
+
+        link = ShareLink.objects.create(
+            saved_view=self.view, permissions=["view", "borrow"], requires_confirmation=True
+        )
+        article = Article.objects.first()
+        self.client.post("/s/%s/" % link.token, {"article_%s" % article.pk: "on"})
+        self.assertEqual(Loan.objects.get().status, "pending")
+
+    def test_no_borrow_without_permission(self):
+        from loans.models import Loan
+
+        link = ShareLink.objects.create(saved_view=self.view, permissions=["view"])
+        article = Article.objects.first()
+        self.client.post("/s/%s/" % link.token, {"article_%s" % article.pk: "on"})
+        self.assertFalse(Loan.objects.exists())

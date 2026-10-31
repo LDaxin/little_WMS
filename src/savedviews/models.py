@@ -42,6 +42,8 @@ class ShareLink(models.Model):
     saved_view = models.ForeignKey(SavedView, on_delete=models.CASCADE, related_name="share_links")
     token = models.CharField(max_length=64, unique=True)
     access_mode = models.CharField(max_length=10, choices=ACCESS_MODES, default="public")
+    permissions = models.JSONField(default=list, blank=True)
+    requires_confirmation = models.BooleanField(default=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     single_use = models.BooleanField(default=False)
     used_count = models.IntegerField(default=0)
@@ -63,6 +65,9 @@ class ShareLink(models.Model):
         if self.single_use and self.used_count >= 1:
             return False
         return True
+
+    def can_borrow(self):
+        return "borrow" in (self.permissions or [])
 
     def __str__(self):
         return "Share link for %s" % self.saved_view

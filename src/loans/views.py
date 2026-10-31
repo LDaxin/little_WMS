@@ -5,11 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from article.models import Article
-from loans.models import Lending, Loan, LoanOffer, LoanOfferItem
+from loans.models import Lending, Loan
 from occasion.models import Occasion
 from organisation.decorators import require_scope
 from organisation.models import Organisation
-from organisation.services import active_organisation
 from planning.models import CalendarEntry
 
 
@@ -99,54 +98,6 @@ def returnLoan(request, loanId):
         loan.save()
         loan.article.ownership = "owned"
         loan.article.save()
-    return redirect("loans")
-
-
-@login_required(login_url='/accounts/login/')
-@require_scope("article", "view")
-def loanOffers(request):
-    return render(request, "loans/offers.html", {"offers": LoanOffer.objects.all()})
-
-
-@login_required(login_url='/accounts/login/')
-@require_scope("article", "move")
-def createLoanOffer(request):
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        if name:
-            offer = LoanOffer.objects.create(
-                lender_organisation=active_organisation(request),
-                name=name,
-                requires_confirmation=request.POST.get("requires_confirmation") == "on",
-            )
-            for article_id in request.POST.getlist("article"):
-                article = Article.objects.filter(pk=article_id).first()
-                if article:
-                    LoanOfferItem.objects.create(offer=offer, article=article)
-    return redirect("loan offers")
-
-
-@login_required(login_url='/accounts/login/')
-@require_scope("article", "move")
-def borrowFromOffer(request, offerId):
-    offer = get_object_or_404(LoanOffer, pk=offerId)
-    if request.method == "POST":
-        start = request.POST.get("start_date") or date.today().isoformat()
-        for item in offer.items.all():
-            if not request.POST.get("item_%s" % item.pk):
-                continue
-            status = "pending" if item.needs_confirmation() else "active"
-            Loan.objects.create(
-                article=item.article,
-                lender_type="organisation",
-                lender_organisation=offer.lender_organisation,
-                borrower_organisation=active_organisation(request),
-                start_date=start,
-                status=status,
-            )
-            if status == "active":
-                item.article.ownership = "borrowed"
-                item.article.save()
     return redirect("loans")
 
 

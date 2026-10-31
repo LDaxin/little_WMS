@@ -66,42 +66,6 @@ class Loan(SoftDeleteObject, models.Model):
         return "%s from %s" % (self.article, self.lender_name or self.lender_organisation)
 
 
-class LoanOffer(SoftDeleteObject, models.Model):
-    """A named list of articles offered for loan (§20)."""
-
-    objects = SoftDeleteOrganisationManager()
-
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    lender_organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, related_name="loan_offers")
-    name = models.CharField(max_length=200)
-    requires_confirmation = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.name
-
-
-class LoanOfferItem(SoftDeleteObject, models.Model):
-    """An article in a loan offer; ``requires_confirmation=None`` uses the offer's."""
-
-    objects = SoftDeleteOrganisationManager()
-
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    offer = models.ForeignKey(LoanOffer, on_delete=models.CASCADE, related_name="items")
-    article = models.ForeignKey("article.Article", on_delete=models.CASCADE)
-    requires_confirmation = models.BooleanField(null=True, blank=True)
-
-    def needs_confirmation(self):
-        """Resolve: item → offer → article (§20)."""
-        if self.requires_confirmation is not None:
-            return self.requires_confirmation
-        if not self.offer.requires_confirmation:
-            return False
-        return self.article.loan_requires_confirmation
-
-    def __str__(self):
-        return "%s in %s" % (self.article, self.offer)
-
-
 class OrganisationMembership(models.Model):
     """A pool membership: a pool organisation lends to a member (§20)."""
 
