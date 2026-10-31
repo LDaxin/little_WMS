@@ -36,6 +36,7 @@ class CalendarEntry(SoftDeleteObject, models.Model):
         ("purchase", "Purchase"),
         ("disposal", "Disposal"),
         ("inventory", "Inventory"),
+        ("loan", "Loan"),
         ("other", "Other"),
     ]
 

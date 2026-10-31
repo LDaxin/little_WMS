@@ -41,6 +41,8 @@ def _article_terms(article):
         terms.append({"date": article.ablaufdatum, "label": "Expires", "url": None})
     for entry in article.calendar_entries.filter(entry_type="maintenance"):
         terms.append({"date": entry.start_date, "label": "Maintenance: %s" % entry.title, "url": None})
+    for entry in article.calendar_entries.filter(entry_type="loan"):
+        terms.append({"date": entry.start_date, "label": "Loan: %s" % entry.title, "url": None})
     terms.sort(key=lambda term: term["date"])
     return terms
 

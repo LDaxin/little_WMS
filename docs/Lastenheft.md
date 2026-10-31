@@ -2586,6 +2586,20 @@ No new concept needed – uses:
 2. **Shared pool**: Included – a pool is an organisation that lends.
 3. **After return**: Archive (soft-delete) – confirmed.
 
+### Borrowing from the organisation (external person)
+
+The reverse direction: a **private person borrows an article from the
+organisation**. The article stays the organisation's property; the loan records
+who has it, for how long, and how to reach them.
+
+- The borrower is identified by **name and email** (the email enables return
+  reminders).
+- The loan period is a **calendar entry** (type `loan`), so it shows in the
+  calendar and the article's mini calendar.
+- A loan can optionally be tied to an **occasion**.
+- The organisation records the return (a borrower-facing link is a later step,
+  §10).
+
 ---
 
 ## 21. Storage Integrity (Cycle Prevention & Depth Limit) ⚡

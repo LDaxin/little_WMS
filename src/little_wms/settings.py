@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "planning.apps.PlanningConfig",
     "occasion.apps.OccasionConfig",
     "notifications.apps.NotificationsConfig",
+    "loans.apps.LoansConfig",
     "api.apps.ApiConfig",
     "softdelete",
     "django.contrib.admin",

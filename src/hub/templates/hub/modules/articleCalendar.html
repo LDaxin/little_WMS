@@ -16,4 +16,12 @@
         <input name="due_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
         <button class="btn btn-sm btn-outline-secondary">Add maintenance</button>
     </form>
+    <form method="post" action="{% url 'lend article' typ id %}" class="d-flex gap-2 mt-2">
+        {% csrf_token %}
+        <input name="borrower_name" class="form-control form-control-sm" placeholder="Borrower" style="max-width:12rem">
+        <input name="borrower_email" type="email" class="form-control form-control-sm" placeholder="Email" style="max-width:12rem">
+        <input name="start_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
+        <input name="end_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
+        <button class="btn btn-sm btn-outline-secondary">Lend</button>
+    </form>
 </div>
