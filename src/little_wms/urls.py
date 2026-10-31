@@ -29,6 +29,7 @@ urlpatterns = [
     path('', include("movement.urls")),
     path('', include("planning.urls")),
     path('', include("occasion.urls")),
+    path('', include("notifications.urls")),
     path('', include("location.urls")),
     path('', include("export.urls")),
     path('', include("codeSystem.urls")),

@@ -1,0 +1,31 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center">
+    <h4>Notifications</h4>
+    <form method="post" action="{% url 'notifications read all' %}">
+        {% csrf_token %}
+        <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
+    </form>
+</div>
+
+<ul class="list-group mt-2">
+    {% for n in notifications %}
+    <li class="list-group-item d-flex justify-content-between align-items-center {% if not n.is_read %}fw-bold{% endif %}">
+        <span>
+            {% if n.link %}<a href="{{ n.link }}">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}
+            {% if n.message %}<div class="small text-muted">{{ n.message }}</div>{% endif %}
+            <div class="small text-muted">{{ n.created_at|date:"Y-m-d H:i" }}</div>
+        </span>
+        {% if not n.is_read %}
+        <form method="post" action="{% url 'notification read' n.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-secondary">Mark read</button>
+        </form>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No notifications</li>
+    {% endfor %}
+</ul>
+{% endblock %}

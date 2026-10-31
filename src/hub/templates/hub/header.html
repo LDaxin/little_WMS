@@ -8,8 +8,8 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
         <script src="{% static 'hub/jquery/jquery.min.js' %}"></script>
-        <script src="{% static 'hub/bootstrap/js/bootstrap.min.js' %}"></script>
-        <script src="https://unpkg.com/html5-qrcode" type="text/javascript">
+        <script src="{% static 'hub/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.7"></script>
         {% livereload_script %}
@@ -54,6 +54,21 @@
                         <img style="width:45px" src="{% static 'hub/symbols/Signout.svg' %}">
                     </button>
                 </form>
+                <div class="dropdown">
+                    <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img style="width:45px" src="{% static 'hub/symbols/List.svg' %}">
+                        {% if unreadNotifications %}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unreadNotifications }}</span>{% endif %}
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        {% for n in request.user.notifications.all|slice:":5" %}
+                        <li><a class="dropdown-item" href="{{ n.link|default:'#' }}">{{ n.title }}</a></li>
+                        {% empty %}
+                        <li><span class="dropdown-item-text text-muted">No notifications</span></li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'notifications' %}">View all</a></li>
+                    </ul>
+                </div>
                 <a class="btn btn-light" type="button" href="/accounts/password_change"><img style="width:45px" src="{% static 'hub/symbols/Setting.svg' %}"></a>
                 {% if can_manage_roles %}<a class="btn btn-light" type="button" href="/roles/">Roles</a>{% endif %}
                 {% if request.path != "/" %}
