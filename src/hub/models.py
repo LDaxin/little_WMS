@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
@@ -6,9 +7,9 @@ from hub.fields import SelfForeignKey
 # Create your models here.
 class Settings(SoftDeleteObject, models.Model):
     REGISTRATION_POLICY_CHOICES = [
-        ("open", "Open"),
-        ("invite", "Invite only"),
-        ("request", "Request"),
+        ("open", _("Open")),
+        ("invite", _("Invite only")),
+        ("request", _("Request")),
     ]
 
     storageDepth = models.IntegerField(default = 7)
@@ -26,8 +27,8 @@ class EmailPreference(models.Model):
     """
 
     CATEGORY_CHOICES = [
-        ("notifications", "Notifications"),
-        ("invitations", "Invitations"),
+        ("notifications", _("Notifications")),
+        ("invitations", _("Invitations")),
     ]
 
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="email_preferences")

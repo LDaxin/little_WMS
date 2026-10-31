@@ -1,13 +1,14 @@
+{% load i18n %}
 <div id="delModalInner">
     <p>
-        do you realy want to delete these items:
+        {% trans "Do you really want to delete these items:" %}
     </p>
     <ul id="delList">
         
     </ul>
     <form id="delForm" method="POST" action="./del">
         {% csrf_token %}
-        <button type="submit" id="delButton" class="btn btn-danger" hx-trigger="click" hx-post="./del" hx-swap="afterbegin" hx-target=".toast-container" name="sub_">Delete</button>
+        <button type="submit" id="delButton" class="btn btn-danger" hx-trigger="click" hx-post="./del" hx-swap="afterbegin" hx-target=".toast-container" name="sub_">{% trans "Delete" %}</button>
     </form>
     <script>
 

@@ -1,45 +1,46 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Configuration</h4>
+<h4>{% trans "Configuration" %}</h4>
 
 <div class="row">
     <div class="col-md-6">
-        <h6>Article types</h6>
+        <h6>{% trans "Article types" %}</h6>
         <ul class="list-group mb-2">
             {% for t in article_types %}
             <li class="list-group-item">{{ t.name }} <small class="text-muted">{{ t.symbol }}</small></li>
             {% empty %}
-            <li class="list-group-item text-muted">None yet</li>
+            <li class="list-group-item text-muted">{% trans "None yet" %}</li>
             {% endfor %}
         </ul>
         <form method="post" class="d-flex gap-2 align-items-center">
             {% csrf_token %}
             <input type="hidden" name="action" value="article_type">
-            <input name="name" class="form-control" placeholder="Name" style="max-width:10rem">
-            <input name="symbol" class="form-control" placeholder="Symbol" style="max-width:6rem">
+            <input name="name" class="form-control" placeholder="{% trans "Name" %}" style="max-width:10rem">
+            <input name="symbol" class="form-control" placeholder="{% trans "Symbol" %}" style="max-width:6rem">
             <label class="form-check-label d-flex align-items-center gap-1">
-                <input type="checkbox" name="article_toggle_space" class="form-check-input"> Space
+                <input type="checkbox" name="article_toggle_space" class="form-check-input"> {% trans "Space" %}
             </label>
-            <button class="btn btn-primary">Add</button>
+            <button class="btn btn-primary">{% trans "Add" %}</button>
         </form>
     </div>
 
     <div class="col-md-6">
-        <h6>Storage types</h6>
+        <h6>{% trans "Storage types" %}</h6>
         <ul class="list-group mb-2">
             {% for t in storage_types %}
             <li class="list-group-item">{{ t.name }} <small class="text-muted">{{ t.symbol }}</small></li>
             {% empty %}
-            <li class="list-group-item text-muted">None yet</li>
+            <li class="list-group-item text-muted">{% trans "None yet" %}</li>
             {% endfor %}
         </ul>
         <form method="post" class="d-flex gap-2">
             {% csrf_token %}
             <input type="hidden" name="action" value="storage_type">
-            <input name="name" class="form-control" placeholder="Name" style="max-width:10rem">
-            <input name="symbol" class="form-control" placeholder="Symbol" style="max-width:6rem">
-            <button class="btn btn-primary">Add</button>
+            <input name="name" class="form-control" placeholder="{% trans "Name" %}" style="max-width:10rem">
+            <input name="symbol" class="form-control" placeholder="{% trans "Symbol" %}" style="max-width:6rem">
+            <button class="btn btn-primary">{% trans "Add" %}</button>
         </form>
     </div>
 </div>
@@ -48,13 +49,13 @@
     <form method="post">
         {% csrf_token %}
         <input type="hidden" name="action" value="load_defaults">
-        <button class="btn btn-outline-secondary">Load defaults</button>
+        <button class="btn btn-outline-secondary">{% trans "Load defaults" %}</button>
     </form>
     <form method="post">
         {% csrf_token %}
         <input type="hidden" name="action" value="role_templates">
-        <button class="btn btn-outline-secondary">Create role templates</button>
+        <button class="btn btn-outline-secondary">{% trans "Create role templates" %}</button>
     </form>
 </div>
-<a class="btn btn-outline-secondary mt-3" href="{% url 'onboarding' %}">Restart onboarding wizard</a>
+<a class="btn btn-outline-secondary mt-3" href="{% url 'onboarding' %}">{% trans "Restart onboarding wizard" %}</a>
 {% endblock %}

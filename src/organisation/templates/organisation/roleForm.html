@@ -1,4 +1,5 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 <h4>{{ role.name }}</h4>
@@ -7,7 +8,7 @@
     {% csrf_token %}
     <table class="table table-sm">
         <thead>
-            <tr><th>Object</th><th>Scope</th><th>Action</th><th>Granted</th></tr>
+            <tr><th>{% trans "Object" %}</th><th>{% trans "Scope" %}</th><th>{% trans "Action" %}</th><th>{% trans "Granted" %}</th></tr>
         </thead>
         <tbody>
             {% for row in rows %}
@@ -23,7 +24,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <button class="btn btn-primary">Save</button>
-    <a class="btn btn-outline-secondary" href="{% url 'roles' %}">Back</a>
+    <button class="btn btn-primary">{% trans "Save" %}</button>
+    <a class="btn btn-outline-secondary" href="{% url 'roles' %}">{% trans "Back" %}</a>
 </form>
 {% endblock %}

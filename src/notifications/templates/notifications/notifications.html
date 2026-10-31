@@ -1,14 +1,15 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
-    <h4>Notifications</h4>
+    <h4>{% trans "Notifications" %}</h4>
     <div class="d-flex gap-2">
-        {% if can_manage_notification_rules %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rules' %}">Rules</a>{% endif %}
-        <a class="btn btn-sm btn-outline-secondary" href="{% url 'email preferences' %}">Email preferences</a>
+        {% if can_manage_notification_rules %}<a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rules' %}">{% trans "Rules" %}</a>{% endif %}
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'email preferences' %}">{% trans "Email preferences" %}</a>
         <form method="post" action="{% url 'notifications read all' %}">
             {% csrf_token %}
-            <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
+            <button class="btn btn-sm btn-outline-secondary">{% trans "Mark all as read" %}</button>
         </form>
     </div>
 </div>
@@ -24,12 +25,12 @@
         {% if not n.is_read %}
         <form method="post" action="{% url 'notification read' n.pk %}">
             {% csrf_token %}
-            <button class="btn btn-sm btn-outline-secondary">Mark read</button>
+            <button class="btn btn-sm btn-outline-secondary">{% trans "Mark read" %}</button>
         </form>
         {% endif %}
     </li>
     {% empty %}
-    <li class="list-group-item text-muted">No notifications</li>
+    <li class="list-group-item text-muted">{% trans "No notifications" %}</li>
     {% endfor %}
 </ul>
 {% endblock %}

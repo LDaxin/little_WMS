@@ -1,38 +1,39 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
-    <h4>Notification rules</h4>
-    <a class="btn btn-sm btn-primary" href="{% url 'notification rule add' %}">Add rule</a>
+    <h4>{% trans "Notification rules" %}</h4>
+    <a class="btn btn-sm btn-primary" href="{% url 'notification rule add' %}">{% trans "Add rule" %}</a>
 </div>
 
 <table class="table mt-2">
     <thead>
-        <tr><th>Trigger</th><th>Active</th><th>Threshold (days)</th><th>Channels</th><th></th></tr>
+        <tr><th>{% trans "Trigger" %}</th><th>{% trans "Active" %}</th><th>{% trans "Threshold (days)" %}</th><th>{% trans "Channels" %}</th><th></th></tr>
     </thead>
     <tbody>
         {% for rule in rules %}
         <tr>
             <td>{{ rule.get_trigger_type_display }}</td>
-            <td>{% if rule.active %}yes{% else %}no{% endif %}</td>
+            <td>{% if rule.active %}{% trans "yes" %}{% else %}{% trans "no" %}{% endif %}</td>
             <td>{{ rule.threshold_days|default:"—" }}</td>
             <td>
-                {% if rule.channel_in_app %}in-app{% endif %}
-                {% if rule.channel_email %}email{% endif %}
+                {% if rule.channel_in_app %}{% trans "in-app" %}{% endif %}
+                {% if rule.channel_email %}{% trans "email" %}{% endif %}
             </td>
             <td class="d-flex gap-2">
-                <a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rule edit' rule.pk %}">Edit</a>
+                <a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rule edit' rule.pk %}">{% trans "Edit" %}</a>
                 <form method="post" action="{% url 'notification rule delete' rule.pk %}">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    <button class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
                 </form>
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="5" class="text-muted">No rules. The default recipients are used.</td></tr>
+        <tr><td colspan="5" class="text-muted">{% trans "No rules. The default recipients are used." %}</td></tr>
         {% endfor %}
     </tbody>
 </table>
 
-<a class="btn btn-outline-secondary" href="{% url 'notifications' %}">Back</a>
+<a class="btn btn-outline-secondary" href="{% url 'notifications' %}">{% trans "Back" %}</a>
 {% endblock %}

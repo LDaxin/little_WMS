@@ -8,6 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.translation import gettext as _
 
 from organisation.decorators import require_perm
 from organisation.models import Invitation, Organisation, OrganisationRequest, Role, UserProfile
@@ -88,7 +89,7 @@ def roleCreate(request):
     )
     name = request.POST.get("name", "").strip() or template.name
     if Role.objects.filter(organisation=organisation, name=name, is_template=False).exists():
-        return roles(request, error="A role named '%s' already exists." % name)
+        return roles(request, error=_("A role named '%s' already exists.") % name)
     role = Role.objects.create(organisation=organisation, name=name, is_template=False)
     role.permissions.set(template.permissions.all())
     return redirect("roles")
@@ -265,11 +266,11 @@ def inviteAccept(request, token):
         password = request.POST.get("password", "")
         password2 = request.POST.get("password2", "")
         if not username or not email or not password:
-            error = "Username, email, and password are required."
+            error = _("Username, email, and password are required.")
         elif password != password2:
-            error = "The passwords do not match."
+            error = _("The passwords do not match.")
         elif User.objects.filter(username=username).exists():
-            error = "That username is already taken."
+            error = _("That username is already taken.")
         else:
             user = User.objects.create_user(username, email, password)
             login(request, user)
@@ -338,9 +339,9 @@ def registerOrganisation(request):
         email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
         if not name or not username or not email or not password:
-            error = "All fields are required."
+            error = _("All fields are required.")
         elif User.objects.filter(username=username).exists():
-            error = "That username is already taken."
+            error = _("That username is already taken.")
         else:
             organisation = _create_organisation(name)
             user = User.objects.create_user(username, email, password)
@@ -356,7 +357,7 @@ def registerOrganisation(request):
         email = request.POST.get("email", "").strip()
         reason = request.POST.get("reason", "").strip()
         if not name or not email or not reason:
-            error = "Name, email, and reason are required."
+            error = _("Name, email, and reason are required.")
         else:
             OrganisationRequest.objects.create(name=name, email=email, reason=reason)
             return render(request, "organisation/registerRequested.html", {"name": name})
@@ -416,8 +417,8 @@ def serverSettings(request):
             sent = send(request.user.email, "little_WMS test email",
                         "This is a test email from little_WMS.",
                         require_verified=False)
-            test_result = ("Test email sent." if sent
-                           else "Email is not configured; nothing was sent.")
+            test_result = (_("Test email sent.") if sent
+                           else _("Email is not configured; nothing was sent."))
         else:
             policy = request.POST.get("registration_policy")
             if policy in dict(Settings.REGISTRATION_POLICY_CHOICES):

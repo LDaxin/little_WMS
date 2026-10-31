@@ -38,7 +38,9 @@ class UserLanguageMiddleware:
     def __call__(self, request):
         user = getattr(request, "user", None)
         if user is not None and user.is_authenticated:
-            profile = user.profiles.first()
+            profile = user.profiles.filter(
+                organisation=active_organisation(request)
+            ).first()
             if profile and profile.language:
                 translation.activate(profile.language)
                 request.LANGUAGE_CODE = profile.language

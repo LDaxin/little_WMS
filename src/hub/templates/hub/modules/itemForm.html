@@ -1,3 +1,4 @@
+{% load i18n %}
 
 <form method="POST" action="./{{id}}/{{ actionType }}" id="{{id}}{{ actionType }}Form">
     {% csrf_token %}
@@ -23,7 +24,7 @@
                             hx-swap="outerHTML"
                             hx-target="#scannerDiv{{field.auto_id}}" 
                             hx-trigger="click">
-                            QR
+                            {% trans "QR" %}
                         </button>
                     </div>
                 </div>
@@ -48,24 +49,24 @@
         theme: "bootstrap-5",
         dropdownParent: $("#modal{{modalId}}"),
         width: "100%",
-        placeholder: "Select tags"
+        placeholder: "{% trans "Select tags" %}"
     });
     $("#id_unit_change").select2({
         theme: "bootstrap-5",
         dropdownParent: $("#modal{{modalId}}"),
         width: "100%",
-        placeholder: "Select tags"
+        placeholder: "{% trans "Select tags" %}"
     });
     $("#id_parent_change").select2({
         theme: "bootstrap-5",
         dropdownParent: $("#modal{{modalId}}"),
         width: "100%",
-        placeholder: "Select patent"
+        placeholder: "{% trans "Select patent" %}"
     });
     document.body.addEventListener("htmx:confirm", function (e) {
         if (e.detail.elt && e.detail.elt.id === "{{actionType}}Button") {
             var menge = document.querySelector("[name$='-menge']");
-            if (menge && menge.value === "0" && !confirm("Setting menge to 0 deletes the article. Continue?")) {
+            if (menge && menge.value === "0" && !confirm("{% trans "Setting menge to 0 deletes the article. Continue?" %}")) {
                 e.preventDefault();
             }
         }

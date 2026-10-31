@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Notification(models.Model):
@@ -28,10 +29,10 @@ class NotificationRule(models.Model):
     """
 
     TRIGGER_CHOICES = [
-        ("expiry_date_reached", "Article expires soon"),
-        ("maintenance_due", "Maintenance due"),
-        ("minimum_stock_undercut", "Low stock"),
-        ("return_overdue", "Loan return overdue"),
+        ("expiry_date_reached", _("Article expires soon")),
+        ("maintenance_due", _("Maintenance due")),
+        ("minimum_stock_undercut", _("Low stock")),
+        ("return_overdue", _("Loan return overdue")),
     ]
 
     organisation = models.ForeignKey(

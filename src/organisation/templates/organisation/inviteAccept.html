@@ -1,28 +1,29 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Join {{ invitation.organisation.name }}</h4>
+<h4>{% blocktrans with name=invitation.organisation.name %}Join {{ name }}{% endblocktrans %}</h4>
 
 {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
 
 <form method="post">
     {% csrf_token %}
     <div class="mb-2">
-        <input name="username" class="form-control" placeholder="Username" autofocus autocomplete="username" required>
+        <input name="username" class="form-control" placeholder="{% trans "Username" %}" autofocus autocomplete="username" required>
     </div>
     <div class="mb-2">
-        <input name="email" type="email" class="form-control" placeholder="Email" autocomplete="email" required>
+        <input name="email" type="email" class="form-control" placeholder="{% trans "Email" %}" autocomplete="email" required>
     </div>
     <div class="mb-2">
-        <input name="password" type="password" class="form-control" placeholder="Password" autocomplete="new-password" required>
+        <input name="password" type="password" class="form-control" placeholder="{% trans "Password" %}" autocomplete="new-password" required>
     </div>
     <div class="mb-2">
-        <input name="password2" type="password" class="form-control" placeholder="Confirm password" autocomplete="new-password" required>
+        <input name="password2" type="password" class="form-control" placeholder="{% trans "Confirm password" %}" autocomplete="new-password" required>
     </div>
-    <button class="btn btn-primary">Create account &amp; join</button>
+    <button class="btn btn-primary">{% trans "Create account & join" %}</button>
 </form>
 
 <p class="mt-2">
-    <a href="/accounts/login/?next=/invite/{{ invitation.token }}/">Already have an account? Log in</a>
+    <a href="/accounts/login/?next=/invite/{{ invitation.token }}/">{% trans "Already have an account? Log in" %}</a>
 </p>
 {% endblock %}

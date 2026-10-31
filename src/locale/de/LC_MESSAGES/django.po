@@ -1,0 +1,866 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-31 20:54+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: article/importer.py:69
+msgid "missing name"
+msgstr "Name fehlt"
+
+#: article/importer.py:71
+msgid "name too long (max 20)"
+msgstr "Name zu lang (max. 20)"
+
+#: article/importer.py:73
+msgid "missing type"
+msgstr "Typ fehlt"
+
+#: article/importer.py:78
+#, python-format
+msgid "invalid menge: %s"
+msgstr "Ungültige Menge: %s"
+
+#: article/importer.py:81
+#, python-format
+msgid "invalid zustand: %s"
+msgstr "Ungültiger Zustand: %s"
+
+#: article/importer.py:138
+#, python-format
+msgid "unknown type: %s"
+msgstr "Unbekannter Typ: %s"
+
+#: article/importer.py:146
+#, python-format
+msgid "unknown storage: %s"
+msgstr "Unbekannter Lagerort: %s"
+
+#: article/templates/article/import.html:5
+msgid "Import articles"
+msgstr "Artikel importieren"
+
+#: article/templates/article/import.html:7
+msgid ""
+"Upload a CSV with the columns name, type, menge, storage, zustand. German "
+"headers and a semicolon delimiter work too."
+msgstr "Lade eine CSV mit den Spalten name, type, menge, storage, zustand hoch. Deutsche Spaltennamen und Semikolon als Trennzeichen funktionieren ebenfalls."
+
+#: article/templates/article/import.html:8
+msgid "Download template"
+msgstr "Vorlage herunterladen"
+
+#: article/templates/article/import.html:16
+msgid "Preview"
+msgstr "Vorschau"
+
+#: article/templates/article/import.html:22
+msgid "Imported"
+msgstr "Importiert"
+
+#: article/templates/article/import.html:23
+msgid "updated"
+msgstr "aktualisiert"
+
+#: article/templates/article/import.html:24
+msgid "skipped"
+msgstr "übersprungen"
+
+#: article/templates/article/import.html:29
+#: article/templates/article/importPreview.html:16
+msgid "Row"
+msgstr "Zeile"
+
+#: article/templates/article/importPreview.html:5
+msgid "Import preview"
+msgstr "Import-Vorschau"
+
+#: article/templates/article/importPreview.html:7
+msgid "rows"
+msgstr "Zeilen"
+
+#: article/templates/article/importPreview.html:8
+msgid "valid"
+msgstr "gültig"
+
+#: article/templates/article/importPreview.html:9
+msgid "errors"
+msgstr "Fehler"
+
+#: article/templates/article/importPreview.html:13
+msgid "Errors"
+msgstr "Fehler"
+
+#: article/templates/article/importPreview.html:25
+msgid "Unknown types"
+msgstr "Unbekannte Typen"
+
+#: article/templates/article/importPreview.html:31
+#: article/templates/article/importPreview.html:46
+msgid "Create new"
+msgstr "Neu anlegen"
+
+#: article/templates/article/importPreview.html:32
+#: article/templates/article/importPreview.html:47
+msgid "Skip rows"
+msgstr "Zeilen überspringen"
+
+#: article/templates/article/importPreview.html:33
+#: article/templates/article/importPreview.html:48
+msgid "Use"
+msgstr "Verwenden"
+
+#: article/templates/article/importPreview.html:40
+msgid "Unknown storages"
+msgstr "Unbekannte Lagerorte"
+
+#: article/templates/article/importPreview.html:55
+msgid "Duplicates"
+msgstr "Duplikate"
+
+#: article/templates/article/importPreview.html:58
+msgid "Skip existing"
+msgstr "Vorhandene überspringen"
+
+#: article/templates/article/importPreview.html:62
+msgid "Update existing"
+msgstr "Vorhandene aktualisieren"
+
+#: article/templates/article/importPreview.html:66
+msgid "Import"
+msgstr "Importieren"
+
+#: hub/models.py:10 hub/templates/hub/modules/item.html:12
+msgid "Open"
+msgstr "Öffnen"
+
+#: hub/models.py:11
+msgid "Invite only"
+msgstr "Nur auf Einladung"
+
+#: hub/models.py:12
+msgid "Request"
+msgstr "Anfrage"
+
+#: hub/models.py:30 hub/templates/hub/dashboard.html:29
+#: notifications/templates/notifications/notifications.html:6
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+#: hub/models.py:31
+msgid "Invitations"
+msgstr "Einladungen"
+
+#: hub/templates/hub/dashboard.html:5 hub/templates/hub/hub.html:125
+msgid "Dashboard"
+msgstr "Übersicht"
+
+#: hub/templates/hub/dashboard.html:11
+msgid "Upcoming occasions"
+msgstr "Anstehende Anlässe"
+
+#: hub/templates/hub/dashboard.html:19 hub/templates/hub/dashboard.html:34
+#: hub/templates/hub/dashboard.html:49 hub/templates/hub/dashboard.html:77
+msgid "None"
+msgstr "Keine"
+
+#: hub/templates/hub/dashboard.html:44
+msgid "Alerts"
+msgstr "Warnungen"
+
+#: hub/templates/hub/dashboard.html:59
+msgid "Statistics"
+msgstr "Statistik"
+
+#: hub/templates/hub/dashboard.html:61 hub/templates/hub/dashboard.html:90
+msgid "Articles"
+msgstr "Artikel"
+
+#: hub/templates/hub/dashboard.html:62 hub/templates/hub/dashboard.html:91
+msgid "Storages"
+msgstr "Lagerorte"
+
+#: hub/templates/hub/dashboard.html:63 hub/templates/hub/hub.html:81
+msgid "Occasions"
+msgstr "Anlässe"
+
+#: hub/templates/hub/dashboard.html:72
+msgid "Recent activity"
+msgstr "Letzte Aktivitäten"
+
+#: hub/templates/hub/dashboard.html:87
+msgid "Quick actions"
+msgstr "Schnellaktionen"
+
+#: hub/templates/hub/dashboard.html:89
+msgid "Movement"
+msgstr "Bewegung"
+
+#: hub/templates/hub/dashboard.html:102
+msgid "Show all"
+msgstr "Alle anzeigen"
+
+#: hub/templates/hub/dashboard.html:108
+msgid "No articles"
+msgstr "Keine Artikel"
+
+#: hub/templates/hub/emailPreferences.html:5
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: hub/templates/hub/emailPreferences.html:7
+msgid "Language"
+msgstr "Sprache"
+
+#: hub/templates/hub/emailPreferences.html:16
+#: organisation/templates/organisation/inviteAccept.html:15
+#: organisation/templates/organisation/serverSettings.html:20
+#: organisation/templates/organisation/users.html:9
+msgid "Email"
+msgstr "E-Mail"
+
+#: hub/templates/hub/emailPreferences.html:17
+msgid ""
+"Choose which emails you want to receive. Emails are only sent to a confirmed "
+"address."
+msgstr "Wähle, welche E-Mails du erhalten möchtest. E-Mails werden nur an eine bestätigte Adresse gesendet."
+
+#: hub/templates/hub/emailPreferences.html:26
+#: notifications/templates/notifications/ruleForm.html:9
+#: organisation/templates/organisation/roleForm.html:27
+#: organisation/templates/organisation/serverSettings.html:15
+#: organisation/templates/organisation/users.html:36
+msgid "Save"
+msgstr "Speichern"
+
+#: hub/templates/hub/header.html:69
+#: notifications/templates/notifications/notifications.html:33
+msgid "No notifications"
+msgstr "Keine Benachrichtigungen"
+
+#: hub/templates/hub/header.html:72
+msgid "View all"
+msgstr "Alle anzeigen"
+
+#: hub/templates/hub/header.html:76
+#: organisation/templates/organisation/roles.html:29
+msgid "Roles"
+msgstr "Rollen"
+
+#: hub/templates/hub/hub.html:17
+msgid "All articles"
+msgstr "Alle Artikel"
+
+#: hub/templates/hub/hub.html:43
+msgid "All storages"
+msgstr "Alle Lagerorte"
+
+#: hub/templates/hub/hub.html:92
+msgid "Calendar"
+msgstr "Kalender"
+
+#: hub/templates/hub/hub.html:103 hub/templates/hub/trash.html:5
+msgid "Trash"
+msgstr "Papierkorb"
+
+#: hub/templates/hub/hub.html:114
+#: organisation/templates/organisation/configuration.html:5
+msgid "Configuration"
+msgstr "Konfiguration"
+
+#: hub/templates/hub/hub.html:136
+msgid "Loans"
+msgstr "Ausleihen"
+
+#: hub/templates/hub/hub.html:147
+msgid "Lendings"
+msgstr "Verliehen"
+
+#: hub/templates/hub/hub.html:158
+msgid "Reports"
+msgstr "Berichte"
+
+#: hub/templates/hub/hub.html:169
+msgid "My Views"
+msgstr "Meine Ansichten"
+
+#: hub/templates/hub/modules/addForm.html:25
+#: hub/templates/hub/modules/itemForm.html:27
+#: hub/templates/hub/modules/search.html:27
+msgid "QR"
+msgstr "QR"
+
+#: hub/templates/hub/modules/addForm.html:41
+#: hub/templates/hub/modules/addModal.html:4
+#: organisation/templates/organisation/configuration.html:25
+#: organisation/templates/organisation/configuration.html:43
+msgid "Add"
+msgstr "Hinzufügen"
+
+#: hub/templates/hub/modules/addForm.html:49
+msgid "Select parent"
+msgstr "Übergeordnetes auswählen"
+
+#: hub/templates/hub/modules/delForm.html:4
+msgid "Do you really want to delete these items:"
+msgstr "Möchtest du diese Objekte wirklich löschen:"
+
+#: hub/templates/hub/modules/delForm.html:11
+#: hub/templates/hub/modules/deleteModal.html:4
+#: notifications/templates/notifications/rules.html:28
+#: organisation/templates/organisation/roles.html:36
+#: organisation/templates/organisation/users.html:42
+msgid "Delete"
+msgstr "Löschen"
+
+#: hub/templates/hub/modules/item.html:10
+#: organisation/templates/organisation/organisationRequests.html:19
+msgid "Copy link"
+msgstr "Link kopieren"
+
+#: hub/templates/hub/modules/itemForm.html:52
+#: hub/templates/hub/modules/itemForm.html:58
+msgid "Select tags"
+msgstr "Tags auswählen"
+
+#: hub/templates/hub/modules/itemForm.html:64
+msgid "Select patent"
+msgstr "Übergeordnetes auswählen"
+
+#: hub/templates/hub/modules/itemForm.html:69
+msgid "Setting menge to 0 deletes the article. Continue?"
+msgstr "Menge 0 löscht den Artikel. Fortfahren?"
+
+#: hub/templates/hub/modules/search.html:12
+msgid "Search"
+msgstr "Suche"
+
+#: hub/templates/hub/modules/search.html:39
+msgid "Advanced"
+msgstr "Erweitert"
+
+#: hub/templates/hub/modules/search.html:52
+#: hub/templates/hub/modules/search.html:55
+#: hub/templates/hub/modules/search.html:58
+#: hub/templates/hub/modules/search.html:65
+#: organisation/templates/organisation/configuration.html:20
+#: organisation/templates/organisation/configuration.html:41
+msgid "Name"
+msgstr "Name"
+
+#: hub/templates/hub/modules/search.html:61
+msgid "Code"
+msgstr "Code"
+
+#: hub/templates/hub/modules/search.html:62
+msgid "used"
+msgstr "verwendet"
+
+#: hub/templates/hub/modules/search.html:69
+#: notifications/templates/notifications/rules.html:25
+msgid "Edit"
+msgstr "Bearbeiten"
+
+#: hub/templates/hub/modules/toast.html:7
+msgid "Close"
+msgstr "Schließen"
+
+#: hub/templates/hub/trash.html:12
+msgid "deleted"
+msgstr "gelöscht"
+
+#: hub/templates/hub/trash.html:16
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+#: hub/templates/hub/trash.html:19
+msgid "Permanently delete this object?"
+msgstr "Dieses Objekt endgültig löschen?"
+
+#: hub/templates/hub/trash.html:21
+msgid "Delete forever"
+msgstr "Endgültig löschen"
+
+#: hub/templates/hub/trash.html:28
+msgid "Trash is empty."
+msgstr "Der Papierkorb ist leer."
+
+#: hub/templates/hub/trash.html:31
+msgid "Back to hub"
+msgstr "Zurück zur Startseite"
+
+#: hub/templates/registration/login.html:9
+msgid "Welcome!"
+msgstr "Willkommen!"
+
+#: hub/templates/registration/login.html:16
+#: organisation/templates/organisation/inviteAccept.html:12
+msgid "Username"
+msgstr "Benutzername"
+
+#: hub/templates/registration/login.html:21
+#: organisation/templates/organisation/inviteAccept.html:18
+#: organisation/templates/organisation/register.html:25
+msgid "Password"
+msgstr "Passwort"
+
+#: hub/templates/registration/login.html:25
+msgid "Login"
+msgstr "Anmelden"
+
+#: notifications/checks.py:35
+#, python-format
+msgid "Article expires soon: %(name)s"
+msgstr "Artikel läuft bald ab: %(name)s"
+
+#: notifications/checks.py:36
+#, python-format
+msgid "Expires on %(date)s"
+msgstr "Läuft ab am %(date)s"
+
+#: notifications/checks.py:55
+#, python-format
+msgid "Maintenance due: %(title)s"
+msgstr "Wartung fällig: %(title)s"
+
+#: notifications/checks.py:71
+#, python-format
+msgid "Low stock: %(name)s"
+msgstr "Geringer Bestand: %(name)s"
+
+#: notifications/checks.py:72
+#, python-format
+msgid "%(total)s of %(min)s left"
+msgstr "%(total)s von %(min)s übrig"
+
+#: notifications/checks.py:88
+#, python-format
+msgid "Loan overdue: %(name)s"
+msgstr "Ausleihe überfällig: %(name)s"
+
+#: notifications/checks.py:89
+#, python-format
+msgid "Due %(date)s, borrowed by %(who)s"
+msgstr "Fällig %(date)s, ausgeliehen an %(who)s"
+
+#: notifications/checks.py:101
+#, python-format
+msgid "Return overdue: %(name)s"
+msgstr "Rückgabe überfällig: %(name)s"
+
+#: notifications/checks.py:102
+#, python-format
+msgid "Due %(date)s"
+msgstr "Fällig %(date)s"
+
+#: notifications/models.py:32
+msgid "Article expires soon"
+msgstr "Artikel läuft bald ab"
+
+#: notifications/models.py:33
+msgid "Maintenance due"
+msgstr "Wartung fällig"
+
+#: notifications/models.py:34
+msgid "Low stock"
+msgstr "Geringer Bestand"
+
+#: notifications/models.py:35
+msgid "Loan return overdue"
+msgstr "Rückgabe überfällig"
+
+#: notifications/templates/notifications/notifications.html:8
+msgid "Rules"
+msgstr "Regeln"
+
+#: notifications/templates/notifications/notifications.html:9
+msgid "Email preferences"
+msgstr "E-Mail-Einstellungen"
+
+#: notifications/templates/notifications/notifications.html:12
+msgid "Mark all as read"
+msgstr "Alle als gelesen markieren"
+
+#: notifications/templates/notifications/notifications.html:28
+msgid "Mark read"
+msgstr "Als gelesen markieren"
+
+#: notifications/templates/notifications/ruleForm.html:5
+msgid "Notification rule"
+msgstr "Benachrichtigungsregel"
+
+#: notifications/templates/notifications/ruleForm.html:10
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: notifications/templates/notifications/rules.html:6
+msgid "Notification rules"
+msgstr "Benachrichtigungsregeln"
+
+#: notifications/templates/notifications/rules.html:7
+msgid "Add rule"
+msgstr "Regel hinzufügen"
+
+#: notifications/templates/notifications/rules.html:12
+msgid "Trigger"
+msgstr "Auslöser"
+
+#: notifications/templates/notifications/rules.html:12
+msgid "Active"
+msgstr "Aktiv"
+
+#: notifications/templates/notifications/rules.html:12
+msgid "Threshold (days)"
+msgstr "Schwelle (Tage)"
+
+#: notifications/templates/notifications/rules.html:12
+msgid "Channels"
+msgstr "Kanäle"
+
+#: notifications/templates/notifications/rules.html:18
+msgid "yes"
+msgstr "ja"
+
+#: notifications/templates/notifications/rules.html:18
+msgid "no"
+msgstr "nein"
+
+#: notifications/templates/notifications/rules.html:21
+msgid "in-app"
+msgstr "In-App"
+
+#: notifications/templates/notifications/rules.html:22
+msgid "email"
+msgstr "E-Mail"
+
+#: notifications/templates/notifications/rules.html:33
+msgid "No rules. The default recipients are used."
+msgstr "Keine Regeln. Es werden die Standard-Empfänger benachrichtigt."
+
+#: notifications/templates/notifications/rules.html:38
+#: organisation/templates/organisation/roleForm.html:28
+msgid "Back"
+msgstr "Zurück"
+
+#: organisation/templates/organisation/configuration.html:9
+msgid "Article types"
+msgstr "Artikeltypen"
+
+#: organisation/templates/organisation/configuration.html:14
+#: organisation/templates/organisation/configuration.html:35
+msgid "None yet"
+msgstr "Noch keine"
+
+#: organisation/templates/organisation/configuration.html:21
+#: organisation/templates/organisation/configuration.html:42
+msgid "Symbol"
+msgstr "Symbol"
+
+#: organisation/templates/organisation/configuration.html:23
+msgid "Space"
+msgstr "Behälter"
+
+#: organisation/templates/organisation/configuration.html:30
+msgid "Storage types"
+msgstr "Lagerorttypen"
+
+#: organisation/templates/organisation/configuration.html:52
+msgid "Load defaults"
+msgstr "Standard laden"
+
+#: organisation/templates/organisation/configuration.html:57
+msgid "Create role templates"
+msgstr "Rollen-Vorlagen anlegen"
+
+#: organisation/templates/organisation/configuration.html:60
+msgid "Restart onboarding wizard"
+msgstr "Einrichtungsassistent neu starten"
+
+#: organisation/templates/organisation/inviteAccept.html:5
+#, python-format
+msgid "Join %(name)s"
+msgstr "%(name)s beitreten"
+
+#: organisation/templates/organisation/inviteAccept.html:21
+msgid "Confirm password"
+msgstr "Passwort bestätigen"
+
+#: organisation/templates/organisation/inviteAccept.html:23
+msgid "Create account & join"
+msgstr "Konto erstellen & beitreten"
+
+#: organisation/templates/organisation/inviteAccept.html:27
+msgid "Already have an account? Log in"
+msgstr "Bereits ein Konto? Anmelden"
+
+#: organisation/templates/organisation/inviteInvalid.html:6
+#, python-format
+msgid "This invitation is no longer valid (%(status)s)."
+msgstr "Diese Einladung ist nicht mehr gültig (%(status)s)."
+
+#: organisation/templates/organisation/organisationRequests.html:5
+#: organisation/templates/organisation/serverSettings.html:18
+msgid "Organisation requests"
+msgstr "Organisationsanfragen"
+
+#: organisation/templates/organisation/organisationRequests.html:16
+msgid "Invitation link:"
+msgstr "Einladungslink:"
+
+#: organisation/templates/organisation/organisationRequests.html:28
+msgid "Approve"
+msgstr "Genehmigen"
+
+#: organisation/templates/organisation/organisationRequests.html:33
+msgid "Reject"
+msgstr "Ablehnen"
+
+#: organisation/templates/organisation/organisationRequests.html:39
+msgid "No requests"
+msgstr "Keine Anfragen"
+
+#: organisation/templates/organisation/organisationRequests.html:43
+#: organisation/templates/organisation/serverSettings.html:5
+msgid "Server settings"
+msgstr "Server-Einstellungen"
+
+#: organisation/templates/organisation/register.html:5
+msgid "Register organisation"
+msgstr "Organisation registrieren"
+
+#: organisation/templates/organisation/register.html:10
+msgid ""
+"Registration is invite-only. Please ask an organisation for an invitation "
+"link."
+msgstr "Die Registrierung ist nur auf Einladung möglich. Bitte frage eine Organisation nach einem Einladungslink."
+
+#: organisation/templates/organisation/register.html:14
+#: organisation/templates/organisation/register.html:22
+msgid "Organisation name"
+msgstr "Name der Organisation"
+
+#: organisation/templates/organisation/register.html:15
+msgid "Your email"
+msgstr "Deine E-Mail"
+
+#: organisation/templates/organisation/register.html:16
+msgid "Why do you want to use little_WMS?"
+msgstr "Warum möchtest du little_WMS nutzen?"
+
+#: organisation/templates/organisation/register.html:17
+msgid "Send request"
+msgstr "Anfrage senden"
+
+#: organisation/templates/organisation/register.html:23
+msgid "Admin username"
+msgstr "Admin-Benutzername"
+
+#: organisation/templates/organisation/register.html:24
+msgid "Admin email"
+msgstr "Admin-E-Mail"
+
+#: organisation/templates/organisation/register.html:26
+msgid "Create organisation"
+msgstr "Organisation erstellen"
+
+#: organisation/templates/organisation/registerRequested.html:5
+msgid "Request sent"
+msgstr "Anfrage gesendet"
+
+#: organisation/templates/organisation/registerRequested.html:6
+#, python-format
+msgid ""
+"Thanks! Your request for <strong>%(name)s</strong> was sent. A server admin "
+"will review it."
+msgstr "Danke! Deine Anfrage für <strong>%(name)s</strong> wurde gesendet. Ein Server-Admin prüft sie."
+
+#: organisation/templates/organisation/roleForm.html:11
+msgid "Object"
+msgstr "Objekt"
+
+#: organisation/templates/organisation/roleForm.html:11
+msgid "Scope"
+msgstr "Umfang"
+
+#: organisation/templates/organisation/roleForm.html:11
+msgid "Action"
+msgstr "Aktion"
+
+#: organisation/templates/organisation/roleForm.html:11
+msgid "Granted"
+msgstr "Gewährt"
+
+#: organisation/templates/organisation/roles.html:5
+msgid "Roles & Permissions"
+msgstr "Rollen & Berechtigungen"
+
+#: organisation/templates/organisation/roles.html:9
+msgid "Templates"
+msgstr "Vorlagen"
+
+#: organisation/templates/organisation/roles.html:19
+msgid "created"
+msgstr "erstellt"
+
+#: organisation/templates/organisation/roles.html:21
+msgid "Create"
+msgstr "Anlegen"
+
+#: organisation/templates/organisation/roles.html:40
+msgid "No roles yet"
+msgstr "Noch keine Rollen"
+
+#: organisation/templates/organisation/roles.html:44
+msgid "Assign roles to users"
+msgstr "Rollen Benutzern zuweisen"
+
+#: organisation/templates/organisation/selectOrganisation.html:5
+msgid "Which organisation?"
+msgstr "Welche Organisation?"
+
+#: organisation/templates/organisation/serverSettings.html:9
+msgid "Registration policy"
+msgstr "Registrierungsrichtlinie"
+
+#: organisation/templates/organisation/serverSettings.html:22
+msgid "SMTP configured"
+msgstr "SMTP konfiguriert"
+
+#: organisation/templates/organisation/serverSettings.html:24
+msgid "not configured"
+msgstr "nicht konfiguriert"
+
+#: organisation/templates/organisation/serverSettings.html:29
+msgid "Send test email"
+msgstr "Test-E-Mail senden"
+
+#: organisation/templates/organisation/serverSettings.html:33
+msgid "Backup"
+msgstr "Backup"
+
+#: organisation/templates/organisation/serverSettings.html:34
+msgid "Download a full copy of the database."
+msgstr "Lade eine vollständige Kopie der Datenbank herunter."
+
+#: organisation/templates/organisation/serverSettings.html:35
+msgid "Download backup"
+msgstr "Backup herunterladen"
+
+#: organisation/templates/organisation/users.html:5
+msgid "Users"
+msgstr "Benutzer"
+
+#: organisation/templates/organisation/users.html:9
+msgid "User"
+msgstr "Benutzer"
+
+#: organisation/templates/organisation/users.html:9
+msgid "Role"
+msgstr "Rolle"
+
+#: organisation/templates/organisation/users.html:17
+msgid "verified"
+msgstr "bestätigt"
+
+#: organisation/templates/organisation/users.html:19
+msgid "unverified"
+msgstr "unbestätigt"
+
+#: organisation/templates/organisation/users.html:22
+msgid "Resend"
+msgstr "Erneut senden"
+
+#: organisation/templates/organisation/users.html:30
+msgid "none"
+msgstr "keine"
+
+#: organisation/templates/organisation/users.html:40
+msgid "Delete this user?"
+msgstr "Diesen Benutzer löschen?"
+
+#: organisation/templates/organisation/users.html:50
+msgid "Back to roles"
+msgstr "Zurück zu den Rollen"
+
+#: organisation/templates/organisation/users.html:52
+msgid "Invite"
+msgstr "Einladen"
+
+#: organisation/templates/organisation/users.html:56
+msgid "no role"
+msgstr "keine Rolle"
+
+#: organisation/templates/organisation/users.html:61
+msgid "Email (optional)"
+msgstr "E-Mail (optional)"
+
+#: organisation/templates/organisation/users.html:62
+msgid "Expiry in days (default 7)"
+msgstr "Ablauf in Tagen (Standard 7)"
+
+#: organisation/templates/organisation/users.html:63
+msgid "Create link"
+msgstr "Link erstellen"
+
+#: organisation/templates/organisation/users.html:73
+msgid "expires"
+msgstr "läuft ab"
+
+#: organisation/templates/organisation/users.html:82
+msgid "Revoke"
+msgstr "Widerrufen"
+
+#: organisation/templates/organisation/verifyEmail.html:7
+#, python-format
+msgid "Your email address <strong>%(email)s</strong> is now confirmed."
+msgstr "Deine E-Mail-Adresse <strong>%(email)s</strong> ist jetzt bestätigt."
+
+#: organisation/templates/organisation/verifyEmail.html:11
+msgid "This confirmation link is invalid."
+msgstr "Dieser Bestätigungslink ist ungültig."
+
+#: organisation/views.py:92
+#, python-format
+msgid "A role named '%s' already exists."
+msgstr "Eine Rolle namens '%s' existiert bereits."
+
+#: organisation/views.py:269
+msgid "Username, email, and password are required."
+msgstr "Benutzername, E-Mail und Passwort sind erforderlich."
+
+#: organisation/views.py:271
+msgid "The passwords do not match."
+msgstr "Die Passwörter stimmen nicht überein."
+
+#: organisation/views.py:273 organisation/views.py:344
+msgid "That username is already taken."
+msgstr "Dieser Benutzername ist bereits vergeben."
+
+#: organisation/views.py:342
+msgid "All fields are required."
+msgstr "Alle Felder sind erforderlich."
+
+#: organisation/views.py:360
+msgid "Name, email, and reason are required."
+msgstr "Name, E-Mail und Begründung sind erforderlich."
+
+#: organisation/views.py:420
+msgid "Test email sent."
+msgstr "Test-E-Mail gesendet."
+
+#: organisation/views.py:421
+msgid "Email is not configured; nothing was sent."
+msgstr "E-Mail ist nicht konfiguriert; es wurde nichts gesendet."

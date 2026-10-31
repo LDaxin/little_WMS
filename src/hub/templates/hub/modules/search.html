@@ -1,3 +1,4 @@
+{% load i18n %}
 <!-- ____________________________Search Bar______________________________________ -->
 
 <div class="d-flex p-2">
@@ -8,7 +9,7 @@
             name="search" 
             type="search" 
             qtype="search" 
-            placeholder="Search" 
+            placeholder="{% trans "Search" %}" 
             hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
             hx-get="{% if savedQuery %}./search?query={{ savedQuery|urlencode }}{% else %}./search{% endif %}" 
             hx-trigger="load, keyup changed delay:500ms, refresh" 
@@ -23,7 +24,7 @@
                     type="button" 
                     hx-target="#scannerDiv{{searchFieldName}}" 
                     hx-trigger="click">
-                    QR
+                    {% trans "QR" %}
                 </button>
                 <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
             </form>
@@ -35,7 +36,7 @@
 </div>
 
 {% if type == "article" %}
-<button type="button" class="btn btn-sm btn-outline-secondary ms-2 mb-2" onclick="qbToggle()">Advanced</button>
+<button type="button" class="btn btn-sm btn-outline-secondary ms-2 mb-2" onclick="qbToggle()">{% trans "Advanced" %}</button>
 {% include "hub/modules/queryBuilder.html" %}
 {% endif %}
 
@@ -48,24 +49,24 @@
                 <input class="form-check-input" type="checkbox" id="checkAll">
             </th>
         {% if type == "article" %}
-            <th scope="col">Name</th>
+            <th scope="col">{% trans "Name" %}</th>
 
         {% elif type == "location" %}
-            <th scope="col">Name</th>
+            <th scope="col">{% trans "Name" %}</th>
 
         {% elif type == "storage" %}
-            <th scope="col">Name</th>
+            <th scope="col">{% trans "Name" %}</th>
 
         {% elif type == "code" %}
-            <th scope="col">Code</th>
-            <th scope="col">used</th>
+            <th scope="col">{% trans "Code" %}</th>
+            <th scope="col">{% trans "used" %}</th>
 
         {% else %}
-            <th scope="col">Name</th>
+            <th scope="col">{% trans "Name" %}</th>
 
         {% endif %}
         {% if type != "code" %}
-            <th scope="col">Edit</th>
+            <th scope="col">{% trans "Edit" %}</th>
         {% endif %}
         </tr>
     </thead>

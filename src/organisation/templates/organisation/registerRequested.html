@@ -1,6 +1,7 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Request sent</h4>
-<p>Thanks! Your request for <strong>{{ name }}</strong> was sent. A server admin will review it.</p>
+<h4>{% trans "Request sent" %}</h4>
+<p>{% blocktrans with name=name %}Thanks! Your request for <strong>{{ name }}</strong> was sent. A server admin will review it.{% endblocktrans %}</p>
 {% endblock %}

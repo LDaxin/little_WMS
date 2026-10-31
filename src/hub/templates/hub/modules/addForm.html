@@ -1,3 +1,4 @@
+{% load i18n %}
 <form method="POST" action="./add" id="addForm">
     {% csrf_token %}
 
@@ -21,7 +22,7 @@
                             hx-swap="outerHTML"
                             hx-target="#scannerDiv{{field.auto_id}}" 
                             hx-trigger="click">
-                            QR
+                            {% trans "QR" %}
                         </button>
                     </div>
                 </div>
@@ -37,7 +38,7 @@
         {% endfor %}
     {% endfor %}
     <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
-    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >Add</button>
+    <button class="btn btn-success" hx-trigger="click" hx-post="./add" hx-swap="afterbegin" hx-target=".toast-container" >{% trans "Add" %}</button>
 </form>
 
 <script>
@@ -45,7 +46,7 @@
         theme: "bootstrap-5",
         dropdownParent: $("#modal{{modalId}}"),
         width: "100%",
-        placeholder: "Select parent"
+        placeholder: "{% trans "Select parent" %}"
     });
     function closeScanner() {
         console.log("hello");
