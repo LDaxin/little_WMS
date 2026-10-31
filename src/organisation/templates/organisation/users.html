@@ -24,6 +24,12 @@
                     <button class="btn btn-sm btn-primary">Save</button>
                 </form>
             </td>
+            <td>
+                <form method="post" action="{% url 'delete user' row.user.pk %}" onsubmit="return confirm('Delete this user?');">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+            </td>
         </tr>
         {% endfor %}
     </tbody>
