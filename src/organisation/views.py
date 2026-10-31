@@ -212,13 +212,22 @@ def inviteCreate(request):
     role = organisation.roles.filter(pk=role_id).first() if role_id else None
     days = request.POST.get("days", "").strip()
     expires_at = timezone.now() + timedelta(days=int(days)) if days.isdigit() else None
-    Invitation.objects.create(
+    email = request.POST.get("email", "").strip()
+    invitation = Invitation.objects.create(
         organisation=organisation,
-        email=request.POST.get("email", "").strip(),
+        email=email,
         role=role,
         invited_by=request.user,
         expires_at=expires_at,
     )
+    if email:
+        from django.urls import reverse
+
+        from hub.mail import send
+
+        link = request.build_absolute_uri(reverse("invite accept", args=[invitation.token]))
+        send(email, "Invitation to little_WMS",
+             "You have been invited to join %s.\n\n%s\n" % (organisation.name, link))
     return redirect("users")
 
 
@@ -372,18 +381,32 @@ def serverSettings(request):
     if not request.user.is_superuser:
         raise PermissionDenied
 
+    from django.conf import settings as django_settings
+
     from hub.models import Settings
 
     settings = Settings.objects.first() or Settings.objects.create()
+    test_result = ""
     if request.method == "POST":
-        policy = request.POST.get("registration_policy")
-        if policy in dict(Settings.REGISTRATION_POLICY_CHOICES):
-            settings.registration_policy = policy
-            settings.save()
-        return redirect("server settings")
+        if request.POST.get("action") == "test_email":
+            from hub.mail import send
+
+            sent = send(request.user.email, "little_WMS test email",
+                        "This is a test email from little_WMS.")
+            test_result = ("Test email sent." if sent
+                           else "Email is not configured; nothing was sent.")
+        else:
+            policy = request.POST.get("registration_policy")
+            if policy in dict(Settings.REGISTRATION_POLICY_CHOICES):
+                settings.registration_policy = policy
+                settings.save()
+            return redirect("server settings")
     return render(request, "organisation/serverSettings.html", {
         "settings": settings,
         "policies": Settings.REGISTRATION_POLICY_CHOICES,
+        "email_configured": django_settings.EMAIL_CONFIGURED,
+        "email_host": django_settings.EMAIL_HOST,
+        "test_result": test_result,
     })
 
 

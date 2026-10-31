@@ -1,5 +1,6 @@
 from django.contrib.auth.models import Permission, User
-from django.test import TestCase
+from django.core import mail
+from django.test import TestCase, override_settings
 
 from organisation.models import Role, UserProfile
 
@@ -101,3 +102,27 @@ class UserRoleViewTest(TestCase):
     def test_clear_role(self):
         self.client.post(f"/users/{self.user.pk}/role/", {"role": ""})
         self.assertIsNone(UserProfile.objects.get(user=self.user).role)
+
+
+class ServerSettingsTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser("root", "root@example.com", "pw")
+        self.client.login(username="root", password="pw")
+
+    @override_settings(EMAIL_CONFIGURED=False)
+    def test_page_shows_status(self):
+        response = self.client.get("/server-settings/")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "not configured")
+
+    @override_settings(EMAIL_CONFIGURED=True)
+    def test_send_test_email(self):
+        response = self.client.post("/server-settings/", {"action": "test_email"})
+        self.assertContains(response, "Test email sent")
+        self.assertEqual(len(mail.outbox), 1)
+
+    @override_settings(EMAIL_CONFIGURED=False)
+    def test_test_email_not_configured(self):
+        response = self.client.post("/server-settings/", {"action": "test_email"})
+        self.assertContains(response, "not configured")
+        self.assertEqual(len(mail.outbox), 0)
