@@ -62,6 +62,17 @@ wrap this workflow.
 **Always rebuild Docker before asking for the merge** — the owner tests the
 running container, not the working tree.
 
+## Branch model
+
+- `dev` is the **live** system. `ki` is branched off `dev` and holds all the
+  OpenSpec work.
+- Everything on `ki` that has **not** been merged into `dev` has **never run in
+  a real/live system**. There is no production data to preserve for `ki`-only
+  changes: migrations and data models on `ki` may be restructured freely (e.g.
+  moving a model to another app, dropping/recreating a table) without a
+  data-preserving migration. Do not argue for a convoluted migration "to keep
+  the data" — there is none.
+
 ## Known Issues
 
 - Before touching a view/model, check `docs/Known Issues.md` for related
