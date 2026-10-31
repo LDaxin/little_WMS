@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
+from django.urls import reverse
 from decimal import Decimal, InvalidOperation
 from .models import *
 from codeSystem.models import *
@@ -21,6 +22,24 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 from audit.models import AuditLog
 from audit.services import log as audit_log
+
+
+def _article_terms(article):
+    """The article's dated terms for the mini calendar (§2)."""
+    from occasion.models import Packlist
+
+    terms = []
+    for entry in Packlist.objects.filter(article=article).select_related("occasion__calendar_entry"):
+        calendar_entry = entry.occasion.calendar_entry
+        terms.append({
+            "date": calendar_entry.start_date,
+            "label": "Occasion: %s" % calendar_entry.title,
+            "url": reverse("occasion", args=[entry.occasion.pk]),
+        })
+    if article.ablaufdatum:
+        terms.append({"date": article.ablaufdatum, "label": "Expires", "url": None})
+    terms.sort(key=lambda term: term["date"])
+    return terms
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -63,6 +82,8 @@ def article(request, typ, articleId):
             "code":p.code.code if p.code else "",
             "link":("/a/" + p.code.code) if p.code else "",
             "storeActions":True,
+            "articleCalendar":True,
+            "articleTerms":_article_terms(p),
             **_store_actions_context(p, "./%s/store" % articleId, "./%s/remove" % articleId),
             "tagChips":True,
             "tags":p.tags.all(),
