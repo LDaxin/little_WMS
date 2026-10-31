@@ -24,4 +24,15 @@
         <input name="end_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
         <button class="btn btn-sm btn-outline-secondary">Lend</button>
     </form>
+    <form method="post" action="{% url 'borrow article' typ id %}" class="d-flex gap-2 mt-2">
+        {% csrf_token %}
+        <select name="lender_type" class="form-select form-select-sm" style="max-width:10rem">
+            <option value="person">Person</option>
+            <option value="organisation">Organisation</option>
+        </select>
+        <input name="lender_name" class="form-control form-control-sm" placeholder="Lender" style="max-width:12rem">
+        <input name="start_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
+        <input name="end_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
+        <button class="btn btn-sm btn-outline-secondary">Borrow</button>
+    </form>
 </div>
