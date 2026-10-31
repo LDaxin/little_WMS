@@ -5,23 +5,56 @@
 
 <ul class="list-group">
     {% for view in views %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>
-            {{ view.name }}
-            <small class="text-muted">{{ view.owner }}{% if view.is_shared %} &middot; shared{% endif %}</small>
-        </span>
-        <span class="d-flex gap-2">
-            <a class="btn btn-sm btn-outline-primary" href="{{ view.applyUrl }}">Apply</a>
-            {% if view.owner == request.user %}
-            <form method="post" action="{% url 'delete saved view' view.pk %}">
-                {% csrf_token %}
-                <button class="btn btn-sm btn-outline-danger">Delete</button>
-            </form>
-            {% endif %}
-        </span>
+    <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center">
+            <span>
+                {{ view.name }}
+                <small class="text-muted">{{ view.owner }}{% if view.is_shared %} &middot; shared{% endif %}</small>
+            </span>
+            <span class="d-flex gap-2">
+                <a class="btn btn-sm btn-outline-primary" href="{{ view.applyUrl }}">Apply</a>
+                {% if view.owner == request.user %}
+                <form method="post" action="{% url 'delete saved view' view.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                </form>
+                {% endif %}
+            </span>
+        </div>
+        <form method="post" action="{% url 'share saved view' view.pk %}" class="d-flex gap-2 align-items-center mt-2">
+            {% csrf_token %}
+            <select name="access_mode" class="form-select form-select-sm" style="max-width:12rem">
+                <option value="public">Public</option>
+                <option value="guest">Guest token</option>
+                <option value="internal">Internal</option>
+            </select>
+            <input name="days" type="number" min="1" class="form-control form-control-sm" style="max-width:6rem" placeholder="Days">
+            <input name="password" type="text" class="form-control form-control-sm" style="max-width:10rem" placeholder="Password">
+            <label class="form-check-label d-flex align-items-center gap-1"><input type="checkbox" name="single_use" class="form-check-input"> Single use</label>
+            <button class="btn btn-sm btn-outline-secondary">Share</button>
+        </form>
     </li>
     {% empty %}
     <li class="list-group-item text-muted">No views yet</li>
+    {% endfor %}
+</ul>
+
+<h5 class="mt-4">Active links</h5>
+<ul class="list-group">
+    {% for link in links %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            {{ link.saved_view.name }}
+            <a href="{% url 'share link' link.token %}">{% url 'share link' link.token %}</a>
+            <small class="text-muted">{{ link.get_access_mode_display }}{% if link.expires_at %} &middot; expires {{ link.expires_at|date:"Y-m-d" }}{% endif %}{% if link.single_use %} &middot; single use{% endif %}</small>
+        </span>
+        <form method="post" action="{% url 'revoke share link' link.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-danger">Revoke</button>
+        </form>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No active links</li>
     {% endfor %}
 </ul>
 {% endblock %}
