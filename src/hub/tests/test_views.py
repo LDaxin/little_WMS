@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from hub.mail import is_subscribed
+from organisation.models import Organisation, UserProfile
 
 
 class HubViewTest(TestCase):
@@ -40,3 +41,9 @@ class EmailPreferencesViewTest(TestCase):
         self.client.post("/email-preferences/", {"notifications": "on"})
         self.assertTrue(is_subscribed(self.user, "notifications"))
         self.assertFalse(is_subscribed(self.user, "invitations"))
+
+    def test_save_language(self):
+        org = Organisation.objects.create(name="A", slug="a")
+        UserProfile.objects.create(user=self.user, organisation=org)
+        self.client.post("/email-preferences/", {"language": "en"})
+        self.assertEqual(self.user.profiles.first().language, "en")
