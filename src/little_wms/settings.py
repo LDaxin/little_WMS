@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "planning.apps.PlanningConfig",
     "occasion.apps.OccasionConfig",
     "notifications.apps.NotificationsConfig",
+    "api.apps.ApiConfig",
     "softdelete",
     "django.contrib.admin",
     "django.contrib.auth",
@@ -63,6 +64,16 @@ INSTALLED_APPS = [
 
 if 'test' in sys.argv:
     INSTALLED_APPS.append("softdelete.test_softdelete_app")
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.BasicAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "api.permissions.RolePermission",
+    ],
+}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
