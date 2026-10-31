@@ -195,6 +195,15 @@ def articles(request, typ):
             "export":True,
             "qr":True,
         }
+        view_id = request.GET.get("view")
+        if view_id:
+            import json
+
+            from savedviews.views import visible_views
+
+            saved_view = visible_views(request.user).filter(pk=view_id).first()
+            if saved_view:
+                context["savedQuery"] = json.dumps(saved_view.query)
         return render(request, "hub/modules/items.html", context=context)
 
 @login_required(login_url='/accounts/login/')

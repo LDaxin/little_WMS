@@ -1,0 +1,27 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>My Views</h4>
+
+<ul class="list-group">
+    {% for view in views %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            {{ view.name }}
+            <small class="text-muted">{{ view.owner }}{% if view.is_shared %} &middot; shared{% endif %}</small>
+        </span>
+        <span class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-primary" href="{{ view.applyUrl }}">Apply</a>
+            {% if view.owner == request.user %}
+            <form method="post" action="{% url 'delete saved view' view.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">Delete</button>
+            </form>
+            {% endif %}
+        </span>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No views yet</li>
+    {% endfor %}
+</ul>
+{% endblock %}

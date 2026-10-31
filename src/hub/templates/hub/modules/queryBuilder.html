@@ -11,6 +11,16 @@
         <button class="btn btn-sm btn-success">Apply</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbClear()">Clear</button>
     </form>
+    <form method="post" action="/views/save/" class="mt-2 d-flex gap-2 align-items-center"
+          onsubmit="document.getElementById('qbSaveQuery').value = JSON.stringify(qbState);">
+        {% csrf_token %}
+        <input type="hidden" name="query" id="qbSaveQuery">
+        <input type="hidden" name="typ" value="{{ name }}">
+        <input type="hidden" name="next" value="{{ request.path }}">
+        <input name="name" class="form-control form-control-sm" placeholder="View name" style="max-width:14rem">
+        <label class="form-check-label d-flex align-items-center gap-1"><input type="checkbox" name="is_shared" class="form-check-input"> Share</label>
+        <button class="btn btn-sm btn-outline-primary">Save as View</button>
+    </form>
 </div>
 
 <script>
@@ -32,6 +42,8 @@ const QB_OPS = {
     boolean: [["is_true", "is true"], ["is_false", "is false"]],
 };
 let qbState = {type: "AND", conditions: []};
+const SAVED_QUERY = {{ savedQuery|default:"null"|safe }};
+if (SAVED_QUERY) { qbState = SAVED_QUERY; }
 
 function qbFieldType(field) {
     const f = QB_FIELDS.find((x) => x[0] === field);

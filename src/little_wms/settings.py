@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "loans.apps.LoansConfig",
     "reports.apps.ReportsConfig",
     "querybuilder.apps.QuerybuilderConfig",
+    "savedviews.apps.SavedviewsConfig",
     "api.apps.ApiConfig",
     "softdelete",
     "django.contrib.admin",

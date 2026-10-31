@@ -32,6 +32,7 @@ urlpatterns = [
     path('', include("occasion.urls")),
     path('', include("notifications.urls")),
     path('', include("reports.urls")),
+    path('', include("savedviews.urls")),
     path('api/v1/', include("api.urls")),
     path('', include("location.urls")),
     path('', include("export.urls")),
