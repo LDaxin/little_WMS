@@ -2,6 +2,8 @@ from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
+    re_path(r"^storage/search", views.searchStoragesAll, name="search storages all"),
+    re_path(r"^storage/$", views.storagesAll, name="storages all"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/update", views.updateStorage, name="update Storage"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/store-search", views.storeArticleSearch, name="store article search"),
     re_path(r"^storage/(?P<typ>\w+)/(?P<storageId>[0-9]+)/store", views.storeInStorage, name="store in Storage"),

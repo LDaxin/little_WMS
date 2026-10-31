@@ -94,6 +94,36 @@ def storages(request, typ):
         }
         return render(request, "hub/modules/items.html", context=context)
 
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
+def storagesAll(request):
+    """List all storages across types."""
+    return render(request, "hub/modules/items.html", context={
+        "symbol": "Logo",
+        "searchFieldName": "storageSearchAll",
+        "type": "storage",
+        "name": "",
+        "form": [],
+        "typ": "",
+        "add": False,
+        "del": False,
+        "export": False,
+        "qr": False,
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
+def searchStoragesAll(request):
+    if request.method == "GET":
+        r = Storage.objects.all()
+        if request.GET.get("search"):
+            search = request.GET["search"]
+            r = r.filter(Q(name__contains=search) | Q(code__code__contains=search))
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})
+
+
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.create_all")
 def addModal(request, typ):
