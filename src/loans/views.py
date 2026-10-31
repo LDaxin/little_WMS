@@ -1,4 +1,6 @@
 """Loans (§20)."""
+from datetime import date
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -95,5 +97,17 @@ def returnLoan(request, loanId):
         loan.status = "returned"
         loan.save()
         loan.article.ownership = "owned"
+        loan.article.save()
+    return redirect("loans")
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "move")
+def confirmLoan(request, loanId):
+    loan = get_object_or_404(Loan, pk=loanId)
+    if request.method == "POST":
+        loan.status = "active"
+        loan.save()
+        loan.article.ownership = "borrowed"
         loan.article.save()
     return redirect("loans")

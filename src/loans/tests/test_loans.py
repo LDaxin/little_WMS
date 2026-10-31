@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
-from loans.models import Lending, Loan
+from loans.models import Lending, Loan, OrganisationMembership
 from organisation.models import Organisation, Role, UserProfile
 
 
@@ -103,3 +103,12 @@ class LoanTest(TestCase):
         user_with(self.org, "u", "article_view_all")
         self.client.login(username="u", password="pw")
         self.assertEqual(self._borrow().status_code, 403)
+
+
+class MembershipTest(TestCase):
+    def test_membership(self):
+        pool = Organisation.objects.create(name="B", slug="b")
+        member = Organisation.objects.create(name="A", slug="a")
+        membership = OrganisationMembership.objects.create(pool=pool, member=member)
+        self.assertTrue(membership.can_borrow)
+        self.assertFalse(membership.can_add)

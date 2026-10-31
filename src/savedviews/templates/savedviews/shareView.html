@@ -3,14 +3,30 @@
 {% block content %}
 <h4>{{ link.saved_view.name }}</h4>
 
-<table class="table">
-    <thead><tr><th>Name</th><th>Code</th></tr></thead>
-    <tbody>
-        {% for article in articles %}
-        <tr><td>{{ article.base.name }}</td><td>{{ article.code.code }}</td></tr>
-        {% empty %}
-        <tr><td colspan="2" class="text-muted">No articles</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+<form method="post">
+    {% csrf_token %}
+    <table class="table">
+        <thead>
+            <tr>
+                {% if link.can_borrow and request.user.is_authenticated %}<th></th>{% endif %}
+                <th>Name</th><th>Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for article in articles %}
+            <tr>
+                {% if link.can_borrow and request.user.is_authenticated %}
+                <td><input type="checkbox" name="article_{{ article.pk }}" class="form-check-input"></td>
+                {% endif %}
+                <td>{{ article.base.name }}</td><td>{{ article.code.code }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="text-muted">No articles</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% if link.can_borrow and request.user.is_authenticated %}
+    <button class="btn btn-primary">Borrow selected</button>
+    {% endif %}
+</form>
 {% endblock %}

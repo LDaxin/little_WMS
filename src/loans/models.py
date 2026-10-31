@@ -43,6 +43,7 @@ class Loan(SoftDeleteObject, models.Model):
         ("organisation", "Another organisation"),
     ]
     STATUS_CHOICES = [
+        ("pending", "Pending"),
         ("active", "Active"),
         ("returned", "Returned"),
     ]
@@ -63,3 +64,15 @@ class Loan(SoftDeleteObject, models.Model):
 
     def __str__(self):
         return "%s from %s" % (self.article, self.lender_name or self.lender_organisation)
+
+
+class OrganisationMembership(models.Model):
+    """A pool membership: a pool organisation lends to a member (§20)."""
+
+    pool = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, related_name="members")
+    member = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, related_name="pools")
+    can_borrow = models.BooleanField(default=True)
+    can_add = models.BooleanField(default=False)
+
+    def __str__(self):
+        return "%s in pool %s" % (self.member, self.pool)

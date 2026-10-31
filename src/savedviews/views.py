@@ -66,6 +66,8 @@ def shareSavedView(request, viewId):
         ShareLink.objects.create(
             saved_view=saved_view,
             access_mode=request.POST.get("access_mode", "public"),
+            permissions=["view", "borrow"] if request.POST.get("allow_borrow") == "on" else ["view"],
+            requires_confirmation=request.POST.get("requires_confirmation") == "on",
             expires_at=timezone.now() + timedelta(days=int(days)) if days.isdigit() else None,
             single_use=request.POST.get("single_use") == "on",
             password_hash=make_password(password) if password else "",
@@ -108,6 +110,29 @@ def shareLinkView(request, token):
         articles = articles.filter(parse_json(json.dumps(link.saved_view.query), ARTICLE_FIELDS))
     except QueryError:
         pass
+
+    if request.method == "POST" and link.can_borrow() and request.user.is_authenticated:
+        from datetime import date
+
+        from loans.models import Loan
+        from organisation.services import active_organisation
+
+        for article in articles:
+            if not request.POST.get("article_%s" % article.pk):
+                continue
+            status = "pending" if link.requires_confirmation else "active"
+            Loan.objects.create(
+                article=article,
+                lender_type="organisation",
+                lender_organisation=link.saved_view.organisation,
+                borrower_organisation=active_organisation(request),
+                start_date=date.today().isoformat(),
+                status=status,
+            )
+            if status == "active":
+                article.ownership = "borrowed"
+                article.save()
+        return redirect("loans")
 
     if link.single_use:
         link.used_count += 1
