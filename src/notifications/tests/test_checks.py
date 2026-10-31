@@ -1,0 +1,67 @@
+from datetime import date, timedelta
+
+from django.contrib.auth.models import Permission, User
+from django.core.management import call_command
+from django.test import TestCase
+
+from article.models import Article, ArticleBase, ArticleType, Stock
+from notifications.checks import expiry_findings, low_stock_findings, maintenance_findings
+from notifications.models import Notification
+from organisation.models import Organisation, Role, UserProfile
+from planning.models import CalendarEntry
+
+
+class ChecksTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.org = Organisation.objects.create(name="A", slug="a")
+        cls.article_type = ArticleType.objects.create(name="tool", symbol="WZ", organisation=cls.org)
+        cls.base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type, organisation=cls.org)
+
+    def test_expiry_finding(self):
+        Article.objects.create(
+            base=self.base, organisation=self.org, ablaufdatum=date.today() + timedelta(days=3)
+        )
+        findings = list(expiry_findings(self.org))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].trigger_type, "expiry_date_reached")
+
+    def test_maintenance_finding(self):
+        CalendarEntry.objects.create(
+            entry_type="maintenance", title="Sharpen", start_date=date.today(), organisation=self.org
+        )
+        findings = list(maintenance_findings(self.org))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].trigger_type, "maintenance_due")
+
+    def test_low_stock_finding(self):
+        self.base.mindestbestand = 5
+        self.base.save()
+        article = Article.objects.create(base=self.base, organisation=self.org)
+        Stock.objects.create(article=article, menge=2)
+        findings = list(low_stock_findings(self.org))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].trigger_type, "minimum_stock_undercut")
+
+
+class CommandTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.org = Organisation.objects.create(name="A", slug="a")
+        cls.article_type = ArticleType.objects.create(name="tool", symbol="WZ", organisation=cls.org)
+        cls.base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type, organisation=cls.org)
+
+    def setUp(self):
+        role = Role.objects.create(organisation=self.org, name="R")
+        role.permissions.set(Permission.objects.filter(codename="article_view_all"))
+        self.user = User.objects.create_user("u", password="pw")
+        UserProfile.objects.create(user=self.user, organisation=self.org, role=role)
+
+    def test_command_creates_and_dedupes(self):
+        Article.objects.create(
+            base=self.base, organisation=self.org, ablaufdatum=date.today() + timedelta(days=3)
+        )
+        call_command("check_notifications")
+        self.assertEqual(Notification.objects.filter(user=self.user).count(), 1)
+        call_command("check_notifications")
+        self.assertEqual(Notification.objects.filter(user=self.user).count(), 1)
