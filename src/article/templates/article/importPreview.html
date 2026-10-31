@@ -1,0 +1,67 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Import preview</h4>
+<p>
+    {{ preview.total }} rows:
+    <strong>{{ preview.valid|length }}</strong> valid,
+    <strong>{{ preview.errors|length }}</strong> errors.
+</p>
+
+{% if preview.errors %}
+<h6 class="mt-3">Errors</h6>
+<ul class="list-group">
+    {% for row, reason in preview.errors %}
+    <li class="list-group-item text-danger">Row {{ row }}: {{ reason }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post" action="{% url 'import confirm' %}">
+    {% csrf_token %}
+
+    {% if preview.unknown_types %}
+    <h6 class="mt-3">Unknown types</h6>
+    {% for name in preview.unknown_types %}
+    <div class="d-flex gap-2 align-items-center mb-1">
+        <input type="hidden" name="unknown_type" value="{{ name }}">
+        <span style="min-width:10rem">{{ name }}</span>
+        <select name="type_{{ name }}" class="form-select form-select-sm" style="max-width:16rem">
+            <option value="create">Create new</option>
+            <option value="skip">Skip rows</option>
+            {% for t in types %}<option value="{{ t.pk }}">Use {{ t.name }}</option>{% endfor %}
+        </select>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if preview.unknown_storages %}
+    <h6 class="mt-3">Unknown storages</h6>
+    {% for name in preview.unknown_storages %}
+    <div class="d-flex gap-2 align-items-center mb-1">
+        <input type="hidden" name="unknown_storage" value="{{ name }}">
+        <span style="min-width:10rem">{{ name }}</span>
+        <select name="storage_{{ name }}" class="form-select form-select-sm" style="max-width:16rem">
+            <option value="create">Create new</option>
+            <option value="skip">Skip rows</option>
+            {% for s in storages %}<option value="{{ s.pk }}">Use {{ s.name }}</option>{% endfor %}
+        </select>
+    </div>
+    {% endfor %}
+    {% endif %}
+
+    {% if preview.duplicates %}
+    <h6 class="mt-3">Duplicates ({{ preview.duplicates|length }})</h6>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="duplicates" value="skip" checked id="dup-skip">
+        <label class="form-check-label" for="dup-skip">Skip existing</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="duplicates" value="update" id="dup-update">
+        <label class="form-check-label" for="dup-update">Update existing</label>
+    </div>
+    {% endif %}
+
+    <button class="btn btn-primary mt-3">Import</button>
+</form>
+{% endblock %}
