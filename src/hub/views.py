@@ -208,17 +208,20 @@ def emailPreferences(request):
 
     from hub.mail import is_subscribed, set_subscription
     from hub.models import EmailPreference
+    from organisation.models import UserProfile
+    from organisation.services import active_organisation
 
     categories = EmailPreference.CATEGORY_CHOICES
-    profile = request.user.profiles.first()
+    profile, _ = UserProfile.objects.get_or_create(
+        user=request.user, organisation=active_organisation(request)
+    )
     if request.method == "POST":
         for value, _label in categories:
             set_subscription(request.user, value, request.POST.get(value) == "on")
-        if profile is not None:
-            language = request.POST.get("language", "")
-            if language in dict(django_settings.LANGUAGES):
-                profile.language = language
-                profile.save()
+        language = request.POST.get("language", "")
+        if language in dict(django_settings.LANGUAGES):
+            profile.language = language
+            profile.save()
         return redirect("email preferences")
     return render(request, "hub/emailPreferences.html", {
         "categories": [
@@ -226,6 +229,6 @@ def emailPreferences(request):
             for value, label in categories
         ],
         "languages": django_settings.LANGUAGES,
-        "current_language": profile.language if profile else "",
+        "current_language": profile.language,
     })
 
