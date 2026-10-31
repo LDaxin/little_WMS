@@ -92,5 +92,23 @@
         </div>
     </div>
     {% endif %}
+
+    {% for widget in viewWidgets %}
+    <div class="col-md-6 mb-3">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>{{ widget.view.name }}</span>
+                <a class="small" href="{{ widget.view.applyUrl }}">Show all</a>
+            </div>
+            <ul class="list-group list-group-flush">
+                {% for article in widget.articles %}
+                <li class="list-group-item">{{ article.base.name }}</li>
+                {% empty %}
+                <li class="list-group-item text-muted">No articles</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}

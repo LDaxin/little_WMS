@@ -14,6 +14,10 @@
             <span class="d-flex gap-2">
                 <a class="btn btn-sm btn-outline-primary" href="{{ view.applyUrl }}">Apply</a>
                 {% if view.owner == request.user %}
+                <form method="post" action="{% url 'toggle dashboard view' view.pk %}">
+                    {% csrf_token %}
+                    <button class="btn btn-sm {% if view.show_on_dashboard %}btn-primary{% else %}btn-outline-secondary{% endif %}">Dashboard</button>
+                </form>
                 <form method="post" action="{% url 'delete saved view' view.pk %}">
                     {% csrf_token %}
                     <button class="btn btn-sm btn-outline-danger">Delete</button>

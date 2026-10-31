@@ -20,6 +20,7 @@ class SavedView(SoftDeleteObject, models.Model):
     typ = models.CharField(max_length=20, blank=True)
     query = models.JSONField(default=dict, blank=True)
     is_shared = models.BooleanField(default=False)
+    show_on_dashboard = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

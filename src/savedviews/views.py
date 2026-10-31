@@ -58,6 +58,16 @@ def delSavedView(request, viewId):
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "view")
+def toggleDashboard(request, viewId):
+    saved_view = get_object_or_404(SavedView, pk=viewId, owner=request.user)
+    if request.method == "POST":
+        saved_view.show_on_dashboard = not saved_view.show_on_dashboard
+        saved_view.save()
+    return redirect("saved views")
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
 def shareSavedView(request, viewId):
     saved_view = get_object_or_404(SavedView, pk=viewId)
     if request.method == "POST":
