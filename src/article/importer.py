@@ -8,6 +8,8 @@ import csv
 import io
 from decimal import Decimal, InvalidOperation
 
+from django.utils.translation import gettext as _
+
 from article.models import Article, ArticleBase, ArticleType, Stock, ZUSTAND_CHOICES
 from storage.models import Storage, StorageType
 
@@ -64,19 +66,19 @@ def _row_error(row):
     """Validate the fields that do not depend on the database."""
     name = (row.get("name") or "").strip()
     if not name:
-        return "missing name"
+        return _("missing name")
     if len(name) > 20:
-        return "name too long (max 20)"
+        return _("name too long (max 20)")
     if not (row.get("type") or "").strip():
-        return "missing type"
+        return _("missing type")
     menge_raw = (row.get("menge") or "").strip() or "1"
     try:
         Decimal(menge_raw)
     except InvalidOperation:
-        return "invalid menge: %s" % menge_raw
+        return _("invalid menge: %s") % menge_raw
     zustand = (row.get("zustand") or "").strip() or "gut"
     if zustand not in dict(ZUSTAND_CHOICES):
-        return "invalid zustand: %s" % zustand
+        return _("invalid zustand: %s") % zustand
     return None
 
 
@@ -133,7 +135,7 @@ def import_articles(rows, organisation, type_choices=None, storage_choices=None,
         type_name = row["type"].strip().lower()
         article_type = _resolve_type(organisation, type_name, type_choices.get(type_name))
         if article_type is None:
-            errors.append((row_number, "unknown type: %s" % type_name))
+            errors.append((row_number, _("unknown type: %s") % type_name))
             continue
 
         stored = None
@@ -141,7 +143,7 @@ def import_articles(rows, organisation, type_choices=None, storage_choices=None,
         if storage_name:
             storage = _resolve_storage(organisation, storage_name, storage_choices.get(storage_name))
             if storage is None:
-                errors.append((row_number, "unknown storage: %s" % storage_name))
+                errors.append((row_number, _("unknown storage: %s") % storage_name))
                 continue
             stored = storage.space
 
