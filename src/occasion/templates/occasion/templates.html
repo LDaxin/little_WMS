@@ -1,0 +1,31 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Occasion templates</h4>
+
+<ul class="list-group mb-3">
+    {% for t in templates %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ t.name }} <small class="text-muted">{{ t.occasion_type.name }} &middot; {{ t.default_packlist|length }} article(s)</small></span>
+        <form method="post" action="{% url 'delete occasion template' t.pk %}" onsubmit="return confirm('Delete this template?');">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+        </form>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">None yet</li>
+    {% endfor %}
+</ul>
+
+<form method="post" action="{% url 'add occasion template' %}" class="d-flex gap-2">
+    {% csrf_token %}
+    <input name="name" class="form-control" placeholder="Name" style="max-width:16rem">
+    <select name="type" class="form-select" style="max-width:16rem" required>
+        <option value="">&mdash; type &mdash;</option>
+        {% for t in types %}<option value="{{ t.pk }}">{{ t.name }}</option>{% endfor %}
+    </select>
+    <button class="btn btn-primary">Add</button>
+</form>
+
+<a class="btn btn-outline-secondary mt-3" href="{% url 'occasions' %}">Back to occasions</a>
+{% endblock %}

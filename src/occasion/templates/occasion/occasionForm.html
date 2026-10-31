@@ -9,6 +9,12 @@
     {% csrf_token %}
     <div class="mb-2"><input name="name" class="form-control" placeholder="Name" required></div>
     <div class="mb-2">
+        <select name="template" class="form-select">
+            <option value="">&mdash; template (optional) &mdash;</option>
+            {% for t in templates %}<option value="{{ t.pk }}" data-type="{{ t.occasion_type_id }}">{{ t.name }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="mb-2">
         <select name="type" class="form-select" required>
             <option value="">&mdash; type &mdash;</option>
             {% for t in types %}<option value="{{ t.pk }}">{{ t.name }}</option>{% endfor %}
@@ -25,4 +31,12 @@
     <div class="mb-2"><input name="participants" type="number" min="1" class="form-control" placeholder="Participants"></div>
     <button class="btn btn-primary">Create</button>
 </form>
+<script>
+    document.querySelector("[name=template]").addEventListener("change", function () {
+        var opt = this.selectedOptions[0];
+        if (opt && opt.dataset.type) {
+            document.querySelector("[name=type]").value = opt.dataset.type;
+        }
+    });
+</script>
 {% endblock %}

@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from article.models import Article
 from location.models import Location
 from organisation.decorators import require_perm
-from occasion.models import CalendarEntry, Occasion, OccasionType, Packlist
+from occasion.models import CalendarEntry, Occasion, OccasionTemplate, OccasionType, Packlist
 
 
 def _int_or_none(value):
@@ -17,6 +17,16 @@ def _int_or_none(value):
 
 def _location(value):
     return Location.objects.filter(pk=value).first() if value else None
+
+
+def _apply_template(occasion, template):
+    """Copy a template's default packlist onto an occasion, skipping gone articles."""
+    for item in template.default_packlist:
+        article = Article.objects.filter(pk=item.get("article")).first()
+        if article:
+            Packlist.objects.create(
+                occasion=occasion, article=article, quantity=item.get("quantity") or 1
+            )
 
 
 def _packlist_context(occasion, error=""):
@@ -50,7 +60,8 @@ def occasion(request, occasionId):
 def addOccasion(request):
     error = ""
     if request.method == "POST":
-        occasion_type = OccasionType.objects.filter(pk=request.POST.get("type") or None).first()
+        template = OccasionTemplate.objects.filter(pk=request.POST.get("template") or None).first()
+        occasion_type = template.occasion_type if template else OccasionType.objects.filter(pk=request.POST.get("type") or None).first()
         name = request.POST.get("name", "").strip()
         start_date = request.POST.get("start_date", "")
         if occasion_type is None or not name or not start_date:
@@ -69,9 +80,12 @@ def addOccasion(request):
                 location=_location(request.POST.get("location")),
                 participant_count=_int_or_none(request.POST.get("participants")),
             )
+            if template:
+                _apply_template(occ, template)
             return redirect("occasion", occasionId=occ.pk)
     return render(request, "occasion/occasionForm.html", {
         "types": OccasionType.objects.all(),
+        "templates": OccasionTemplate.objects.all(),
         "locations": Location.objects.all(),
         "error": error,
     })
@@ -116,6 +130,51 @@ def addOccasionType(request):
         if name:
             OccasionType.objects.create(name=name, symbol=request.POST.get("symbol", "").strip())
     return redirect("occasion types")
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.view_all")
+def occasionTemplates(request):
+    return render(request, "occasion/templates.html", {
+        "templates": OccasionTemplate.objects.all(),
+        "types": OccasionType.objects.all(),
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.create_all")
+def addOccasionTemplate(request):
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        occasion_type = OccasionType.objects.filter(pk=request.POST.get("type") or None).first()
+        if name and occasion_type:
+            OccasionTemplate.objects.create(name=name, occasion_type=occasion_type)
+    return redirect("occasion templates")
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.delete_all")
+def delOccasionTemplate(request, templateId):
+    template = get_object_or_404(OccasionTemplate, pk=templateId)
+    if request.method == "POST":
+        template.delete()
+    return redirect("occasion templates")
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.create_all")
+def saveOccasionAsTemplate(request, occasionId):
+    occ = get_object_or_404(Occasion, pk=occasionId)
+    if request.method == "POST":
+        OccasionTemplate.objects.create(
+            name=request.POST.get("name", "").strip() or str(occ),
+            occasion_type=occ.occasion_type,
+            default_packlist=[
+                {"article": entry.article_id, "quantity": entry.quantity}
+                for entry in occ.packlist.all()
+            ],
+        )
+    return redirect("occasion", occasionId=occ.pk)
 
 
 @login_required(login_url='/accounts/login/')

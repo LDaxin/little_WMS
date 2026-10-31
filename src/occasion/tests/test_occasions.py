@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
-from occasion.models import CalendarEntry, Occasion, OccasionType, Packlist
+from occasion.models import CalendarEntry, Occasion, OccasionTemplate, OccasionType, Packlist
 from organisation.models import Role, UserProfile
 
 
@@ -137,3 +137,59 @@ class PacklistTest(TestCase):
 
         self.client.post("/occasions/%s/packlist/%s/remove/" % (self.occasion.pk, entry.pk))
         self.assertFalse(Packlist.objects.filter(pk=entry.pk).exists())
+
+
+class OccasionTemplateTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.occ_type = OccasionType.objects.create(name="Camp")
+        article_type = ArticleType.objects.create(name="Werkzeug", symbol="WZ")
+        base = ArticleBase.objects.create(name="Hammer", pType=article_type)
+        cls.article = Article.objects.create(base=base)
+
+    def setUp(self):
+        User.objects.create_superuser("boss", "b@e.st", "pw")
+        self.client.login(username="boss", password="pw")
+
+    def test_model_str(self):
+        template = OccasionTemplate.objects.create(name="Standard Camp", occasion_type=self.occ_type)
+        self.assertEqual(str(template), "Standard Camp")
+
+    def test_save_occasion_as_template(self):
+        occasion = make_occasion(self.occ_type)
+        Packlist.objects.create(occasion=occasion, article=self.article, quantity=4)
+        self.client.post("/occasions/%s/save-template/" % occasion.pk, {"name": "Standard Camp"})
+        template = OccasionTemplate.objects.get(name="Standard Camp")
+        self.assertEqual(template.occasion_type, self.occ_type)
+        self.assertEqual(template.default_packlist, [{"article": self.article.pk, "quantity": 4}])
+
+    def test_create_from_template(self):
+        template = OccasionTemplate.objects.create(
+            name="Standard Camp",
+            occasion_type=self.occ_type,
+            default_packlist=[{"article": self.article.pk, "quantity": 4}],
+        )
+        self.client.post(
+            "/occasions/add/",
+            {"name": "Summer", "template": template.pk, "start_date": "2026-07-01"},
+        )
+        occasion = Occasion.objects.get(calendar_entry__title="Summer")
+        self.assertEqual(occasion.occasion_type, self.occ_type)
+        entry = occasion.packlist.get()
+        self.assertEqual(entry.article, self.article)
+        self.assertEqual(entry.quantity, 4)
+
+    def test_template_list_and_delete(self):
+        template = OccasionTemplate.objects.create(name="Standard Camp", occasion_type=self.occ_type)
+        self.assertContains(self.client.get("/occasions/templates/"), "Standard Camp")
+        self.client.post("/occasions/templates/%s/delete/" % template.pk)
+        template.refresh_from_db()
+        self.assertIsNotNone(template.deleted_at)
+
+    def test_template_permission(self):
+        user_with("helper", "occasion_view_all")
+        self.client.login(username="helper", password="pw")
+        response = self.client.post(
+            "/occasions/templates/add/", {"name": "X", "type": self.occ_type.pk}
+        )
+        self.assertEqual(response.status_code, 403)

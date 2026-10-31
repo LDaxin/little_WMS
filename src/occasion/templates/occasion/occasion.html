@@ -20,6 +20,12 @@
 
 {% include "occasion/packlist.html" %}
 
+<form method="post" action="{% url 'save occasion as template' occasion.pk %}" class="d-flex gap-2 align-items-center mb-3">
+    {% csrf_token %}
+    <input name="name" class="form-control" style="max-width:16rem" placeholder="Template name" value="{{ occasion }}">
+    <button class="btn btn-outline-secondary">Save as template</button>
+</form>
+
 <form method="post" action="{% url 'delete occasion' occasion.pk %}" onsubmit="return confirm('Delete this occasion?');">
     {% csrf_token %}
     <button class="btn btn-outline-danger">Delete occasion</button>
