@@ -1,3 +1,4 @@
+from hub.toasts import toast
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
@@ -42,8 +43,8 @@ def addLocation(request):
         if l.is_valid():
             location = l.save()
             location.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Add Succses", "toastId":"successToast", "toastText":str(location) + " was added to your system.", "toastType":"status"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+            return toast(request, "Add Succses", str(location) + " was added to your system.", "status")
+    return toast(request, "Error", "thomething went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.delete_all")
@@ -57,13 +58,13 @@ def delLocation(request):
                     pa = Location.objects.filter(pk=value).first()
                     delList.append(pa)
                 except Exception as e:
-                    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":e, "toastType":"alert"})
+                    return toast(request, "Error", e, "alert")
         for i in delList:
             delListReturn = delListReturn + i.__str__() + " "
             i.deleted = True
             i.save()
-        return render(request, "hub/modules/toast.html", context={"toastName":"Delete", "toastId":"successToast", "toastText":delListReturn, "toastType":"alert"})
-    return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thomething went wrong", "toastType":"alert"})
+        return toast(request, "Delete", delListReturn, "alert")
+    return toast(request, "Error", "thomething went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.edit_all")
@@ -74,8 +75,8 @@ def updateLocation(request, locationId):
         locationForm = FormLocation(request.POST, instance=locationObject)
         if locationForm.is_valid():
             locationForm.save()
-            return render(request, "hub/modules/toast.html", context={"toastName":"Update Succses", "toastId":"successToast", "toastText":"Location was updated", "toastType":"status"})
-        return render(request, "hub/modules/toast.html", context={"toastName":"Error", "toastId":"errorToast", "toastText":"thething went wrong", "toastType":"alert"})
+            return toast(request, "Update Succses", "Location was updated", "status")
+        return toast(request, "Error", "thething went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.view_all")

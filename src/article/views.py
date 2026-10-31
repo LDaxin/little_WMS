@@ -1,3 +1,4 @@
+from hub.toasts import toast
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
@@ -200,13 +201,7 @@ def addArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
     if t == None:
-        context = {
-                "toastName":"Error",
-                "toastId":"errorToast",
-                "toastText":"no article type named " + typ,
-                "toastType":"alert"
-            }
-        return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Error", "no article type named " + typ, "alert")
 
     else:
         if request.method == "POST":
@@ -219,26 +214,14 @@ def addArticle(request, typ):
                 try:
                     target = resolve_space(p["stored"].value())
                 except ValidationError as e:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":e.messages[0] if e.messages else str(e),
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
+                    return toast(request, "Error", e.messages[0] if e.messages else str(e), "alert")
 
             if pb.is_valid():
                 base = pb.save(commit=False)
                 base.pType = t
                 base.save()
             else:
-                context = {
-                    "toastName":"Error",
-                    "toastId":"errorToast",
-                    "toastText":"article base not valid"+str(pb.errors),
-                    "toastType":"alert"
-                }
-                return render(request, "hub/modules/toast.html", context=context)
+                return toast(request, "Error", "article base not valid"+str(pb.errors), "alert")
 
             if p.is_valid():
                 pa = p.save(commit=False)
@@ -246,21 +229,9 @@ def addArticle(request, typ):
                     try:
                         code = UuidCode.objects.get(code=str(p["code"].value()))
                         if code.used:
-                            context = {
-                                "toastName":"Error",
-                                "toastId":"errorToast",
-                                "toastText":"code is already used",
-                                "toastType":"alert"
-                            }
-                            return render(request, "hub/modules/toast.html", context=context)
+                            return toast(request, "Error", "code is already used", "alert")
                     except:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"no code with id " + p["code"].value(),
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
+                        return toast(request, "Error", "no code with id " + p["code"].value(), "alert")
 
 
                 if p["code"].value() != "":
@@ -291,22 +262,9 @@ def addArticle(request, typ):
                 if target is not None:
                     MovementService.store_article(pa, target, request.user)
 
-                context = {
-                    "toastName":"Add Succses",
-                    "toastId":"successToast",
-                    "toastText":pa.base.name + " was added to your system.",
-                    "toastType":"status"
-                }
+                return toast(request, "Add Succses", pa.base.name + " was added to your system.", "status", template="hub/modules/itemAdd.html")
 
-                return render(request, "hub/modules/itemAdd.html", context=context)
-
-        context = {
-                "toastName":"Error",
-                "toastId":"errorToast",
-                "toastText":"article not valid " + str(p.errors),
-                "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Error", "article not valid " + str(p.errors), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "delete")
@@ -314,13 +272,7 @@ def delArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
     if t == None:
-        context = {
-                "toastName":"Error",
-                "toastId":"errorToast",
-                "toastText":"no article type named " + typ,
-                "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Error", "no article type named " + typ, "alert")
     else:
         if request.method == "POST":
             delList = []
@@ -331,34 +283,16 @@ def delArticle(request, typ):
                         pa = Article.objects.filter(base__pType__name__exact=typ, pk=value).first()
                         delList.append(pa)
                     except Exception as e:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":e,
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
+                        return toast(request, "Error", e, "alert")
             for i in delList:
                 _require_article(request, "delete", i)
                 delListReturn = delListReturn + i.__str__() + " "
                 audit_log("deleted", i, request.user)
                 i.delete()
 
-            context = {
-                "toastName":"Delete",
-                "toastId":"successToast",
-                "toastText":delListReturn,
-                "toastType":"status"
-            }
-            return render(request, "hub/modules/itemDelete.html", context=context)
+            return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
 
-        context = {
-            "toastName":"Error",
-            "toastId":"errorToast",
-            "toastText":"something went wrong",
-            "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Error", "something went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "edit")
@@ -368,13 +302,7 @@ def updateArticle(request, typ, articleId):
     _require_article(request, "edit", articleObject)
 
     if articleTypeObject == None:
-        context = {
-            toastName:"Error",
-            toastId:"toastError",
-            toastText:"no article type named " + typ,
-            toastType:"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Error", "no article type named " + typ, "alert")
     else:
         if request.method == "POST":
             old_values = _snapshot(articleObject)
@@ -384,13 +312,7 @@ def updateArticle(request, typ, articleId):
             if articleBaseForm.is_valid():
                 articleBaseForm.save()
             else:
-                context = {
-                    "toastName":"Error",
-                    "toastId":"errorToast",
-                    "toastText":articleBaseForm.errors,
-                    "toastType":"alert"
-                }
-                return render(request, "hub/modules/toast.html", context=context)
+                return toast(request, "Error", articleBaseForm.errors, "alert")
 
             if articleForm.is_valid():
                 article = articleForm.save(commit=False)
@@ -399,13 +321,7 @@ def updateArticle(request, typ, articleId):
                     # menge 0 means "used up" (§4d)
                     audit_log("deleted", article, request.user, {"reason": "menge 0"})
                     article.delete()
-                    context = {
-                        "toastName":"Delete",
-                        "toastId":"successToast",
-                        "toastText":"article was deleted (menge 0)",
-                        "toastType":"status"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
+                    return toast(request, "Delete", "article was deleted (menge 0)", "status")
                 article.save()
                 audit_log("updated", article, request.user, _diff(old_values, _snapshot(article)))
                 if menge is not None:
@@ -414,20 +330,8 @@ def updateArticle(request, typ, articleId):
                     stock.menge = menge
                     stock.save()
 
-            context = {
-                "toastName":"Update",
-                "toastId":"successToast",
-                "toastText":"article was updated",
-                "toastType":"status"
-            }
-            return render(request, "hub/modules/toast.html", context=context)
-        context = {
-            "toastName":"Error",
-            "toastId":"errorToast",
-            "toastText":"something went wrong",
-            "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+            return toast(request, "Update", "article was updated", "status")
+        return toast(request, "Error", "something went wrong", "alert")
 
 def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {

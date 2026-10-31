@@ -1,3 +1,4 @@
+from hub.toasts import toast
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
@@ -128,49 +129,19 @@ def addStorage(request, typ):
                 try:
                     code = UuidCode.objects.get(code=s["code"].value())
                     if code.used:
-                        context = {
-                            "toastName":"Error",
-                            "toastId":"errorToast",
-                            "toastText":"code is already used",
-                            "toastType":"alert"
-                        }
-                        return render(request, "hub/modules/toast.html", context=context)
+                        return toast(request, "Error", "code is already used", "alert")
                     code.used = True
                     code.save()
                     storage.code = code
                 except:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":"not valid code",
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
+                    return toast(request, "Error", "not valid code", "alert")
             else:
                 pass
 
             so = storage.save()
-            context = {
-                "toastName":"Add Succses",
-                "toastId":"successToast",
-                "toastText":str(storage) + " was added to your system.",
-                "toastType":"status"
-            }
-            return render(request, "hub/modules/itemAdd.html", context=context)
-        context = {
-            "toastName":"Error",
-            "toastId":"errorToast",
-            "toastText":"something went wrong",
-            "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
-    context = {
-        "toastName":"Error",
-        "toastId":"errorToast",
-        "toastText":"something went wrong",
-        "toastType":"alert"
-    }
-    return render(request, "hub/modules/toast.html", context=context)
+            return toast(request, "Add Succses", str(storage) + " was added to your system.", "status", template="hub/modules/itemAdd.html")
+        return toast(request, "Error", "something went wrong", "alert")
+    return toast(request, "Error", "something went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.delete_all")
@@ -190,28 +161,10 @@ def delStorage(request, typ):
                         i.save()
                     pa.delete()
                 except Exception as e:
-                    context = {
-                        "toastName":"Error",
-                        "toastId":"errorToast",
-                        "toastText":e,
-                        "toastType":"alert"
-                    }
-                    return render(request, "hub/modules/toast.html", context=context)
+                    return toast(request, "Error", e, "alert")
 
-        context = {
-            "toastName":"Delete",
-            "toastId":"successToast",
-            "toastText":delListReturn,
-            "toastType":"status"
-        }
-        return render(request, "hub/modules/itemDelete.html", context=context)
-    context = {
-        "toastName":"Error",
-        "toastId":"errorToast",
-        "toastText":"something went wrong",
-        "toastType":"alert"
-    }
-    return render(request, "hub/modules/toast.html", context=context)
+        return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
+    return toast(request, "Error", "something went wrong", "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.edit_all")
@@ -222,20 +175,8 @@ def updateStorage(request, storageId, typ):
         form = FormStorage(request.POST, instance=storageObject)
         if form.is_valid():
             form.save()
-            context = {
-                "toastName":"Update",
-                "toastId":"successToast",
-                "toastText":str(storageObject) + " was updated",
-                "toastType":"status"
-            }
-            return render(request, "hub/modules/toast.html", context=context)
-        context ={
-            "toastName":"Error",
-            "toastId":"errorToast",
-            "toastText":"something went wrong",
-            "toastType":"alert"
-        }
-        return render(request, "hub/modules/toast.html", context=context)
+            return toast(request, "Update", str(storageObject) + " was updated", "status")
+        return toast(request, "Error", "something went wrong", "alert")
 
 
 def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning="", forceCode=""):
