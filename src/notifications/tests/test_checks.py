@@ -5,7 +5,13 @@ from django.core.management import call_command
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, Stock
-from notifications.checks import expiry_findings, low_stock_findings, maintenance_findings
+from loans.models import Lending, Loan
+from notifications.checks import (
+    expiry_findings,
+    low_stock_findings,
+    maintenance_findings,
+    return_overdue_findings,
+)
 from notifications.models import Notification
 from organisation.models import Organisation, Role, UserProfile
 from planning.models import CalendarEntry
@@ -44,6 +50,46 @@ class ChecksTest(TestCase):
         self.assertEqual(findings[0].trigger_type, "minimum_stock_undercut")
 
 
+class ReturnOverdueTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.org = Organisation.objects.create(name="A", slug="a")
+        cls.article_type = ArticleType.objects.create(name="tool", symbol="WZ", organisation=cls.org)
+        cls.base = ArticleBase.objects.create(name="Hammer", pType=cls.article_type, organisation=cls.org)
+        cls.article = Article.objects.create(base=cls.base, organisation=cls.org)
+
+    def _lending(self, status="active"):
+        entry = CalendarEntry.objects.create(
+            entry_type="loan", title="Loan", organisation=self.org, article=self.article,
+            start_date=date.today() - timedelta(days=10),
+            end_date=date.today() - timedelta(days=1),
+        )
+        return Lending.objects.create(
+            article=self.article, calendar_entry=entry, borrower_name="Anna",
+            organisation=self.org, status=status,
+        )
+
+    def test_overdue_lending(self):
+        self._lending()
+        findings = list(return_overdue_findings(self.org))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].trigger_type, "return_overdue")
+
+    def test_returned_lending_no_finding(self):
+        self._lending(status="returned")
+        self.assertEqual(list(return_overdue_findings(self.org)), [])
+
+    def test_overdue_loan(self):
+        Loan.objects.create(
+            article=self.article, organisation=self.org,
+            start_date=date.today() - timedelta(days=10),
+            end_date=date.today() - timedelta(days=1),
+        )
+        findings = list(return_overdue_findings(self.org))
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].trigger_type, "return_overdue")
+
+
 class CommandTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -65,3 +111,22 @@ class CommandTest(TestCase):
         self.assertEqual(Notification.objects.filter(user=self.user).count(), 1)
         call_command("check_notifications")
         self.assertEqual(Notification.objects.filter(user=self.user).count(), 1)
+
+    def test_command_creates_and_dedupes_overdue(self):
+        entry = CalendarEntry.objects.create(
+            entry_type="loan", title="Loan", organisation=self.org,
+            start_date=date.today() - timedelta(days=10),
+            end_date=date.today() - timedelta(days=1),
+        )
+        article = Article.objects.create(base=self.base, organisation=self.org)
+        Lending.objects.create(
+            article=article, calendar_entry=entry, borrower_name="Anna", organisation=self.org
+        )
+        call_command("check_notifications")
+        self.assertEqual(
+            Notification.objects.filter(user=self.user, trigger_type="return_overdue").count(), 1
+        )
+        call_command("check_notifications")
+        self.assertEqual(
+            Notification.objects.filter(user=self.user, trigger_type="return_overdue").count(), 1
+        )
