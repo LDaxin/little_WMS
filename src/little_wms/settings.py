@@ -156,6 +156,7 @@ LANGUAGE_CODE = "en-us"
 # locale/<code>/LC_MESSAGES/django.po file to translate.
 LANGUAGES = [
     ("en", "English"),
+    ("de", "Deutsch"),
 ]
 LOCALE_PATHS = [BASE_DIR / "locale"]
 

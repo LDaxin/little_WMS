@@ -1,11 +1,12 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Roles &amp; Permissions</h4>
+<h4>{% trans "Roles & Permissions" %}</h4>
 
 {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
 
-<h6 class="mt-3">Templates</h6>
+<h6 class="mt-3">{% trans "Templates" %}</h6>
 <div class="row">
     {% for t in templates %}
     <div class="col-6 col-md-4 p-2">
@@ -15,9 +16,9 @@
             <div class="card h-100">
                 <div class="card-body">
                     <strong>{{ t.name }}</strong>
-                    {% if t.name in role_names %}<span class="badge text-bg-success">&#10003; created</span>{% endif %}
+                    {% if t.name in role_names %}<span class="badge text-bg-success">&#10003; {% trans "created" %}</span>{% endif %}
                     <input name="name" class="form-control form-control-sm my-2" value="{{ t.name }}">
-                    <button class="btn btn-sm btn-primary">Create</button>
+                    <button class="btn btn-sm btn-primary">{% trans "Create" %}</button>
                 </div>
             </div>
         </form>
@@ -25,20 +26,20 @@
     {% endfor %}
 </div>
 
-<h6 class="mt-3">Roles</h6>
+<h6 class="mt-3">{% trans "Roles" %}</h6>
 <ul class="list-group">
     {% for r in roles %}
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <a href="{% url 'role detail' r.pk %}">{{ r.name }}</a>
         <form method="post" action="{% url 'role delete' r.pk %}">
             {% csrf_token %}
-            <button class="btn btn-sm btn-outline-danger">Delete</button>
+            <button class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
         </form>
     </li>
     {% empty %}
-    <li class="list-group-item text-muted">No roles yet</li>
+    <li class="list-group-item text-muted">{% trans "No roles yet" %}</li>
     {% endfor %}
 </ul>
 
-<a class="btn btn-outline-secondary mt-3" href="{% url 'users' %}">Assign roles to users</a>
+<a class="btn btn-outline-secondary mt-3" href="{% url 'users' %}">{% trans "Assign roles to users" %}</a>
 {% endblock %}

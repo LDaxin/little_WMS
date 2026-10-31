@@ -1,28 +1,29 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Register organisation</h4>
+<h4>{% trans "Register organisation" %}</h4>
 
 {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
 
 {% if policy == "invite" %}
-<p class="text-muted">Registration is invite-only. Please ask an organisation for an invitation link.</p>
+<p class="text-muted">{% trans "Registration is invite-only. Please ask an organisation for an invitation link." %}</p>
 {% elif policy == "request" %}
 <form method="post">
     {% csrf_token %}
-    <div class="mb-2"><input name="name" class="form-control" placeholder="Organisation name" required></div>
-    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="Your email" required></div>
-    <div class="mb-2"><textarea name="reason" class="form-control" placeholder="Why do you want to use little_WMS?" required></textarea></div>
-    <button class="btn btn-primary">Send request</button>
+    <div class="mb-2"><input name="name" class="form-control" placeholder="{% trans "Organisation name" %}" required></div>
+    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="{% trans "Your email" %}" required></div>
+    <div class="mb-2"><textarea name="reason" class="form-control" placeholder="{% trans "Why do you want to use little_WMS?" %}" required></textarea></div>
+    <button class="btn btn-primary">{% trans "Send request" %}</button>
 </form>
 {% else %}
 <form method="post">
     {% csrf_token %}
-    <div class="mb-2"><input name="name" class="form-control" placeholder="Organisation name" required></div>
-    <div class="mb-2"><input name="username" class="form-control" placeholder="Admin username" required></div>
-    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="Admin email" required></div>
-    <div class="mb-2"><input name="password" type="password" class="form-control" placeholder="Password" required></div>
-    <button class="btn btn-primary">Create organisation</button>
+    <div class="mb-2"><input name="name" class="form-control" placeholder="{% trans "Organisation name" %}" required></div>
+    <div class="mb-2"><input name="username" class="form-control" placeholder="{% trans "Admin username" %}" required></div>
+    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="{% trans "Admin email" %}" required></div>
+    <div class="mb-2"><input name="password" type="password" class="form-control" placeholder="{% trans "Password" %}" required></div>
+    <button class="btn btn-primary">{% trans "Create organisation" %}</button>
 </form>
 {% endif %}
 {% endblock %}

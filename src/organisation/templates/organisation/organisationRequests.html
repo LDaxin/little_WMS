@@ -1,7 +1,8 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Organisation requests</h4>
+<h4>{% trans "Organisation requests" %}</h4>
 
 <ul class="list-group">
     {% for r in requests %}
@@ -12,10 +13,10 @@
             <span class="badge text-bg-secondary">{{ r.get_status_display }}</span>
             {% if r.invitation %}
             <div class="small mt-1">
-                Invitation link:
+                {% trans "Invitation link:" %}
                 <a href="{% url 'invite accept' r.invitation.token %}">{% url 'invite accept' r.invitation.token %}</a>
                 <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="navigator.clipboard.writeText(window.location.origin + '{% url 'invite accept' r.invitation.token %}');">Copy link</button>
+                        onclick="navigator.clipboard.writeText(window.location.origin + '{% url 'invite accept' r.invitation.token %}');">{% trans "Copy link" %}</button>
             </div>
             {% endif %}
         </span>
@@ -24,20 +25,20 @@
             <form method="post" action="{% url 'organisation request review' r.pk %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="approve">
-                <button class="btn btn-sm btn-outline-success">Approve</button>
+                <button class="btn btn-sm btn-outline-success">{% trans "Approve" %}</button>
             </form>
             <form method="post" action="{% url 'organisation request review' r.pk %}">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="reject">
-                <button class="btn btn-sm btn-outline-danger">Reject</button>
+                <button class="btn btn-sm btn-outline-danger">{% trans "Reject" %}</button>
             </form>
         </span>
         {% endif %}
     </li>
     {% empty %}
-    <li class="list-group-item text-muted">No requests</li>
+    <li class="list-group-item text-muted">{% trans "No requests" %}</li>
     {% endfor %}
 </ul>
 
-<a class="btn btn-outline-secondary mt-3" href="{% url 'server settings' %}">Server settings</a>
+<a class="btn btn-outline-secondary mt-3" href="{% url 'server settings' %}">{% trans "Server settings" %}</a>
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 <div class="alert alert-warning">
-    This invitation is no longer valid ({{ invitation.get_status_display|lower }}).
+    {% blocktrans with status=invitation.get_status_display|lower %}This invitation is no longer valid ({{ status }}).{% endblocktrans %}
 </div>
 {% endblock %}

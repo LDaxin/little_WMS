@@ -1,35 +1,36 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Server settings</h4>
+<h4>{% trans "Server settings" %}</h4>
 
 <form method="post" class="d-flex gap-2 align-items-center mb-3">
     {% csrf_token %}
-    <label class="form-label mb-0">Registration policy</label>
+    <label class="form-label mb-0">{% trans "Registration policy" %}</label>
     <select name="registration_policy" class="form-select" style="max-width:14rem">
         {% for value, label in policies %}
         <option value="{{ value }}" {% if settings.registration_policy == value %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
     </select>
-    <button class="btn btn-primary">Save</button>
+    <button class="btn btn-primary">{% trans "Save" %}</button>
 </form>
 
-<a class="btn btn-outline-secondary" href="{% url 'organisation requests' %}">Organisation requests</a>
+<a class="btn btn-outline-secondary" href="{% url 'organisation requests' %}">{% trans "Organisation requests" %}</a>
 
-<h5 class="mt-4">Email</h5>
+<h5 class="mt-4">{% trans "Email" %}</h5>
 {% if email_configured %}
-<p class="mb-2">Status: <span class="badge text-bg-success">SMTP configured</span> ({{ email_host }})</p>
+<p class="mb-2">Status: <span class="badge text-bg-success">{% trans "SMTP configured" %}</span> ({{ email_host }})</p>
 {% else %}
-<p class="mb-2">Status: <span class="badge text-bg-secondary">not configured</span> &mdash; set the <code>EMAIL_*</code> variables in <code>.env</code>.</p>
+<p class="mb-2">Status: <span class="badge text-bg-secondary">{% trans "not configured" %}</span> &mdash; set the <code>EMAIL_*</code> variables in <code>.env</code>.</p>
 {% endif %}
 <form method="post" class="d-flex gap-2 align-items-center">
     {% csrf_token %}
     <input type="hidden" name="action" value="test_email">
-    <button class="btn btn-outline-secondary">Send test email</button>
+    <button class="btn btn-outline-secondary">{% trans "Send test email" %}</button>
     {% if test_result %}<span class="text-muted">{{ test_result }}</span>{% endif %}
 </form>
 
-<h5 class="mt-4">Backup</h5>
-<p class="text-muted mb-2">Download a full copy of the database.</p>
-<a class="btn btn-outline-secondary" href="{% url 'server backup' %}">Download backup</a>
+<h5 class="mt-4">{% trans "Backup" %}</h5>
+<p class="text-muted mb-2">{% trans "Download a full copy of the database." %}</p>
+<a class="btn btn-outline-secondary" href="{% url 'server backup' %}">{% trans "Download backup" %}</a>
 {% endblock %}

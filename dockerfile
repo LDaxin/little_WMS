@@ -18,6 +18,10 @@ WORKDIR $APP_HOME
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
+# gettext provides makemessages/compilemessages (§14)
+RUN apt-get update && apt-get install -y --no-install-recommends gettext \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN chmod +x $APP_HOME/entrypoint.sh
 
 WORKDIR $WMS_HOME

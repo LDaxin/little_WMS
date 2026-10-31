@@ -1,13 +1,14 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Dashboard</h4>
+<h4>{% trans "Dashboard" %}</h4>
 
 <div class="row">
     {% if upcomingOccasions %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Upcoming occasions</div>
+            <div class="card-header">{% trans "Upcoming occasions" %}</div>
             <ul class="list-group list-group-flush">
                 {% for occ in upcomingOccasions %}
                 <li class="list-group-item d-flex justify-content-between">
@@ -15,7 +16,7 @@
                     <span class="text-muted small">{{ occ.calendar_entry.start_date }}</span>
                 </li>
                 {% empty %}
-                <li class="list-group-item text-muted">None</li>
+                <li class="list-group-item text-muted">{% trans "None" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -25,12 +26,12 @@
     {% if unreadNotifications %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Notifications</div>
+            <div class="card-header">{% trans "Notifications" %}</div>
             <ul class="list-group list-group-flush">
                 {% for n in unreadNotifications %}
                 <li class="list-group-item">{% if n.link %}<a href="{{ n.link }}">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}</li>
                 {% empty %}
-                <li class="list-group-item text-muted">None</li>
+                <li class="list-group-item text-muted">{% trans "None" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -40,12 +41,12 @@
     {% if alerts %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Alerts</div>
+            <div class="card-header">{% trans "Alerts" %}</div>
             <ul class="list-group list-group-flush">
                 {% for a in alerts %}
                 <li class="list-group-item">{% if a.link %}<a href="{{ a.link }}">{{ a.title }}</a>{% else %}{{ a.title }}{% endif %}</li>
                 {% empty %}
-                <li class="list-group-item text-muted">None</li>
+                <li class="list-group-item text-muted">{% trans "None" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -55,11 +56,11 @@
     {% if statistics %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Statistics</div>
+            <div class="card-header">{% trans "Statistics" %}</div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item d-flex justify-content-between"><span>Articles</span><span>{{ statistics.articles }}</span></li>
-                <li class="list-group-item d-flex justify-content-between"><span>Storages</span><span>{{ statistics.storages }}</span></li>
-                <li class="list-group-item d-flex justify-content-between"><span>Occasions</span><span>{{ statistics.occasions }}</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span>{% trans "Articles" %}</span><span>{{ statistics.articles }}</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span>{% trans "Storages" %}</span><span>{{ statistics.storages }}</span></li>
+                <li class="list-group-item d-flex justify-content-between"><span>{% trans "Occasions" %}</span><span>{{ statistics.occasions }}</span></li>
             </ul>
         </div>
     </div>
@@ -68,12 +69,12 @@
     {% if recentActivity %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Recent activity</div>
+            <div class="card-header">{% trans "Recent activity" %}</div>
             <ul class="list-group list-group-flush">
                 {% for log in recentActivity %}
                 <li class="list-group-item small">{{ log.action }} &middot; {{ log.content_object }} <span class="text-muted">{{ log.timestamp|date:"Y-m-d H:i" }}</span></li>
                 {% empty %}
-                <li class="list-group-item text-muted">None</li>
+                <li class="list-group-item text-muted">{% trans "None" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -83,11 +84,11 @@
     {% if quickActions %}
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Quick actions</div>
+            <div class="card-header">{% trans "Quick actions" %}</div>
             <div class="card-body d-flex gap-2">
-                <a class="btn btn-sm btn-outline-primary" href="/movement/">Movement</a>
-                <a class="btn btn-sm btn-outline-primary" href="/article/">Articles</a>
-                <a class="btn btn-sm btn-outline-primary" href="/storage/">Storages</a>
+                <a class="btn btn-sm btn-outline-primary" href="/movement/">{% trans "Movement" %}</a>
+                <a class="btn btn-sm btn-outline-primary" href="/article/">{% trans "Articles" %}</a>
+                <a class="btn btn-sm btn-outline-primary" href="/storage/">{% trans "Storages" %}</a>
             </div>
         </div>
     </div>
@@ -98,13 +99,13 @@
         <div class="card">
             <div class="card-header d-flex justify-content-between">
                 <span>{{ widget.view.name }}</span>
-                <a class="small" href="{{ widget.view.applyUrl }}">Show all</a>
+                <a class="small" href="{{ widget.view.applyUrl }}">{% trans "Show all" %}</a>
             </div>
             <ul class="list-group list-group-flush">
                 {% for article in widget.articles %}
                 <li class="list-group-item">{{ article.base.name }}</li>
                 {% empty %}
-                <li class="list-group-item text-muted">No articles</li>
+                <li class="list-group-item text-muted">{% trans "No articles" %}</li>
                 {% endfor %}
             </ul>
         </div>

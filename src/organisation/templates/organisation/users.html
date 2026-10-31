@@ -1,11 +1,12 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Users</h4>
+<h4>{% trans "Users" %}</h4>
 
 <table class="table">
     <thead>
-        <tr><th>User</th><th>Email</th><th>Role</th></tr>
+        <tr><th>{% trans "User" %}</th><th>{% trans "Email" %}</th><th>{% trans "Role" %}</th></tr>
     </thead>
     <tbody>
         {% for row in rows %}
@@ -13,12 +14,12 @@
             <td>{{ row.user }}</td>
             <td>
                 {% if row.verified %}
-                <span class="badge text-bg-success">verified</span>
+                <span class="badge text-bg-success">{% trans "verified" %}</span>
                 {% else %}
-                <span class="badge text-bg-secondary">unverified</span>
+                <span class="badge text-bg-secondary">{% trans "unverified" %}</span>
                 <form method="post" action="{% url 'resend verification' row.user.pk %}" class="d-inline">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-secondary">Resend</button>
+                    <button class="btn btn-sm btn-outline-secondary">{% trans "Resend" %}</button>
                 </form>
                 {% endif %}
             </td>
@@ -26,19 +27,19 @@
                 <form method="post" action="{% url 'user role' row.user.pk %}" class="d-flex gap-2">
                     {% csrf_token %}
                     <select name="role" class="form-select form-select-sm" style="max-width:16rem">
-                        <option value="">&mdash; none &mdash;</option>
+                        <option value="">&mdash; {% trans "none" %} &mdash;</option>
                         {% for r in roles %}
                         <option value="{{ r.pk }}"
                                 {% if row.profile and row.profile.role_id == r.pk %}selected{% endif %}>{{ r.name }}</option>
                         {% endfor %}
                     </select>
-                    <button class="btn btn-sm btn-primary">Save</button>
+                    <button class="btn btn-sm btn-primary">{% trans "Save" %}</button>
                 </form>
             </td>
             <td>
-                <form method="post" action="{% url 'delete user' row.user.pk %}" onsubmit="return confirm('Delete this user?');">
+                <form method="post" action="{% url 'delete user' row.user.pk %}" onsubmit="return confirm('{% trans "Delete this user?" %}');">
                     {% csrf_token %}
-                    <button class="btn btn-sm btn-outline-danger">Delete</button>
+                    <button class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
                 </form>
             </td>
         </tr>
@@ -46,20 +47,20 @@
     </tbody>
 </table>
 
-<a class="btn btn-outline-secondary" href="{% url 'roles' %}">Back to roles</a>
+<a class="btn btn-outline-secondary" href="{% url 'roles' %}">{% trans "Back to roles" %}</a>
 
-<h5 class="mt-4">Invite</h5>
+<h5 class="mt-4">{% trans "Invite" %}</h5>
 <form method="post" action="{% url 'invite create' %}" class="d-flex gap-2 mb-3">
     {% csrf_token %}
     <select name="role" class="form-select form-select-sm" style="max-width:16rem">
-        <option value="">&mdash; no role &mdash;</option>
+        <option value="">&mdash; {% trans "no role" %} &mdash;</option>
         {% for r in roles %}
         <option value="{{ r.pk }}">{{ r.name }}</option>
         {% endfor %}
     </select>
-    <input name="email" type="email" class="form-control form-control-sm" placeholder="Email (optional)" style="max-width:16rem">
-    <input name="days" type="number" min="1" class="form-control form-control-sm" value="7" title="Expiry in days (default 7)" style="max-width:6rem">
-    <button class="btn btn-sm btn-primary">Create link</button>
+    <input name="email" type="email" class="form-control form-control-sm" placeholder="{% trans "Email (optional)" %}" style="max-width:16rem">
+    <input name="days" type="number" min="1" class="form-control form-control-sm" value="7" title="{% trans "Expiry in days (default 7)" %}" style="max-width:6rem">
+    <button class="btn btn-sm btn-primary">{% trans "Create link" %}</button>
 </form>
 
 {% if invitations %}
@@ -69,7 +70,7 @@
         <span>
             <code>/invite/{{ invitation.token }}/</code>
             {% if invitation.role %}<span class="badge text-bg-secondary">{{ invitation.role.name }}</span>{% endif %}
-            <span class="text-muted small">expires {{ invitation.expires_at|date:"Y-m-d" }}</span>
+            <span class="text-muted small">{% trans "expires" %} {{ invitation.expires_at|date:"Y-m-d" }}</span>
         </span>
         <span class="d-flex gap-2">
             <button type="button" class="btn btn-sm btn-outline-secondary"
@@ -78,7 +79,7 @@
             </button>
             <form method="post" action="{% url 'invite revoke' invitation.pk %}">
                 {% csrf_token %}
-                <button class="btn btn-sm btn-outline-danger">Revoke</button>
+                <button class="btn btn-sm btn-outline-danger">{% trans "Revoke" %}</button>
             </form>
         </span>
     </li>
