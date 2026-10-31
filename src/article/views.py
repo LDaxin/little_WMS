@@ -643,10 +643,18 @@ def setGlobalMinimum(request, spaceId, itemId):
 @require_scope("article", "view")
 def searchArticle(request, typ):
     if request.method == "GET":
-        if request.GET['search'] == "":
-            r = Article.objects.filter(base__pType__name__exact=typ)
-        else:
-            r = Article.objects.filter(Q(base__name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), base__pType__name__exact=typ)
+        r = Article.objects.filter(base__pType__name__exact=typ)
+        query = request.GET.get("query")
+        if query:
+            from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+
+            try:
+                r = r.filter(parse_json(query, ARTICLE_FIELDS))
+            except QueryError:
+                pass
+        elif request.GET.get("search"):
+            search = request.GET["search"]
+            r = r.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
         r = _scoped_articles(r, request)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 
