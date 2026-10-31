@@ -8,8 +8,8 @@
     <li class="list-group-item d-flex justify-content-between align-items-center">
         <span>
             <a href="{% url 'article' loan.article.base.pType.name loan.article.pk %}">{{ loan.article.base.name }}</a>
-            &rarr; {{ loan.borrower_name }}
-            <small class="text-muted">{{ loan.calendar_entry.start_date }}{% if loan.calendar_entry.end_date %} &ndash; {{ loan.calendar_entry.end_date }}{% endif %}</small>
+            &larr; {{ loan.lender_name|default:loan.lender_organisation }}
+            <small class="text-muted">{{ loan.start_date }}{% if loan.end_date %} &ndash; {{ loan.end_date }}{% endif %}</small>
             <span class="badge text-bg-secondary">{{ loan.get_status_display }}</span>
         </span>
         {% if loan.status == "active" %}

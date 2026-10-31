@@ -180,6 +180,14 @@ class Article(SoftDeleteObject, models.Model):
     ist_verbrauchsartikel = models.BooleanField(default=False)
     mengeneinheit = models.CharField(max_length=20, blank=True)
 
+    # Ownership (§20): owned by the organisation or borrowed from an external lender.
+    OWNERSHIP_CHOICES = [
+        ("owned", "Owned by organisation"),
+        ("borrowed", "Borrowed from external"),
+    ]
+    ownership = models.CharField(max_length=10, choices=OWNERSHIP_CHOICES, default="owned")
+    loan_requires_confirmation = models.BooleanField(default=True)
+
     # Custom field values for article-level fields (§25)
     attributes = models.JSONField(default=dict, blank=True)
 
