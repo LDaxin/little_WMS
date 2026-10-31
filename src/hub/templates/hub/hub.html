@@ -8,6 +8,17 @@
 
         {% if l == "Article" %}
 
+        <div class="col-6 col-sm-4 p-2">
+            <a class="card-block text-decorations-none" href="/article/">
+                <div class="card p-2 justify-content-between align-items-center">
+                    <div class="card-body text-center">
+                        <img style="width:100px" src="{% static 'hub/symbols/List.svg' %}">
+                        <div class="small">All articles</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
         {% for t in paType %}
         <div class="col-6 col-sm-4 p-2">
             <a class="card-block text-decorations-none" href="article/{{t.name|lower}}">
@@ -22,6 +33,17 @@
         {% endfor %}
 
         {% elif l == "Storage" %}
+
+        <div class="col-6 col-sm-4 p-2">
+            <a class="card-block text-decorations-none" href="/storage/">
+                <div class="card p-2 justify-content-between align-items-center">
+                    <div class="card-body text-center">
+                        <img style="width:100px" src="{% static 'hub/symbols/List.svg' %}">
+                        <div class="small">All storages</div>
+                    </div>
+                </div>
+            </a>
+        </div>
 
         {% for t in stType %}
         <div class="col-6 col-sm-4 p-2">
