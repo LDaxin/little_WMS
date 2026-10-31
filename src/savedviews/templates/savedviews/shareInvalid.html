@@ -1,6 +1,7 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Link unavailable</h4>
-<p class="text-muted">This share link is expired, revoked, or already used.</p>
+<h4>{% trans "Link unavailable" %}</h4>
+<p class="text-muted">{% trans "This share link is expired, revoked, or already used." %}</p>
 {% endblock %}

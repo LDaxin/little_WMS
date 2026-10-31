@@ -1,7 +1,8 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Lendings</h4>
+<h4>{% trans "Lendings" %}</h4>
 
 <ul class="list-group">
     {% for lending in lendings %}
@@ -15,12 +16,12 @@
         {% if lending.status == "active" %}
         <form method="post" action="{% url 'return lending' lending.pk %}">
             {% csrf_token %}
-            <button class="btn btn-sm btn-outline-secondary">Return</button>
+            <button class="btn btn-sm btn-outline-secondary">{% trans "Return" %}</button>
         </form>
         {% endif %}
     </li>
     {% empty %}
-    <li class="list-group-item text-muted">No lendings</li>
+    <li class="list-group-item text-muted">{% trans "No lendings" %}</li>
     {% endfor %}
 </ul>
 {% endblock %}

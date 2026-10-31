@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
@@ -11,10 +12,10 @@ from organisation.managers import SoftDeleteOrganisationManager
 # Create your models here.
 
 ZUSTAND_CHOICES = [
-    ("gut", "gut"),
-    ("gebraucht", "gebraucht"),
-    ("defekt", "defekt"),
-    ("reparatur", "in Reparatur"),
+    ("gut", _("gut")),
+    ("gebraucht", _("gebraucht")),
+    ("defekt", _("defekt")),
+    ("reparatur", _("in Reparatur")),
 ]
 
 SIZE_CLASS_CHOICES = [
@@ -38,11 +39,11 @@ class ArticleType(SoftDeleteObject, models.Model):
     objects = SoftDeleteOrganisationManager()
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    name = models.CharField(max_length=20)
-    symbol = models.CharField(max_length=20)
+    name = models.CharField(_("Name"), max_length=20)
+    symbol = models.CharField(_("Symbol"), max_length=20)
 
-    article_toggle_space = models.BooleanField(default=False)
-    allow_merge_split = models.BooleanField(default=False)
+    article_toggle_space = models.BooleanField(_("Container"), default=False)
+    allow_merge_split = models.BooleanField(_("Merge/split"), default=False)
 
     # Visibility/required of the global fields (§4a-c), e.g.
     # {"zustand": {"visible": true, "required": false}}
@@ -132,9 +133,9 @@ class ArticleBase(SoftDeleteObject, models.Model):
     objects = SoftDeleteOrganisationManager()
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    name = models.CharField(max_length=20)
+    name = models.CharField(_("Name"), max_length=20)
 
-    pType = models.ForeignKey(ArticleType, on_delete=models.CASCADE, blank=True , null = False)
+    pType = models.ForeignKey(ArticleType, on_delete=models.CASCADE, blank=True , null = False, verbose_name=_("Type"))
 
     # Catalog properties (shared by all instances of this model)
     outer_length_mm = models.IntegerField(null=True, blank=True)
@@ -144,7 +145,7 @@ class ArticleBase(SoftDeleteObject, models.Model):
     attributes = models.JSONField(default=dict, blank=True)
 
     # Global minimum for this kind of thing, independent of location (§4d).
-    mindestbestand = models.IntegerField(null=True, blank=True)
+    mindestbestand = models.IntegerField(_("Minimum stock"), null=True, blank=True)
 
     # Optimistic locking (§36): incremented on every save.
     version = models.IntegerField(default=0)
@@ -174,14 +175,14 @@ class Article(SoftDeleteObject, models.Model):
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, blank = True, null = True)
 
     # Global fields (every article has them)
-    zustand = models.CharField(max_length=20, choices=ZUSTAND_CHOICES, default="gut")
-    anschaffungswert = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    kaufdatum = models.DateField(null=True, blank=True)
-    ablaufdatum = models.DateField(null=True, blank=True)
-    gewicht_gramm = models.IntegerField(null=True, blank=True)
-    notiz = models.TextField(blank=True)
+    zustand = models.CharField(_("Condition"), max_length=20, choices=ZUSTAND_CHOICES, default="gut")
+    anschaffungswert = models.DecimalField(_("Purchase value"), max_digits=10, decimal_places=2, null=True, blank=True)
+    kaufdatum = models.DateField(_("Purchase date"), null=True, blank=True)
+    ablaufdatum = models.DateField(_("Expiry date"), null=True, blank=True)
+    gewicht_gramm = models.IntegerField(_("Weight (g)"), null=True, blank=True)
+    notiz = models.TextField(_("Note"), blank=True)
     ist_verbrauchsartikel = models.BooleanField(default=False)
-    mengeneinheit = models.CharField(max_length=20, blank=True)
+    mengeneinheit = models.CharField(_("Unit"), max_length=20, blank=True)
 
     # Ownership (§20): owned by the organisation or borrowed from an external lender.
     OWNERSHIP_CHOICES = [

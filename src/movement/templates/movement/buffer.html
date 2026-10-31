@@ -1,11 +1,12 @@
+{% load i18n %}
 <div id="movementBuffer">
     <div class="btn-group mb-2" role="group">
         <button type="button" class="btn {% if mode == 'store' %}btn-success{% else %}btn-outline-success{% endif %}"
                 hx-post="{% url 'movement mode' %}" hx-vals='{"mode": "store"}'
-                hx-target="#movementBuffer" hx-swap="outerHTML">Store</button>
+                hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Store" %}</button>
         <button type="button" class="btn {% if mode == 'remove' %}btn-danger{% else %}btn-outline-danger{% endif %}"
                 hx-post="{% url 'movement mode' %}" hx-vals='{"mode": "remove"}'
-                hx-target="#movementBuffer" hx-swap="outerHTML">Remove</button>
+                hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Remove" %}</button>
     </div>
 
     {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
@@ -14,21 +15,21 @@
     {% if mode == 'store' %}
     <div class="card mb-2">
         <div class="card-body">
-            <strong>Target:</strong>
+            <strong>{% trans "Target:" %}</strong>
             {% if target %}
                 {{ target }}
                 <button type="button" class="btn btn-sm btn-outline-secondary"
                         hx-post="{% url 'movement target clear' %}"
-                        hx-target="#movementBuffer" hx-swap="outerHTML">Clear</button>
+                        hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Clear" %}</button>
                 {% if target_smart %}
-                <div class="small text-muted mt-1">Container detected – set as target.
+                <div class="small text-muted mt-1">{% trans "Container detected – set as target." %}
                     <button type="button" class="btn btn-sm btn-link p-0"
                             hx-post="{% url 'movement treat as article' %}"
-                            hx-target="#movementBuffer" hx-swap="outerHTML">Treat as article</button>
+                            hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Treat as article" %}</button>
                 </div>
                 {% endif %}
             {% else %}
-                <span class="text-muted">scan a storage or container</span>
+                <span class="text-muted">{% trans "scan a storage or container" %}</span>
             {% endif %}
         </div>
     </div>
@@ -38,15 +39,15 @@
     {% with active=buffer|last %}
     <div class="card mb-2 border-primary">
         <div class="card-body">
-            <strong>Active:</strong> {{ active.base.name }}
+            <strong>{% trans "Active:" %}</strong> {{ active.base.name }}
             <div class="mt-1 d-flex gap-2">
                 <button type="button" class="btn btn-sm btn-outline-danger"
                         hx-post="{% url 'movement buffer remove' %}" hx-vals='{"code": "{{ active.code.code }}"}'
-                        hx-target="#movementBuffer" hx-swap="outerHTML">Remove</button>
+                        hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Remove" %}</button>
                 {% if active.space.active %}
                 <button type="button" class="btn btn-sm btn-outline-primary"
                         hx-post="{% url 'movement set target' %}" hx-vals='{"code": "{{ active.code.code }}"}'
-                        hx-target="#movementBuffer" hx-swap="outerHTML">Set as target</button>
+                        hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Set as target" %}</button>
                 {% endif %}
             </div>
         </div>
@@ -56,7 +57,7 @@
 
     <div class="card mb-2">
         <div class="card-body">
-            <strong>Buffer ({{ buffer|length }})</strong>
+            <strong>{% trans "Buffer" %} ({{ buffer|length }})</strong>
             <ul class="list-group list-group-flush">
                 {% for article in buffer|slice:":-1" %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -66,7 +67,7 @@
                             hx-target="#movementBuffer" hx-swap="outerHTML"></button>
                 </li>
                 {% empty %}
-                <li class="list-group-item text-muted">Empty</li>
+                <li class="list-group-item text-muted">{% trans "Empty" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -75,19 +76,19 @@
     <div class="d-flex gap-2">
         {% if mode == 'store' %}
         <button type="button" class="btn btn-success" {% if not buffer or not target %}disabled{% endif %}
-                hx-post="{% url 'movement store' %}" hx-target="#movementBuffer" hx-swap="outerHTML">Store</button>
+                hx-post="{% url 'movement store' %}" hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Store" %}</button>
         {% else %}
         <button type="button" class="btn btn-danger" {% if not buffer %}disabled{% endif %}
-                hx-post="{% url 'movement remove' %}" hx-target="#movementBuffer" hx-swap="outerHTML">Remove</button>
+                hx-post="{% url 'movement remove' %}" hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Remove" %}</button>
         {% endif %}
         <button type="button" class="btn btn-outline-secondary"
-                hx-post="{% url 'movement clear' %}" hx-target="#movementBuffer" hx-swap="outerHTML">Clear</button>
+                hx-post="{% url 'movement clear' %}" hx-target="#movementBuffer" hx-swap="outerHTML">{% trans "Clear" %}</button>
     </div>
 
     {% if session_entries %}
     <div class="card mt-2">
         <div class="card-body">
-            <strong>Session</strong>
+            <strong>{% trans "Session" %}</strong>
             <ul class="list-group list-group-flush">
                 {% for entry in session_entries %}
                 <li class="list-group-item d-flex justify-content-between align-items-center {% if entry.undone %}text-muted text-decoration-line-through{% endif %}">
@@ -101,7 +102,7 @@
                 {% endfor %}
             </ul>
             <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
-                    hx-post="{% url 'movement undo' %}" hx-target="#movementBuffer" hx-swap="outerHTML">&#8630; Undo last action</button>
+                    hx-post="{% url 'movement undo' %}" hx-target="#movementBuffer" hx-swap="outerHTML">&#8630; {% trans "Undo last action" %}</button>
         </div>
     </div>
     {% endif %}

@@ -1,6 +1,7 @@
 {% extends "hub/modules/modal.html" %}
+{% load i18n %}
 
-{% block title %}Print QR{% endblock %}
+{% block title %}{% trans "Print QR" %}{% endblock %}
 
 {% block body %}
     {% include "hub/modules/qrForm.html" %}

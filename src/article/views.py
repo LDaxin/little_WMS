@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
@@ -252,7 +253,7 @@ def addArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
     if t == None:
-        return toast(request, "Error", "no article type named " + typ, "alert")
+        return toast(request, _("Error"), _("no article type named ") + typ, "alert")
 
     else:
         if request.method == "POST":
@@ -272,7 +273,7 @@ def addArticle(request, typ):
                 base.pType = t
                 base.save()
             else:
-                return toast(request, "Error", "article base not valid"+str(pb.errors), "alert")
+                return toast(request, _("Error"), _("article base not valid")+str(pb.errors), "alert")
 
             if p.is_valid():
                 pa = p.save(commit=False)
@@ -280,9 +281,9 @@ def addArticle(request, typ):
                     try:
                         code = UuidCode.objects.get(code=str(p["code"].value()))
                         if code.used:
-                            return toast(request, "Error", "code is already used", "alert")
+                            return toast(request, _("Error"), _("code is already used"), "alert")
                     except:
-                        return toast(request, "Error", "no code with id " + p["code"].value(), "alert")
+                        return toast(request, _("Error"), _("no code with id ") + p["code"].value(), "alert")
 
 
                 if p["code"].value() != "":
@@ -315,7 +316,7 @@ def addArticle(request, typ):
 
                 return toast(request, "Add Succses", pa.base.name + " was added to your system.", "status", template="hub/modules/itemAdd.html")
 
-        return toast(request, "Error", "article not valid " + str(p.errors), "alert")
+        return toast(request, _("Error"), _("article not valid ") + str(p.errors), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "delete")
@@ -323,7 +324,7 @@ def delArticle(request, typ):
     t = ArticleType.objects.get(name__exact=typ)
     
     if t == None:
-        return toast(request, "Error", "no article type named " + typ, "alert")
+        return toast(request, _("Error"), _("no article type named ") + typ, "alert")
     else:
         if request.method == "POST":
             delList = []
@@ -343,7 +344,7 @@ def delArticle(request, typ):
 
             return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
 
-        return toast(request, "Error", "something went wrong", "alert")
+        return toast(request, _("Error"), _("something went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "edit")
@@ -353,12 +354,12 @@ def updateArticle(request, typ, articleId):
     _require_article(request, "edit", articleObject)
 
     if articleTypeObject == None:
-        return toast(request, "Error", "no article type named " + typ, "alert")
+        return toast(request, _("Error"), _("no article type named ") + typ, "alert")
     else:
         if request.method == "POST":
             loaded_version = request.POST.get("version")
             if loaded_version is not None and loaded_version.isdigit() and int(loaded_version) != articleObject.version:
-                return toast(request, "Error", "The article was changed by someone else. Please reload.", "alert")
+                return toast(request, _("Error"), _("The article was changed by someone else. Please reload."), "alert")
             old_values = _snapshot(articleObject)
             articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base", article_type=articleTypeObject)
             articleForm =  FormChangeArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
@@ -375,19 +376,19 @@ def updateArticle(request, typ, articleId):
                     # menge 0 means "used up" (§4d)
                     audit_log("deleted", article, request.user, {"reason": "menge 0"})
                     article.delete()
-                    return toast(request, "Delete", "article was deleted (menge 0)", "status")
+                    return toast(request, _("Delete"), _("article was deleted (menge 0)"), "status")
                 article.save()
                 article.version += 1
                 article.save(update_fields=["version"])
                 audit_log("updated", article, request.user, _diff(old_values, _snapshot(article)))
                 if menge is not None:
-                    stock, _ = Stock.objects.get_or_create(
+                    stock, _created = Stock.objects.get_or_create(
                         article=article, stored=None, defaults={"menge": menge})
                     stock.menge = menge
                     stock.save()
 
-            return toast(request, "Update", "article was updated", "status")
-        return toast(request, "Error", "something went wrong", "alert")
+            return toast(request, _("Update"), _("article was updated"), "status")
+        return toast(request, _("Error"), _("something went wrong"), "alert")
 
 def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
     return {

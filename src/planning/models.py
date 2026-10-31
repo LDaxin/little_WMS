@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 
 from organisation.current import current_organisation_id
@@ -18,8 +19,8 @@ class RecurrenceRule(SoftDeleteObject, models.Model):
     objects = SoftDeleteOrganisationManager()
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    frequency = models.CharField(max_length=10, choices=FREQUENCY_CHOICES)
-    interval = models.IntegerField(default=1)
+    frequency = models.CharField(_("Frequency"), max_length=10, choices=FREQUENCY_CHOICES)
+    interval = models.IntegerField(_("Interval"), default=1)
     end_date = models.DateField(null=True, blank=True)
     end_after_occurrences = models.IntegerField(null=True, blank=True)
 
@@ -31,23 +32,23 @@ class CalendarEntry(SoftDeleteObject, models.Model):
     """A dated entry on the calendar (§2). Occasions are one entry type."""
 
     ENTRY_TYPE_CHOICES = [
-        ("occasion", "Occasion"),
-        ("maintenance", "Maintenance"),
-        ("purchase", "Purchase"),
-        ("disposal", "Disposal"),
-        ("inventory", "Inventory"),
-        ("loan", "Loan"),
-        ("other", "Other"),
+        ("occasion", _("Occasion")),
+        ("maintenance", _("Maintenance")),
+        ("purchase", _("Purchase")),
+        ("disposal", _("Disposal")),
+        ("inventory", _("Inventory")),
+        ("loan", _("Loan")),
+        ("other", _("Other")),
     ]
 
     objects = SoftDeleteOrganisationManager()
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    entry_type = models.CharField(max_length=20, choices=ENTRY_TYPE_CHOICES, default="occasion")
-    title = models.CharField(max_length=200)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    entry_type = models.CharField(_("Type"), max_length=20, choices=ENTRY_TYPE_CHOICES, default="occasion")
+    title = models.CharField(_("Title"), max_length=200)
+    start_date = models.DateField(_("Start date"))
+    end_date = models.DateField(_("End date"), null=True, blank=True)
+    notes = models.TextField(_("Notes"), blank=True)
     responsible_user = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     recurrence_rule = models.ForeignKey(RecurrenceRule, null=True, blank=True, on_delete=models.SET_NULL, related_name="entries")
     article = models.ForeignKey("article.Article", null=True, blank=True, on_delete=models.CASCADE, related_name="calendar_entries")

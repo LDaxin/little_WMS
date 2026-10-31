@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
@@ -62,7 +63,7 @@ def delTag(request):
             i.deleted = True
             i.save()
         return toast(request, "Delete", delListReturn, "alert")
-    return toast(request, "Error", "thomething went wrong", "alert")
+    return toast(request, _("Error"), _("thomething went wrong"), "alert")
 
 
 
@@ -78,7 +79,7 @@ def updateTag(request, tagId):
         tagForm = FormTag(request.POST, instance=tagObject)
         if tagForm.is_valid():
             tagForm.save()
-            return toast(request, "Update Succses", "Tag was updated.", "status")
+            return toast(request, _("Update Succses"), _("Tag was updated."), "status")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("tag.view_all")

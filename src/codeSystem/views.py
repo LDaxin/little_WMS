@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound, Http404
@@ -30,7 +31,7 @@ def addCode(request):
                     pass
 
 
-    return toast(request, "add success", "added "+ str(request.POST["number"]) + " codes", "status", template="hub/modules/itemAdd.html")
+    return toast(request, _("add success"), _("added ")+ str(request.POST["number"]) + " codes", "status", template="hub/modules/itemAdd.html")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("code.view_all")

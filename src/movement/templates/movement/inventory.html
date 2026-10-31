@@ -1,4 +1,5 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 
@@ -6,7 +7,7 @@
       hx-on::after-request="document.getElementById('invScan').value=''">
     {% csrf_token %}
     <div class="input-group">
-        <input id="invScan" name="code" class="form-control" placeholder="Scan code or search name..." autofocus autocomplete="off"
+        <input id="invScan" name="code" class="form-control" placeholder="{% trans "Scan code or search name..." %}" autofocus autocomplete="off"
                hx-get="{% url 'inventory search' %}" hx-target="#invResults" hx-trigger="input changed delay:300ms">
         {% include "hub/modules/qrScanner.html" with input="invScan" scannerUrl="/movement/scanner/invScan/toggle" %}
     </div>

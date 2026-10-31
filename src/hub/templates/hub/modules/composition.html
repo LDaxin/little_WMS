@@ -1,30 +1,31 @@
+{% load i18n %}
 <div id="composition" class="p-2 border rounded mb-2">
-    <h6>Composition</h6>
+    <h6>{% trans "Composition" %}</h6>
     <ul class="list-group list-group-flush">
         {% for row in compositionStatus %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
             <span>{{ row.item.base.name }}</span>
             <span class="small">
-                {% if row.soll is not None %}Soll {{ row.soll }}{% else %}any{% endif %} / Ist {{ row.ist }}
-                {% if row.min is not None %}· min {{ row.min }}{% endif %}
+                {% if row.soll is not None %}{% trans "Soll" %} {{ row.soll }}{% else %}{% trans "any" %}{% endif %} / {% trans "Ist" %} {{ row.ist }}
+                {% if row.min is not None %}· {% trans "min" %} {{ row.min }}{% endif %}
                 {% if row.min_sum %}· Σ min {{ row.min_sum }}{% endif %}
-                {% if row.global is not None %}· global {{ row.global }}{% endif %}
-                {% if row.over %}<span class="text-danger">· over-allocated ({{ row.available }} available)</span>{% endif %}
-                {% if row.refill %}<span class="text-danger">· refill</span>{% endif %}
+                {% if row.global is not None %}· {% trans "global" %} {{ row.global }}{% endif %}
+                {% if row.over %}<span class="text-danger">· {% trans "over-allocated" %} ({{ row.available }} {% trans "available" %})</span>{% endif %}
+                {% if row.refill %}<span class="text-danger">· {% trans "refill" %}</span>{% endif %}
             </span>
             {% if row.min_sum and row.global != row.min_sum %}
             <button type="button" class="btn btn-sm btn-outline-secondary"
                     hx-post="{{ compositionGlobalUrl }}/{{ row.item.pk }}"
                     hx-target="#composition" hx-swap="outerHTML"
-                    title="Set the global minimum to the sum of the location minimums">Σ min → global</button>
+                    title="{% trans "Set the global minimum to the sum of the location minimums" %}">Σ min → global</button>
             {% endif %}
-            <button type="button" class="btn-close" aria-label="Remove"
+            <button type="button" class="btn-close" aria-label="{% trans "Remove" %}"
                     hx-post="{{ compositionRemoveUrl }}/{{ row.item.pk }}"
-                    hx-confirm="Remove {{ row.item.base.name }} from the composition?"
+                    hx-confirm="{% trans "Remove" %} {{ row.item.base.name }} {% trans "from the composition?" %}"
                     hx-target="#composition" hx-swap="outerHTML"></button>
         </li>
         {% empty %}
-        <li class="list-group-item text-muted">No composition</li>
+        <li class="list-group-item text-muted">{% trans "No composition" %}</li>
         {% endfor %}
     </ul>
     {% if compositionError %}
@@ -35,19 +36,19 @@
         <button type="button" class="btn btn-sm btn-outline-warning"
                 hx-post="{{ compositionAddUrl }}"
                 hx-vals='{"base": "{{ forceBase }}", "soll": "{{ forceSoll }}", "min": "{{ forceMin }}", "force": "1"}'
-                hx-target="#composition" hx-swap="outerHTML">Add anyway</button>
+                hx-target="#composition" hx-swap="outerHTML">{% trans "Add anyway" %}</button>
     </div>
     {% endif %}
     <form class="mt-2" hx-post="{{ compositionAddUrl }}" hx-target="#composition" hx-swap="outerHTML">
         {% csrf_token %}
         <div class="input-group input-group-sm">
-            <input name="base" class="form-control" list="baseOptions" placeholder="Article base">
+            <input name="base" class="form-control" list="baseOptions" placeholder="{% trans "Article base" %}">
             <datalist id="baseOptions">
                 {% for b in allBases %}<option value="{{ b.name }}"></option>{% endfor %}
             </datalist>
-            <input name="soll" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="Soll">
-            <input name="min" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="Min">
-            <button type="submit" class="btn btn-success">Add</button>
+            <input name="soll" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="{% trans "Soll" %}">
+            <input name="min" type="number" min="0" class="form-control" style="max-width:5rem" placeholder="{% trans "Min" %}">
+            <button type="submit" class="btn btn-success">{% trans "Add" %}</button>
         </div>
     </form>
 </div>

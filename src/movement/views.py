@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from django.shortcuts import render
 from django.http import HttpResponseNotFound
 from django.contrib.auth.decorators import login_required

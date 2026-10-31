@@ -1,16 +1,17 @@
+{% load i18n %}
 <div id="inventoryBody">
     {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
     {% if success %}<div class="alert alert-success py-1">{{ success }}</div>{% endif %}
 
     <div class="card mb-2">
         <div class="card-body">
-            <strong>Location:</strong>
+            <strong>{% trans "Location:" %}</strong>
             {% if location %}
                 {{ location }}
                 <button type="button" class="btn btn-sm btn-outline-secondary"
-                        hx-post="{% url 'inventory clear' %}" hx-target="#inventoryBody" hx-swap="outerHTML">Clear</button>
+                        hx-post="{% url 'inventory clear' %}" hx-target="#inventoryBody" hx-swap="outerHTML">{% trans "Clear" %}</button>
             {% else %}
-                <span class="text-muted">scan a location to start</span>
+                <span class="text-muted">{% trans "scan a location to start" %}</span>
             {% endif %}
         </div>
     </div>
@@ -18,7 +19,7 @@
     {% if location %}
     <div class="card mb-2">
         <div class="card-body">
-            <strong>{{ found_count }}/{{ expected_count }} scanned</strong>
+            <strong>{{ found_count }}/{{ expected_count }} {% trans "scanned" %}</strong>
             <ul class="list-group list-group-flush">
                 {% for entry in expected %}
                 <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -26,11 +27,11 @@
                     {% if entry.found %}
                     <span class="text-success">&#10003;</span>
                     {% else %}
-                    <span class="text-muted">&#10067; not found yet</span>
+                    <span class="text-muted">&#10067; {% trans "not found yet" %}</span>
                     {% endif %}
                 </li>
                 {% empty %}
-                <li class="list-group-item text-muted">Nothing expected here</li>
+                <li class="list-group-item text-muted">{% trans "Nothing expected here" %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -39,15 +40,15 @@
     {% if deviations %}
     <div class="card mb-2 border-warning">
         <div class="card-body">
-            <strong>Deviations</strong>
+            <strong>{% trans "Deviations" %}</strong>
             <ul class="list-group list-group-flush">
                 {% for dev in deviations %}
                 <li class="list-group-item">
                     &#9888; {{ dev.article.base.name }}
                     {% if dev.locations %}
-                    <span class="text-muted">&ndash; should be in {{ dev.locations|join:", " }}</span>
+                    <span class="text-muted">&ndash; {% trans "should be in" %} {{ dev.locations|join:", " }}</span>
                     {% else %}
-                    <span class="text-muted">&ndash; not stored</span>
+                    <span class="text-muted">&ndash; {% trans "not stored" %}</span>
                     {% endif %}
                 </li>
                 {% endfor %}
@@ -56,6 +57,6 @@
     </div>
     {% endif %}
 
-    <a class="btn btn-outline-secondary" href="{% url 'inventory export' %}">Export CSV</a>
+    <a class="btn btn-outline-secondary" href="{% url 'inventory export' %}">{% trans "Export CSV" %}</a>
     {% endif %}
 </div>

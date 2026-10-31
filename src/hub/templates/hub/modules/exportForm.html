@@ -1,13 +1,14 @@
+{% load i18n %}
 <div id="exportModalInner">
     <p>
-    Export these items:
+    {% trans "Export these items:" %}
     </p>
     <ul id="exportList">
 
     </ul>
     <form exportForm method="POST" action="./export" id="exportForm">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success" hx-trigger="downloadCSV" hx-target="#download-link" hx-get="./export" >Export</button>
+        <button type="submit" class="btn btn-success" hx-trigger="downloadCSV" hx-target="#download-link" hx-get="./export" >{% trans "Export" %}</button>
         <a id="download-link" style="display: none;"></a>
     </form>
     <script>

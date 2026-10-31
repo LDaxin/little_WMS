@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
@@ -159,19 +160,19 @@ def addStorage(request, typ):
                 try:
                     code = UuidCode.objects.get(code=s["code"].value())
                     if code.used:
-                        return toast(request, "Error", "code is already used", "alert")
+                        return toast(request, _("Error"), _("code is already used"), "alert")
                     code.used = True
                     code.save()
                     storage.code = code
                 except:
-                    return toast(request, "Error", "not valid code", "alert")
+                    return toast(request, _("Error"), _("not valid code"), "alert")
             else:
                 pass
 
             so = storage.save()
             return toast(request, "Add Succses", str(storage) + " was added to your system.", "status", template="hub/modules/itemAdd.html")
-        return toast(request, "Error", "something went wrong", "alert")
-    return toast(request, "Error", "something went wrong", "alert")
+        return toast(request, _("Error"), _("something went wrong"), "alert")
+    return toast(request, _("Error"), _("something went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.delete_all")
@@ -194,7 +195,7 @@ def delStorage(request, typ):
                     return toast(request, "Error", e, "alert")
 
         return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
-    return toast(request, "Error", "something went wrong", "alert")
+    return toast(request, _("Error"), _("something went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.edit_all")
@@ -206,7 +207,7 @@ def updateStorage(request, storageId, typ):
         if form.is_valid():
             form.save()
             return toast(request, "Update", str(storageObject) + " was updated", "status")
-        return toast(request, "Error", "something went wrong", "alert")
+        return toast(request, _("Error"), _("something went wrong"), "alert")
 
 
 def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning="", forceCode=""):

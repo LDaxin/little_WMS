@@ -1,7 +1,8 @@
 
 {% extends "hub/modules/modal.html" %}
+{% load i18n %}
 
-{% block title %}Export{% endblock %}
+{% block title %}{% trans "Export" %}{% endblock %}
 
 {% block body %}
     {% include "hub/modules/exportForm.html" %}

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.core import validators
 from hub import models as hub_models
 from hub.fields import SelfForeignKey
@@ -16,8 +17,8 @@ from organisation.managers import SoftDeleteOrganisationManager
 class StorageType(SoftDeleteObject, models.Model):
     objects = SoftDeleteOrganisationManager()
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    name = models.CharField(max_length=200)
-    symbol = models.CharField(max_length=20)
+    name = models.CharField(_("Name"), max_length=200)
+    symbol = models.CharField(_("Symbol"), max_length=20)
 
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
@@ -36,13 +37,13 @@ class StorageType(SoftDeleteObject, models.Model):
 class Storage(SoftDeleteObject, models.Model):
     objects = SoftDeleteOrganisationManager()
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    name = models.CharField(max_length=200)
-    typ = models.ForeignKey(StorageType, on_delete=models.CASCADE)
-    parent = SelfForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True)
+    name = models.CharField(_("Name"), max_length=200)
+    typ = models.ForeignKey(StorageType, on_delete=models.CASCADE, verbose_name=_("Type"))
+    parent = SelfForeignKey('self', on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_("Parent"))
 
     space = models.OneToOneField(Space,on_delete = models.CASCADE, related_name = "itemStorage", editable = False, blank = True, null = True)
 
-    location = models.ForeignKey("location.Location", on_delete=models.SET_NULL, blank=True, null=True)
+    location = models.ForeignKey("location.Location", on_delete=models.SET_NULL, blank=True, null=True, verbose_name=_("Location"))
 
     tags = models.ManyToManyField(Tag, blank=True, related_name="storages")
 

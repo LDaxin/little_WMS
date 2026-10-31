@@ -1,5 +1,6 @@
+{% load i18n %}
 <div id="auditTimeline" class="p-2 border rounded mb-2">
-    <h6>History</h6>
+    <h6>{% trans "History" %}</h6>
     <ul class="list-group list-group-flush">
         {% for entry in auditLogs %}
         <li class="list-group-item py-1 small">
@@ -9,7 +10,7 @@
             {% if entry.changes %}<div class="text-muted">{{ entry.changes }}</div>{% endif %}
         </li>
         {% empty %}
-        <li class="list-group-item text-muted">No history</li>
+        <li class="list-group-item text-muted">{% trans "No history" %}</li>
         {% endfor %}
     </ul>
 </div>

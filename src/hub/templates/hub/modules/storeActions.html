@@ -1,3 +1,4 @@
+{% load i18n %}
 <div id="storeActions" class="p-2 border rounded mb-2">
     {% if stocks %}
     <ul class="list-group list-group-flush mb-1">
@@ -6,15 +7,15 @@
             <span class="badge text-bg-secondary">{{ stock.stored }} · {{ stock.menge }}</span>
             <button type="button" class="btn btn-sm btn-danger"
                     hx-post="{{ removeUrl }}" hx-vals='{"stock": "{{ stock.pk }}"}'
-                    hx-target="#storeActions" hx-swap="outerHTML">Remove</button>
+                    hx-target="#storeActions" hx-swap="outerHTML">{% trans "Remove" %}</button>
         </li>
         {% endfor %}
     </ul>
     {% else %}
-    <span class="badge text-bg-secondary">Not stored</span>
+    <span class="badge text-bg-secondary">{% trans "Not stored" %}</span>
     {% endif %}
     {% if not_stored %}
-    <div class="small text-warning mt-1">Not stored: {{ not_stored }} — no location assigned.</div>
+    <div class="small text-warning mt-1">{% trans "Not stored:" %} {{ not_stored }} — {% trans "no location assigned." %}</div>
     {% endif %}
     {% if storeError %}
     <div class="text-danger small mt-1">{{ storeError }}</div>
@@ -23,26 +24,26 @@
     <div class="text-warning small mt-1">{{ storeWarning }}
         <button type="button" class="btn btn-sm btn-outline-warning"
                 hx-post="{{ storeUrl }}" hx-vals='{"code": "{{ forceCode }}", "force": "1"}'
-                hx-target="#storeActions" hx-swap="outerHTML">Store anyway</button>
+                hx-target="#storeActions" hx-swap="outerHTML">{% trans "Store anyway" %}</button>
     </div>
     {% endif %}
     {% if defaultLocations %}
-    <div class="small mt-1">Default:
+    <div class="small mt-1">{% trans "Default:" %}
         {% for loc in defaultLocations %}{{ loc }}{% if not forloop.last %}, {% endif %}{% endfor %}
         <button type="button" class="btn btn-sm btn-outline-success"
-                hx-post="{{ storeDefaultUrl }}" hx-target="#storeActions" hx-swap="outerHTML">Store to default</button>
+                hx-post="{{ storeDefaultUrl }}" hx-target="#storeActions" hx-swap="outerHTML">{% trans "Store to default" %}</button>
     </div>
     {% endif %}
     <form class="mt-2" hx-post="{{ storeUrl }}" hx-target="#storeActions" hx-swap="outerHTML">
         {% csrf_token %}
         <div class="input-group input-group-sm">
-            <input id="storeCode" name="code" class="form-control" placeholder="Scan or search target..."
+            <input id="storeCode" name="code" class="form-control" placeholder="{% trans "Scan or search target..." %}"
                    autocomplete="off"
                    hx-get="{{ storeSearchUrl }}" hx-target="#storeResults" hx-swap="innerHTML"
                    hx-trigger="input changed delay:300ms">
-            {% if mergeable %}<input name="amount" type="number" min="1" class="form-control" style="max-width:5rem" placeholder="Qty">{% endif %}
+            {% if mergeable %}<input name="amount" type="number" min="1" class="form-control" style="max-width:5rem" placeholder="{% trans "Qty" %}">{% endif %}
             {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl="./scanner/storeCode/toggle" %}
-            <button type="submit" class="btn btn-success">Store</button>
+            <button type="submit" class="btn btn-success">{% trans "Store" %}</button>
         </div>
         <div id="scannerDivstoreCode"></div>
         <div id="storeResults" class="list-group mt-1"></div>
