@@ -51,3 +51,25 @@ class DashboardTest(TestCase):
             entry_type="maintenance", title="Sharpen", start_date=date.today(), organisation=self.org
         )
         self.assertContains(self.client.get("/dashboard/"), "Maintenance due: Sharpen")
+
+    def test_view_widget_shown(self):
+        from savedviews.models import SavedView
+
+        user = user_with(self.org, "u", "article_view_all")
+        self.client.login(username="u", password="pw")
+        SavedView.objects.create(
+            owner=user, name="My widget", typ="tent", organisation=self.org,
+            show_on_dashboard=True, query={"type": "AND", "conditions": []},
+        )
+        self.assertContains(self.client.get("/dashboard/"), "My widget")
+
+    def test_view_widget_hidden(self):
+        from savedviews.models import SavedView
+
+        user = user_with(self.org, "u", "article_view_all")
+        self.client.login(username="u", password="pw")
+        SavedView.objects.create(
+            owner=user, name="Hidden widget", typ="tent", organisation=self.org,
+            show_on_dashboard=False,
+        )
+        self.assertNotContains(self.client.get("/dashboard/"), "Hidden widget")

@@ -56,6 +56,8 @@ def dashboard(request):
     from organisation.services import active_organisation
     from storage.models import Storage
 
+    import json
+
     organisation = active_organisation(request)
     context = {}
 
@@ -82,6 +84,20 @@ def dashboard(request):
         request.user, "article.move_all", organisation
     ):
         context["quickActions"] = True
+
+    from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+    from savedviews.models import SavedView
+
+    widgets = []
+    for view in SavedView.objects.filter(owner=request.user, show_on_dashboard=True):
+        articles = Article.objects.all()
+        try:
+            articles = articles.filter(parse_json(json.dumps(view.query), ARTICLE_FIELDS))
+        except QueryError:
+            pass
+        widgets.append({"view": view, "articles": articles[:5]})
+    if widgets:
+        context["viewWidgets"] = widgets
 
     return render(request, "hub/dashboard.html", context)
 
