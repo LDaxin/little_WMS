@@ -206,6 +206,45 @@ def articles(request, typ):
                 context["savedQuery"] = json.dumps(saved_view.query)
         return render(request, "hub/modules/items.html", context=context)
 
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articlesAll(request):
+    """List all articles across types."""
+    return render(request, "hub/modules/items.html", context={
+        "symbol": "Logo",
+        "searchFieldName": "articleSearchAll",
+        "type": "article",
+        "name": "",
+        "form": [],
+        "typ": "",
+        "add": False,
+        "del": False,
+        "export": False,
+        "qr": False,
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def searchArticlesAll(request):
+    if request.method == "GET":
+        r = Article.objects.all()
+        query = request.GET.get("query")
+        if query:
+            from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+
+            try:
+                r = r.filter(parse_json(query, ARTICLE_FIELDS))
+            except QueryError:
+                pass
+        elif request.GET.get("search"):
+            search = request.GET["search"]
+            r = r.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
+        r = _scoped_articles(r, request)
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "article"})
+
+
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "create")
 def addArticle(request, typ):

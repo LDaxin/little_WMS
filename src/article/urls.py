@@ -3,6 +3,8 @@ from . import views
 
 
 urlpatterns = [
+    re_path(r'^article/search', views.searchArticlesAll, name="search articles all"),
+    re_path(r'^article/$', views.articlesAll, name="articles all"),
     re_path(r'^composition/(?P<spaceId>[0-9]+)/add', views.addCompositionItem, name="add composition item"),
     re_path(r'^composition/(?P<spaceId>[0-9]+)/remove/(?P<itemId>[0-9]+)', views.removeCompositionItem, name="remove composition item"),
     re_path(r'^composition/(?P<spaceId>[0-9]+)/set-global/(?P<itemId>[0-9]+)', views.setGlobalMinimum, name="set global minimum"),
