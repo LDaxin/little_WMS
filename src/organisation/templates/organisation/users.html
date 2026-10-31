@@ -5,12 +5,23 @@
 
 <table class="table">
     <thead>
-        <tr><th>User</th><th>Role</th></tr>
+        <tr><th>User</th><th>Email</th><th>Role</th></tr>
     </thead>
     <tbody>
         {% for row in rows %}
         <tr>
             <td>{{ row.user }}</td>
+            <td>
+                {% if row.verified %}
+                <span class="badge text-bg-success">verified</span>
+                {% else %}
+                <span class="badge text-bg-secondary">unverified</span>
+                <form method="post" action="{% url 'resend verification' row.user.pk %}" class="d-inline">
+                    {% csrf_token %}
+                    <button class="btn btn-sm btn-outline-secondary">Resend</button>
+                </form>
+                {% endif %}
+            </td>
             <td>
                 <form method="post" action="{% url 'user role' row.user.pk %}" class="d-flex gap-2">
                     {% csrf_token %}

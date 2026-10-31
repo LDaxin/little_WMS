@@ -153,3 +153,24 @@ class OrganisationRequest(models.Model):
     def __str__(self):
         return self.name
 
+
+class EmailVerification(models.Model):
+    """A user's email confirmation state (double opt-in, §30).
+
+    One record per user; a new token is issued on every request.
+    """
+
+    user = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="email_verification")
+    email = models.EmailField()
+    verified = models.BooleanField(default=False)
+    token = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return "%s (%s)" % (self.email, "verified" if self.verified else "unverified")
+

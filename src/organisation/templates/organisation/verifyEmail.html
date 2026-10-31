@@ -1,0 +1,13 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+{% if record %}
+<div class="alert alert-success">
+    Your email address <strong>{{ record.email }}</strong> is now confirmed.
+</div>
+{% else %}
+<div class="alert alert-warning">
+    This confirmation link is invalid.
+</div>
+{% endif %}
+{% endblock %}
