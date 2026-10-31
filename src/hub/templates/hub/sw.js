@@ -1,4 +1,4 @@
-const CACHE = "little-wms-v1";
+const CACHE = "little-wms-v2";
 const ASSETS = [
     "/",
     "/static/hub/bootstrap/css/bootstrap.min.css",
@@ -21,7 +21,13 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
     if (event.request.method !== "GET") return;
+    // Network-first for pages so they are never stale (e.g. after a language
+    // change); cache-first for static assets.
+    if (event.request.mode === "navigate") {
+        event.respondWith(fetch(event.request).catch(() => caches.match("/")));
+        return;
+    }
     event.respondWith(
-        caches.match(event.request).then((cached) => cached || fetch(event.request).catch(() => caches.match("/")))
+        caches.match(event.request).then((cached) => cached || fetch(event.request))
     );
 });

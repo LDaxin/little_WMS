@@ -29,3 +29,18 @@ class UserLanguageTest(TestCase):
         request.user = AnonymousUser()
         UserLanguageMiddleware(lambda r: None)(request)
         self.assertFalse(hasattr(request, "LANGUAGE_CODE"))
+
+
+class LanguageApplyTest(TestCase):
+    def setUp(self):
+        self.org = Organisation.objects.create(name="A", slug="a")
+        self.user = User.objects.create_user("u", password="pw")
+        self.profile = UserProfile.objects.create(user=self.user, organisation=self.org)
+        self.client.login(username="u", password="pw")
+
+    def test_language_applied_after_save(self):
+        self.client.post("/email-preferences/", {"language": "de"})
+        self.profile.refresh_from_db()
+        self.assertEqual(self.profile.language, "de")
+        response = self.client.get("/")
+        self.assertContains(response, "Übersicht")
