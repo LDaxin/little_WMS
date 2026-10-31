@@ -82,6 +82,8 @@ class UserProfile(models.Model):
     user = models.ForeignKey("auth.User", on_delete=models.CASCADE, related_name="profiles")
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=current_organisation_id)
+    # Preferred UI language (§14); empty = the server default.
+    language = models.CharField(max_length=10, blank=True)
 
     class Meta:
         unique_together = ("user", "organisation")
