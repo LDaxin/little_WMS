@@ -1,0 +1,18 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Server settings</h4>
+
+<form method="post" class="d-flex gap-2 align-items-center mb-3">
+    {% csrf_token %}
+    <label class="form-label mb-0">Registration policy</label>
+    <select name="registration_policy" class="form-select" style="max-width:14rem">
+        {% for value, label in policies %}
+        <option value="{{ value }}" {% if settings.registration_policy == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+    </select>
+    <button class="btn btn-primary">Save</button>
+</form>
+
+<a class="btn btn-outline-secondary" href="{% url 'organisation requests' %}">Organisation requests</a>
+{% endblock %}

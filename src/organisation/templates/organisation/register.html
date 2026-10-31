@@ -1,0 +1,28 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Register organisation</h4>
+
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+
+{% if policy == "invite" %}
+<p class="text-muted">Registration is invite-only. Please ask an organisation for an invitation link.</p>
+{% elif policy == "request" %}
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><input name="name" class="form-control" placeholder="Organisation name" required></div>
+    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="Your email" required></div>
+    <div class="mb-2"><textarea name="reason" class="form-control" placeholder="Why do you want to use little_WMS?" required></textarea></div>
+    <button class="btn btn-primary">Send request</button>
+</form>
+{% else %}
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><input name="name" class="form-control" placeholder="Organisation name" required></div>
+    <div class="mb-2"><input name="username" class="form-control" placeholder="Admin username" required></div>
+    <div class="mb-2"><input name="email" type="email" class="form-control" placeholder="Admin email" required></div>
+    <div class="mb-2"><input name="password" type="password" class="form-control" placeholder="Password" required></div>
+    <button class="btn btn-primary">Create organisation</button>
+</form>
+{% endif %}
+{% endblock %}
