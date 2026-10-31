@@ -17,6 +17,11 @@
             {% csrf_token %}
             <button class="btn btn-sm btn-outline-secondary">Return</button>
         </form>
+        {% elif loan.status == "pending" %}
+        <form method="post" action="{% url 'confirm loan' loan.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-success">Confirm</button>
+        </form>
         {% endif %}
     </li>
     {% empty %}
