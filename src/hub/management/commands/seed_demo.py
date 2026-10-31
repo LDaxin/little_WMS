@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from article.models import Article, ArticleBase, ArticleType, Stock
+from location.models import Location
+from occasion.models import Occasion, OccasionTemplate, OccasionType, Packlist
+from planning.models import CalendarEntry
 from space.models import Space
 from storage.models import Storage, StorageType
 from tag.models import Tag
@@ -39,6 +42,32 @@ STORAGES = [
 
 TAGS = ["Sommer", "Winter", "Zeltlager"]
 
+# line1, city, country
+LOCATIONS = [
+    ("Musterstrasse 1", "Musterstadt", "DE"),
+    ("Am See 5", "Waldsee", "DE"),
+]
+
+# name, symbol
+OCCASION_TYPES = [
+    ("Camp", "LA"),
+    ("Trip", "FA"),
+]
+
+# title, type, location, start, end, participants, packlist [(article, qty)]
+OCCASIONS = [
+    ("Sommerlager 2026", "Camp", "Am See 5", "2026-07-01", "2026-07-14", 30,
+     [("Jurte 8P", 4), ("Kuppelzelt 4P", 2), ("Schlafsack", 20)]),
+    ("Herbstfahrt 2026", "Trip", None, "2026-10-10", None, 12,
+     [("Kuppelzelt 4P", 2)]),
+]
+
+# name, type, default packlist [(article, qty)]
+OCCASION_TEMPLATES = [
+    ("Standard Sommerlager", "Camp",
+     [("Jurte 8P", 4), ("Kuppelzelt 4P", 2), ("Schlafsack", 20)]),
+]
+
 
 class Command(BaseCommand):
     help = "Create a small realistic demo dataset (idempotent)."
@@ -48,7 +77,11 @@ class Command(BaseCommand):
         article_types = self._article_types()
         storages = self._storage_types_and_storages()
         self._tags()
-        self._articles(article_types, storages)
+        articles = self._articles(article_types, storages)
+        locations = self._locations()
+        occasion_types = self._occasion_types()
+        self._occasions(occasion_types, locations, articles)
+        self._occasion_templates(occasion_types, articles)
 
         self.stdout.write(self.style.SUCCESS("Demo data ready."))
         self.stdout.write(
@@ -56,8 +89,12 @@ class Command(BaseCommand):
             % (ArticleType.objects.count(), ArticleBase.objects.count(), Article.objects.count())
         )
         self.stdout.write(
-            "  StorageType %d  Storage %d  Tag %d"
-            % (StorageType.objects.count(), Storage.objects.count(), Tag.objects.count())
+            "  StorageType %d  Storage %d  Tag %d  Location %d"
+            % (StorageType.objects.count(), Storage.objects.count(), Tag.objects.count(), Location.objects.count())
+        )
+        self.stdout.write(
+            "  OccasionType %d  Occasion %d  OccasionTemplate %d"
+            % (OccasionType.objects.count(), Occasion.objects.count(), OccasionTemplate.objects.count())
         )
 
     def _user(self):
@@ -94,6 +131,7 @@ class Command(BaseCommand):
 
     def _articles(self, article_types, storages):
         targets = [storages["Fach A"], storages["Fach B"]]
+        articles = {}
         index = 0
         for type_name, names in ARTICLES.items():
             article_type = article_types[type_name]
@@ -111,4 +149,56 @@ class Command(BaseCommand):
                         stored=targets[index % len(targets)].space,
                         menge=1,
                     )
+                articles[name] = article
                 index += 1
+        return articles
+
+    def _locations(self):
+        locations = {}
+        for line1, city, country in LOCATIONS:
+            locations[line1], _ = Location.objects.get_or_create(
+                line1=line1, defaults={"city": city, "country": country}
+            )
+        return locations
+
+    def _occasion_types(self):
+        types = {}
+        for name, symbol in OCCASION_TYPES:
+            types[name], _ = OccasionType.objects.get_or_create(
+                name=name, defaults={"symbol": symbol}
+            )
+        return types
+
+    def _occasions(self, occasion_types, locations, articles):
+        for title, type_name, location_name, start, end, participants, packlist in OCCASIONS:
+            entry, _ = CalendarEntry.objects.get_or_create(
+                title=title,
+                defaults={"entry_type": "occasion", "start_date": start, "end_date": end},
+            )
+            occasion, _ = Occasion.objects.get_or_create(
+                calendar_entry=entry,
+                defaults={
+                    "occasion_type": occasion_types[type_name],
+                    "location": locations.get(location_name),
+                    "participant_count": participants,
+                },
+            )
+            for article_name, quantity in packlist:
+                Packlist.objects.get_or_create(
+                    occasion=occasion,
+                    article=articles[article_name],
+                    defaults={"quantity": quantity},
+                )
+
+    def _occasion_templates(self, occasion_types, articles):
+        for name, type_name, packlist in OCCASION_TEMPLATES:
+            OccasionTemplate.objects.get_or_create(
+                name=name,
+                defaults={
+                    "occasion_type": occasion_types[type_name],
+                    "default_packlist": [
+                        {"article": articles[article_name].pk, "quantity": quantity}
+                        for article_name, quantity in packlist
+                    ],
+                },
+            )
