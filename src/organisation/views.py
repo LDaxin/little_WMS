@@ -4,12 +4,13 @@ from datetime import timedelta
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from organisation.decorators import require_perm
-from organisation.models import Invitation, Organisation, Role, UserProfile
+from organisation.models import Invitation, Organisation, OrganisationRequest, Role, UserProfile
 from organisation.permissions import PERMISSIONS
 from organisation.services import active_organisation, set_active_organisation
 
@@ -243,3 +244,121 @@ def inviteAccept(request, token):
             return redirect("hub")
     return render(request, "organisation/inviteAccept.html",
                   {"invitation": invitation, "error": error})
+
+
+def _registration_policy():
+    from hub.models import Settings
+
+    settings = Settings.objects.first()
+    return settings.registration_policy if settings else "invite"
+
+
+def _unique_slug(name):
+    from django.utils.text import slugify
+
+    base = slugify(name) or "org"
+    slug = base
+    n = 1
+    while Organisation.objects.filter(slug=slug).exists():
+        n += 1
+        slug = "%s-%s" % (base, n)
+    return slug
+
+
+def _create_organisation(name):
+    """Create an organisation with a role holding every permission (§23)."""
+    from organisation.permissions import all_codenames
+
+    organisation = Organisation.objects.create(name=name, slug=_unique_slug(name))
+    role = Role.objects.create(organisation=organisation, name="Admin")
+    role.permissions.set(Permission.objects.filter(codename__in=all_codenames()))
+    return organisation
+
+
+def registerOrganisation(request):
+    """Public registration page, following the server policy (§23)."""
+    policy = _registration_policy()
+    error = ""
+    if policy == "open" and request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        username = request.POST.get("username", "").strip()
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
+        if not name or not username or not email or not password:
+            error = "All fields are required."
+        elif User.objects.filter(username=username).exists():
+            error = "That username is already taken."
+        else:
+            organisation = _create_organisation(name)
+            user = User.objects.create_user(username, email, password)
+            UserProfile.objects.create(
+                user=user, organisation=organisation, role=organisation.roles.get(name="Admin")
+            )
+            login(request, user)
+            set_active_organisation(request, organisation)
+            return redirect("hub")
+    elif policy == "request" and request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        email = request.POST.get("email", "").strip()
+        reason = request.POST.get("reason", "").strip()
+        if not name or not email or not reason:
+            error = "Name, email, and reason are required."
+        else:
+            OrganisationRequest.objects.create(name=name, email=email, reason=reason)
+            return render(request, "organisation/registerRequested.html", {"name": name})
+    return render(request, "organisation/register.html", {"policy": policy, "error": error})
+
+
+@login_required(login_url='/accounts/login/')
+def organisationRequests(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    return render(request, "organisation/organisationRequests.html", {
+        "requests": OrganisationRequest.objects.all(),
+    })
+
+
+@login_required(login_url='/accounts/login/')
+def organisationRequestReview(request, requestId):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    organisation_request = get_object_or_404(OrganisationRequest, pk=requestId)
+    action = request.POST.get("action")
+    if action == "approve":
+        organisation = _create_organisation(organisation_request.name)
+        Invitation.objects.create(
+            organisation=organisation,
+            email=organisation_request.email,
+            role=organisation.roles.get(name="Admin"),
+            invited_by=request.user,
+        )
+        organisation_request.status = "approved"
+    elif action == "reject":
+        organisation_request.status = "rejected"
+    organisation_request.reviewed_by = request.user
+    organisation_request.reviewed_at = timezone.now()
+    organisation_request.save()
+    return redirect("organisation requests")
+
+
+@login_required(login_url='/accounts/login/')
+def serverSettings(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    from hub.models import Settings
+
+    settings = Settings.objects.first() or Settings.objects.create()
+    if request.method == "POST":
+        policy = request.POST.get("registration_policy")
+        if policy in dict(Settings.REGISTRATION_POLICY_CHOICES):
+            settings.registration_policy = policy
+            settings.save()
+        return redirect("server settings")
+    return render(request, "organisation/serverSettings.html", {
+        "settings": settings,
+        "policies": Settings.REGISTRATION_POLICY_CHOICES,
+    })

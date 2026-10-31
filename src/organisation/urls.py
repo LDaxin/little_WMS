@@ -16,4 +16,8 @@ urlpatterns = [
     path("invitations/create/", views.inviteCreate, name="invite create"),
     path("invitations/<int:invitationId>/revoke/", views.inviteRevoke, name="invite revoke"),
     path("invite/<str:token>/", views.inviteAccept, name="invite accept"),
+    path("register/", views.registerOrganisation, name="register organisation"),
+    path("organisation-requests/", views.organisationRequests, name="organisation requests"),
+    path("organisation-requests/<int:requestId>/review/", views.organisationRequestReview, name="organisation request review"),
+    path("server-settings/", views.serverSettings, name="server settings"),
 ]

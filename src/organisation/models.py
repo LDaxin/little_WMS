@@ -126,3 +126,29 @@ class Invitation(models.Model):
 
     def __str__(self):
         return "Invitation to %s" % self.organisation
+
+
+class OrganisationRequest(models.Model):
+    """A request to create a new organisation (§23).
+
+    Used when the server registration policy is "request"; a server admin
+    approves or rejects it.
+    """
+
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    ]
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    reason = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
+    created_at = models.DateTimeField(auto_now_add=True)
+    reviewed_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
