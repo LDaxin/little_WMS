@@ -1,5 +1,5 @@
 """Read-only API viewsets (§7a)."""
-from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from api.serializers import (
     ArticleBaseSerializer,
@@ -34,7 +34,7 @@ class ArticleBaseViewSet(ReadOnlyModelViewSet):
     permission_area = "article"
 
 
-class ArticleTypeViewSet(ReadOnlyModelViewSet):
+class ArticleTypeViewSet(ModelViewSet):
     queryset = ArticleType.objects.all()
     serializer_class = ArticleTypeSerializer
     permission_area = "article"
@@ -46,19 +46,19 @@ class StorageViewSet(ReadOnlyModelViewSet):
     permission_area = "storage"
 
 
-class StorageTypeViewSet(ReadOnlyModelViewSet):
+class StorageTypeViewSet(ModelViewSet):
     queryset = StorageType.objects.all()
     serializer_class = StorageTypeSerializer
     permission_area = "storage"
 
 
-class LocationViewSet(ReadOnlyModelViewSet):
+class LocationViewSet(ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
     permission_area = "location"
 
 
-class TagViewSet(ReadOnlyModelViewSet):
+class TagViewSet(ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_area = "tag"

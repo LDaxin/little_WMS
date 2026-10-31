@@ -26,6 +26,7 @@ class ArticleTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArticleType
         fields = "__all__"
+        read_only_fields = ["code", "organisation"]
 
 
 class StorageSerializer(serializers.ModelSerializer):
@@ -38,18 +39,21 @@ class StorageTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = StorageType
         fields = "__all__"
+        read_only_fields = ["code", "organisation"]
 
 
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = "__all__"
+        read_only_fields = ["code", "organisation"]
 
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = "__all__"
+        read_only_fields = ["code", "organisation"]
 
 
 class SpaceSerializer(serializers.ModelSerializer):
