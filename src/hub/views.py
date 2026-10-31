@@ -23,6 +23,26 @@ def hub(request):
     return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Movement', 'Article', 'Storage', "Code"], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
 
 
+def manifest(request):
+    """Web app manifest (§34)."""
+    return JsonResponse({
+        "name": "little_WMS",
+        "short_name": "little_WMS",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#0d6efd",
+        "icons": [
+            {"src": "/static/hub/symbols/Logo.svg", "sizes": "any", "type": "image/svg+xml"},
+        ],
+    })
+
+
+def serviceWorker(request):
+    """Service worker caching the app shell (§34)."""
+    return render(request, "hub/sw.js", content_type="application/javascript")
+
+
 @login_required(login_url='/accounts/login/')
 def dashboard(request):
     """Command center with permission-gated widgets (§24)."""
