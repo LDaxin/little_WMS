@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "reports.apps.ReportsConfig",
     "querybuilder.apps.QuerybuilderConfig",
     "savedviews.apps.SavedviewsConfig",
+    "security.apps.SecurityConfig",
     "api.apps.ApiConfig",
     "softdelete",
     "django.contrib.admin",
@@ -171,3 +172,12 @@ GRAPH_MODELS = {
     "all_applications": False,
     "group_models": True,
 }
+
+# Security (§29): enable HTTPS-related settings when SECURE_HTTPS is set.
+if os.environ.get("SECURE_HTTPS"):
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

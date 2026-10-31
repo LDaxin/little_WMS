@@ -8,6 +8,7 @@
              <h2 class="mt-2 mb-2">Welcome!</h2>
        </div>
        <div class="card-body">
+         {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
          <form method="post">
              {% csrf_token %}
              <div class="mb-3">
