@@ -36,6 +36,10 @@ class ParserTest(TestCase):
         q = parse({"field": "zustand", "op": "ne", "value": "kaputt"}, ARTICLE_FIELDS)
         self.assertEqual(q, ~Q(zustand__exact="kaputt"))
 
+    def test_negated_condition(self):
+        q = parse({"field": "base__name", "op": "contains", "value": "Tent", "negate": True}, ARTICLE_FIELDS)
+        self.assertEqual(q, ~Q(base__name__icontains="Tent"))
+
     def test_unknown_field(self):
         with self.assertRaises(QueryError):
             parse({"field": "nope", "op": "eq", "value": "x"}, ARTICLE_FIELDS)

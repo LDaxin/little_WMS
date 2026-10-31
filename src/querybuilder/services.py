@@ -46,7 +46,10 @@ OPERATORS = {
 NEGATED = {"ne", "empty", "is_false"}
 
 
-def _condition(field, op, value, fields):
+def _condition(node, fields):
+    field = node.get("field")
+    op = node.get("op")
+    value = node.get("value")
     if field not in fields:
         raise QueryError("unknown field: %s" % field)
     field_type = fields[field]
@@ -60,7 +63,7 @@ def _condition(field, op, value, fields):
     elif op == "is_false":
         value = False
     q = Q(**{"%s__%s" % (field, lookup): value})
-    if op in NEGATED:
+    if op in NEGATED or node.get("negate"):
         q = ~q
     return q
 
@@ -83,7 +86,7 @@ def parse(node, fields):
         if node.get("negate"):
             q = ~q
         return q
-    return _condition(node.get("field"), node.get("op"), node.get("value"), fields)
+    return _condition(node, fields)
 
 
 def parse_json(text, fields):

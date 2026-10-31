@@ -109,6 +109,13 @@ function qbRenderCondition(cond, parent, index) {
     del.onclick = () => qbRemove(parent, index);
     row.appendChild(del);
 
+    const not = document.createElement("button");
+    not.type = "button";
+    not.className = "btn btn-sm py-0 " + (cond.negate ? "btn-danger" : "btn-outline-danger");
+    not.textContent = "NOT";
+    not.onclick = () => { cond.negate = !cond.negate; qbRender(); };
+    row.appendChild(not);
+
     return row;
 }
 
