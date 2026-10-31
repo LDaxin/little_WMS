@@ -1,6 +1,7 @@
 
 <form method="POST" action="./{{id}}/{{ actionType }}" id="{{id}}{{ actionType }}Form">
     {% csrf_token %}
+    <input type="hidden" name="version" value="{{ version }}">
 
     {% for p_form in form %}
         {% for field in p_form %}

@@ -86,6 +86,7 @@ def article(request, typ, articleId):
             "typ":typ,
             "code":p.code.code if p.code else "",
             "link":("/a/" + p.code.code) if p.code else "",
+            "version":p.version,
             "storeActions":True,
             "articleCalendar":True,
             "articleTerms":_article_terms(p),
@@ -355,6 +356,9 @@ def updateArticle(request, typ, articleId):
         return toast(request, "Error", "no article type named " + typ, "alert")
     else:
         if request.method == "POST":
+            loaded_version = request.POST.get("version")
+            if loaded_version is not None and loaded_version.isdigit() and int(loaded_version) != articleObject.version:
+                return toast(request, "Error", "The article was changed by someone else. Please reload.", "alert")
             old_values = _snapshot(articleObject)
             articleBaseForm = FormArticleBase(request.POST, instance=articleObject.base, prefix="base", article_type=articleTypeObject)
             articleForm =  FormChangeArticle(request.POST, instance=articleObject, prefix="article", article_type=articleTypeObject)
@@ -373,6 +377,8 @@ def updateArticle(request, typ, articleId):
                     article.delete()
                     return toast(request, "Delete", "article was deleted (menge 0)", "status")
                 article.save()
+                article.version += 1
+                article.save(update_fields=["version"])
                 audit_log("updated", article, request.user, _diff(old_values, _snapshot(article)))
                 if menge is not None:
                     stock, _ = Stock.objects.get_or_create(
