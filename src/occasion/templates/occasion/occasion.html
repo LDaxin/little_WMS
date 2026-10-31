@@ -48,6 +48,12 @@
     <button class="btn btn-outline-secondary">Save as template</button>
 </form>
 
+<form method="post" action="{% url 'duplicate occasion' occasion.pk %}" class="d-flex gap-2 align-items-center mb-3">
+    {% csrf_token %}
+    <input name="shift_days" type="number" class="form-control" style="max-width:9rem" placeholder="Shift days" value="0">
+    <button class="btn btn-outline-secondary">Duplicate</button>
+</form>
+
 <form method="post" action="{% url 'delete occasion' occasion.pk %}" onsubmit="return confirm('Delete this occasion?');">
     {% csrf_token %}
     <button class="btn btn-outline-danger">Delete occasion</button>

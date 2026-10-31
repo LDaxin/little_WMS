@@ -17,6 +17,7 @@ urlpatterns = [
     path("occasions/<int:occasionId>/delete/", views.delOccasion, name="delete occasion"),
     path("occasions/<int:occasionId>/save-template/", views.saveOccasionAsTemplate, name="save occasion as template"),
     path("occasions/<int:occasionId>/repeat/", views.repeatOccasion, name="repeat occasion"),
+    path("occasions/<int:occasionId>/duplicate/", views.duplicateOccasion, name="duplicate occasion"),
     path("occasions/<int:occasionId>/packlist/add/", views.packlistAdd, name="packlist add"),
     path("occasions/<int:occasionId>/packlist/search/", views.packlistSearch, name="packlist search"),
     path("occasions/<int:occasionId>/packlist/<int:entryId>/status/", views.packlistStatus, name="packlist status"),
