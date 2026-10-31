@@ -9,7 +9,7 @@ urlpatterns = [
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/update', views.updateArticle, name="update article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store-default', views.storeToDefault, name="store article to default"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store-search', views.storeTargetSearch, name="store target search"),
-    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store', views.storeArticle, name="store article"),
+    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/maintenance', views.addMaintenance, name="add maintenance"),    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/store', views.storeArticle, name="store article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/remove', views.removeArticle, name="remove article"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/tags/add', views.addArticleTag, name="add article tag"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/tags/remove/(?P<tagId>[0-9]+)', views.removeArticleTag, name="remove article tag"),

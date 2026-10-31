@@ -49,6 +49,7 @@ class CalendarEntry(SoftDeleteObject, models.Model):
     notes = models.TextField(blank=True)
     responsible_user = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     recurrence_rule = models.ForeignKey(RecurrenceRule, null=True, blank=True, on_delete=models.SET_NULL, related_name="entries")
+    article = models.ForeignKey("article.Article", null=True, blank=True, on_delete=models.CASCADE, related_name="calendar_entries")
 
     class Meta:
         ordering = ["start_date", "id"]

@@ -10,4 +10,10 @@
         <li class="list-group-item text-muted">No terms</li>
         {% endfor %}
     </ul>
+    <form method="post" action="{% url 'add maintenance' typ id %}" class="d-flex gap-2 mt-2">
+        {% csrf_token %}
+        <input name="title" class="form-control form-control-sm" placeholder="Maintenance" style="max-width:14rem">
+        <input name="due_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
+        <button class="btn btn-sm btn-outline-secondary">Add maintenance</button>
+    </form>
 </div>
