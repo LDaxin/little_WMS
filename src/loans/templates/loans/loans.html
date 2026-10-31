@@ -1,0 +1,26 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Loans</h4>
+
+<ul class="list-group">
+    {% for loan in loans %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            <a href="{% url 'article' loan.article.base.pType.name loan.article.pk %}">{{ loan.article.base.name }}</a>
+            &rarr; {{ loan.borrower_name }}
+            <small class="text-muted">{{ loan.calendar_entry.start_date }}{% if loan.calendar_entry.end_date %} &ndash; {{ loan.calendar_entry.end_date }}{% endif %}</small>
+            <span class="badge text-bg-secondary">{{ loan.get_status_display }}</span>
+        </span>
+        {% if loan.status == "active" %}
+        <form method="post" action="{% url 'return loan' loan.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-secondary">Return</button>
+        </form>
+        {% endif %}
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">No loans</li>
+    {% endfor %}
+</ul>
+{% endblock %}

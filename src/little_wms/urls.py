@@ -24,6 +24,7 @@ urlpatterns = [
     path('', include("hub.urls")),
     path('', include("organisation.urls")),
     path('', include("tag.urls")),
+    path('', include("loans.urls")),
     path('', include("article.urls")),
     path('', include("storage.urls")),
     path('', include("movement.urls")),
