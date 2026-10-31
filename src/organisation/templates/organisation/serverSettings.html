@@ -15,4 +15,17 @@
 </form>
 
 <a class="btn btn-outline-secondary" href="{% url 'organisation requests' %}">Organisation requests</a>
+
+<h5 class="mt-4">Email</h5>
+{% if email_configured %}
+<p class="mb-2">Status: <span class="badge text-bg-success">SMTP configured</span> ({{ email_host }})</p>
+{% else %}
+<p class="mb-2">Status: <span class="badge text-bg-secondary">not configured</span> &mdash; set the <code>EMAIL_*</code> variables in <code>.env</code>.</p>
+{% endif %}
+<form method="post" class="d-flex gap-2 align-items-center">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="test_email">
+    <button class="btn btn-outline-secondary">Send test email</button>
+    {% if test_result %}<span class="text-muted">{{ test_result }}</span>{% endif %}
+</form>
 {% endblock %}

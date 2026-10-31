@@ -1,7 +1,8 @@
 from datetime import timedelta
 
 from django.contrib.auth.models import Permission, User
-from django.test import TestCase
+from django.core import mail
+from django.test import TestCase, override_settings
 from django.utils import timezone
 
 from organisation.models import Invitation, Organisation, Role, UserProfile
@@ -58,6 +59,23 @@ class InviteCreateTest(TestCase):
         self.client.post(f"/invitations/{invitation.pk}/revoke/")
         invitation.refresh_from_db()
         self.assertEqual(invitation.status, "revoked")
+
+    @override_settings(EMAIL_CONFIGURED=True)
+    def test_invitation_with_email_sends_link(self):
+        self.client.post("/invitations/create/", {"email": "new@example.com", "days": "3"})
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to, ["new@example.com"])
+        self.assertIn("/invite/", mail.outbox[0].body)
+
+    def test_invitation_without_email_sends_nothing(self):
+        self.client.post("/invitations/create/", {"days": "3"})
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(EMAIL_CONFIGURED=False)
+    def test_invitation_email_skipped_when_not_configured(self):
+        self.client.post("/invitations/create/", {"email": "new@example.com"})
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertTrue(Invitation.objects.filter(email="new@example.com").exists())
 
 
 class InviteAcceptTest(TestCase):
