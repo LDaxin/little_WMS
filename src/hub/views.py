@@ -23,6 +23,49 @@ def hub(request):
     return render(request, "hub/hub.html", context={"symbol":"Logo", "fields":['Movement', 'Article', 'Storage', "Code"], "paType":ar.ArticleType.objects.all(), "stType":st.StorageType.objects.all()})
 
 
+@login_required(login_url='/accounts/login/')
+def dashboard(request):
+    """Command center with permission-gated widgets (§24)."""
+    from datetime import date
+
+    from article.models import Article
+    from audit.models import AuditLog
+    from notifications.checks import run_checks
+    from occasion.models import Occasion
+    from organisation.permissions import has_perm
+    from organisation.services import active_organisation
+    from storage.models import Storage
+
+    organisation = active_organisation(request)
+    context = {}
+
+    if has_perm(request.user, "occasion.view_all", organisation):
+        context["upcomingOccasions"] = Occasion.objects.filter(
+            calendar_entry__start_date__gte=date.today()
+        ).order_by("calendar_entry__start_date")[:5]
+
+    if has_perm(request.user, "notification.view_all", organisation):
+        context["unreadNotifications"] = request.user.notifications.filter(is_read=False)[:5]
+
+    if has_perm(request.user, "article.view_all", organisation):
+        context["alerts"] = list(run_checks(organisation))[:10]
+        context["recentActivity"] = AuditLog.objects.all()[:5]
+
+    if has_perm(request.user, "settings.view_all", organisation):
+        context["statistics"] = {
+            "articles": Article.objects.count(),
+            "storages": Storage.objects.count(),
+            "occasions": Occasion.objects.count(),
+        }
+
+    if has_perm(request.user, "article.create_all", organisation) or has_perm(
+        request.user, "article.move_all", organisation
+    ):
+        context["quickActions"] = True
+
+    return render(request, "hub/dashboard.html", context)
+
+
 def _soft_delete_models():
     from django.apps import apps
 
