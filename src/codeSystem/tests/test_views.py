@@ -1,6 +1,5 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.utils.datastructures import MultiValueDictKeyError
 
 from article.models import Article, ArticleBase, ArticleType
 from codeSystem.models import UuidCode
@@ -22,14 +21,10 @@ class CodeSystemViewTest(TestCase):
             with self.subTest(url=url):
                 self.assertEqual(self.client.get(url).status_code, 200)
 
-    def test_add_modal_url_is_shadowed(self):
-        # Characterization: `^code/add` is registered before `^code/add/modal`,
-        # so GET /code/add/modal is routed to addCode and raises
-        # MultiValueDictKeyError (HTTP 500). The addModal view is unreachable.
-        with self.assertRaises(MultiValueDictKeyError), self.assertLogs(
-            "django.request", level="ERROR"
-        ):
-            self.client.get("/code/add/modal")
+    def test_add_modal_url_reachable(self):
+        # `^code/add$` is anchored, so GET /code/add/modal reaches addModal
+        # instead of being shadowed by addCode.
+        self.assertEqual(self.client.get("/code/add/modal").status_code, 200)
 
     def test_requires_login(self):
         self.client.logout()
