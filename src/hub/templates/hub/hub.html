@@ -12,50 +12,50 @@
         <div class="col-6 col-sm-4 p-2">
             <a class="card-block text-decorations-none" href="article/{{t.name|lower}}">
                 <div class="card p-2 justify-content-between align-items-center">
-                    <div class"=card-body ">
+                    <div class="card-body text-center">
                         <img style="width:100px" src="{% static 'hub/symbols/'|add:t.symbol|add:'.svg' %}">
+                        <div class="small">{{ t.name }}</div>
                     </div>
                 </div>
             </a>
-        </div> 
-
+        </div>
         {% endfor %}
 
         {% elif l == "Storage" %}
 
         {% for t in stType %}
         <div class="col-6 col-sm-4 p-2">
-
             <a class="card-block text-decorations-none" href="storage/{{t.name|lower}}">
                 <div class="card p-2 justify-content-between align-items-center">
-                    <div class"=card-body ">
+                    <div class="card-body text-center">
                         <img style="width:100px" src="{% static 'hub/symbols/'|add:t.symbol|add:'.svg' %}">
+                        <div class="small">{{ t.name }}</div>
                     </div>
                 </div>
             </a>
-        </div> 
-
+        </div>
         {% endfor %}
 
         {% else %}
         <div class="col-6 col-sm-4 p-2">
-
             <a class="card-block text-decorations-none" href="{{l|lower}}">
                 <div class="card p-2 justify-content-between align-items-center">
-                    <div class"=card-body ">
+                    <div class="card-body text-center">
                         <img style="width:100px" src="{% static 'hub/symbols/'|add:l|add:'.svg' %}">
+                        <div class="small">{{ l }}</div>
                     </div>
                 </div>
             </a>
-        </div> 
+        </div>
         {% endif %}
     {% endfor %}
 
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/occasions/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/List.svg' %}">
+                    <div class="small">Occasions</div>
                 </div>
             </div>
         </a>
@@ -64,8 +64,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/calendar/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Grid.svg' %}">
+                    <div class="small">Calendar</div>
                 </div>
             </div>
         </a>
@@ -74,8 +75,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/trash/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Remove.svg' %}">
+                    <div class="small">Trash</div>
                 </div>
             </div>
         </a>
@@ -84,8 +86,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/configuration/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Setting.svg' %}">
+                    <div class="small">Configuration</div>
                 </div>
             </div>
         </a>
@@ -94,8 +97,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/dashboard/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Menu.svg' %}">
+                    <div class="small">Dashboard</div>
                 </div>
             </div>
         </a>
@@ -104,8 +108,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/loans/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Hand.svg' %}">
+                    <div class="small">Loans</div>
                 </div>
             </div>
         </a>
@@ -114,8 +119,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/lendings/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Store.svg' %}">
+                    <div class="small">Lendings</div>
                 </div>
             </div>
         </a>
@@ -124,8 +130,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/reports/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Grid.svg' %}">
+                    <div class="small">Reports</div>
                 </div>
             </div>
         </a>
@@ -134,8 +141,9 @@
     <div class="col-6 col-sm-4 p-2">
         <a class="card-block text-decorations-none" href="/views/">
             <div class="card p-2 justify-content-between align-items-center">
-                <div class="card-body">
+                <div class="card-body text-center">
                     <img style="width:100px" src="{% static 'hub/symbols/Search.svg' %}">
+                    <div class="small">My Views</div>
                 </div>
             </div>
         </a>
