@@ -80,3 +80,9 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-022 | `hub/modules/storeActions.html`, `hub/modules/storageContents.html`, `occasion/packlist.html` | The live-search input had no own `hx-swap`, so it inherited `hx-swap="outerHTML"` from the surrounding `<form>` → the first search **replaced** `#storeResults`/`#packlistResults` instead of filling it, so every later keystroke found no target and the dropdown stopped updating ("works only once") | ✅ fixed | 3.2 | `article/tests/test_store_search.py`, `storage/tests/test_store_search.py`, `occasion/tests/test_occasions.py` |
+
+## Frontend / Assets
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-023 | `hub/templates/hub/header.html` | Loaded `bootstrap.min.js` (non-bundle), which expects a global `Popper` that was never loaded → every Bootstrap dropdown (and tooltip/popover) threw `TypeError: Bootstrap's dropdowns require Popper` and never opened. Also the `html5-qrcode` `<script>` tag had no closing `</script>`, so the following `select2` script was swallowed and never loaded. | ✅ fixed | 3.3 | – |
