@@ -8,7 +8,6 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('article', '0009_article_loan_requires_confirmation_article_ownership'),
         ('loans', '0001_initial'),
         ('organisation', '0012_organisationrequest_invitation'),
     ]
@@ -18,36 +17,6 @@ class Migration(migrations.Migration):
             model_name='loan',
             name='status',
             field=models.CharField(choices=[('pending', 'Pending'), ('active', 'Active'), ('returned', 'Returned')], default='active', max_length=10),
-        ),
-        migrations.CreateModel(
-            name='LoanOffer',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(blank=True, db_index=True, default=None, editable=False, null=True)),
-                ('name', models.CharField(max_length=200)),
-                ('requires_confirmation', models.BooleanField(default=True)),
-                ('lender_organisation', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='loan_offers', to='organisation.organisation')),
-                ('organisation', models.ForeignKey(default=organisation.current.current_organisation_id, on_delete=django.db.models.deletion.CASCADE, to='organisation.organisation')),
-            ],
-            options={
-                'permissions': (('can_undelete', 'Can undelete this object'),),
-                'abstract': False,
-            },
-        ),
-        migrations.CreateModel(
-            name='LoanOfferItem',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('deleted_at', models.DateTimeField(blank=True, db_index=True, default=None, editable=False, null=True)),
-                ('requires_confirmation', models.BooleanField(blank=True, null=True)),
-                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='article.article')),
-                ('offer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='items', to='loans.loanoffer')),
-                ('organisation', models.ForeignKey(default=organisation.current.current_organisation_id, on_delete=django.db.models.deletion.CASCADE, to='organisation.organisation')),
-            ],
-            options={
-                'permissions': (('can_undelete', 'Can undelete this object'),),
-                'abstract': False,
-            },
         ),
         migrations.CreateModel(
             name='OrganisationMembership',
