@@ -24,6 +24,8 @@ DEFAULT_ARTICLE_TYPES = [
     ("sport", "SP", False),
     ("tech", "TE", False),
     ("box", "KI", True),
+    ("container", "CO", True),
+    ("vehicle", "FZ", True),
     ("consumable", "VB", False),
     ("other", "SO", False),
 ]
@@ -33,8 +35,6 @@ DEFAULT_STORAGE_TYPES = [
     ("shelf", "RE"),
     ("compartment", "FA"),
     ("cabinet", "SC"),
-    ("container", "CO"),
-    ("vehicle", "FZ"),
 ]
 
 
