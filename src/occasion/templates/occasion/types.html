@@ -1,22 +1,23 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Occasion types</h4>
+<h4>{% trans "Occasion types" %}</h4>
 
 <ul class="list-group mb-3">
     {% for t in types %}
     <li class="list-group-item">{{ t.name }}</li>
     {% empty %}
-    <li class="list-group-item text-muted">None yet</li>
+    <li class="list-group-item text-muted">{% trans "None yet" %}</li>
     {% endfor %}
 </ul>
 
 <form method="post" action="{% url 'add occasion type' %}" class="d-flex gap-2">
     {% csrf_token %}
-    <input name="name" class="form-control" placeholder="Name" style="max-width:16rem">
-    <input name="symbol" class="form-control" placeholder="Symbol" style="max-width:8rem">
-    <button class="btn btn-primary">Add</button>
+    <input name="name" class="form-control" placeholder="{% trans "Name" %}" style="max-width:16rem">
+    <input name="symbol" class="form-control" placeholder="{% trans "Symbol" %}" style="max-width:8rem">
+    <button class="btn btn-primary">{% trans "Add" %}</button>
 </form>
 
-<a class="btn btn-outline-secondary mt-3" href="{% url 'occasions' %}">Back to occasions</a>
+<a class="btn btn-outline-secondary mt-3" href="{% url 'occasions' %}">{% trans "Back to occasions" %}</a>
 {% endblock %}

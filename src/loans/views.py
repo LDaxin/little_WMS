@@ -1,4 +1,5 @@
 """Loans (§20)."""
+from django.utils.translation import gettext as _
 from datetime import date
 
 from django.contrib.auth.decorators import login_required

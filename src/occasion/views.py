@@ -1,4 +1,5 @@
 """Occasion system (§2): plan material for an event with a packlist."""
+from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import HttpResponseNotFound

@@ -1,15 +1,16 @@
+{% load i18n %}
 <div id="queryBuilder" class="p-2 border rounded mb-2" style="display:none">
     <div class="d-flex justify-content-between align-items-center">
-        <strong>Advanced search</strong>
+        <strong>{% trans "Advanced search" %}</strong>
         <button type="button" class="btn-close" onclick="qbToggle()"></button>
     </div>
     <div id="qbRoot" class="mt-2"></div>
     <form id="qbForm" hx-get="./search" hx-target="#results" class="mt-2 d-flex gap-2">
         <input type="hidden" name="query" id="qbQueryInput">
-        <button type="button" class="btn btn-sm btn-outline-primary" onclick="qbAddCondition(qbState)">+ Condition</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbAddGroup(qbState)">+ Group</button>
-        <button class="btn btn-sm btn-success">Apply</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbClear()">Clear</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" onclick="qbAddCondition(qbState)">+ {% trans "Condition" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbAddGroup(qbState)">+ {% trans "Group" %}</button>
+        <button class="btn btn-sm btn-success">{% trans "Apply" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbClear()">{% trans "Clear" %}</button>
     </form>
     <form method="post" action="/views/save/" class="mt-2 d-flex gap-2 align-items-center"
           onsubmit="document.getElementById('qbSaveQuery').value = JSON.stringify(qbState);">
@@ -17,29 +18,29 @@
         <input type="hidden" name="query" id="qbSaveQuery">
         <input type="hidden" name="typ" value="{{ name }}">
         <input type="hidden" name="next" value="{{ request.path }}">
-        <input name="name" class="form-control form-control-sm" placeholder="View name" style="max-width:14rem">
-        <label class="form-check-label d-flex align-items-center gap-1"><input type="checkbox" name="is_shared" class="form-check-input"> Share</label>
-        <button class="btn btn-sm btn-outline-primary">Save as View</button>
+        <input name="name" class="form-control form-control-sm" placeholder="{% trans "View name" %}" style="max-width:14rem">
+        <label class="form-check-label d-flex align-items-center gap-1"><input type="checkbox" name="is_shared" class="form-check-input"> {% trans "Share" %}</label>
+        <button class="btn btn-sm btn-outline-primary">{% trans "Save as View" %}</button>
     </form>
 </div>
 
 <script>
 const QB_FIELDS = [
-    ["base__name", "Name", "text"],
-    ["code__code", "Code", "text"],
-    ["zustand", "Condition", "choice"],
-    ["ist_verbrauchsartikel", "Consumable", "boolean"],
-    ["gewicht_gramm", "Weight", "number"],
-    ["ablaufdatum", "Expiry", "date"],
-    ["kaufdatum", "Purchase date", "date"],
-    ["tags__name", "Tag", "text"],
+    ["base__name", "{% trans "Name" %}", "text"],
+    ["code__code", "{% trans "Code" %}", "text"],
+    ["zustand", "{% trans "Condition" %}", "choice"],
+    ["ist_verbrauchsartikel", "{% trans "Consumable" %}", "boolean"],
+    ["gewicht_gramm", "{% trans "Weight" %}", "number"],
+    ["ablaufdatum", "{% trans "Expiry" %}", "date"],
+    ["kaufdatum", "{% trans "Purchase date" %}", "date"],
+    ["tags__name", "{% trans "Tag" %}", "text"],
 ];
 const QB_OPS = {
-    text: [["eq", "="], ["ne", "≠"], ["contains", "contains"], ["starts", "starts"], ["ends", "ends"], ["empty", "is empty"], ["not_empty", "is not empty"]],
-    number: [["eq", "="], ["ne", "≠"], ["lt", "<"], ["gt", ">"], ["lte", "≤"], ["gte", "≥"], ["empty", "is empty"]],
-    date: [["eq", "="], ["ne", "≠"], ["before", "before"], ["after", "after"], ["empty", "is empty"]],
+    text: [["eq", "="], ["ne", "≠"], ["contains", "{% trans "contains" %}"], ["starts", "{% trans "starts" %}"], ["ends", "{% trans "ends" %}"], ["empty", "{% trans "is empty" %}"], ["not_empty", "{% trans "is not empty" %}"]],
+    number: [["eq", "="], ["ne", "≠"], ["lt", "<"], ["gt", ">"], ["lte", "≤"], ["gte", "≥"], ["empty", "{% trans "is empty" %}"]],
+    date: [["eq", "="], ["ne", "≠"], ["before", "{% trans "before" %}"], ["after", "{% trans "after" %}"], ["empty", "{% trans "is empty" %}"]],
     choice: [["eq", "="], ["ne", "≠"]],
-    boolean: [["is_true", "is true"], ["is_false", "is false"]],
+    boolean: [["is_true", "{% trans "is true" %}"], ["is_false", "{% trans "is false" %}"]],
 };
 let qbState = {type: "AND", conditions: []};
 const SAVED_QUERY = {{ savedQuery|default:"null"|safe }};

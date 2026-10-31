@@ -1,13 +1,14 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 
 <form id="whereForm" method="GET" action="/where/" class="mb-3">
     <div class="input-group">
-        <input name="q" id="where" class="form-control" placeholder="Scan code or search name..." value="{{ query }}" autofocus autocomplete="off"
+        <input name="q" id="where" class="form-control" placeholder="{% trans "Scan code or search name..." %}" value="{{ query }}" autofocus autocomplete="off"
                hx-get="/where/search" hx-target="#whereResults" hx-trigger="input changed delay:300ms">
         {% include "hub/modules/qrScanner.html" with input="where" scannerUrl="/where/scanner/where/toggle" %}
-        <button class="btn btn-primary" type="submit">Where is...?</button>
+        <button class="btn btn-primary" type="submit">{% trans "Where is...?" %}</button>
     </div>
     <div id="scannerDivwhere"></div>
     <div id="whereResults" class="list-group mt-1"></div>
@@ -17,13 +18,13 @@
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">{{ article.base.name }} <small class="text-muted">{{ article.code.code }}</small></h5>
-        <p class="mb-1"><strong>Current:</strong> {% if current_paths %}{{ current_paths|join:", " }}{% else %}—{% endif %}</p>
+        <p class="mb-1"><strong>{% trans "Current:" %}</strong> {% if current_paths %}{{ current_paths|join:", " }}{% else %}—{% endif %}</p>
         {% if default_paths %}
-        <p class="mb-1"><strong>Default:</strong> {{ default_paths|join:", " }}</p>
+        <p class="mb-1"><strong>{% trans "Default:" %}</strong> {{ default_paths|join:", " }}</p>
         <form method="POST" action="/article/{{ article.base.pType.name }}/{{ article.pk }}/store-default">
             {% csrf_token %}
             <input type="hidden" name="next" value="/where/?q={{ article.code.code }}">
-            <button class="btn btn-success" type="submit">Store to default</button>
+            <button class="btn btn-success" type="submit">{% trans "Store to default" %}</button>
         </form>
         {% endif %}
     </div>
@@ -35,7 +36,7 @@
     {% endfor %}
 </ul>
 {% elif query %}
-<p class="text-muted">No article found.</p>
+<p class="text-muted">{% trans "No article found." %}</p>
 {% endif %}
 
 {% endblock %}

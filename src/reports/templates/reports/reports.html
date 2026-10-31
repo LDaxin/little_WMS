@@ -1,26 +1,27 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Reports</h4>
+<h4>{% trans "Reports" %}</h4>
 
 <form method="get" class="d-flex gap-2 align-items-end mb-3">
-    <div><label class="form-label mb-0 small">From</label><input name="from" type="date" class="form-control form-control-sm" value="{{ from_date }}"></div>
-    <div><label class="form-label mb-0 small">To</label><input name="to" type="date" class="form-control form-control-sm" value="{{ to_date }}"></div>
-    <button class="btn btn-sm btn-primary">Apply</button>
-    <a class="btn btn-sm btn-outline-secondary" href="{% url 'reports export' %}?from={{ from_date }}&to={{ to_date }}">Export CSV</a>
+    <div><label class="form-label mb-0 small">{% trans "From" %}</label><input name="from" type="date" class="form-control form-control-sm" value="{{ from_date }}"></div>
+    <div><label class="form-label mb-0 small">{% trans "To" %}</label><input name="to" type="date" class="form-control form-control-sm" value="{{ to_date }}"></div>
+    <button class="btn btn-sm btn-primary">{% trans "Apply" %}</button>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'reports export' %}?from={{ from_date }}&to={{ to_date }}">{% trans "Export CSV" %}</a>
 </form>
 
 <div class="row">
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Movements over time</div>
+            <div class="card-header">{% trans "Movements over time" %}</div>
             <table class="table table-sm mb-0">
-                <thead><tr><th>Month</th><th>Movements</th></tr></thead>
+                <thead><tr><th>{% trans "Month" %}</th><th>{% trans "Movements" %}</th></tr></thead>
                 <tbody>
                     {% for month, count in movements %}
                     <tr><td>{{ month }}</td><td>{{ count }}</td></tr>
                     {% empty %}
-                    <tr><td colspan="2" class="text-muted">No movements</td></tr>
+                    <tr><td colspan="2" class="text-muted">{% trans "No movements" %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -29,14 +30,14 @@
 
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">Usage (top articles)</div>
+            <div class="card-header">{% trans "Usage (top articles)" %}</div>
             <table class="table table-sm mb-0">
-                <thead><tr><th>Article</th><th>Movements</th></tr></thead>
+                <thead><tr><th>{% trans "Article" %}</th><th>{% trans "Movements" %}</th></tr></thead>
                 <tbody>
                     {% for row in usage %}
                     <tr><td>{{ row.article }}</td><td>{{ row.count }}</td></tr>
                     {% empty %}
-                    <tr><td colspan="2" class="text-muted">No usage</td></tr>
+                    <tr><td colspan="2" class="text-muted">{% trans "No usage" %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -45,14 +46,14 @@
 
     <div class="col-md-6 mb-3">
         <div class="card">
-            <div class="card-header">User activity</div>
+            <div class="card-header">{% trans "User activity" %}</div>
             <table class="table table-sm mb-0">
-                <thead><tr><th>User</th><th>Movements</th></tr></thead>
+                <thead><tr><th>{% trans "User" %}</th><th>{% trans "Movements" %}</th></tr></thead>
                 <tbody>
                     {% for row in activity %}
                     <tr><td>{{ row.user__username|default:"—" }}</td><td>{{ row.count }}</td></tr>
                     {% empty %}
-                    <tr><td colspan="2" class="text-muted">No activity</td></tr>
+                    <tr><td colspan="2" class="text-muted">{% trans "No activity" %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

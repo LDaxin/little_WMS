@@ -1,22 +1,23 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
-<h4>Add occasion</h4>
+<h4>{% trans "Add occasion" %}</h4>
 
 {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
 
 <form method="post">
     {% csrf_token %}
-    <div class="mb-2"><input name="name" class="form-control" placeholder="Name" required></div>
+    <div class="mb-2"><input name="name" class="form-control" placeholder="{% trans "Name" %}" required></div>
     <div class="mb-2">
         <select name="template" class="form-select">
-            <option value="">&mdash; template (optional) &mdash;</option>
+            <option value="">&mdash; {% trans "template (optional)" %} &mdash;</option>
             {% for t in templates %}<option value="{{ t.pk }}" data-type="{{ t.occasion_type_id }}">{{ t.name }}</option>{% endfor %}
         </select>
     </div>
     <div class="mb-2">
         <select name="type" class="form-select" required>
-            <option value="">&mdash; type &mdash;</option>
+            <option value="">&mdash; {% trans "type" %} &mdash;</option>
             {% for t in types %}<option value="{{ t.pk }}">{{ t.name }}</option>{% endfor %}
         </select>
     </div>
@@ -24,12 +25,12 @@
     <div class="mb-2"><input name="end_date" type="date" class="form-control"></div>
     <div class="mb-2">
         <select name="location" class="form-select">
-            <option value="">&mdash; location (optional) &mdash;</option>
+            <option value="">&mdash; {% trans "location (optional)" %} &mdash;</option>
             {% for l in locations %}<option value="{{ l.pk }}">{{ l }}</option>{% endfor %}
         </select>
     </div>
-    <div class="mb-2"><input name="participants" type="number" min="1" class="form-control" placeholder="Participants"></div>
-    <button class="btn btn-primary">Create</button>
+    <div class="mb-2"><input name="participants" type="number" min="1" class="form-control" placeholder="{% trans "Participants" %}"></div>
+    <button class="btn btn-primary">{% trans "Create" %}</button>
 </form>
 <script>
     document.querySelector("[name=template]").addEventListener("change", function () {

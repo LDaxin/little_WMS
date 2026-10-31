@@ -1,6 +1,7 @@
+{% load i18n %}
 <div id="packlist" class="card mb-3">
     <div class="card-body">
-        <strong>Packlist</strong>
+        <strong>{% trans "Packlist" %}</strong>
         {% if error %}<div class="alert alert-danger py-1 mt-1">{{ error }}</div>{% endif %}
         <ul class="list-group list-group-flush">
             {% for entry in packlist %}
@@ -14,25 +15,25 @@
                         <option value="{{ value }}" {% if entry.status == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
-                    <button type="button" class="btn-close" aria-label="Remove"
+                    <button type="button" class="btn-close" aria-label="{% trans "Remove" %}"
                             hx-post="{% url 'packlist remove' occasion.pk entry.pk %}"
                             hx-target="#packlist" hx-swap="outerHTML"></button>
                 </span>
             </li>
             {% empty %}
-            <li class="list-group-item text-muted">Empty</li>
+            <li class="list-group-item text-muted">{% trans "Empty" %}</li>
             {% endfor %}
         </ul>
         <form class="mt-2" hx-post="{% url 'packlist add' occasion.pk %}" hx-target="#packlist" hx-swap="outerHTML">
             {% csrf_token %}
             <div class="input-group input-group-sm">
-                <input id="packlistCode" name="code" class="form-control" placeholder="Scan or search article..."
+                <input id="packlistCode" name="code" class="form-control" placeholder="{% trans "Scan or search article..." %}"
                        autocomplete="off"
                        hx-get="{% url 'packlist search' occasion.pk %}" hx-target="#packlistResults" hx-swap="innerHTML"
                        hx-trigger="input changed delay:300ms">
                 <input name="quantity" type="number" min="1" value="1" class="form-control" style="max-width:6rem">
                 {% include "hub/modules/qrScanner.html" with input="packlistCode" scannerUrl="/occasions/scanner/packlistCode/toggle" %}
-                <button class="btn btn-success">Add</button>
+                <button class="btn btn-success">{% trans "Add" %}</button>
             </div>
             <div id="scannerDivpacklistCode"></div>
             <div id="packlistResults" class="list-group mt-1"></div>

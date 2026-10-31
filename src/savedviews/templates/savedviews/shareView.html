@@ -1,4 +1,5 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 <h4>{{ link.saved_view.name }}</h4>
@@ -9,7 +10,7 @@
         <thead>
             <tr>
                 {% if link.can_borrow and request.user.is_authenticated %}<th></th>{% endif %}
-                <th>Name</th><th>Code</th>
+                <th>{% trans "Name" %}</th><th>{% trans "Code" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -21,12 +22,12 @@
                 <td>{{ article.base.name }}</td><td>{{ article.code.code }}</td>
             </tr>
             {% empty %}
-            <tr><td colspan="3" class="text-muted">No articles</td></tr>
+            <tr><td colspan="3" class="text-muted">{% trans "No articles" %}</td></tr>
             {% endfor %}
         </tbody>
     </table>
     {% if link.can_borrow and request.user.is_authenticated %}
-    <button class="btn btn-primary">Borrow selected</button>
+    <button class="btn btn-primary">{% trans "Borrow selected" %}</button>
     {% endif %}
 </form>
 {% endblock %}

@@ -1,4 +1,5 @@
 {% extends "hub/header.html" %}
+{% load i18n %}
 
 {% block content %}
 
@@ -6,17 +7,17 @@
       hx-on::after-request="document.getElementById('scan').value=''">
     {% csrf_token %}
     <div class="input-group">
-        <input id="scan" name="code" class="form-control" placeholder="Scan or enter code..." autofocus autocomplete="off">
+        <input id="scan" name="code" class="form-control" placeholder="{% trans "Scan or enter code..." %}" autofocus autocomplete="off">
         {% include "hub/modules/qrScanner.html" with input="scan" scannerUrl="/movement/scanner/scan/toggle" %}
     </div>
     <div id="scannerDivscan"></div>
 </form>
 
-<input id="movementSearch" name="search" class="form-control mb-2" placeholder="Search..."
+<input id="movementSearch" name="search" class="form-control mb-2" placeholder="{% trans "Search..." %}"
        hx-get="{% url 'movement search' %}" hx-target="#searchResults" hx-trigger="input changed delay:300ms">
 <div id="searchResults" class="list-group mb-2"></div>
 
-<a class="btn btn-outline-primary mb-2" href="{% url 'inventory' %}">Start inventory</a>
+<a class="btn btn-outline-primary mb-2" href="{% url 'inventory' %}">{% trans "Start inventory" %}</a>
 
 {% include "movement/buffer.html" %}
 

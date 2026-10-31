@@ -1,3 +1,4 @@
+from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
@@ -44,7 +45,7 @@ def addLocation(request):
             location = l.save()
             location.save()
             return toast(request, "Add Succses", str(location) + " was added to your system.", "status")
-    return toast(request, "Error", "thomething went wrong", "alert")
+    return toast(request, _("Error"), _("thomething went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.delete_all")
@@ -64,7 +65,7 @@ def delLocation(request):
             i.deleted = True
             i.save()
         return toast(request, "Delete", delListReturn, "alert")
-    return toast(request, "Error", "thomething went wrong", "alert")
+    return toast(request, _("Error"), _("thomething went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.edit_all")
@@ -75,8 +76,8 @@ def updateLocation(request, locationId):
         locationForm = FormLocation(request.POST, instance=locationObject)
         if locationForm.is_valid():
             locationForm.save()
-            return toast(request, "Update Succses", "Location was updated", "status")
-        return toast(request, "Error", "thething went wrong", "alert")
+            return toast(request, _("Update Succses"), _("Location was updated"), "status")
+        return toast(request, _("Error"), _("thething went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.view_all")

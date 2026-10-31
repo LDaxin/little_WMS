@@ -1,3 +1,4 @@
+{% load i18n %}
 
 <div class="container-sm position-relative" id="scanner{{input}}">
     <div id="reader{{input}}"></div>
@@ -49,7 +50,7 @@
             );
             
             $("#flipCamera{{input}}id").remove();
-            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}("+ newDevice +");\" id=\"flipCamera{{input}}id\">Flip</button>");
+            $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}("+ newDevice +");\" id=\"flipCamera{{input}}id\">{% trans "Flip" %}</button>");
         });
     }
 
@@ -60,7 +61,7 @@
                 if (cameras.length == 1) {
                     var cameraId = cameras[0].id;
                 }else{
-$("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}(1);\" id=\"flipCamera{{input}}id\">Flip</button>");
+$("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\" onclick=\"flipCamera{{inputF}}(1);\" id=\"flipCamera{{input}}id\">{% trans "Flip" %}</button>");
                     var cameraId = cameras[1].id;
                 }
 
@@ -84,7 +85,7 @@ $("#Buttons{{input}}").append("<button type=\"button\" class=\"btn btn-primary\"
         })
         .catch(function (err) {
             console.log(err);
-            $("#scanner{{input}}").append("<p>No cameras found connect one and refresh</p>");
+            $("#scanner{{input}}").append("<p>{% trans "No cameras found connect one and refresh" %}</p>");
         });
     
 </script>

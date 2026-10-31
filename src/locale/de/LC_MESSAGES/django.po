@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-31 20:54+0000\n"
+"POT-Creation-Date: 2026-10-31 21:32+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: article/importer.py:69
 msgid "missing name"
 msgstr "Name fehlt"
@@ -49,6 +50,98 @@ msgstr "Unbekannter Typ: %s"
 msgid "unknown storage: %s"
 msgstr "Unbekannter Lagerort: %s"
 
+#: article/models.py:15
+msgid "gut"
+msgstr "gut"
+
+#: article/models.py:16
+msgid "gebraucht"
+msgstr "gebraucht"
+
+#: article/models.py:17
+msgid "defekt"
+msgstr "defekt"
+
+#: article/models.py:18
+msgid "in Reparatur"
+msgstr "in Reparatur"
+
+#: article/models.py:42 article/models.py:136
+#: hub/templates/hub/modules/qrForm.html:42
+#: hub/templates/hub/modules/queryBuilder.html:29
+#: hub/templates/hub/modules/search.html:52
+#: hub/templates/hub/modules/search.html:55
+#: hub/templates/hub/modules/search.html:58
+#: hub/templates/hub/modules/search.html:65 occasion/models.py:15
+#: occasion/models.py:48 occasion/templates/occasion/occasion.html:9
+#: occasion/templates/occasion/occasionForm.html:11
+#: occasion/templates/occasion/templates.html:23
+#: occasion/templates/occasion/types.html:17
+#: organisation/templates/organisation/configuration.html:20
+#: organisation/templates/organisation/configuration.html:41
+#: savedviews/templates/savedviews/shareView.html:13 storage/models.py:20
+#: storage/models.py:40 tag/models.py:15 tag/models.py:27
+msgid "Name"
+msgstr "Name"
+
+#: article/models.py:43 occasion/models.py:16
+#: occasion/templates/occasion/types.html:18
+#: organisation/templates/organisation/configuration.html:21
+#: organisation/templates/organisation/configuration.html:42
+#: storage/models.py:21
+msgid "Symbol"
+msgstr "Symbol"
+
+#: article/models.py:45
+msgid "Container"
+msgstr "Behälter"
+
+#: article/models.py:46
+msgid "Merge/split"
+msgstr "Zusammenführen/Teilen"
+
+#: article/models.py:138 occasion/models.py:30 occasion/models.py:49
+#: planning/models.py:47 storage/models.py:41
+msgid "Type"
+msgstr "Typ"
+
+#: article/models.py:148
+msgid "Minimum stock"
+msgstr "Mindestbestand"
+
+#: article/models.py:178 hub/templates/hub/modules/queryBuilder.html:10
+#: hub/templates/hub/modules/queryBuilder.html:31
+#, fuzzy
+#| msgid "Configuration"
+msgid "Condition"
+msgstr "Konfiguration"
+
+#: article/models.py:179
+msgid "Purchase value"
+msgstr "Anschaffungswert"
+
+#: article/models.py:180 hub/templates/hub/modules/queryBuilder.html:35
+msgid "Purchase date"
+msgstr "Kaufdatum"
+
+#: article/models.py:181
+#, fuzzy
+#| msgid "Expires on %(date)s"
+msgid "Expiry date"
+msgstr "Läuft ab am %(date)s"
+
+#: article/models.py:182
+msgid "Weight (g)"
+msgstr "Gewicht (g)"
+
+#: article/models.py:183
+msgid "Note"
+msgstr "Notiz"
+
+#: article/models.py:185
+msgid "Unit"
+msgstr "Einheit"
+
 #: article/templates/article/import.html:5
 msgid "Import articles"
 msgstr "Artikel importieren"
@@ -58,6 +151,8 @@ msgid ""
 "Upload a CSV with the columns name, type, menge, storage, zustand. German "
 "headers and a semicolon delimiter work too."
 msgstr "Lade eine CSV mit den Spalten name, type, menge, storage, zustand hoch. Deutsche Spaltennamen und Semikolon als Trennzeichen funktionieren ebenfalls."
+"Lade eine CSV mit den Spalten name, type, menge, storage, zustand hoch. "
+"Deutsche Spaltennamen und Semikolon als Trennzeichen funktionieren ebenfalls."
 
 #: article/templates/article/import.html:8
 msgid "Download template"
@@ -143,7 +238,107 @@ msgstr "Vorhandene aktualisieren"
 msgid "Import"
 msgstr "Importieren"
 
+#: article/views.py:256 article/views.py:276 article/views.py:284
+#: article/views.py:286 article/views.py:319 article/views.py:327
+#: article/views.py:347 article/views.py:357 article/views.py:362
+#: article/views.py:391 location/views.py:48 location/views.py:68
+#: location/views.py:80 storage/views.py:163 storage/views.py:168
+#: storage/views.py:174 storage/views.py:175 storage/views.py:198
+#: storage/views.py:210 tag/views.py:66
+#, fuzzy
+#| msgid "Errors"
+msgid "Error"
+msgstr "Fehler"
+
+#: article/views.py:256 article/views.py:327 article/views.py:357
+#, fuzzy
+#| msgid "Article types"
+msgid "no article type named "
+msgstr "Artikeltypen"
+
+#: article/views.py:276
+msgid "article base not valid"
+msgstr "Artikelbasis ungültig"
+
+#: article/views.py:284 storage/views.py:163
+msgid "code is already used"
+msgstr "Code wird bereits verwendet"
+
+#: article/views.py:286
+msgid "no code with id "
+msgstr "Kein Code mit ID "
+
+#: article/views.py:319
+msgid "article not valid "
+msgstr "Artikel ungültig "
+
+#: article/views.py:347 article/views.py:391 storage/views.py:174
+#: storage/views.py:175 storage/views.py:198 storage/views.py:210
+msgid "something went wrong"
+msgstr "Etwas ist schiefgelaufen"
+
+#: article/views.py:362
+msgid "The article was changed by someone else. Please reload."
+msgstr "Der Artikel wurde von jemand anderem geändert. Bitte neu laden."
+
+#: article/views.py:379 hub/templates/hub/modules/delForm.html:11
+#: hub/templates/hub/modules/deleteModal.html:4
+#: notifications/templates/notifications/rules.html:28
+#: occasion/templates/occasion/templates.html:13
+#: organisation/templates/organisation/roles.html:36
+#: organisation/templates/organisation/users.html:42
+#: savedviews/templates/savedviews/savedViews.html:24
+msgid "Delete"
+msgstr "Löschen"
+
+#: article/views.py:379
+msgid "article was deleted (menge 0)"
+msgstr "Artikel wurde gelöscht (Menge 0)"
+
+#: article/views.py:390
+#, fuzzy
+#| msgid "updated"
+msgid "Update"
+msgstr "aktualisiert"
+
+#: article/views.py:390
+msgid "article was updated"
+msgstr "Artikel wurde aktualisiert"
+
+#: codeSystem/models.py:14 hub/templates/hub/modules/qrForm.html:43
+#: hub/templates/hub/modules/queryBuilder.html:30
+#: hub/templates/hub/modules/search.html:61
+#: savedviews/templates/savedviews/shareView.html:13
+msgid "Code"
+msgstr "Code"
+
+#: codeSystem/models.py:15
+msgid "Prefix"
+msgstr "Präfix"
+
+#: codeSystem/models.py:16
+msgid "Used"
+msgstr "Verwendet"
+
+#: codeSystem/views.py:34
+msgid "add success"
+msgstr "Hinzugefügt"
+
+#: codeSystem/views.py:34
+msgid "added "
+msgstr "hinzugefügt: "
+
+#: export/templates/export/qrPrint.html:7
+msgid "QR Sheet"
+msgstr "QR-Blatt"
+
+#: export/templates/export/qrPrint.html:22
+#: hub/templates/hub/modules/qrForm.html:46
+msgid "Print"
+msgstr "Drucken"
+
 #: hub/models.py:10 hub/templates/hub/modules/item.html:12
+#: savedviews/templates/savedviews/sharePassword.html:12
 msgid "Open"
 msgstr "Öffnen"
 
@@ -165,6 +360,7 @@ msgid "Invitations"
 msgstr "Einladungen"
 
 #: hub/templates/hub/dashboard.html:5 hub/templates/hub/hub.html:125
+#: savedviews/templates/savedviews/savedViews.html:20
 msgid "Dashboard"
 msgstr "Übersicht"
 
@@ -194,6 +390,7 @@ msgid "Storages"
 msgstr "Lagerorte"
 
 #: hub/templates/hub/dashboard.html:63 hub/templates/hub/hub.html:81
+#: occasion/templates/occasion/occasions.html:6
 msgid "Occasions"
 msgstr "Anlässe"
 
@@ -214,6 +411,7 @@ msgid "Show all"
 msgstr "Alle anzeigen"
 
 #: hub/templates/hub/dashboard.html:108
+#: savedviews/templates/savedviews/shareView.html:25
 msgid "No articles"
 msgstr "Keine Artikel"
 
@@ -226,6 +424,7 @@ msgid "Language"
 msgstr "Sprache"
 
 #: hub/templates/hub/emailPreferences.html:16
+#: hub/templates/hub/modules/articleCalendar.html:23
 #: organisation/templates/organisation/inviteAccept.html:15
 #: organisation/templates/organisation/serverSettings.html:20
 #: organisation/templates/organisation/users.html:9
@@ -237,9 +436,12 @@ msgid ""
 "Choose which emails you want to receive. Emails are only sent to a confirmed "
 "address."
 msgstr "Wähle, welche E-Mails du erhalten möchtest. E-Mails werden nur an eine bestätigte Adresse gesendet."
+"Wähle, welche E-Mails du erhalten möchtest. E-Mails werden nur an eine "
+"bestätigte Adresse gesendet."
 
 #: hub/templates/hub/emailPreferences.html:26
 #: notifications/templates/notifications/ruleForm.html:9
+#: occasion/templates/occasion/occasion.html:19
 #: organisation/templates/organisation/roleForm.html:27
 #: organisation/templates/organisation/serverSettings.html:15
 #: organisation/templates/organisation/users.html:36
@@ -269,6 +471,8 @@ msgid "All storages"
 msgstr "Alle Lagerorte"
 
 #: hub/templates/hub/hub.html:92
+#: hub/templates/hub/modules/articleCalendar.html:3
+#: planning/templates/planning/calendar.html:5
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -281,30 +485,37 @@ msgstr "Papierkorb"
 msgid "Configuration"
 msgstr "Konfiguration"
 
-#: hub/templates/hub/hub.html:136
+#: hub/templates/hub/hub.html:136 loans/templates/loans/loans.html:5
 msgid "Loans"
 msgstr "Ausleihen"
 
-#: hub/templates/hub/hub.html:147
+#: hub/templates/hub/hub.html:147 loans/templates/loans/lendings.html:5
 msgid "Lendings"
 msgstr "Verliehen"
 
-#: hub/templates/hub/hub.html:158
+#: hub/templates/hub/hub.html:158 reports/templates/reports/reports.html:5
 msgid "Reports"
 msgstr "Berichte"
 
 #: hub/templates/hub/hub.html:169
+#: savedviews/templates/savedviews/savedViews.html:5
 msgid "My Views"
 msgstr "Meine Ansichten"
 
 #: hub/templates/hub/modules/addForm.html:25
 #: hub/templates/hub/modules/itemForm.html:27
+#: hub/templates/hub/modules/qrScanner.html:4
 #: hub/templates/hub/modules/search.html:27
 msgid "QR"
 msgstr "QR"
 
 #: hub/templates/hub/modules/addForm.html:41
 #: hub/templates/hub/modules/addModal.html:4
+#: hub/templates/hub/modules/composition.html:51
+#: hub/templates/hub/modules/tagChips.html:25
+#: occasion/templates/occasion/packlist.html:36
+#: occasion/templates/occasion/templates.html:28
+#: occasion/templates/occasion/types.html:19
 #: organisation/templates/organisation/configuration.html:25
 #: organisation/templates/organisation/configuration.html:43
 msgid "Add"
@@ -314,17 +525,167 @@ msgstr "Hinzufügen"
 msgid "Select parent"
 msgstr "Übergeordnetes auswählen"
 
+#: hub/templates/hub/modules/articleCalendar.html:11
+msgid "No terms"
+msgstr "Keine Termine"
+
+#: hub/templates/hub/modules/articleCalendar.html:16 planning/models.py:36
+#, fuzzy
+#| msgid "Maintenance due"
+msgid "Maintenance"
+msgstr "Wartung fällig"
+
+#: hub/templates/hub/modules/articleCalendar.html:18
+#, fuzzy
+#| msgid "Maintenance due"
+msgid "Add maintenance"
+msgstr "Wartung fällig"
+
+#: hub/templates/hub/modules/articleCalendar.html:22 loans/models.py:26
+msgid "Borrower"
+msgstr "Ausleiher"
+
+#: hub/templates/hub/modules/articleCalendar.html:26
+#, fuzzy
+#| msgid "Lendings"
+msgid "Lend"
+msgstr "Verliehen"
+
+#: hub/templates/hub/modules/articleCalendar.html:31
+msgid "Person"
+msgstr "Person"
+
+#: hub/templates/hub/modules/articleCalendar.html:32
+#, fuzzy
+#| msgid "Organisation name"
+msgid "Organisation"
+msgstr "Name der Organisation"
+
+#: hub/templates/hub/modules/articleCalendar.html:34 loans/models.py:57
+msgid "Lender"
+msgstr "Verleiher"
+
+#: hub/templates/hub/modules/articleCalendar.html:37
+msgid "Borrow"
+msgstr "Ausleihen"
+
+#: hub/templates/hub/modules/assignedTo.html:3
+#, fuzzy
+#| msgid "Assign roles to users"
+msgid "Assigned to"
+msgstr "Rollen Benutzern zuweisen"
+
+#: hub/templates/hub/modules/assignedTo.html:8
+msgid "Unassign"
+msgstr "Zuordnung entfernen"
+
+#: hub/templates/hub/modules/assignedTo.html:13
+msgid "Nobody"
+msgstr "Niemand"
+
+#: hub/templates/hub/modules/assignedTo.html:22
+msgid "Assign"
+msgstr "Zuordnen"
+
+#: hub/templates/hub/modules/auditTimeline.html:3
+msgid "History"
+msgstr "Verlauf"
+
+#: hub/templates/hub/modules/auditTimeline.html:13
+msgid "No history"
+msgstr "Kein Verlauf"
+
+#: hub/templates/hub/modules/composition.html:3
+msgid "Composition"
+msgstr "Zusammensetzung"
+
+#: hub/templates/hub/modules/composition.html:9
+#: hub/templates/hub/modules/composition.html:49
+msgid "Soll"
+msgstr "Soll"
+
+#: hub/templates/hub/modules/composition.html:9
+msgid "any"
+msgstr "beliebig"
+
+#: hub/templates/hub/modules/composition.html:9
+msgid "Ist"
+msgstr "Ist"
+
+#: hub/templates/hub/modules/composition.html:10
+msgid "min"
+msgstr "min"
+
+#: hub/templates/hub/modules/composition.html:12
+msgid "global"
+msgstr "global"
+
+#: hub/templates/hub/modules/composition.html:13
+msgid "over-allocated"
+msgstr "überbelegt"
+
+#: hub/templates/hub/modules/composition.html:13
+msgid "available"
+msgstr "verfügbar"
+
+#: hub/templates/hub/modules/composition.html:14
+msgid "refill"
+msgstr "nachfüllen"
+
+#: hub/templates/hub/modules/composition.html:20
+msgid "Set the global minimum to the sum of the location minimums"
+msgstr "Setzt das globale Minimum auf die Summe der Lagerort-Minima"
+
+#: hub/templates/hub/modules/composition.html:22
+#: hub/templates/hub/modules/composition.html:24
+#: hub/templates/hub/modules/storageContents.html:10
+#: hub/templates/hub/modules/storeActions.html:10
+#: hub/templates/hub/modules/tagChips.html:7
+#: movement/templates/movement/buffer.html:9
+#: movement/templates/movement/buffer.html:46
+#: movement/templates/movement/buffer.html:82
+#: occasion/templates/occasion/packlist.html:18
+msgid "Remove"
+msgstr "Entfernen"
+
+#: hub/templates/hub/modules/composition.html:24
+msgid "from the composition?"
+msgstr "aus der Zusammensetzung entfernen?"
+
+#: hub/templates/hub/modules/composition.html:28
+#, fuzzy
+#| msgid "No notifications"
+msgid "No composition"
+msgstr "Keine Benachrichtigungen"
+
+#: hub/templates/hub/modules/composition.html:39
+msgid "Add anyway"
+msgstr "Trotzdem hinzufügen"
+
+#: hub/templates/hub/modules/composition.html:45
+#, fuzzy
+#| msgid "Articles"
+msgid "Article base"
+msgstr "Artikel"
+
+#: hub/templates/hub/modules/composition.html:50
+msgid "Min"
+msgstr "Min"
+
 #: hub/templates/hub/modules/delForm.html:4
 msgid "Do you really want to delete these items:"
 msgstr "Möchtest du diese Objekte wirklich löschen:"
 
-#: hub/templates/hub/modules/delForm.html:11
-#: hub/templates/hub/modules/deleteModal.html:4
-#: notifications/templates/notifications/rules.html:28
-#: organisation/templates/organisation/roles.html:36
-#: organisation/templates/organisation/users.html:42
-msgid "Delete"
-msgstr "Löschen"
+#: hub/templates/hub/modules/exportForm.html:4
+msgid "Export these items:"
+msgstr "Diese Objekte exportieren:"
+
+#: hub/templates/hub/modules/exportForm.html:11
+#: hub/templates/hub/modules/exportModal.html:5
+#, fuzzy
+#| msgid "Import"
+msgid "Export"
+msgstr "Importieren"
 
 #: hub/templates/hub/modules/item.html:10
 #: organisation/templates/organisation/organisationRequests.html:19
@@ -344,6 +705,176 @@ msgstr "Übergeordnetes auswählen"
 msgid "Setting menge to 0 deletes the article. Continue?"
 msgstr "Menge 0 löscht den Artikel. Fortfahren?"
 
+#: hub/templates/hub/modules/modal.html:12
+#: hub/templates/hub/modules/toast.html:7
+msgid "Close"
+msgstr "Schließen"
+
+#: hub/templates/hub/modules/qrForm.html:3
+msgid "Print QR codes for these items:"
+msgstr "QR-Codes für diese Objekte drucken:"
+
+#: hub/templates/hub/modules/qrForm.html:9
+msgid "Format"
+msgstr "Format"
+
+#: hub/templates/hub/modules/qrForm.html:17
+msgid "QR size"
+msgstr "QR-Größe"
+
+#: hub/templates/hub/modules/qrForm.html:19
+msgid "Small"
+msgstr "Klein"
+
+#: hub/templates/hub/modules/qrForm.html:20
+msgid "Medium"
+msgstr "Mittel"
+
+#: hub/templates/hub/modules/qrForm.html:21
+msgid "Large"
+msgstr "Groß"
+
+#: hub/templates/hub/modules/qrForm.html:25
+msgid "Label"
+msgstr "Beschriftung"
+
+#: hub/templates/hub/modules/qrForm.html:27
+msgid "QR only"
+msgstr "Nur QR"
+
+#: hub/templates/hub/modules/qrForm.html:28
+msgid "QR + name"
+msgstr "QR + Name"
+
+#: hub/templates/hub/modules/qrForm.html:29
+msgid "QR + name + symbol"
+msgstr "QR + Name + Symbol"
+
+#: hub/templates/hub/modules/qrForm.html:33
+msgid "QR content"
+msgstr "QR-Inhalt"
+
+#: hub/templates/hub/modules/qrForm.html:35
+msgid "Code (app scanner)"
+msgstr "Code (App-Scanner)"
+
+#: hub/templates/hub/modules/qrForm.html:36
+msgid "Link (universal)"
+msgstr "Link (universal)"
+
+#: hub/templates/hub/modules/qrForm.html:40
+msgid "Sort"
+msgstr "Sortierung"
+
+#: hub/templates/hub/modules/qrModal.html:4
+msgid "Print QR"
+msgstr "QR drucken"
+
+#: hub/templates/hub/modules/queryBuilder.html:4
+#, fuzzy
+#| msgid "Advanced"
+msgid "Advanced search"
+msgstr "Erweitert"
+
+#: hub/templates/hub/modules/queryBuilder.html:11
+msgid "Group"
+msgstr "Gruppe"
+
+#: hub/templates/hub/modules/queryBuilder.html:12
+#: reports/templates/reports/reports.html:10
+#: savedviews/templates/savedviews/savedViews.html:16
+msgid "Apply"
+msgstr "Anwenden"
+
+#: hub/templates/hub/modules/queryBuilder.html:13
+#: movement/templates/movement/buffer.html:23
+#: movement/templates/movement/buffer.html:85
+#: movement/templates/movement/inventoryBody.html:12
+msgid "Clear"
+msgstr "Leeren"
+
+#: hub/templates/hub/modules/queryBuilder.html:21
+#, fuzzy
+#| msgid "View all"
+msgid "View name"
+msgstr "Alle anzeigen"
+
+#: hub/templates/hub/modules/queryBuilder.html:22
+#: savedviews/templates/savedviews/savedViews.html:41
+msgid "Share"
+msgstr "Teilen"
+
+#: hub/templates/hub/modules/queryBuilder.html:23
+msgid "Save as View"
+msgstr "Als Ansicht speichern"
+
+#: hub/templates/hub/modules/queryBuilder.html:32
+msgid "Consumable"
+msgstr "Verbrauchsartikel"
+
+#: hub/templates/hub/modules/queryBuilder.html:33
+msgid "Weight"
+msgstr "Gewicht"
+
+#: hub/templates/hub/modules/queryBuilder.html:34
+#, fuzzy
+#| msgid "expires"
+msgid "Expiry"
+msgstr "läuft ab"
+
+#: hub/templates/hub/modules/queryBuilder.html:36
+msgid "Tag"
+msgstr "Tag"
+
+#: hub/templates/hub/modules/queryBuilder.html:39
+msgid "contains"
+msgstr "enthält"
+
+#: hub/templates/hub/modules/queryBuilder.html:39
+msgid "starts"
+msgstr "beginnt mit"
+
+#: hub/templates/hub/modules/queryBuilder.html:39
+msgid "ends"
+msgstr "endet mit"
+
+#: hub/templates/hub/modules/queryBuilder.html:39
+#: hub/templates/hub/modules/queryBuilder.html:40
+#: hub/templates/hub/modules/queryBuilder.html:41
+#, fuzzy
+#| msgid "Trash is empty."
+msgid "is empty"
+msgstr "Der Papierkorb ist leer."
+
+#: hub/templates/hub/modules/queryBuilder.html:39
+msgid "is not empty"
+msgstr "ist nicht leer"
+
+#: hub/templates/hub/modules/queryBuilder.html:41
+msgid "before"
+msgstr "vor"
+
+#: hub/templates/hub/modules/queryBuilder.html:41
+msgid "after"
+msgstr "nach"
+
+#: hub/templates/hub/modules/queryBuilder.html:43
+msgid "is true"
+msgstr "ist wahr"
+
+#: hub/templates/hub/modules/queryBuilder.html:43
+msgid "is false"
+msgstr "ist falsch"
+
+#: hub/templates/hub/modules/scanner.html:53
+#: hub/templates/hub/modules/scanner.html:64
+msgid "Flip"
+msgstr "Wechseln"
+
+#: hub/templates/hub/modules/scanner.html:88
+msgid "No cameras found connect one and refresh"
+msgstr "Keine Kamera gefunden – eine anschließen und neu laden"
+
 #: hub/templates/hub/modules/search.html:12
 msgid "Search"
 msgstr "Suche"
@@ -351,19 +882,6 @@ msgstr "Suche"
 #: hub/templates/hub/modules/search.html:39
 msgid "Advanced"
 msgstr "Erweitert"
-
-#: hub/templates/hub/modules/search.html:52
-#: hub/templates/hub/modules/search.html:55
-#: hub/templates/hub/modules/search.html:58
-#: hub/templates/hub/modules/search.html:65
-#: organisation/templates/organisation/configuration.html:20
-#: organisation/templates/organisation/configuration.html:41
-msgid "Name"
-msgstr "Name"
-
-#: hub/templates/hub/modules/search.html:61
-msgid "Code"
-msgstr "Code"
 
 #: hub/templates/hub/modules/search.html:62
 msgid "used"
@@ -374,9 +892,158 @@ msgstr "verwendet"
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: hub/templates/hub/modules/toast.html:7
-msgid "Close"
-msgstr "Schließen"
+#: hub/templates/hub/modules/storageContents.html:3
+msgid "Contents"
+msgstr "Inhalt"
+
+#: hub/templates/hub/modules/storageContents.html:13
+#: movement/templates/movement/buffer.html:70
+#: occasion/templates/occasion/packlist.html:24
+msgid "Empty"
+msgstr "Leer"
+
+#: hub/templates/hub/modules/storageContents.html:23
+#: hub/templates/hub/modules/storeActions.html:27
+msgid "Store anyway"
+msgstr "Trotzdem einlagern"
+
+#: hub/templates/hub/modules/storageContents.html:29
+#: occasion/templates/occasion/packlist.html:30
+msgid "Scan or search article..."
+msgstr "Artikel scannen oder suchen..."
+
+#: hub/templates/hub/modules/storageContents.html:33
+#: hub/templates/hub/modules/storeActions.html:44
+msgid "Qty"
+msgstr "Menge"
+
+#: hub/templates/hub/modules/storageContents.html:35
+#, fuzzy
+#| msgid "Storage types"
+msgid "Store here"
+msgstr "Lagerorttypen"
+
+#: hub/templates/hub/modules/storeActions.html:15
+msgid "Not stored"
+msgstr "Nicht eingelagert"
+
+#: hub/templates/hub/modules/storeActions.html:18
+msgid "Not stored:"
+msgstr "Nicht eingelagert:"
+
+#: hub/templates/hub/modules/storeActions.html:18
+msgid "no location assigned."
+msgstr "kein Lagerort zugewiesen."
+
+#: hub/templates/hub/modules/storeActions.html:31
+#: movement/templates/movement/where.html:23
+msgid "Default:"
+msgstr "Standard:"
+
+#: hub/templates/hub/modules/storeActions.html:34
+#: movement/templates/movement/where.html:27
+#, fuzzy
+#| msgid "Load defaults"
+msgid "Store to default"
+msgstr "Standard laden"
+
+#: hub/templates/hub/modules/storeActions.html:40
+msgid "Scan or search target..."
+msgstr "Ziel scannen oder suchen..."
+
+#: hub/templates/hub/modules/storeActions.html:46
+#: movement/templates/movement/buffer.html:6
+#: movement/templates/movement/buffer.html:79
+#, fuzzy
+#| msgid "Storages"
+msgid "Store"
+msgstr "Lagerorte"
+
+#: hub/templates/hub/modules/tagChips.html:12
+msgid "No tags"
+msgstr "Keine Tags"
+
+#: hub/templates/hub/modules/tagChips.html:21
+msgid "Add tag..."
+msgstr "Tag hinzufügen..."
+
+#: hub/templates/hub/onboarding.html:5
+msgid "Welcome to little_WMS"
+msgstr "Willkommen bei little_WMS"
+
+#: hub/templates/hub/onboarding.html:6
+msgid "A quick setup. You can change everything later in Configuration."
+msgstr "Eine kurze Einrichtung. Du kannst alles später in der Konfiguration ändern."
+
+#: hub/templates/hub/onboarding.html:12
+#, fuzzy
+#| msgid "Why do you want to use little_WMS?"
+msgid "How will you use little_WMS?"
+msgstr "Warum möchtest du little_WMS nutzen?"
+
+#: hub/templates/hub/onboarding.html:14
+#, fuzzy
+#| msgid "Create organisation"
+msgid "For an organization"
+msgstr "Organisation erstellen"
+
+#: hub/templates/hub/onboarding.html:15
+msgid "For private use"
+msgstr "Für den privaten Gebrauch"
+
+#: hub/templates/hub/onboarding.html:16
+msgid "Both"
+msgstr "Beides"
+
+#: hub/templates/hub/onboarding.html:21
+msgid "How many people will use it?"
+msgstr "Wie viele Personen werden es nutzen?"
+
+#: hub/templates/hub/onboarding.html:23
+msgid "Just me"
+msgstr "Nur ich"
+
+#: hub/templates/hub/onboarding.html:24
+msgid "2–5 people"
+msgstr "2–5 Personen"
+
+#: hub/templates/hub/onboarding.html:25
+msgid "6–20 people"
+msgstr "6–20 Personen"
+
+#: hub/templates/hub/onboarding.html:26
+msgid "20+ people"
+msgstr "20+ Personen"
+
+#: hub/templates/hub/onboarding.html:30
+#, fuzzy
+#| msgid "Article types"
+msgid "Suggested article types"
+msgstr "Artikeltypen"
+
+#: hub/templates/hub/onboarding.html:39
+#, fuzzy
+#| msgid "Storage types"
+msgid "Suggested storage types"
+msgstr "Lagerorttypen"
+
+#: hub/templates/hub/onboarding.html:50
+#, fuzzy
+#| msgid "Create role templates"
+msgid "Create the standard role templates"
+msgstr "Rollen-Vorlagen anlegen"
+
+#: hub/templates/hub/onboarding.html:54
+#: occasion/templates/occasion/occasionForm.html:33
+#: organisation/templates/organisation/roles.html:21
+msgid "Create"
+msgstr "Anlegen"
+
+#: hub/templates/hub/onboarding.html:55
+#, fuzzy
+#| msgid "Skip rows"
+msgid "Skip"
+msgstr "Zeilen überspringen"
 
 #: hub/templates/hub/trash.html:12
 msgid "deleted"
@@ -398,7 +1065,7 @@ msgstr "Endgültig löschen"
 msgid "Trash is empty."
 msgstr "Der Papierkorb ist leer."
 
-#: hub/templates/hub/trash.html:31
+#: hub/templates/hub/trash.html:31 planning/templates/planning/calendar.html:24
 msgid "Back to hub"
 msgstr "Zurück zur Startseite"
 
@@ -414,12 +1081,253 @@ msgstr "Benutzername"
 #: hub/templates/registration/login.html:21
 #: organisation/templates/organisation/inviteAccept.html:18
 #: organisation/templates/organisation/register.html:25
+#: savedviews/templates/savedviews/savedViews.html:37
+#: savedviews/templates/savedviews/sharePassword.html:11
 msgid "Password"
 msgstr "Passwort"
 
 #: hub/templates/registration/login.html:25
 msgid "Login"
 msgstr "Anmelden"
+
+#: loans/models.py:17 loans/models.py:48
+#: notifications/templates/notifications/rules.html:12
+msgid "Active"
+msgstr "Aktiv"
+
+#: loans/models.py:18 loans/models.py:49 occasion/models.py:63
+msgid "Returned"
+msgstr "Zurückgegeben"
+
+#: loans/models.py:27
+#, fuzzy
+#| msgid "Your email"
+msgid "Borrower email"
+msgstr "Deine E-Mail"
+
+#: loans/models.py:29 planning/models.py:35
+#, fuzzy
+#| msgid "Occasions"
+msgid "Occasion"
+msgstr "Anlässe"
+
+#: loans/models.py:30 loans/models.py:64 planning/models.py:51
+msgid "Notes"
+msgstr "Notizen"
+
+#: loans/models.py:43
+msgid "External person"
+msgstr "Externe Person"
+
+#: loans/models.py:44
+#, fuzzy
+#| msgid "Register organisation"
+msgid "Another organisation"
+msgstr "Organisation registrieren"
+
+#: loans/models.py:47
+#, fuzzy
+#| msgid "Lendings"
+msgid "Pending"
+msgstr "Verliehen"
+
+#: loans/models.py:56
+msgid "Lender type"
+msgstr "Verleihertyp"
+
+#: loans/models.py:61 planning/models.py:49
+msgid "Start date"
+msgstr "Startdatum"
+
+#: loans/models.py:62 planning/models.py:50
+msgid "End date"
+msgstr "Enddatum"
+
+#: loans/models.py:63 occasion/models.py:69
+#, fuzzy
+#| msgid "Statistics"
+msgid "Status"
+msgstr "Statistik"
+
+#: loans/templates/loans/lendings.html:19 loans/templates/loans/loans.html:19
+msgid "Return"
+msgstr "Zurückgeben"
+
+#: loans/templates/loans/lendings.html:24
+#, fuzzy
+#| msgid "Lendings"
+msgid "No lendings"
+msgstr "Verliehen"
+
+#: loans/templates/loans/loans.html:24
+#, fuzzy
+#| msgid "Confirm password"
+msgid "Confirm"
+msgstr "Passwort bestätigen"
+
+#: loans/templates/loans/loans.html:29
+#, fuzzy
+#| msgid "Loans"
+msgid "No loans"
+msgstr "Ausleihen"
+
+#: location/models.py:18
+msgid "Address line 1"
+msgstr "Adresszeile 1"
+
+#: location/models.py:19
+msgid "Address line 2"
+msgstr "Adresszeile 2"
+
+#: location/models.py:20
+msgid "Postal code"
+msgstr "Postleitzahl"
+
+#: location/models.py:21
+msgid "City"
+msgstr "Stadt"
+
+#: location/models.py:22
+msgid "State"
+msgstr "Bundesland"
+
+#: location/models.py:23
+msgid "Country"
+msgstr "Land"
+
+#: location/views.py:48 location/views.py:68 tag/views.py:66
+msgid "thomething went wrong"
+msgstr "Etwas ist schiefgelaufen"
+
+#: location/views.py:79 tag/views.py:82
+#, fuzzy
+#| msgid "Update existing"
+msgid "Update Succses"
+msgstr "Vorhandene aktualisieren"
+
+#: location/views.py:79
+msgid "Location was updated"
+msgstr "Lagerort wurde aktualisiert"
+
+#: location/views.py:80
+msgid "thething went wrong"
+msgstr "Etwas ist schiefgelaufen"
+
+#: movement/templates/movement/buffer.html:18
+msgid "Target:"
+msgstr "Ziel:"
+
+#: movement/templates/movement/buffer.html:25
+msgid "Container detected – set as target."
+msgstr "Behälter erkannt – als Ziel gesetzt."
+
+#: movement/templates/movement/buffer.html:28
+#, fuzzy
+#| msgid "Import articles"
+msgid "Treat as article"
+msgstr "Artikel importieren"
+
+#: movement/templates/movement/buffer.html:32
+msgid "scan a storage or container"
+msgstr "Lagerort oder Behälter scannen"
+
+#: movement/templates/movement/buffer.html:42
+#, fuzzy
+#| msgid "Active"
+msgid "Active:"
+msgstr "Aktiv"
+
+#: movement/templates/movement/buffer.html:50
+msgid "Set as target"
+msgstr "Als Ziel setzen"
+
+#: movement/templates/movement/buffer.html:60
+msgid "Buffer"
+msgstr "Puffer"
+
+#: movement/templates/movement/buffer.html:91
+msgid "Session"
+msgstr "Sitzung"
+
+#: movement/templates/movement/buffer.html:105
+msgid "Undo last action"
+msgstr "Letzte Aktion rückgängig"
+
+#: movement/templates/movement/inventory.html:10
+#: movement/templates/movement/where.html:8
+msgid "Scan code or search name..."
+msgstr "Code scannen oder Namen suchen..."
+
+#: movement/templates/movement/inventoryBody.html:8
+#, fuzzy
+#| msgid "Action"
+msgid "Location:"
+msgstr "Aktion"
+
+#: movement/templates/movement/inventoryBody.html:14
+msgid "scan a location to start"
+msgstr "Lagerort scannen zum Starten"
+
+#: movement/templates/movement/inventoryBody.html:22
+msgid "scanned"
+msgstr "gescannt"
+
+#: movement/templates/movement/inventoryBody.html:30
+msgid "not found yet"
+msgstr "noch nicht gefunden"
+
+#: movement/templates/movement/inventoryBody.html:34
+msgid "Nothing expected here"
+msgstr "Hier wird nichts erwartet"
+
+#: movement/templates/movement/inventoryBody.html:43
+#, fuzzy
+#| msgid "Invitations"
+msgid "Deviations"
+msgstr "Einladungen"
+
+#: movement/templates/movement/inventoryBody.html:49
+msgid "should be in"
+msgstr "sollte sein in"
+
+#: movement/templates/movement/inventoryBody.html:51
+#, fuzzy
+#| msgid "not configured"
+msgid "not stored"
+msgstr "nicht konfiguriert"
+
+#: movement/templates/movement/inventoryBody.html:60
+#: reports/templates/reports/reports.html:11
+msgid "Export CSV"
+msgstr "CSV exportieren"
+
+#: movement/templates/movement/movement.html:10
+msgid "Scan or enter code..."
+msgstr "Code scannen oder eingeben..."
+
+#: movement/templates/movement/movement.html:16
+#, fuzzy
+#| msgid "Search"
+msgid "Search..."
+msgstr "Suche"
+
+#: movement/templates/movement/movement.html:20
+msgid "Start inventory"
+msgstr "Inventur starten"
+
+#: movement/templates/movement/where.html:11
+msgid "Where is...?"
+msgstr "Wo ist...?"
+
+#: movement/templates/movement/where.html:21
+msgid "Current:"
+msgstr "Aktuell:"
+
+#: movement/templates/movement/where.html:39
+#, fuzzy
+#| msgid "No articles"
+msgid "No article found."
+msgstr "Keine Artikel"
 
 #: notifications/checks.py:35
 #, python-format
@@ -519,10 +1427,6 @@ msgid "Trigger"
 msgstr "Auslöser"
 
 #: notifications/templates/notifications/rules.html:12
-msgid "Active"
-msgstr "Aktiv"
-
-#: notifications/templates/notifications/rules.html:12
 msgid "Threshold (days)"
 msgstr "Schwelle (Tage)"
 
@@ -555,19 +1459,192 @@ msgstr "Keine Regeln. Es werden die Standard-Empfänger benachrichtigt."
 msgid "Back"
 msgstr "Zurück"
 
-#: organisation/templates/organisation/configuration.html:9
-msgid "Article types"
-msgstr "Artikeltypen"
+#: occasion/models.py:31 storage/models.py:46
+#, fuzzy
+#| msgid "Action"
+msgid "Location"
+msgstr "Aktion"
 
+#: occasion/models.py:32 occasion/templates/occasion/occasion.html:18
+#: occasion/templates/occasion/occasionForm.html:32
+msgid "Participants"
+msgstr "Teilnehmer"
+
+#: occasion/models.py:60
+msgid "Needed"
+msgstr "Benötigt"
+
+#: occasion/models.py:61
+#, fuzzy
+#| msgid "Resend"
+msgid "Reserved"
+msgstr "Erneut senden"
+
+#: occasion/models.py:62
+msgid "Checked out"
+msgstr "Ausgegeben"
+
+#: occasion/models.py:68
+msgid "Quantity"
+msgstr "Menge"
+
+#: occasion/templates/occasion/occasion.html:14
+#, fuzzy
+#| msgid "Action"
+msgid "location"
+msgstr "Aktion"
+
+#: occasion/templates/occasion/occasion.html:26
+#, python-format
+msgid "Repeats %(rule)s — %(count)s occurrence(s)."
+msgstr "Wiederholt sich %(rule)s — %(count)s Vorkommen."
+
+#: occasion/templates/occasion/occasion.html:33
+msgid "Daily"
+msgstr "Täglich"
+
+#: occasion/templates/occasion/occasion.html:34
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+#: occasion/templates/occasion/occasion.html:35
+msgid "Monthly"
+msgstr "Monatlich"
+
+#: occasion/templates/occasion/occasion.html:36
+msgid "Yearly"
+msgstr "Jährlich"
+
+#: occasion/templates/occasion/occasion.html:39 planning/models.py:23
+msgid "Interval"
+msgstr "Intervall"
+
+#: occasion/templates/occasion/occasion.html:41
+#, fuzzy
+#| msgid "Preferences"
+msgid "Occurrences"
+msgstr "Einstellungen"
+
+#: occasion/templates/occasion/occasion.html:42
+msgid "Repeat"
+msgstr "Wiederholen"
+
+#: occasion/templates/occasion/occasion.html:48
+#, fuzzy
+#| msgid "Templates"
+msgid "Template name"
+msgstr "Vorlagen"
+
+#: occasion/templates/occasion/occasion.html:49
+#, fuzzy
+#| msgid "Create role templates"
+msgid "Save as template"
+msgstr "Rollen-Vorlagen anlegen"
+
+#: occasion/templates/occasion/occasion.html:54
+msgid "Shift days"
+msgstr "Verschiebung (Tage)"
+
+#: occasion/templates/occasion/occasion.html:55
+#, fuzzy
+#| msgid "Duplicates"
+msgid "Duplicate"
+msgstr "Duplikate"
+
+#: occasion/templates/occasion/occasion.html:58
+#, fuzzy
+#| msgid "Delete this user?"
+msgid "Delete this occasion?"
+msgstr "Diesen Benutzer löschen?"
+
+#: occasion/templates/occasion/occasion.html:60
+msgid "Delete occasion"
+msgstr "Anlass löschen"
+
+#: occasion/templates/occasion/occasionForm.html:5
+#: occasion/templates/occasion/occasions.html:8
+#, fuzzy
+#| msgid "Occasions"
+msgid "Add occasion"
+msgstr "Anlässe"
+
+#: occasion/templates/occasion/occasionForm.html:14
+#, fuzzy
+#| msgid "Email (optional)"
+msgid "template (optional)"
+msgstr "E-Mail (optional)"
+
+#: occasion/templates/occasion/occasionForm.html:20
+#: occasion/templates/occasion/templates.html:25
+msgid "type"
+msgstr "Typ"
+
+#: occasion/templates/occasion/occasionForm.html:28
+#, fuzzy
+#| msgid "Email (optional)"
+msgid "location (optional)"
+msgstr "E-Mail (optional)"
+
+#: occasion/templates/occasion/occasions.html:9
+#: organisation/templates/organisation/roles.html:9
+msgid "Templates"
+msgstr "Vorlagen"
+
+#: occasion/templates/occasion/occasions.html:10
+msgid "Types"
+msgstr "Typen"
+
+#: occasion/templates/occasion/occasions.html:24
+#, fuzzy
+#| msgid "Upcoming occasions"
+msgid "No occasions yet"
+msgstr "Anstehende Anlässe"
+
+#: occasion/templates/occasion/packlist.html:4
+msgid "Packlist"
+msgstr "Packliste"
+
+#: occasion/templates/occasion/templates.html:5
+#, fuzzy
+#| msgid "Occasions"
+msgid "Occasion templates"
+msgstr "Anlässe"
+
+#: occasion/templates/occasion/templates.html:10
+#, fuzzy
+#| msgid "Articles"
+msgid "article(s)"
+msgstr "Artikel"
+
+#: occasion/templates/occasion/templates.html:11
+#, fuzzy
+#| msgid "Delete this user?"
+msgid "Delete this template?"
+msgstr "Diesen Benutzer löschen?"
+
+#: occasion/templates/occasion/templates.html:17
+#: occasion/templates/occasion/types.html:11
 #: organisation/templates/organisation/configuration.html:14
 #: organisation/templates/organisation/configuration.html:35
 msgid "None yet"
 msgstr "Noch keine"
 
-#: organisation/templates/organisation/configuration.html:21
-#: organisation/templates/organisation/configuration.html:42
-msgid "Symbol"
-msgstr "Symbol"
+#: occasion/templates/occasion/templates.html:31
+#: occasion/templates/occasion/types.html:22
+#, fuzzy
+#| msgid "Upcoming occasions"
+msgid "Back to occasions"
+msgstr "Anstehende Anlässe"
+
+#: occasion/templates/occasion/types.html:5
+#, fuzzy
+#| msgid "Occasions"
+msgid "Occasion types"
+msgstr "Anlässe"
+
+#: organisation/templates/organisation/configuration.html:9
+msgid "Article types"
+msgstr "Artikeltypen"
 
 #: organisation/templates/organisation/configuration.html:23
 msgid "Space"
@@ -646,6 +1723,8 @@ msgid ""
 "Registration is invite-only. Please ask an organisation for an invitation "
 "link."
 msgstr "Die Registrierung ist nur auf Einladung möglich. Bitte frage eine Organisation nach einem Einladungslink."
+"Die Registrierung ist nur auf Einladung möglich. Bitte frage eine "
+"Organisation nach einem Einladungslink."
 
 #: organisation/templates/organisation/register.html:14
 #: organisation/templates/organisation/register.html:22
@@ -686,6 +1765,8 @@ msgid ""
 "Thanks! Your request for <strong>%(name)s</strong> was sent. A server admin "
 "will review it."
 msgstr "Danke! Deine Anfrage für <strong>%(name)s</strong> wurde gesendet. Ein Server-Admin prüft sie."
+"Danke! Deine Anfrage für <strong>%(name)s</strong> wurde gesendet. Ein "
+"Server-Admin prüft sie."
 
 #: organisation/templates/organisation/roleForm.html:11
 msgid "Object"
@@ -707,17 +1788,9 @@ msgstr "Gewährt"
 msgid "Roles & Permissions"
 msgstr "Rollen & Berechtigungen"
 
-#: organisation/templates/organisation/roles.html:9
-msgid "Templates"
-msgstr "Vorlagen"
-
 #: organisation/templates/organisation/roles.html:19
 msgid "created"
 msgstr "erstellt"
-
-#: organisation/templates/organisation/roles.html:21
-msgid "Create"
-msgstr "Anlegen"
 
 #: organisation/templates/organisation/roles.html:40
 msgid "No roles yet"
@@ -764,6 +1837,7 @@ msgid "Users"
 msgstr "Benutzer"
 
 #: organisation/templates/organisation/users.html:9
+#: reports/templates/reports/reports.html:51
 msgid "User"
 msgstr "Benutzer"
 
@@ -816,10 +1890,12 @@ msgid "Create link"
 msgstr "Link erstellen"
 
 #: organisation/templates/organisation/users.html:73
+#: savedviews/templates/savedviews/savedViews.html:56
 msgid "expires"
 msgstr "läuft ab"
 
 #: organisation/templates/organisation/users.html:82
+#: savedviews/templates/savedviews/savedViews.html:60
 msgid "Revoke"
 msgstr "Widerrufen"
 
@@ -864,3 +1940,191 @@ msgstr "Test-E-Mail gesendet."
 #: organisation/views.py:421
 msgid "Email is not configured; nothing was sent."
 msgstr "E-Mail ist nicht konfiguriert; es wurde nichts gesendet."
+
+#: planning/models.py:22
+msgid "Frequency"
+msgstr "Häufigkeit"
+
+#: planning/models.py:37
+msgid "Purchase"
+msgstr "Kauf"
+
+#: planning/models.py:38
+msgid "Disposal"
+msgstr "Entsorgung"
+
+#: planning/models.py:39
+msgid "Inventory"
+msgstr "Inventur"
+
+#: planning/models.py:40
+#, fuzzy
+#| msgid "Loans"
+msgid "Loan"
+msgstr "Ausleihen"
+
+#: planning/models.py:41
+msgid "Other"
+msgstr "Sonstiges"
+
+#: planning/models.py:48
+msgid "Title"
+msgstr "Titel"
+
+#: planning/templates/planning/calendar.html:21
+msgid "No entries."
+msgstr "Keine Einträge."
+
+#: reports/templates/reports/reports.html:8
+msgid "From"
+msgstr "Von"
+
+#: reports/templates/reports/reports.html:9
+msgid "To"
+msgstr "Bis"
+
+#: reports/templates/reports/reports.html:17
+msgid "Movements over time"
+msgstr "Bewegungen über die Zeit"
+
+#: reports/templates/reports/reports.html:19
+msgid "Month"
+msgstr "Monat"
+
+#: reports/templates/reports/reports.html:19
+#: reports/templates/reports/reports.html:35
+#: reports/templates/reports/reports.html:51
+#, fuzzy
+#| msgid "Movement"
+msgid "Movements"
+msgstr "Bewegung"
+
+#: reports/templates/reports/reports.html:24
+#, fuzzy
+#| msgid "Movement"
+msgid "No movements"
+msgstr "Bewegung"
+
+#: reports/templates/reports/reports.html:33
+#, fuzzy
+#| msgid "No articles"
+msgid "Usage (top articles)"
+msgstr "Keine Artikel"
+
+#: reports/templates/reports/reports.html:35
+#, fuzzy
+#| msgid "Articles"
+msgid "Article"
+msgstr "Artikel"
+
+#: reports/templates/reports/reports.html:40
+msgid "No usage"
+msgstr "Keine Nutzung"
+
+#: reports/templates/reports/reports.html:49
+#, fuzzy
+#| msgid "Recent activity"
+msgid "User activity"
+msgstr "Letzte Aktivitäten"
+
+#: reports/templates/reports/reports.html:56
+#, fuzzy
+#| msgid "Recent activity"
+msgid "No activity"
+msgstr "Letzte Aktivitäten"
+
+#: savedviews/templates/savedviews/savedViews.html:13
+msgid "shared"
+msgstr "geteilt"
+
+#: savedviews/templates/savedviews/savedViews.html:32
+msgid "Public"
+msgstr "Öffentlich"
+
+#: savedviews/templates/savedviews/savedViews.html:33
+#, fuzzy
+#| msgid "Request sent"
+msgid "Guest token"
+msgstr "Anfrage gesendet"
+
+#: savedviews/templates/savedviews/savedViews.html:34
+msgid "Internal"
+msgstr "Intern"
+
+#: savedviews/templates/savedviews/savedViews.html:36
+msgid "Days"
+msgstr "Tage"
+
+#: savedviews/templates/savedviews/savedViews.html:38
+msgid "Allow borrowing"
+msgstr "Ausleihen erlauben"
+
+#: savedviews/templates/savedviews/savedViews.html:39
+#, fuzzy
+#| msgid "Configuration"
+msgid "Needs confirmation"
+msgstr "Konfiguration"
+
+#: savedviews/templates/savedviews/savedViews.html:40
+msgid "Single use"
+msgstr "Einmalig"
+
+#: savedviews/templates/savedviews/savedViews.html:45
+#, fuzzy
+#| msgid "No roles yet"
+msgid "No views yet"
+msgstr "Noch keine Rollen"
+
+#: savedviews/templates/savedviews/savedViews.html:49
+#, fuzzy
+#| msgid "Active"
+msgid "Active links"
+msgstr "Aktiv"
+
+#: savedviews/templates/savedviews/savedViews.html:56
+msgid "single use"
+msgstr "einmalig"
+
+#: savedviews/templates/savedviews/savedViews.html:64
+#, fuzzy
+#| msgid "Create link"
+msgid "No active links"
+msgstr "Link erstellen"
+
+#: savedviews/templates/savedviews/shareInvalid.html:5
+msgid "Link unavailable"
+msgstr "Link nicht verfügbar"
+
+#: savedviews/templates/savedviews/shareInvalid.html:6
+msgid "This share link is expired, revoked, or already used."
+msgstr "Dieser Freigabelink ist abgelaufen, widerrufen oder bereits verwendet."
+
+#: savedviews/templates/savedviews/shareView.html:30
+msgid "Borrow selected"
+msgstr "Ausgewählte ausleihen"
+
+#: storage/models.py:42 tag/models.py:28
+msgid "Parent"
+msgstr "Übergeordnet"
+
+#: storage/views.py:168
+msgid "not valid code"
+msgstr "Ungültiger Code"
+
+#: tag/models.py:16 tag/models.py:30
+msgid "Color"
+msgstr "Farbe"
+
+#: tag/models.py:29
+msgid "Category"
+msgstr "Kategorie"
+
+#: tag/models.py:31
+msgid "Icon"
+msgstr "Symbol"
+
+#: tag/views.py:82
+#, fuzzy
+#| msgid "updated"
+msgid "Tag was updated."
+msgstr "aktualisiert"
