@@ -1,12 +1,15 @@
-"""Saved views (§10)."""
+"""Saved views and share links (§10)."""
 import json
+from datetime import timedelta
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password, make_password
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from organisation.decorators import require_scope
-from savedviews.models import SavedView
+from savedviews.models import SavedView, ShareLink
 
 
 def visible_views(user):
@@ -19,6 +22,7 @@ def visible_views(user):
 def savedViews(request):
     return render(request, "savedviews/savedViews.html", {
         "views": visible_views(request.user),
+        "links": ShareLink.objects.filter(saved_view__in=visible_views(request.user), is_active=True),
     })
 
 
@@ -50,3 +54,63 @@ def delSavedView(request, viewId):
     if request.method == "POST":
         saved_view.delete()
     return redirect("saved views")
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def shareSavedView(request, viewId):
+    saved_view = get_object_or_404(SavedView, pk=viewId)
+    if request.method == "POST":
+        days = request.POST.get("days", "").strip()
+        password = request.POST.get("password", "")
+        ShareLink.objects.create(
+            saved_view=saved_view,
+            access_mode=request.POST.get("access_mode", "public"),
+            expires_at=timezone.now() + timedelta(days=int(days)) if days.isdigit() else None,
+            single_use=request.POST.get("single_use") == "on",
+            password_hash=make_password(password) if password else "",
+            created_by=request.user,
+        )
+    return redirect("saved views")
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def revokeShareLink(request, linkId):
+    link = get_object_or_404(ShareLink, pk=linkId)
+    if request.method == "POST":
+        link.is_active = False
+        link.save()
+    return redirect("saved views")
+
+
+def shareLinkView(request, token):
+    """Public capability URL: show a saved view read-only (§10)."""
+    from article.models import Article
+    from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+
+    link = get_object_or_404(ShareLink, token=token)
+    if not link.is_valid():
+        return render(request, "savedviews/shareInvalid.html", {"link": link})
+
+    session_key = "share_%s" % link.pk
+    if link.password_hash and not request.session.get(session_key):
+        error = ""
+        if request.method == "POST":
+            if check_password(request.POST.get("password", ""), link.password_hash):
+                request.session[session_key] = True
+                return redirect("share link", token=token)
+            error = "Wrong password"
+        return render(request, "savedviews/sharePassword.html", {"link": link, "error": error})
+
+    articles = Article.objects.all()
+    try:
+        articles = articles.filter(parse_json(json.dumps(link.saved_view.query), ARTICLE_FIELDS))
+    except QueryError:
+        pass
+
+    if link.single_use:
+        link.used_count += 1
+        link.save()
+
+    return render(request, "savedviews/shareView.html", {"link": link, "articles": articles})

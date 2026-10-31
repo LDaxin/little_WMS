@@ -1,0 +1,16 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>{{ link.saved_view.name }}</h4>
+
+<table class="table">
+    <thead><tr><th>Name</th><th>Code</th></tr></thead>
+    <tbody>
+        {% for article in articles %}
+        <tr><td>{{ article.base.name }}</td><td>{{ article.code.code }}</td></tr>
+        {% empty %}
+        <tr><td colspan="2" class="text-muted">No articles</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,8 +1,13 @@
+from datetime import timedelta
+
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import Permission, User
 from django.test import TestCase
+from django.utils import timezone
 
+from article.models import Article, ArticleBase, ArticleType
 from organisation.models import Organisation, Role, UserProfile
-from savedviews.models import SavedView
+from savedviews.models import SavedView, ShareLink
 
 
 def user_with(organisation, username, *codenames):
@@ -46,3 +51,59 @@ class SavedViewTest(TestCase):
         self.client.post("/views/%s/delete/" % view.pk)
         view.refresh_from_db()
         self.assertIsNotNone(view.deleted_at)
+
+
+class ShareLinkTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.org = Organisation.objects.create(name="A", slug="a")
+        article_type = ArticleType.objects.create(name="tent", symbol="TZ", organisation=cls.org)
+        base = ArticleBase.objects.create(name="Jurte", pType=article_type, organisation=cls.org)
+        Article.objects.create(base=base, organisation=cls.org)
+
+    def setUp(self):
+        self.user = user_with(self.org, "u", "article_view_all")
+        self.client.login(username="u", password="pw")
+        self.view = SavedView.objects.create(
+            owner=self.user, name="Mine", typ="tent", organisation=self.org,
+            query={"type": "AND", "conditions": []},
+        )
+
+    def test_create_link(self):
+        self.client.post("/views/%s/share/" % self.view.pk, {"access_mode": "public"})
+        link = ShareLink.objects.get()
+        self.assertTrue(link.token)
+        self.assertTrue(link.is_active)
+
+    def test_open_valid_link(self):
+        link = ShareLink.objects.create(saved_view=self.view)
+        response = self.client.get("/s/%s/" % link.token)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Jurte")
+
+    def test_expired_link(self):
+        link = ShareLink.objects.create(saved_view=self.view, expires_at=timezone.now() - timedelta(days=1))
+        self.assertContains(self.client.get("/s/%s/" % link.token), "unavailable")
+
+    def test_revoked_link(self):
+        link = ShareLink.objects.create(saved_view=self.view, is_active=False)
+        self.assertContains(self.client.get("/s/%s/" % link.token), "unavailable")
+
+    def test_single_use(self):
+        link = ShareLink.objects.create(saved_view=self.view, single_use=True)
+        self.client.get("/s/%s/" % link.token)
+        link.refresh_from_db()
+        self.assertEqual(link.used_count, 1)
+        self.assertContains(self.client.get("/s/%s/" % link.token), "unavailable")
+
+    def test_password(self):
+        link = ShareLink.objects.create(saved_view=self.view, password_hash=make_password("secret"))
+        self.assertContains(self.client.get("/s/%s/" % link.token), "Password")
+        response = self.client.post("/s/%s/" % link.token, {"password": "secret"})
+        self.assertEqual(response.status_code, 302)
+
+    def test_revoke(self):
+        link = ShareLink.objects.create(saved_view=self.view)
+        self.client.post("/share-links/%s/revoke/" % link.pk)
+        link.refresh_from_db()
+        self.assertFalse(link.is_active)
