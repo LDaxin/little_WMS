@@ -1,22 +1,26 @@
 ## Why
 
 §19 lists import. New organisations often have their inventory in a spreadsheet;
-without import they would type hundreds of articles by hand. This is the
-practical blocker for using the system with real data.
+without import they would type hundreds of articles by hand. A first CSV import
+exists, but it fails a row on an unknown type/storage and does not handle the
+German Excel export (semicolon delimiter, German headers).
 
 ## What Changes
 
-- A CSV import for articles: upload a file with the columns `name`, `type`,
-  `menge`, `storage`, `zustand`.
-- Validation per row (unknown type/storage, invalid quantity, missing name) with
-  a report of imported and failed rows.
-- A downloadable CSV template with the expected columns and an example row.
+- A two-step import: upload → **preview** (dry-run) → confirm.
+- The preview classifies rows (valid, errors, unknown types, unknown storages,
+  duplicates) and lets the user decide per unknown type/storage: create, map to
+  an existing one, or skip; and for duplicates: skip or update.
+- Delimiter detection (`,` / `;` / tab) so German Excel exports work.
+- Header aliases (German and English) mapped to the canonical columns.
+- A downloadable CSV template.
 
 ## Capabilities
 
 ### New Capabilities
 
-- `import`: CSV import of articles with validation and a report.
+- `import`: CSV import of articles with a preview, decisions, validation, and a
+  report.
 
 ### Modified Capabilities
 
@@ -24,6 +28,7 @@ practical blocker for using the system with real data.
 
 ## Impact
 
-- New `article/importer.py` service, an import view/template/urls, tests.
-- **Deferred**: column-mapping UI, Excel (`openpyxl`), HTMX preview, importing
-  storages/locations/tags/types, duplicate handling.
+- `article/importer.py` (parse, preview, import), import views/templates/urls,
+  tests, example CSVs.
+- **Deferred**: Excel (`openpyxl`), importing storages/locations/tags/types,
+  per-row column mapping UI.
