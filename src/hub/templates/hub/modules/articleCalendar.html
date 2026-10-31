@@ -1,0 +1,13 @@
+<div id="articleCalendar" class="p-2 border rounded mb-2">
+    <h6>Calendar</h6>
+    <ul class="list-group list-group-flush">
+        {% for term in articleTerms %}
+        <li class="list-group-item py-1 d-flex justify-content-between align-items-center">
+            <span>{% if term.url %}<a href="{{ term.url }}">{{ term.label }}</a>{% else %}{{ term.label }}{% endif %}</span>
+            <span class="text-muted small">{{ term.date|date:"Y-m-d" }}</span>
+        </li>
+        {% empty %}
+        <li class="list-group-item text-muted">No terms</li>
+        {% endfor %}
+    </ul>
+</div>
