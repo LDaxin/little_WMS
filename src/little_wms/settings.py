@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "occasion.apps.OccasionConfig",
     "notifications.apps.NotificationsConfig",
     "loans.apps.LoansConfig",
+    "reports.apps.ReportsConfig",
     "api.apps.ApiConfig",
     "softdelete",
     "django.contrib.admin",
