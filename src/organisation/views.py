@@ -11,8 +11,31 @@ from django.utils import timezone
 
 from organisation.decorators import require_perm
 from organisation.models import Invitation, Organisation, OrganisationRequest, Role, UserProfile
-from organisation.permissions import PERMISSIONS
+from organisation.permissions import PERMISSIONS, ensure_role_templates
 from organisation.services import active_organisation, set_active_organisation
+
+
+# Standard types from §8.
+DEFAULT_ARTICLE_TYPES = [
+    ("tent", "TZ", True),
+    ("kitchen", "KU", False),
+    ("tool", "WZ", False),
+    ("office", "BU", False),
+    ("sport", "SP", False),
+    ("tech", "TE", False),
+    ("box", "KI", True),
+    ("consumable", "VB", False),
+    ("other", "SO", False),
+]
+DEFAULT_STORAGE_TYPES = [
+    ("building", "GE"),
+    ("room", "RA"),
+    ("shelf", "RE"),
+    ("compartment", "FA"),
+    ("cabinet", "SC"),
+    ("container", "CO"),
+    ("vehicle", "FZ"),
+]
 
 
 def _organisation(request):
@@ -361,4 +384,52 @@ def serverSettings(request):
     return render(request, "organisation/serverSettings.html", {
         "settings": settings,
         "policies": Settings.REGISTRATION_POLICY_CHOICES,
+    })
+
+
+def _load_defaults():
+    """Create the standard article and storage types from §8."""
+    from article.models import ArticleType
+    from storage.models import StorageType
+
+    for name, symbol, toggle in DEFAULT_ARTICLE_TYPES:
+        ArticleType.objects.get_or_create(
+            name=name, defaults={"symbol": symbol, "article_toggle_space": toggle}
+        )
+    for name, symbol in DEFAULT_STORAGE_TYPES:
+        StorageType.objects.get_or_create(name=name, defaults={"symbol": symbol})
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("settings.edit_all")
+def configuration(request):
+    """Organisation configuration: article types, storage types, role templates (§8)."""
+    from article.models import ArticleType
+    from storage.models import StorageType
+
+    organisation = _organisation(request)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "article_type":
+            name = request.POST.get("name", "").strip()
+            if name:
+                ArticleType.objects.create(
+                    name=name,
+                    symbol=request.POST.get("symbol", "").strip(),
+                    article_toggle_space=request.POST.get("article_toggle_space") == "on",
+                )
+        elif action == "storage_type":
+            name = request.POST.get("name", "").strip()
+            if name:
+                StorageType.objects.create(
+                    name=name, symbol=request.POST.get("symbol", "").strip()
+                )
+        elif action == "load_defaults":
+            _load_defaults()
+        elif action == "role_templates":
+            ensure_role_templates(organisation)
+        return redirect("configuration")
+    return render(request, "organisation/configuration.html", {
+        "article_types": ArticleType.objects.all(),
+        "storage_types": StorageType.objects.all(),
     })
