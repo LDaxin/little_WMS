@@ -1,0 +1,56 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Welcome to little_WMS</h4>
+<p class="text-muted">A quick setup. You can change everything later in Configuration.</p>
+
+<form method="post">
+    {% csrf_token %}
+
+    <div class="mb-3">
+        <label class="form-label">How will you use little_WMS?</label>
+        <select name="usage" class="form-select" style="max-width:20rem">
+            <option value="organization">For an organization</option>
+            <option value="private">For private use</option>
+            <option value="both">Both</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">How many people will use it?</label>
+        <select name="team_size" class="form-select" style="max-width:20rem">
+            <option value="1">Just me</option>
+            <option value="5">2&ndash;5 people</option>
+            <option value="20">6&ndash;20 people</option>
+            <option value="100">20+ people</option>
+        </select>
+    </div>
+
+    <h6>Suggested article types</h6>
+    <div class="d-flex flex-wrap gap-3 mb-3">
+        {% for name, symbol, toggle in article_types %}
+        <label class="form-check-label d-flex align-items-center gap-1">
+            <input type="checkbox" name="article_{{ name }}" class="form-check-input" checked> {{ name }}
+        </label>
+        {% endfor %}
+    </div>
+
+    <h6>Suggested storage types</h6>
+    <div class="d-flex flex-wrap gap-3 mb-3">
+        {% for name, symbol in storage_types %}
+        <label class="form-check-label d-flex align-items-center gap-1">
+            <input type="checkbox" name="storage_{{ name }}" class="form-check-input" checked> {{ name }}
+        </label>
+        {% endfor %}
+    </div>
+
+    <div class="mb-3">
+        <label class="form-check-label d-flex align-items-center gap-1">
+            <input type="checkbox" name="role_templates" class="form-check-input" checked> Create the standard role templates
+        </label>
+    </div>
+
+    <button class="btn btn-primary">Create</button>
+    <button class="btn btn-outline-secondary" name="skip" value="1">Skip</button>
+</form>
+{% endblock %}

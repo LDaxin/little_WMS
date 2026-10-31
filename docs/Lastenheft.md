@@ -1003,8 +1003,6 @@ python manage.py test
 | Shelf | A shelf in the room |
 | Compartment | A compartment in the shelf |
 | Cabinet | A cabinet |
-| Container | Shipping/storage container |
-| Vehicle | Car, van, trailer (when used as storage) |
 
 ### Standard Article Types (easily movable)
 
@@ -1017,6 +1015,8 @@ python manage.py test
 | Sport | ❌ No | Sport type |
 | Tech | ❌ No | Power consumption (watt), battery type |
 | Box/Crate | ✅ Yes | Dimensions, material, stackable?, load capacity |
+| Container | ✅ Yes | Dimensions, material |
+| Vehicle | ✅ Yes | Plate, type |
 | Consumable | ❌ No | Expiry date, hazardous? |
 | Other | ❌ No | – |
 

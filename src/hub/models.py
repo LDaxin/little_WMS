@@ -15,4 +15,5 @@ class Settings(SoftDeleteObject, models.Model):
     registration_policy = models.CharField(
         max_length=10, choices=REGISTRATION_POLICY_CHOICES, default="invite"
     )
+    onboarding_completed = models.BooleanField(default=False)
 

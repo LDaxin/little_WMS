@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound
 from django.template.loader import render_to_string
 from .models import *
@@ -41,6 +41,38 @@ def manifest(request):
 def serviceWorker(request):
     """Service worker caching the app shell (§34)."""
     return render(request, "hub/sw.js", content_type="application/javascript")
+
+
+@login_required(login_url='/accounts/login/')
+def onboarding(request):
+    """First-run setup wizard (§8)."""
+    from article.models import ArticleType
+    from hub.models import Settings
+    from organisation.permissions import ensure_role_templates
+    from organisation.services import active_organisation
+    from organisation.views import DEFAULT_ARTICLE_TYPES, DEFAULT_STORAGE_TYPES
+    from storage.models import StorageType
+
+    settings = Settings.objects.first() or Settings.objects.create()
+    if request.method == "POST":
+        if not request.POST.get("skip"):
+            for name, symbol, toggle in DEFAULT_ARTICLE_TYPES:
+                if request.POST.get("article_%s" % name):
+                    ArticleType.objects.get_or_create(
+                        name=name, defaults={"symbol": symbol, "article_toggle_space": toggle}
+                    )
+            for name, symbol in DEFAULT_STORAGE_TYPES:
+                if request.POST.get("storage_%s" % name):
+                    StorageType.objects.get_or_create(name=name, defaults={"symbol": symbol})
+            if request.POST.get("role_templates"):
+                ensure_role_templates(active_organisation(request))
+        settings.onboarding_completed = True
+        settings.save()
+        return redirect("hub")
+    return render(request, "hub/onboarding.html", {
+        "article_types": DEFAULT_ARTICLE_TYPES,
+        "storage_types": DEFAULT_STORAGE_TYPES,
+    })
 
 
 @login_required(login_url='/accounts/login/')

@@ -40,3 +40,13 @@ class ConfigurationTest(TestCase):
         user_with("nobody", "article_view_all")
         self.client.login(username="nobody", password="pw")
         self.assertEqual(self.client.get("/configuration/").status_code, 403)
+
+    def test_container_vehicle_are_article_types(self):
+        from organisation.views import DEFAULT_ARTICLE_TYPES, DEFAULT_STORAGE_TYPES
+
+        article_names = [t[0] for t in DEFAULT_ARTICLE_TYPES]
+        storage_names = [t[0] for t in DEFAULT_STORAGE_TYPES]
+        self.assertIn("container", article_names)
+        self.assertIn("vehicle", article_names)
+        self.assertNotIn("container", storage_names)
+        self.assertNotIn("vehicle", storage_names)
