@@ -13,6 +13,7 @@ from organisation.decorators import require_perm
 from organisation.models import Invitation, Organisation, OrganisationRequest, Role, UserProfile
 from organisation.permissions import PERMISSIONS, ensure_role_templates
 from organisation.services import active_organisation, set_active_organisation
+from organisation.verification import is_user_verified, request_verification, verify
 
 
 # Standard types from §8.
@@ -130,7 +131,7 @@ def roleDelete(request, roleId):
 def users(request):
     organisation = _organisation(request)
     rows = [
-        {"user": p.user, "profile": p}
+        {"user": p.user, "profile": p, "verified": is_user_verified(p.user)}
         for p in UserProfile.objects.filter(organisation=organisation).select_related("user")
     ]
     return render(request, "organisation/users.html", {
@@ -227,7 +228,8 @@ def inviteCreate(request):
 
         link = request.build_absolute_uri(reverse("invite accept", args=[invitation.token]))
         send(email, "Invitation to little_WMS",
-             "You have been invited to join %s.\n\n%s\n" % (organisation.name, link))
+             "You have been invited to join %s.\n\n%s\n" % (organisation.name, link),
+             require_verified=False)
     return redirect("users")
 
 
@@ -272,10 +274,29 @@ def inviteAccept(request, token):
             user = User.objects.create_user(username, email, password)
             login(request, user)
             _accept_invitation(invitation, user)
+            request_verification(user, request)
             set_active_organisation(request, invitation.organisation)
             return redirect("hub")
     return render(request, "organisation/inviteAccept.html",
                   {"invitation": invitation, "error": error})
+
+
+def verifyEmail(request, token):
+    """Public confirmation link (§30)."""
+    record = verify(token)
+    return render(request, "organisation/verifyEmail.html", {"record": record})
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("user.edit_role_all")
+def resendVerification(request, userId):
+    """Resend the confirmation link for a user (§30)."""
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    user = get_object_or_404(User, pk=userId)
+    request_verification(user, request)
+    return redirect("users")
 
 
 def _registration_policy():
@@ -326,6 +347,7 @@ def registerOrganisation(request):
             UserProfile.objects.create(
                 user=user, organisation=organisation, role=organisation.roles.get(name="Admin")
             )
+            request_verification(user, request)
             login(request, user)
             set_active_organisation(request, organisation)
             return redirect("hub")
@@ -392,7 +414,8 @@ def serverSettings(request):
             from hub.mail import send
 
             sent = send(request.user.email, "little_WMS test email",
-                        "This is a test email from little_WMS.")
+                        "This is a test email from little_WMS.",
+                        require_verified=False)
             test_result = ("Test email sent." if sent
                            else "Email is not configured; nothing was sent.")
         else:
