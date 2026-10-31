@@ -5,7 +5,7 @@ from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -431,6 +431,19 @@ def serverSettings(request):
         "email_host": django_settings.EMAIL_HOST,
         "test_result": test_result,
     })
+
+
+@login_required(login_url='/accounts/login/')
+def serverBackup(request):
+    """Download a full database backup (§17)."""
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    from hub.backup import backup_bytes
+
+    response = HttpResponse(backup_bytes(), content_type="application/octet-stream")
+    response["Content-Disposition"] = 'attachment; filename="little_wms_backup.sqlite3"'
+    return response
 
 
 def _load_defaults():

@@ -28,4 +28,8 @@
     <button class="btn btn-outline-secondary">Send test email</button>
     {% if test_result %}<span class="text-muted">{{ test_result }}</span>{% endif %}
 </form>
+
+<h5 class="mt-4">Backup</h5>
+<p class="text-muted mb-2">Download a full copy of the database.</p>
+<a class="btn btn-outline-secondary" href="{% url 'server backup' %}">Download backup</a>
 {% endblock %}
