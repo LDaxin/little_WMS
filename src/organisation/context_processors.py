@@ -15,4 +15,5 @@ def active_organisation(request):
             for profile in request.user.profiles.select_related("organisation")
         ],
         "can_manage_roles": has_perm(request.user, "user.edit_role_all", organisation),
+        "can_manage_notification_rules": has_perm(request.user, "notification.manage_rules_all", organisation),
     }

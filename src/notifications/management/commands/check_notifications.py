@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand
 
 from notifications.checks import run_checks
-from notifications.services import notify_roles
+from notifications.models import NotificationRule
+from notifications.services import notify, notify_email, notify_roles
 from organisation.models import Organisation
 
 
@@ -12,14 +13,33 @@ class Command(BaseCommand):
         created = 0
         for organisation in Organisation.objects.all():
             for finding in run_checks(organisation):
-                results = notify_roles(
-                    organisation,
-                    "article_view_all",
-                    finding.title,
-                    finding.message,
-                    finding.link,
-                    finding.trigger_type,
-                    finding.dedupe_key,
-                )
-                created += sum(1 for result in results if result is not None)
+                created += self._apply(organisation, finding)
         self.stdout.write(self.style.SUCCESS("Notifications created: %d" % created))
+
+    def _apply(self, organisation, finding):
+        """Notify the recipients of a finding, using the configured rules."""
+        rules = NotificationRule.objects.filter(
+            organisation=organisation, trigger_type=finding.trigger_type, active=True
+        )
+        if not rules.exists():
+            results = notify_roles(
+                organisation, "article_view_all",
+                finding.title, finding.message, finding.link,
+                finding.trigger_type, finding.dedupe_key,
+            )
+            return sum(1 for result in results if result is not None)
+
+        created = 0
+        for rule in rules:
+            for user in rule.recipients():
+                if rule.channel_in_app:
+                    result = notify(
+                        user, finding.title, finding.message, finding.link,
+                        finding.trigger_type, finding.dedupe_key, email=rule.channel_email,
+                    )
+                    created += 1 if result is not None else 0
+                elif rule.channel_email:
+                    created += 1 if notify_email(
+                        user, finding.title, finding.message, finding.link
+                    ) else 0
+        return created

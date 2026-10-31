@@ -1,0 +1,11 @@
+{% extends "hub/header.html" %}
+
+{% block content %}
+<h4>Notification rule</h4>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary">Save</button>
+    <a class="btn btn-outline-secondary" href="{% url 'notification rules' %}">Cancel</a>
+</form>
+{% endblock %}
