@@ -27,6 +27,7 @@ urlpatterns = [
     path('', include("article.urls")),
     path('', include("storage.urls")),
     path('', include("movement.urls")),
+    path('', include("planning.urls")),
     path('', include("occasion.urls")),
     path('', include("location.urls")),
     path('', include("export.urls")),
