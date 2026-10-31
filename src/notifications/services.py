@@ -3,6 +3,7 @@
 Views never build notification text themselves — they call this service, which
 is the single place to translate the messages.
 """
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from notifications.models import Notification
@@ -18,7 +19,7 @@ def notify(user, title, message="", link="", trigger_type="", dedupe_key=""):
         user=user, dedupe_key=dedupe_key, is_read=False
     ).exists():
         return None
-    return Notification.objects.create(
+    notification = Notification.objects.create(
         user=user,
         title=title,
         message=message,
@@ -26,6 +27,24 @@ def notify(user, title, message="", link="", trigger_type="", dedupe_key=""):
         trigger_type=trigger_type,
         dedupe_key=dedupe_key,
     )
+    _send_email(notification)
+    return notification
+
+
+def _send_email(notification):
+    """Email the notification to the user (subject to verification + opt-out)."""
+    user = notification.user
+    if not user.email:
+        return
+    from hub.mail import send
+
+    body = notification.message
+    link = notification.link
+    if link and settings.SITE_URL:
+        link = settings.SITE_URL + link
+    if link:
+        body = (body + "\n\n" if body else "") + link
+    send(user.email, notification.title, body, category="notifications")
 
 
 def notify_roles(organisation, codename, title, message="", link="", trigger_type="", dedupe_key=""):

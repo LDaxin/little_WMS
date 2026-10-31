@@ -3,10 +3,13 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center">
     <h4>Notifications</h4>
-    <form method="post" action="{% url 'notifications read all' %}">
-        {% csrf_token %}
-        <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
-    </form>
+    <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{% url 'email preferences' %}">Email preferences</a>
+        <form method="post" action="{% url 'notifications read all' %}">
+            {% csrf_token %}
+            <button class="btn btn-sm btn-outline-secondary">Mark all as read</button>
+        </form>
+    </div>
 </div>
 
 <ul class="list-group mt-2">

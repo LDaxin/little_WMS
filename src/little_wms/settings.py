@@ -193,3 +193,6 @@ DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "little_WMS <noreply@l
 EMAIL_CONFIGURED = bool(EMAIL_HOST)
 if not EMAIL_CONFIGURED:
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+# Absolute base URL used to build links in emails (e.g. https://wms.example.com).
+SITE_URL = os.environ.get("SITE_URL", "").rstrip("/")

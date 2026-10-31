@@ -200,3 +200,22 @@ def trashDeleteForever(request, contentTypeId, objectId):
         obj.delete()
     return redirect("trash")
 
+
+@login_required(login_url='/accounts/login/')
+def emailPreferences(request):
+    """Per-category email opt-out (§6)."""
+    from hub.mail import is_subscribed, set_subscription
+    from hub.models import EmailPreference
+
+    categories = EmailPreference.CATEGORY_CHOICES
+    if request.method == "POST":
+        for value, _label in categories:
+            set_subscription(request.user, value, request.POST.get(value) == "on")
+        return redirect("email preferences")
+    return render(request, "hub/emailPreferences.html", {
+        "categories": [
+            {"value": value, "label": label, "subscribed": is_subscribed(request.user, value)}
+            for value, label in categories
+        ],
+    })
+

@@ -1,9 +1,11 @@
 from django.contrib.auth.models import Permission, User
-from django.test import TestCase
+from django.core import mail
+from django.test import TestCase, override_settings
 
+from hub.mail import set_subscription
 from notifications.models import Notification
 from notifications.services import notify, notify_roles
-from organisation.models import Organisation, Role, UserProfile
+from organisation.models import EmailVerification, Organisation, Role, UserProfile
 
 
 class NotificationServiceTest(TestCase):
@@ -50,3 +52,28 @@ class NotificationCenterTest(TestCase):
         User.objects.create_user("nobody", password="pw")
         self.client.login(username="nobody", password="pw")
         self.assertEqual(self.client.get("/notifications/").status_code, 403)
+
+
+class NotificationEmailTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("u", "u@example.com", "pw")
+
+    @override_settings(EMAIL_CONFIGURED=True)
+    def test_notify_sends_email_when_verified(self):
+        EmailVerification.objects.create(user=self.user, email="u@example.com", verified=True)
+        notify(self.user, "Hello", message="World", link="/x/")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].subject, "Hello")
+
+    @override_settings(EMAIL_CONFIGURED=True)
+    def test_notify_skips_unverified(self):
+        notify(self.user, "Hello")
+        self.assertEqual(len(mail.outbox), 0)
+
+    @override_settings(EMAIL_CONFIGURED=True)
+    def test_notify_skips_opted_out(self):
+        EmailVerification.objects.create(user=self.user, email="u@example.com", verified=True)
+        set_subscription(self.user, "notifications", False)
+        notify(self.user, "Hello")
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertTrue(Notification.objects.filter(user=self.user).exists())
