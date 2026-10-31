@@ -9,7 +9,7 @@ from planning.models import CalendarEntry, RecurrenceRule
 from location.models import Location
 from organisation.decorators import require_perm
 from occasion.models import Occasion, OccasionTemplate, OccasionType, Packlist
-from occasion.services import repeat_occasion
+from occasion.services import duplicate_occasion, repeat_occasion
 
 
 def _int_or_none(value):
@@ -195,6 +195,17 @@ def repeatOccasion(request, occasionId):
             occ.calendar_entry.recurrence_rule = rule
             occ.calendar_entry.save()
             repeat_occasion(occ, rule)
+    return redirect("occasion", occasionId=occ.pk)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("occasion.create_all")
+def duplicateOccasion(request, occasionId):
+    occ = get_object_or_404(Occasion, pk=occasionId)
+    if request.method == "POST":
+        shift = _int_or_none(request.POST.get("shift_days")) or 0
+        copy = duplicate_occasion(occ, shift)
+        return redirect("occasion", occasionId=copy.pk)
     return redirect("occasion", occasionId=occ.pk)
 
 
