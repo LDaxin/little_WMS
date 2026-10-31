@@ -38,6 +38,8 @@ def _article_terms(article):
         })
     if article.ablaufdatum:
         terms.append({"date": article.ablaufdatum, "label": "Expires", "url": None})
+    for entry in article.calendar_entries.filter(entry_type="maintenance"):
+        terms.append({"date": entry.start_date, "label": "Maintenance: %s" % entry.title, "url": None})
     terms.sort(key=lambda term: term["date"])
     return terms
 
@@ -105,6 +107,28 @@ def article(request, typ, articleId):
         return render(request, "hub/modules/item.html", context=context)
     else:
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def addMaintenance(request, typ, articleId):
+    """Record a maintenance due date for an article (§2)."""
+    from planning.models import CalendarEntry
+
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        due = request.POST.get("due_date", "")
+        if title and due:
+            CalendarEntry.objects.create(
+                entry_type="maintenance",
+                title=title,
+                start_date=due,
+                article=article,
+                responsible_user=request.user,
+            )
+    return redirect("article", typ=typ, articleId=articleId)
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "create")
