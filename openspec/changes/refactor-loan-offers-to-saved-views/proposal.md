@@ -12,7 +12,7 @@ Reusing §9/§10 removes the duplication.
   `requires_confirmation`; a link with the `borrow` permission lets a logged-in
   user borrow the view's articles (a loan, pending or active).
 - Keep `OrganisationMembership` (shared pools) — there is no existing system for
-  it.
+  it; it lives in the `loans` capability.
 
 ## Capabilities
 
@@ -23,7 +23,7 @@ Reusing §9/§10 removes the duplication.
 ### Modified Capabilities
 
 - `saved-views`: share links can allow borrowing.
-- `loans`: offers are saved views + share links.
+- `loans`: offers are saved views + share links; shared pools; pending loans.
 
 ## Impact
 
