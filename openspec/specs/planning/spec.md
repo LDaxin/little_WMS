@@ -107,3 +107,12 @@ article. The article's mini calendar SHALL list its maintenance entries.
 - **WHEN** a user without `article.edit_all` adds a maintenance entry
 - **THEN** the system responds with 403
 
+### Requirement: Loan calendar entries
+
+The calendar SHALL support a `loan` entry type, used by loans for their period.
+
+#### Scenario: A loan entry is a calendar entry
+
+- **WHEN** a loan is created
+- **THEN** it is backed by a calendar entry of type `loan`
+
