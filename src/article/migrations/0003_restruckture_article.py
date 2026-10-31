@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='article.articlebase'),
                 preserve_default=False,
             ),
-            migrations.RunPython(dataTransfer),
+            migrations.RunPython(dataTransfer, reverse_code=migrations.RunPython.noop),
             migrations.AlterField(
                 model_name='article',
                 name='base',
