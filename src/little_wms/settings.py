@@ -181,3 +181,15 @@ if os.environ.get("SECURE_HTTPS"):
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Email / SMTP (§30): configured via the environment. Without EMAIL_HOST the
+# console backend is used and email counts as not configured.
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = os.environ.get("EMAIL_USE_TLS", "True").lower() in ("1", "true", "yes")
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "little_WMS <noreply@localhost>")
+EMAIL_CONFIGURED = bool(EMAIL_HOST)
+if not EMAIL_CONFIGURED:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
