@@ -146,6 +146,9 @@ class ArticleBase(SoftDeleteObject, models.Model):
     # Global minimum for this kind of thing, independent of location (§4d).
     mindestbestand = models.IntegerField(null=True, blank=True)
 
+    # Optimistic locking (§36): incremented on every save.
+    version = models.IntegerField(default=0)
+
     code = models.OneToOneField(UuidCode, on_delete = models.CASCADE, editable = False, blank = True, null = True)
 
     def save(self, *args, **kwargs):
@@ -190,6 +193,9 @@ class Article(SoftDeleteObject, models.Model):
 
     # Custom field values for article-level fields (§25)
     attributes = models.JSONField(default=dict, blank=True)
+
+    # Optimistic locking (§36): incremented on every save.
+    version = models.IntegerField(default=0)
 
     tags = models.ManyToManyField(Tag, blank=True, related_name="articles")
 
