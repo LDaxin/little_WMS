@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "space.apps.SpaceConfig",
     "export.apps.ExportConfig",
     "movement.apps.MovementConfig",
+    "planning.apps.PlanningConfig",
     "occasion.apps.OccasionConfig",
     "softdelete",
     "django.contrib.admin",
