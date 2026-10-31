@@ -763,3 +763,63 @@ def articleScanner(request, typ, scannerId, state):
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
+def importArticles(request):
+    """Upload a CSV and preview the import (§19)."""
+    from article.importer import parse_csv, preview_import
+
+    if request.method == "POST":
+        upload = request.FILES.get("file")
+        if upload is None:
+            return render(request, "article/import.html", {"error": "No file uploaded."})
+        text = upload.read().decode("utf-8-sig", errors="replace")
+        request.session["import_text"] = text
+        organisation = active_organisation(request)
+        return render(request, "article/importPreview.html", {
+            "preview": preview_import(parse_csv(text), organisation),
+            "types": ArticleType.objects.filter(organisation=organisation),
+            "storages": Storage.objects.filter(organisation=organisation),
+        })
+    return render(request, "article/import.html", {})
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
+def importConfirm(request):
+    """Apply the preview choices and import (§19)."""
+    from article.importer import import_articles, parse_csv
+
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+    text = request.session.pop("import_text", None)
+    if not text:
+        return redirect("import articles")
+    organisation = active_organisation(request)
+    type_choices = {
+        name: request.POST.get("type_%s" % name, "skip")
+        for name in request.POST.getlist("unknown_type")
+    }
+    storage_choices = {
+        name: request.POST.get("storage_%s" % name, "skip")
+        for name in request.POST.getlist("unknown_storage")
+    }
+    report = import_articles(
+        parse_csv(text), organisation, type_choices, storage_choices,
+        request.POST.get("duplicates", "skip"),
+    )
+    return render(request, "article/import.html", {"report": report})
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("article.create_all")
+def importTemplate(request):
+    """Downloadable CSV template (§19)."""
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="article-import-template.csv"'
+    writer = csv.writer(response)
+    writer.writerow(["name", "type", "menge", "storage", "zustand"])
+    writer.writerow(["Hammer", "tool", "1", "Regal 1", "gut"])
+    return response
+
