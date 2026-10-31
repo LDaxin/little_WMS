@@ -165,3 +165,14 @@ the standard types from §8 and create the standard role templates.
 - **WHEN** a user without `settings.edit_all` opens the configuration page
 - **THEN** the system responds with 403
 
+### Requirement: Standard configuration defaults
+
+The standard article types SHALL include Container and Vehicle (both with
+`article_toggle_space`), and the standard storage types SHALL NOT include them,
+following the §8 philosophy (movable = article).
+
+#### Scenario: Container and Vehicle are article types
+
+- **WHEN** the standard defaults are loaded
+- **THEN** Container and Vehicle are created as article types that can hold articles
+
