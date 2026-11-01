@@ -23,5 +23,7 @@ urlpatterns = [
     path("organisation-requests/<int:requestId>/review/", views.organisationRequestReview, name="organisation request review"),
     path("server-settings/", views.serverSettings, name="server settings"),
     path("server-settings/backup/", views.serverBackup, name="server backup"),
+    path("server-settings/export/", views.serverExport, name="server export"),
+    path("server-settings/import/", views.serverImport, name="server import"),
     path("configuration/", views.configuration, name="configuration"),
 ]
