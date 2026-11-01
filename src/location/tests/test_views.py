@@ -94,6 +94,34 @@ class LocationViewTest(TestCase):
         self.assertContains(response, "Lager Nord")
         self.assertContains(response, "Summer Camp")
 
+    def test_map_popup_links_to_floor_plan(self):
+        import shutil
+        import tempfile
+        from io import BytesIO
+
+        from django.core.files.uploadedfile import SimpleUploadedFile
+        from django.test import override_settings
+        from PIL import Image
+
+        from storage.models import FloorPlan, Storage, StorageType
+
+        media = tempfile.mkdtemp()
+        try:
+            with override_settings(MEDIA_ROOT=media):
+                loc = Location.objects.create(line1="Camp", latitude=52.52, longitude=13.405)
+                stype = StorageType.objects.create(name="room", symbol="RA")
+                storage = Storage.objects.create(name="Lager Nord", typ=stype, location=loc)
+                buf = BytesIO()
+                Image.new("RGB", (20, 20), "white").save(buf, format="JPEG")
+                FloorPlan.objects.create(
+                    storage=storage,
+                    image=SimpleUploadedFile("p.jpg", buf.getvalue(), content_type="image/jpeg"),
+                )
+                response = self.client.get("/location/map")
+                self.assertContains(response, f"/storage/room/{storage.pk}/plan")
+        finally:
+            shutil.rmtree(media, ignore_errors=True)
+
     def test_location_detail_shows_linked_objects(self):
         loc = self._linked_location()
         response = self.client.get(f"/location/{loc.pk}")

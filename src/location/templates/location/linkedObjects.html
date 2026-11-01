@@ -4,7 +4,13 @@
     <div class="card-header">{% trans "Linked objects" %}</div>
     <ul class="list-group list-group-flush">
         {% for s in linkedStorages %}
-        <li class="list-group-item"><a href="{% url 'storage' s.typ.name s.id %}">{{ s.name }}</a></li>
+        <li class="list-group-item">
+            {% if s.floor_plan.image %}
+            <a href="{% url 'floor plan' s.typ.name s.id %}">{{ s.name }}</a>
+            {% else %}
+            <a href="{% url 'storage' s.typ.name s.id %}">{{ s.name }}</a>
+            {% endif %}
+        </li>
         {% endfor %}
         {% for o in linkedOccasions %}
         <li class="list-group-item"><a href="{% url 'occasion' o.pk %}">{{ o }}</a></li>

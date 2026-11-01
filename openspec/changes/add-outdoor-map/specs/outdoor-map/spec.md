@@ -24,12 +24,24 @@ and SHALL link to the location's detail page.
 ### Requirement: Map marker links
 
 The system SHALL list the storages and occasions assigned to a location in that
-location's map popup, each as a link to the object's detail page.
+location's map popup, each as a link. A storage SHALL link to its floor plan when
+it has one, otherwise to the storage's detail page. The location itself SHALL be
+reachable from the popup as a secondary link.
 
 #### Scenario: Linked storages are listed
 
 - **WHEN** a location has storages assigned to it
 - **THEN** the marker popup lists those storages as links
+
+#### Scenario: Storage with a floor plan
+
+- **WHEN** a storage assigned to the location has a floor plan
+- **THEN** the popup links to that storage's floor plan
+
+#### Scenario: Storage without a floor plan
+
+- **WHEN** a storage assigned to the location has no floor plan
+- **THEN** the popup links to that storage's detail page
 
 #### Scenario: Linked occasions are listed
 

@@ -18,11 +18,15 @@
     var markers = [];
     {% localize off %}
     {% for loc in locations %}
-    var popup = '<strong><a href="{% url "location" loc.pk %}">{{ loc|escapejs }}</a></strong>';
+    var popup = '<strong>{{ loc|escapejs }}</strong>';
     {% if loc.storage_set.all %}
     popup += '<br><span class="text-muted">{% trans "Storages" %}</span>';
     {% for s in loc.storage_set.all %}
+    {% if s.floor_plan.image %}
+    popup += '<br><a href="{% url "floor plan" s.typ.name s.id %}">{{ s.name|escapejs }}</a>';
+    {% else %}
     popup += '<br><a href="{% url "storage" s.typ.name s.id %}">{{ s.name|escapejs }}</a>';
+    {% endif %}
     {% endfor %}
     {% endif %}
     {% if loc.occasion_set.all %}
@@ -31,6 +35,7 @@
     popup += '<br><a href="{% url "occasion" o.pk %}">{{ o|escapejs }}</a>';
     {% endfor %}
     {% endif %}
+    popup += '<br><a class="small" href="{% url "location" loc.pk %}">{% trans "Location details" %}</a>';
     markers.push(
         L.marker([{{ loc.latitude }}, {{ loc.longitude }}])
             .addTo(map)
