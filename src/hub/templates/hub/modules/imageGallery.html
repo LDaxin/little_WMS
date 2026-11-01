@@ -18,7 +18,7 @@
     </div>
     <form method="post" action="{{ imageBaseUrl }}add" enctype="multipart/form-data" class="mt-2 d-flex gap-2">
         {% csrf_token %}
-        <input type="file" name="image" accept="image/*" capture="environment" class="form-control form-control-sm" required>
+        <input type="file" name="image" accept="image/*" class="form-control form-control-sm" required>
         <input type="text" name="caption" class="form-control form-control-sm" placeholder="{% trans "Caption" %}">
         <button class="btn btn-sm btn-primary">{% trans "Upload" %}</button>
     </form>
