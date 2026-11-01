@@ -81,7 +81,7 @@ sections are still to be built.
 | 12 | Mobile & Navigation | `navigation` |
 | 13 | Tags | `tags` |
 | 14 | Internationalization | `i18n` |
-| 15 | Images & Floor Plans | `images` (images only; floor plans deferred) |
+| 15 | Images & Floor Plans | `images`, `floor-plans` |
 | 17 | Admin Dashboard & Backup | `dashboard`, `backup`, `organisation-export` |
 | 19 | Import | `import` |
 | 20 | Loans & Shared Pools | `loans` |
@@ -106,7 +106,7 @@ Supporting capabilities without a dedicated section: `hub`, `storage-management`
 `demo-seed`.
 
 Still to be built: **7b** Testing Strategy, **7c** Migrations (safe handling),
-**15** Floor Plans / Outdoor Map, **16** Power Functions, **18** Data Migration &
+**15** Outdoor Map, **16** Power Functions, **18** Data Migration &
 Transformation, **37** Database & Scaling.
 
 ---
