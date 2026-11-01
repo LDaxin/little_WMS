@@ -1,0 +1,39 @@
+{% load i18n %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<div id="locationPicker" style="height: 300px;" class="mb-2"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+(function () {
+    var latInput = document.getElementById('id_latitude');
+    var lngInput = document.getElementById('id_longitude');
+    if (!latInput || !lngInput) { return; }
+    var lat = parseFloat(latInput.value);
+    var lng = parseFloat(lngInput.value);
+    var hasCoords = !isNaN(lat) && !isNaN(lng);
+    var map = L.map('locationPicker').setView(hasCoords ? [lat, lng] : [51.1657, 10.4515], hasCoords ? 13 : 5);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+        referrerPolicy: 'strict-origin-when-cross-origin',
+    }).addTo(map);
+    var marker = null;
+    function write(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+    }
+    function place(lat, lng) {
+        if (marker) {
+            marker.setLatLng([lat, lng]);
+        } else {
+            marker = L.marker([lat, lng], {draggable: true}).addTo(map);
+            marker.on('dragend', function () {
+                var p = marker.getLatLng();
+                write(p.lat, p.lng);
+            });
+        }
+        write(lat, lng);
+    }
+    if (hasCoords) { place(lat, lng); }
+    map.on('click', function (e) { place(e.latlng.lat, e.latlng.lng); });
+})();
+</script>

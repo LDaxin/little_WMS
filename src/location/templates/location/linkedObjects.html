@@ -1,0 +1,14 @@
+{% load i18n %}
+{% if linkedStorages or linkedOccasions %}
+<div class="card mb-2">
+    <div class="card-header">{% trans "Linked objects" %}</div>
+    <ul class="list-group list-group-flush">
+        {% for s in linkedStorages %}
+        <li class="list-group-item"><a href="{% url 'storage' s.typ.name s.id %}">{{ s.name }}</a></li>
+        {% endfor %}
+        {% for o in linkedOccasions %}
+        <li class="list-group-item"><a href="{% url 'occasion' o.pk %}">{{ o }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

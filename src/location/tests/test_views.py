@@ -74,6 +74,41 @@ class LocationViewTest(TestCase):
         self.assertAlmostEqual(loc.latitude, 52.5200625, places=3)
         self.assertAlmostEqual(loc.longitude, 13.4050625, places=3)
 
+    def _linked_location(self):
+        from storage.models import Storage, StorageType
+        from occasion.models import Occasion, OccasionType
+        from planning.models import CalendarEntry
+
+        loc = Location.objects.create(line1="Camp", latitude=52.52, longitude=13.405)
+        stype = StorageType.objects.create(name="room", symbol="RA")
+        Storage.objects.create(name="Lager Nord", typ=stype, location=loc)
+        otype = OccasionType.objects.create(name="Camp")
+        entry = CalendarEntry.objects.create(title="Summer Camp", start_date="2026-07-01")
+        Occasion.objects.create(calendar_entry=entry, occasion_type=otype, location=loc)
+        return loc
+
+    def test_map_popup_lists_linked_objects(self):
+        self._linked_location()
+        response = self.client.get("/location/map")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Lager Nord")
+        self.assertContains(response, "Summer Camp")
+
+    def test_location_detail_shows_linked_objects(self):
+        loc = self._linked_location()
+        response = self.client.get(f"/location/{loc.pk}")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Lager Nord")
+        self.assertContains(response, "Summer Camp")
+
+    def test_location_detail_has_map_picker(self):
+        response = self.client.get(f"/location/{self.location.pk}")
+        self.assertContains(response, "locationPicker")
+
+    def test_location_list_has_add_button(self):
+        response = self.client.get("/location/")
+        self.assertContains(response, "modalButtonAdd")
+
     def test_add_location(self):
         response = self.client.post(
             "/location/add",
