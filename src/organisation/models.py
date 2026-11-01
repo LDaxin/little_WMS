@@ -9,7 +9,6 @@ from organisation.permissions import PERMISSIONS
 
 # Sidebar navigation settings (§12).
 SIDEBAR_POSITION_CHOICES = [("left", "Left"), ("right", "Right")]
-SIDEBAR_SIZE_CHOICES = [("small", "Small"), ("medium", "Medium"), ("large", "Large")]
 VIEW_MODE_CHOICES = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
 
 
@@ -96,10 +95,10 @@ class UserProfile(models.Model):
     sidebar_position_mobile = models.CharField(
         max_length=10, choices=SIDEBAR_POSITION_CHOICES, default="left"
     )
-    icon_size_desktop = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
-    icon_size_mobile = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
-    text_size_desktop = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
-    text_size_mobile = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
+    icon_size_desktop = models.IntegerField(default=28)
+    icon_size_mobile = models.IntegerField(default=28)
+    text_size_desktop = models.IntegerField(default=15)
+    text_size_mobile = models.IntegerField(default=15)
     view_mode = models.CharField(max_length=10, choices=VIEW_MODE_CHOICES, default="auto")
 
     class Meta:

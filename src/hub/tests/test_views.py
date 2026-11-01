@@ -54,19 +54,19 @@ class EmailPreferencesViewTest(TestCase):
         self.client.post("/email-preferences/", {
             "sidebar_position_desktop": "right",
             "sidebar_position_mobile": "left",
-            "icon_size_desktop": "large",
-            "icon_size_mobile": "small",
-            "text_size_desktop": "large",
-            "text_size_mobile": "small",
+            "icon_size_desktop": "40",
+            "icon_size_mobile": "20",
+            "text_size_desktop": "18",
+            "text_size_mobile": "12",
             "view_mode": "mobile",
         })
         profile = self.user.profiles.first()
         self.assertEqual(profile.sidebar_position_desktop, "right")
         self.assertEqual(profile.sidebar_position_mobile, "left")
-        self.assertEqual(profile.icon_size_desktop, "large")
-        self.assertEqual(profile.icon_size_mobile, "small")
-        self.assertEqual(profile.text_size_desktop, "large")
-        self.assertEqual(profile.text_size_mobile, "small")
+        self.assertEqual(profile.icon_size_desktop, 40)
+        self.assertEqual(profile.icon_size_mobile, 20)
+        self.assertEqual(profile.text_size_desktop, 18)
+        self.assertEqual(profile.text_size_mobile, 12)
         self.assertEqual(profile.view_mode, "mobile")
 
 

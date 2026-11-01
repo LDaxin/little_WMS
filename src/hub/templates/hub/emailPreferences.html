@@ -34,38 +34,30 @@
     </div>
     <div class="row g-2 mt-1">
         <div class="col-auto">
-            <label class="form-label mb-0">{% trans "Icon size (desktop)" %}</label>
-            <select name="icon_size_desktop" class="form-select" style="max-width:12rem">
-                {% for value, label in sizes %}
-                <option value="{{ value }}" {% if profile.icon_size_desktop == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label mb-0">{% trans "Icon size (desktop)" %}: <span id="iconDesktopValue">{{ profile.icon_size_desktop }}</span> px</label>
+            <input type="range" name="icon_size_desktop" min="16" max="48" step="1" value="{{ profile.icon_size_desktop }}"
+                   class="form-range" style="max-width:14rem"
+                   oninput="document.getElementById('iconDesktopValue').textContent = this.value">
         </div>
         <div class="col-auto">
-            <label class="form-label mb-0">{% trans "Icon size (mobile)" %}</label>
-            <select name="icon_size_mobile" class="form-select" style="max-width:12rem">
-                {% for value, label in sizes %}
-                <option value="{{ value }}" {% if profile.icon_size_mobile == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label mb-0">{% trans "Icon size (mobile)" %}: <span id="iconMobileValue">{{ profile.icon_size_mobile }}</span> px</label>
+            <input type="range" name="icon_size_mobile" min="16" max="48" step="1" value="{{ profile.icon_size_mobile }}"
+                   class="form-range" style="max-width:14rem"
+                   oninput="document.getElementById('iconMobileValue').textContent = this.value">
         </div>
     </div>
     <div class="row g-2 mt-1">
         <div class="col-auto">
-            <label class="form-label mb-0">{% trans "Text size (desktop)" %}</label>
-            <select name="text_size_desktop" class="form-select" style="max-width:12rem">
-                {% for value, label in sizes %}
-                <option value="{{ value }}" {% if profile.text_size_desktop == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label mb-0">{% trans "Text size (desktop)" %}: <span id="textDesktopValue">{{ profile.text_size_desktop }}</span> px</label>
+            <input type="range" name="text_size_desktop" min="10" max="24" step="1" value="{{ profile.text_size_desktop }}"
+                   class="form-range" style="max-width:14rem"
+                   oninput="document.getElementById('textDesktopValue').textContent = this.value">
         </div>
         <div class="col-auto">
-            <label class="form-label mb-0">{% trans "Text size (mobile)" %}</label>
-            <select name="text_size_mobile" class="form-select" style="max-width:12rem">
-                {% for value, label in sizes %}
-                <option value="{{ value }}" {% if profile.text_size_mobile == value %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
+            <label class="form-label mb-0">{% trans "Text size (mobile)" %}: <span id="textMobileValue">{{ profile.text_size_mobile }}</span> px</label>
+            <input type="range" name="text_size_mobile" min="10" max="24" step="1" value="{{ profile.text_size_mobile }}"
+                   class="form-range" style="max-width:14rem"
+                   oninput="document.getElementById('textMobileValue').textContent = this.value">
         </div>
     </div>
     <div class="mt-2">

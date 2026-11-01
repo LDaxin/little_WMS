@@ -3,7 +3,6 @@
 from django.db import migrations, models
 
 POSITION = [("left", "Left"), ("right", "Right")]
-SIZE = [("small", "Small"), ("medium", "Medium"), ("large", "Large")]
 VIEW = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
 
 
@@ -27,22 +26,22 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='icon_size_desktop',
-            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+            field=models.IntegerField(default=28),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='icon_size_mobile',
-            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+            field=models.IntegerField(default=28),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='text_size_desktop',
-            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+            field=models.IntegerField(default=15),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='text_size_mobile',
-            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+            field=models.IntegerField(default=15),
         ),
         migrations.AddField(
             model_name='userprofile',

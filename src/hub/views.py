@@ -210,7 +210,6 @@ def emailPreferences(request):
     from hub.models import EmailPreference
     from organisation.models import (
         SIDEBAR_POSITION_CHOICES,
-        SIDEBAR_SIZE_CHOICES,
         VIEW_MODE_CHOICES,
         UserProfile,
     )
@@ -226,14 +225,14 @@ def emailPreferences(request):
         language = request.POST.get("language", "")
         if language in dict(django_settings.LANGUAGES):
             profile.language = language
-        for field in (
-            "sidebar_position_desktop", "sidebar_position_mobile",
-            "icon_size_desktop", "icon_size_mobile",
-            "text_size_desktop", "text_size_mobile", "view_mode",
-        ):
+        for field in ("sidebar_position_desktop", "sidebar_position_mobile", "view_mode"):
             value = request.POST.get(field, "")
             if value in dict(UserProfile._meta.get_field(field).choices):
                 setattr(profile, field, value)
+        for field in ("icon_size_desktop", "icon_size_mobile", "text_size_desktop", "text_size_mobile"):
+            value = request.POST.get(field, "")
+            if value.isdigit():
+                setattr(profile, field, int(value))
         profile.save()
         return redirect("email preferences")
     return render(request, "hub/emailPreferences.html", {
@@ -245,7 +244,6 @@ def emailPreferences(request):
         "current_language": profile.language,
         "profile": profile,
         "sidebar_positions": SIDEBAR_POSITION_CHOICES,
-        "sizes": SIDEBAR_SIZE_CHOICES,
         "view_modes": VIEW_MODE_CHOICES,
     })
 
