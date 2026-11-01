@@ -42,11 +42,6 @@ DEFAULT_STORAGE_TYPES = [
 ]
 
 
-def _organisation(request):
-    """The active organisation of the request (§22)."""
-    return active_organisation(request)
-
-
 def _matrix(role):
     """Flat rows for the checkbox matrix (area × scope × action)."""
     granted = set(role.permissions.values_list("codename", flat=True)) if role else set()
@@ -69,7 +64,7 @@ def _matrix(role):
 @login_required(login_url='/accounts/login/')
 @require_perm("user.edit_role_all")
 def roles(request, error=""):
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     roles = organisation.roles.filter(is_template=False)
     return render(request, "organisation/roles.html", {
         "templates": organisation.roles.filter(is_template=True),
@@ -85,7 +80,7 @@ def roleCreate(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     template = get_object_or_404(
         Role, organisation=organisation, name=request.POST.get("template", ""), is_template=True
     )
@@ -100,7 +95,7 @@ def roleCreate(request):
 @login_required(login_url='/accounts/login/')
 @require_perm("user.edit_role_all")
 def roleDetail(request, roleId):
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     role = get_object_or_404(Role, pk=roleId, organisation=organisation)
     return render(request, "organisation/roleForm.html", {"role": role, "rows": _matrix(role)})
 
@@ -111,7 +106,7 @@ def roleSave(request, roleId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     role = get_object_or_404(Role, pk=roleId, organisation=organisation)
     role.permissions.set(Permission.objects.filter(codename__in=request.POST.getlist("perm")))
     return redirect("role detail", roleId=role.pk)
@@ -123,7 +118,7 @@ def roleDelete(request, roleId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     role = get_object_or_404(Role, pk=roleId, organisation=organisation, is_template=False)
     role.delete()
     return redirect("roles")
@@ -132,7 +127,7 @@ def roleDelete(request, roleId):
 @login_required(login_url='/accounts/login/')
 @require_perm("user.view_all")
 def users(request):
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     rows = [
         {"user": p.user, "profile": p, "verified": is_user_verified(p.user)}
         for p in UserProfile.objects.filter(organisation=organisation).select_related("user")
@@ -150,7 +145,7 @@ def userRole(request, userId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     user = get_object_or_404(User, pk=userId)
     role_id = request.POST.get("role") or None
     role = organisation.roles.filter(pk=role_id).first() if role_id else None
@@ -211,7 +206,7 @@ def inviteCreate(request):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     role_id = request.POST.get("role") or None
     role = organisation.roles.filter(pk=role_id).first() if role_id else None
     days = request.POST.get("days", "").strip()
@@ -243,7 +238,7 @@ def inviteRevoke(request, invitationId):
     if request.method != "POST":
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     invitation = get_object_or_404(Invitation, pk=invitationId, organisation=organisation)
     invitation.status = "revoked"
     invitation.save()
@@ -502,7 +497,7 @@ def configuration(request):
     from article.models import ArticleType
     from storage.models import StorageType
 
-    organisation = _organisation(request)
+    organisation = active_organisation(request)
     if request.method == "POST":
         action = request.POST.get("action")
         if action == "article_type":

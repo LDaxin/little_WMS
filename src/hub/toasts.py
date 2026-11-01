@@ -14,11 +14,3 @@ def toast(request, name, text, type="status", template="hub/modules/toast.html")
         "toastText": text,
         "toastType": type,
     })
-
-
-def success_toast(request, text, name="Success", template="hub/modules/toast.html"):
-    return toast(request, name, text, "status", template)
-
-
-def error_toast(request, text, name="Error", template="hub/modules/toast.html"):
-    return toast(request, name, text, "alert", template)

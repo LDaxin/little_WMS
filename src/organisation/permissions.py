@@ -22,7 +22,7 @@ PERMISSIONS = {
 }
 
 
-def action_for(obj, action, scope):
+def action_for(action, scope):
     """``action_scope`` string, e.g. ``view_all``."""
     return "%s_%s" % (action, scope)
 
@@ -30,7 +30,7 @@ def action_for(obj, action, scope):
 def all_for(obj):
     """Every ``action_scope`` string for one area."""
     spec = PERMISSIONS[obj]
-    return [action_for(obj, action, scope) for scope in spec["scopes"] for action in spec["actions"]]
+    return [action_for(action, scope) for scope in spec["scopes"] for action in spec["actions"]]
 
 
 def all_codenames():

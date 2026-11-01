@@ -101,7 +101,7 @@ class SoftDeleteRecordAdmin(admin.ModelAdmin):
 
 class ChangeSetAdmin(admin.ModelAdmin):
     model = ChangeSet
-    form = ChangeSetAdminForm
+    form = ChangeSetForm
     inlines = (SoftDeleteRecordInline,)
     actions = ['soft_undelete']
 

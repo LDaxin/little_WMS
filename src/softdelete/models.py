@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 
-import django
-
 from django.conf import settings
 from django.db.models import query, OneToOneRel
 from django.db import models, transaction
@@ -11,15 +9,9 @@ try:
     from django.contrib.contenttypes.fields import GenericForeignKey
 except ImportError:
     from django.contrib.contenttypes.generic import GenericForeignKey
-from django.contrib.auth.models import Group, Permission
 from django.utils import timezone
 import logging
 from softdelete.signals import *
-
-try:
-    USE_SOFTDELETE_GROUP = settings.USE_SOFTDELETE_GROUP
-except:
-    USE_SOFTDELETE_GROUP = False
 
 
 def _determine_change_set(obj, create=True):
@@ -71,53 +63,23 @@ class SoftDeleteQuerySet(query.QuerySet):
 
 class SoftDeleteManager(models.Manager):
 
-    def _get_base_queryset(self):
-        '''
-        Convenience method for grabbing the base query set. Accounts for the
-        deprecation of get_query_set in Django 18.
-        '''
-
-        if django.VERSION >= (1, 8, 0, 'final', 0):
-            return super(SoftDeleteManager, self).get_queryset()
-        else:
-            return super(SoftDeleteManager, self).get_query_set()
-
-    def _get_self_queryset(self):
-        '''
-        Convenience method for grabbing the query set. Accounts for the
-        deprecation of get_query_set in Django 1.8
-        '''
-
-        if django.VERSION >= (1, 8, 0, 'final', 0):
-            return self.get_queryset()
-        else:
-            return self.get_query_set()
-
-    def get_query_set(self):
-        qs = super(SoftDeleteManager, self).get_query_set().filter(
-            deleted_at__isnull=True)
-        if not issubclass(qs.__class__, SoftDeleteQuerySet):
-            qs.__class__ = SoftDeleteQuerySet
-        return qs
-
     def get_queryset(self):
-        qs = super(SoftDeleteManager, self).get_queryset().filter(
-            deleted_at__isnull=True)
+        qs = super().get_queryset().filter(deleted_at__isnull=True)
         if not issubclass(qs.__class__, SoftDeleteQuerySet):
             qs.__class__ = SoftDeleteQuerySet
         return qs
 
     def all_with_deleted(self, prt=False):
         if hasattr(self, 'core_filters'):  # it's a RelatedManager
-            qs = self._get_base_queryset().filter(**self.core_filters)
+            qs = super().get_queryset().filter(**self.core_filters)
         else:
-            qs = self._get_base_queryset()
+            qs = super().get_queryset()
         if not issubclass(qs.__class__, SoftDeleteQuerySet):
             qs.__class__ = SoftDeleteQuerySet
         return qs
 
     def deleted_set(self):
-        qs = self._get_base_queryset().filter(deleted_at__isnull=False)
+        qs = super().get_queryset().filter(deleted_at__isnull=False)
         if not issubclass(qs.__class__, SoftDeleteQuerySet):
             qs.__class__ = SoftDeleteQuerySet
         return qs
@@ -125,14 +87,13 @@ class SoftDeleteManager(models.Manager):
     def get(self, *args, **kwargs):
         if 'pk' in kwargs:
             return self.all_with_deleted().get(*args, **kwargs)
-        else:
-            return self._get_self_queryset().get(*args, **kwargs)
+        return self.get_queryset().get(*args, **kwargs)
 
     def filter(self, *args, **kwargs):
         if 'pk' in kwargs:
             qs = self.all_with_deleted().filter(*args, **kwargs)
         else:
-            qs = self._get_self_queryset().filter(*args, **kwargs)
+            qs = self.get_queryset().filter(*args, **kwargs)
         if not issubclass(qs.__class__, SoftDeleteQuerySet):
             qs.__class__ = SoftDeleteQuerySet
         return qs
@@ -383,33 +344,3 @@ class SoftDeleteRecord(models.Model):
             self.changeset.created_date)
 
     content = property(get_content, set_content)
-
-
-def assign_permissions(user_or_group):
-    for model in ['ChangeSet', 'SoftDeleteRecord']:
-        ct = ContentType.objects.get(app_label="softdelete",
-                                     model=model.lower())
-        p, pc = Permission.objects.get_or_create(
-            name="Can undelete a soft-deleted object",
-            codename="can_undelete",
-            content_type=ct)
-        permissions = [p]
-        for permission in ['add_%s' % model.lower(),
-                           'change_%s' % model.lower(),
-                           'delete_%s' % model.lower(),
-                           'can_undelete']:
-            for perm_obj in Permission.objects.filter(codename=permission):
-                permissions.append(perm_obj)
-        perm_list = getattr(user_or_group, 'permissions',
-                            getattr(user_or_group, 'user_permissions'))
-        [perm_list.add(x) for x in permissions]
-        user_or_group.save()
-    return user_or_group
-
-
-def create_group():
-    if USE_SOFTDELETE_GROUP:
-        gr, cr = Group.objects.get_or_create(name='Softdelete User')
-        if cr:
-            assign_permissions(gr)
-        return gr

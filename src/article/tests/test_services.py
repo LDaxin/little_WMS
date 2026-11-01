@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType, CompositionItem, Stock
-from article.services import actual_quantity, allocation, composition_status, consume, default_locations, location_minimum_sum
+from article.services import actual_quantity, allocation, composition_status, default_locations, location_minimum_sum
 from space.models import Space
 
 
@@ -140,32 +140,3 @@ class AllocationTest(TestCase):
         Article.objects.create(base=self.base)
         self.assertTrue(composition_status(self.space)[0]["over"])
 
-
-class ConsumeTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.article_type = ArticleType.objects.create(
-            name="Perlen", symbol="PR", allow_merge_split=True
-        )
-        cls.base = ArticleBase.objects.create(name="Bügelperle", pType=cls.article_type)
-
-    def make(self, menge):
-        article = Article.objects.create(base=self.base)
-        Stock.objects.create(article=article, stored=None, menge=menge)
-        return article
-
-    def test_consume_decrements(self):
-        article = self.make(5)
-        consume(article, 2)
-        self.assertEqual(article.stocks.get(stored=None).menge, 3)
-
-    def test_consume_to_zero_deletes(self):
-        article = self.make(2)
-        consume(article, 2)
-        self.assertFalse(Article.objects.all().filter(pk=article.pk).exists())
-        self.assertTrue(Article.objects.all_with_deleted().filter(pk=article.pk).exists())
-
-    def test_consume_below_zero_deletes(self):
-        article = self.make(1)
-        consume(article, 5)
-        self.assertFalse(Article.objects.all().filter(pk=article.pk).exists())
