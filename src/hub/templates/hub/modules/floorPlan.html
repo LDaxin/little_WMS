@@ -1,0 +1,35 @@
+{% extends "hub/header.html" %}
+{% load i18n l10n %}
+{% block content %}
+<h4>{{ plan.storage }}</h4>
+{% if plan.image %}
+{% localize off %}
+<svg id="planSvg" viewBox="0 0 {{ plan.image.width }} {{ plan.image.height }}"
+     width="{{ plan.image.width }}" height="{{ plan.image.height }}"
+     style="max-width:100%; max-height:80vh">
+    <image href="{{ plan.image.url }}" width="{{ plan.image.width }}" height="{{ plan.image.height }}" pointer-events="none"/>
+    {% for area in areas %}
+    <rect x="{{ area.x }}" y="{{ area.y }}" width="{{ area.w }}" height="{{ area.h }}"
+          fill="{{ area.color }}33" stroke="{{ area.color }}" vector-effect="non-scaling-stroke"
+          {% if area.href %}data-href="{{ area.href }}" pointer-events="all" style="cursor:pointer"{% endif %}
+          {% if area.storage.id == highlight %}stroke-width="4"{% endif %}>
+        <title>{{ area.label|default:area.storage }}</title>
+    </rect>
+    {% endfor %}
+</svg>
+{% endlocalize %}
+<script>
+    document.querySelectorAll("#planSvg rect[data-href]").forEach(function (rect) {
+        rect.addEventListener("click", function () {
+            window.location.href = rect.getAttribute("data-href");
+        });
+    });
+</script>
+{% else %}
+<p class="text-muted">{% trans "No plan uploaded yet." %}</p>
+{% endif %}
+<div class="mt-2 d-flex gap-2">
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'storage' plan.storage.typ.name plan.storage.id %}">{% trans "Back to storage" %}</a>
+    <a class="btn btn-sm btn-outline-secondary" href="./plan/edit">{% trans "Edit plan" %}</a>
+</div>
+{% endblock %}

@@ -87,4 +87,36 @@ class StorageImage(BaseImage):
 
     class Meta:
         ordering = ["order", "id"]
+
+
+class FloorPlan(models.Model):
+    """A floor plan for a storage (§15).
+
+    The image is uploaded (Stage 1); the areas are drawn on it (Stage 2).
+    """
+
+    storage = models.OneToOneField(Storage, on_delete=models.CASCADE, related_name="floor_plan")
+    name = models.CharField(max_length=100, blank=True)
+    image = models.ImageField(upload_to="floorplans/%Y/%m/", null=True, blank=True)
+
+    def __str__(self):
+        return self.name or str(self.storage)
+
+
+class FloorPlanArea(models.Model):
+    """A rectangular area on a floor plan, optionally linked to a storage (§15).
+
+    ``shape`` holds relative coordinates (0–1): ``{"x", "y", "w", "h"}``.
+    """
+
+    floor_plan = models.ForeignKey(FloorPlan, on_delete=models.CASCADE, related_name="areas")
+    storage = models.ForeignKey(
+        Storage, null=True, blank=True, on_delete=models.SET_NULL, related_name="plan_areas"
+    )
+    shape = models.JSONField(default=dict)
+    label = models.CharField(max_length=100, blank=True)
+    color = models.CharField(max_length=7, default="#0d6efd")
+
+    def __str__(self):
+        return self.label or str(self.storage or "area")
         

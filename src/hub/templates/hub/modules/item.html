@@ -13,6 +13,11 @@
     </div>
     {% endif %}
     {% if storeActions %}{% include "hub/modules/storeActions.html" %}{% endif %}
+    {% if floorPlanUrl %}
+    <div class="p-2">
+        <a class="btn btn-sm btn-outline-secondary" href="{{ floorPlanUrl }}">{% trans "Floor plan" %}</a>
+    </div>
+    {% endif %}
     {% if imageGallery %}{% include "hub/modules/imageGallery.html" %}{% endif %}
     {% if storageContents %}{% include "hub/modules/storageContents.html" %}{% endif %}
     {% if articleCalendar %}{% include "hub/modules/articleCalendar.html" %}{% endif %}

@@ -56,6 +56,12 @@ will make that test fail and force it to be updated.
 |---|---|---|---|---|---|
 | KI-018 | `Article.stored` / `hub/fields.py` `SelfForeignKey` | Cycles between articles/spaces were possible; `SelfForeignKey` silently set the value to `None` on a cycle; `Settings.storageDepth` was unused | ✅ fixed | 1.6 | `space/tests/test_services.py`, `hub/tests/test_fields.py` |
 
+## Floor plans (§15)
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-024 | `hub/templates/hub/modules/floorPlan.html` | Server-rendered rect coordinates used the locale's decimal separator (`x="20,0"` in German) → invalid SVG numbers, so the drawn areas were invisible on the plan page. The editor was unaffected because it builds the rects in JavaScript. | ✅ fixed | add-floor-plans | `storage/tests/test_floor_plans.py` |
+
 ## Migrations
 
 | ID | Location | Symptom | Status | Found in | Test |

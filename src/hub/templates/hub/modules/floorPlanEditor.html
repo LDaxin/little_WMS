@@ -1,0 +1,113 @@
+{% extends "hub/header.html" %}
+{% load i18n %}
+{% block content %}
+{% trans "Label" as label_text %}
+<h4>{% trans "Edit plan" %}: {{ plan.storage }}</h4>
+
+<form method="post" action="./upload" enctype="multipart/form-data" class="mb-2 d-flex gap-2">
+    {% csrf_token %}
+    <input type="file" name="image" accept="image/*" class="form-control form-control-sm" required>
+    <button class="btn btn-sm btn-primary">{% trans "Upload plan" %}</button>
+</form>
+
+{% if plan.image %}
+<svg id="planSvg" viewBox="0 0 {{ plan.image.width }} {{ plan.image.height }}"
+     width="{{ plan.image.width }}" height="{{ plan.image.height }}"
+     style="max-width:100%; max-height:60vh; cursor:crosshair">
+    <image href="{{ plan.image.url }}" width="{{ plan.image.width }}" height="{{ plan.image.height }}"/>
+</svg>
+<p class="text-muted small mt-1">{% trans "Drag on the plan to draw an area, then link it to a storage." %}</p>
+<div id="areaList" class="mt-2" style="max-height:20vh; overflow-y:auto"></div>
+<form id="areasForm" method="post" action="./areas">
+    {% csrf_token %}
+    <input type="hidden" name="areas" id="areasInput">
+    <button type="button" class="btn btn-success" onclick="saveAreas()">{% trans "Save areas" %}</button>
+</form>
+
+{{ areas|json_script:"areasData" }}
+{{ storages|json_script:"storagesData" }}
+<script>
+    const NS = "http://www.w3.org/2000/svg";
+    const LABEL = "{{ label_text|escapejs }}";
+    const W = {{ plan.image.width }}, H = {{ plan.image.height }};
+    const areas = JSON.parse(document.getElementById("areasData").textContent);
+    const storages = JSON.parse(document.getElementById("storagesData").textContent);
+    const svg = document.getElementById("planSvg");
+    let drawing = false, start = null, preview = null;
+
+    function rel(e) {
+        const r = svg.getBoundingClientRect();
+        return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
+    }
+    function rectAttrs(el, a) {
+        el.setAttribute("x", a.x * W); el.setAttribute("y", a.y * H);
+        el.setAttribute("width", a.w * W); el.setAttribute("height", a.h * H);
+        el.setAttribute("fill", a.color + "33");
+        el.setAttribute("stroke", a.color);
+        el.setAttribute("vector-effect", "non-scaling-stroke");
+    }
+    function render() {
+        svg.querySelectorAll("rect").forEach(r => r.remove());
+        areas.forEach(a => {
+            const rect = document.createElementNS(NS, "rect");
+            rectAttrs(rect, a);
+            svg.appendChild(rect);
+        });
+        const list = document.getElementById("areaList");
+        list.innerHTML = "";
+        areas.forEach((a, i) => {
+            const row = document.createElement("div");
+            row.className = "d-flex gap-2 mb-1";
+            const options = ['<option value="">&mdash;</option>'].concat(
+                storages.map(s => '<option value="' + s.id + '"' +
+                    (String(a.storage) === String(s.id) ? " selected" : "") + ">" + s.name + "</option>")
+            ).join("");
+            row.innerHTML = '<select class="form-select form-select-sm" style="max-width:16rem">' + options + "</select>" +
+                '<input class="form-control form-control-sm" placeholder="' + LABEL + '" value="' + (a.label || "") + '">' +
+                '<button type="button" class="btn btn-sm btn-outline-danger">&times;</button>';
+            row.querySelector("select").onchange = e => { areas[i].storage = e.target.value; };
+            row.querySelector("input").oninput = e => { areas[i].label = e.target.value; };
+            row.querySelector("button").onclick = () => { areas.splice(i, 1); render(); };
+            list.appendChild(row);
+        });
+    }
+    svg.addEventListener("mousedown", e => {
+        drawing = true; start = rel(e);
+        preview = document.createElementNS(NS, "rect");
+        preview.setAttribute("fill", "rgba(13,110,253,0.2)");
+        preview.setAttribute("stroke", "#0d6efd");
+        preview.setAttribute("vector-effect", "non-scaling-stroke");
+        svg.appendChild(preview);
+    });
+    svg.addEventListener("mousemove", e => {
+        if (!drawing) return;
+        const p = rel(e);
+        rectAttrs(preview, {
+            x: Math.min(start.x, p.x), y: Math.min(start.y, p.y),
+            w: Math.abs(p.x - start.x), h: Math.abs(p.y - start.y), color: "#0d6efd",
+        });
+    });
+    svg.addEventListener("mouseup", e => {
+        if (!drawing) return;
+        drawing = false;
+        const p = rel(e);
+        const a = {
+            x: Math.min(start.x, p.x), y: Math.min(start.y, p.y),
+            w: Math.abs(p.x - start.x), h: Math.abs(p.y - start.y),
+            storage: "", label: "", color: "#0d6efd",
+        };
+        preview.remove();
+        if (a.w < 0.01 || a.h < 0.01) return;
+        areas.push(a);
+        render();
+    });
+    function saveAreas() {
+        document.getElementById("areasInput").value = JSON.stringify(areas);
+        document.getElementById("areasForm").submit();
+    }
+    render();
+</script>
+{% else %}
+<p class="text-muted">{% trans "Upload a plan image first." %}</p>
+{% endif %}
+{% endblock %}

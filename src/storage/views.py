@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
+from django.urls import reverse
 from .forms import *
 from .models import *
 from codeSystem.models import *
@@ -14,6 +15,7 @@ from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
 import csv
+import json
 from time import sleep
 
 @login_required(login_url='/accounts/login/')
@@ -45,6 +47,7 @@ def storage(request, typ, storageId):
                 "imageGallery":True,
                 "images":storageObject.images.all(),
                 "imageBaseUrl":"./%s/images/" % storageId,
+                "floorPlanUrl":"./%s/plan" % storageId,
             }
             context.update(composition_context(storageObject.space))
             return render(request, "hub/modules/item.html", context=context)
@@ -86,6 +89,140 @@ def setPrimaryStorageImage(request, typ, storageId, imageId):
         storage.images.update(is_primary=False)
         storage.images.filter(pk=imageId).update(is_primary=True)
     return redirect("storage", typ=typ, storageId=storageId)
+
+
+def _plan_areas_json(plan):
+    return [
+        {
+            "x": area.shape.get("x", 0),
+            "y": area.shape.get("y", 0),
+            "w": area.shape.get("w", 0),
+            "h": area.shape.get("h", 0),
+            "storage": area.storage_id or "",
+            "label": area.label,
+            "color": area.color,
+        }
+        for area in plan.areas.all()
+    ]
+
+
+def _plan_areas_px(plan):
+    """Areas with pixel coordinates and a click target for the plan image.
+
+    The target is the linked storage's own plan when it has one, otherwise its
+    detail page.
+    """
+    if not plan.image:
+        return []
+    width, height = plan.image.width, plan.image.height
+    storage_ids_with_plan = set(
+        FloorPlan.objects.exclude(image="")
+        .filter(image__isnull=False)
+        .values_list("storage_id", flat=True)
+    )
+    areas = []
+    for area in plan.areas.select_related("storage__typ"):
+        storage = area.storage
+        if storage is None:
+            href = ""
+        elif storage.pk in storage_ids_with_plan:
+            href = reverse("floor plan", args=[storage.typ.name, storage.pk])
+        else:
+            href = reverse("storage", args=[storage.typ.name, storage.pk])
+        areas.append({
+            "storage": storage,
+            "label": area.label,
+            "color": area.color,
+            "x": area.shape.get("x", 0) * width,
+            "y": area.shape.get("y", 0) * height,
+            "w": area.shape.get("w", 0) * width,
+            "h": area.shape.get("h", 0) * height,
+            "href": href,
+        })
+    return areas
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.view_all")
+def floorPlan(request, typ, storageId):
+    """Show a storage's floor plan with its clickable areas (§15)."""
+    storage = Storage.objects.get(pk=storageId)
+    plan, _ = FloorPlan.objects.get_or_create(storage=storage)
+    highlight = request.GET.get("highlight", "")
+    return render(request, "hub/modules/floorPlan.html", {
+        "plan": plan,
+        "areas": _plan_areas_px(plan),
+        "highlight": int(highlight) if highlight.isdigit() else None,
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def floorPlanEdit(request, typ, storageId):
+    """Draw areas on a storage's floor plan (§15)."""
+    storage = Storage.objects.get(pk=storageId)
+    plan, _ = FloorPlan.objects.get_or_create(storage=storage)
+    return render(request, "hub/modules/floorPlanEditor.html", {
+        "plan": plan,
+        "areas": _plan_areas_json(plan),
+        "storages": [{"id": s.id, "name": str(s)} for s in Storage.objects.all()],
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def uploadFloorPlan(request, typ, storageId):
+    """Upload or replace a storage's floor plan image (§15, Stage 1)."""
+    storage = Storage.objects.get(pk=storageId)
+    plan, _ = FloorPlan.objects.get_or_create(storage=storage)
+    if request.method == "POST" and request.FILES.get("image"):
+        plan.image = _resize_plan_upload(request.FILES["image"])
+        plan.save()
+    return redirect("edit floor plan", typ=typ, storageId=storageId)
+
+
+def _resize_plan_upload(upload, max_edge=2000):
+    """Scale a plan image down so the SVG stays light in the browser."""
+    from io import BytesIO
+
+    from django.core.files.base import ContentFile
+    from PIL import Image, ImageOps
+
+    img = ImageOps.exif_transpose(Image.open(upload)).convert("RGB")
+    if max(img.size) > max_edge:
+        img.thumbnail((max_edge, max_edge))
+    buf = BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    return ContentFile(buf.getvalue(), name=upload.name)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def saveFloorPlanAreas(request, typ, storageId):
+    """Replace a floor plan's areas with the drawn ones (§15, Stage 2)."""
+    storage = Storage.objects.get(pk=storageId)
+    plan, _ = FloorPlan.objects.get_or_create(storage=storage)
+    if request.method == "POST":
+        try:
+            areas = json.loads(request.POST.get("areas", "[]"))
+        except ValueError:
+            areas = []
+        plan.areas.all().delete()
+        for area in areas:
+            storage_id = area.get("storage")
+            FloorPlanArea.objects.create(
+                floor_plan=plan,
+                storage_id=int(storage_id) if str(storage_id).isdigit() else None,
+                shape={
+                    "x": area.get("x", 0),
+                    "y": area.get("y", 0),
+                    "w": area.get("w", 0),
+                    "h": area.get("h", 0),
+                },
+                label=area.get("label", ""),
+                color=area.get("color", "#0d6efd"),
+            )
+    return redirect("floor plan", typ=typ, storageId=storageId)
     
 
 @login_required(login_url='/accounts/login/')
