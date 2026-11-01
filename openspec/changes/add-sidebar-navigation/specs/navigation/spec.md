@@ -33,8 +33,10 @@ The system SHALL show the sidebar as a narrow icon rail that expands on hover
 
 ### Requirement: Sidebar settings
 
-The system SHALL let a user choose the sidebar position (left/right) and the
-view mode (auto / always mobile / always desktop) on the preferences page.
+The system SHALL let a user choose the sidebar position (left/right), the icon
+size, the text size, and the view mode (auto / always mobile / always desktop)
+on the preferences page. Icon and text size SHALL be configurable separately for
+desktop and mobile.
 
 #### Scenario: Position
 
@@ -45,3 +47,13 @@ view mode (auto / always mobile / always desktop) on the preferences page.
 
 - **WHEN** a user chooses "always mobile"
 - **THEN** the mobile layout is used regardless of the viewport
+
+#### Scenario: Icon size
+
+- **WHEN** a user changes the icon size
+- **THEN** the sidebar icons are shown at the chosen size
+
+#### Scenario: Text size
+
+- **WHEN** a user changes the text size
+- **THEN** the whole app text (content and sidebar) is shown at the chosen size

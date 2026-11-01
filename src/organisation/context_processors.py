@@ -4,8 +4,8 @@
 def _sidebar(profile):
     icon_desktop = getattr(profile, "icon_size_desktop", 28)
     icon_mobile = getattr(profile, "icon_size_mobile", 28)
-    text_desktop = getattr(profile, "text_size_desktop", 15)
-    text_mobile = getattr(profile, "text_size_mobile", 15)
+    text_desktop = getattr(profile, "text_size_desktop", 16)
+    text_mobile = getattr(profile, "text_size_mobile", 16)
     pos_desktop = getattr(profile, "sidebar_position_desktop", "left")
     pos_mobile = getattr(profile, "sidebar_position_mobile", "left")
     return {

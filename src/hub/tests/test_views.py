@@ -78,3 +78,8 @@ class SidebarTest(TestCase):
     def test_sidebar_rendered(self):
         response = self.client.get("/")
         self.assertContains(response, 'class="sidebar')
+
+    def test_text_size_scales_root_font(self):
+        response = self.client.get("/")
+        self.assertContains(response, "--text-desktop: 16px")
+        self.assertContains(response, "font-size: var(--text-desktop")

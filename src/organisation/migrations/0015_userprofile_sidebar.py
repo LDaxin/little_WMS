@@ -36,12 +36,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='userprofile',
             name='text_size_desktop',
-            field=models.IntegerField(default=15),
+            field=models.IntegerField(default=16),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='text_size_mobile',
-            field=models.IntegerField(default=15),
+            field=models.IntegerField(default=16),
         ),
         migrations.AddField(
             model_name='userprofile',

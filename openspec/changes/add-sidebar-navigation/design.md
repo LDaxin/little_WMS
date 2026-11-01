@@ -35,6 +35,12 @@ the header reads them. The view mode adds a CSS class (`view-mobile` /
 Dashboard, articles, storages, and movement. Auto-tracking the most-used views
 is deferred.
 
+### Decision 4: Text size scales the root font
+
+The text size is applied as the root (`html`) `font-size`; Bootstrap sizes
+everything in `rem`, so the whole app (content and sidebar) scales. Icon size is
+a separate CSS variable on the sidebar. Both are stored per desktop/mobile.
+
 ## Risks / Trade-offs
 
 - [Hover-expand on touch] → a toggle button is provided.
@@ -42,4 +48,4 @@ is deferred.
 
 ## Migration Plan
 
-- Two new `UserProfile` columns with defaults; no data migration.
+- New `UserProfile` columns with defaults; no data migration.

@@ -10,6 +10,7 @@
 ## 3. Settings
 
 - [x] 3.1 Position and view mode on the preferences page
+- [x] 3.2 Icon and text size sliders (desktop/mobile) on the preferences page
 
 ## 4. Tests
 

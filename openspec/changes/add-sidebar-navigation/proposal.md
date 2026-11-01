@@ -11,8 +11,8 @@ and desktop.
   logout, and the organisation switcher.
 - Responsive CSS: a narrow icon rail that expands on hover (desktop) or via a
   toggle (mobile); the content is padded so the sidebar never covers it.
-- Per-user settings: sidebar position (left/right) and view mode (auto / always
-  mobile / always desktop).
+- Per-user settings: sidebar position (left/right), icon size, text size, and
+  view mode (auto / always mobile / always desktop).
 
 ## Capabilities
 

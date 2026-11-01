@@ -97,8 +97,8 @@ class UserProfile(models.Model):
     )
     icon_size_desktop = models.IntegerField(default=28)
     icon_size_mobile = models.IntegerField(default=28)
-    text_size_desktop = models.IntegerField(default=15)
-    text_size_mobile = models.IntegerField(default=15)
+    text_size_desktop = models.IntegerField(default=16)
+    text_size_mobile = models.IntegerField(default=16)
     view_mode = models.CharField(max_length=10, choices=VIEW_MODE_CHOICES, default="auto")
 
     class Meta:

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html style="--icon-desktop: {{ sidebar.icon_desktop }}; --icon-mobile: {{ sidebar.icon_mobile }}; --text-desktop: {{ sidebar.text_desktop }}; --text-mobile: {{ sidebar.text_mobile }}; --dir-desktop: {{ sidebar.dir_desktop }}; --dir-mobile: {{ sidebar.dir_mobile }};">
     <head>
         {% load livereload_tags %}
         {% load static %}
@@ -16,6 +16,7 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.7"></script>
         <style>
+            html { font-size: var(--text-desktop, 16px); }
             .layout { display: flex; min-height: 100vh; flex-direction: var(--dir-desktop, row); }
             .sidebar {
                 --icon-size: var(--icon-desktop, 28px);
@@ -46,6 +47,7 @@
             .sidebar-spacer { flex: 1; }
             .content { flex: 1 1 auto; min-width: 0; padding: 1rem; }
             @media (max-width: 768px) {
+                html { font-size: var(--text-mobile, 16px); }
                 .layout { flex-direction: var(--dir-mobile, row); }
                 .sidebar {
                     --icon-size: var(--icon-mobile, 28px);
@@ -53,6 +55,8 @@
                 }
                 .sidebar:hover { width: var(--rail); }
             }
+            html:has(body.view-mobile) { font-size: var(--text-mobile, 16px); }
+            html:has(body.view-desktop) { font-size: var(--text-desktop, 16px); }
             body.view-mobile .layout { flex-direction: var(--dir-mobile, row); }
             body.view-mobile .sidebar {
                 --icon-size: var(--icon-mobile, 28px);
@@ -76,8 +80,7 @@
             </div>
         </div>
 
-        <div class="layout"
-             style="--icon-desktop: {{ sidebar.icon_desktop }}; --icon-mobile: {{ sidebar.icon_mobile }}; --text-desktop: {{ sidebar.text_desktop }}; --text-mobile: {{ sidebar.text_mobile }}; --dir-desktop: {{ sidebar.dir_desktop }}; --dir-mobile: {{ sidebar.dir_mobile }};">
+        <div class="layout">
             {% if request.user.is_authenticated %}
             <aside class="sidebar" id="sidebar">
                 <a class="sidebar-item" href="{% url 'hub' %}">
