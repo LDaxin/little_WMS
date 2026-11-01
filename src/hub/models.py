@@ -71,10 +71,10 @@ class BaseImage(models.Model):
         from io import BytesIO
 
         from django.core.files.base import ContentFile
-        from PIL import Image
+        from PIL import Image, ImageOps
 
         self.image.open()
-        img = Image.open(self.image).convert("RGB")
+        img = ImageOps.exif_transpose(Image.open(self.image)).convert("RGB")
         name = self.image.name
 
         img.thumbnail((self.MAX_EDGE, self.MAX_EDGE))
