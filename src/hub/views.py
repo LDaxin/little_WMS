@@ -208,7 +208,12 @@ def emailPreferences(request):
 
     from hub.mail import is_subscribed, set_subscription
     from hub.models import EmailPreference
-    from organisation.models import UserProfile
+    from organisation.models import (
+        SIDEBAR_POSITION_CHOICES,
+        SIDEBAR_SIZE_CHOICES,
+        VIEW_MODE_CHOICES,
+        UserProfile,
+    )
     from organisation.services import active_organisation
 
     categories = EmailPreference.CATEGORY_CHOICES
@@ -221,12 +226,14 @@ def emailPreferences(request):
         language = request.POST.get("language", "")
         if language in dict(django_settings.LANGUAGES):
             profile.language = language
-        position = request.POST.get("sidebar_position", "")
-        if position in dict(UserProfile._meta.get_field("sidebar_position").choices):
-            profile.sidebar_position = position
-        view_mode = request.POST.get("view_mode", "")
-        if view_mode in dict(UserProfile._meta.get_field("view_mode").choices):
-            profile.view_mode = view_mode
+        for field in (
+            "sidebar_position_desktop", "sidebar_position_mobile",
+            "icon_size_desktop", "icon_size_mobile",
+            "text_size_desktop", "text_size_mobile", "view_mode",
+        ):
+            value = request.POST.get(field, "")
+            if value in dict(UserProfile._meta.get_field(field).choices):
+                setattr(profile, field, value)
         profile.save()
         return redirect("email preferences")
     return render(request, "hub/emailPreferences.html", {
@@ -236,9 +243,9 @@ def emailPreferences(request):
         ],
         "languages": django_settings.LANGUAGES,
         "current_language": profile.language,
-        "sidebar_positions": UserProfile._meta.get_field("sidebar_position").choices,
-        "view_modes": UserProfile._meta.get_field("view_mode").choices,
-        "current_position": profile.sidebar_position,
-        "current_view_mode": profile.view_mode,
+        "profile": profile,
+        "sidebar_positions": SIDEBAR_POSITION_CHOICES,
+        "sizes": SIDEBAR_SIZE_CHOICES,
+        "view_modes": VIEW_MODE_CHOICES,
     })
 

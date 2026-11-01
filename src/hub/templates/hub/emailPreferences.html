@@ -14,19 +14,65 @@
     </select>
 
     <h6 class="mt-4">{% trans "Navigation" %}</h6>
-    <div class="mb-2">
-        <label class="form-label mb-0">{% trans "Sidebar position" %}</label>
-        <select name="sidebar_position" class="form-select" style="max-width:14rem">
-            {% for value, label in sidebar_positions %}
-            <option value="{{ value }}" {% if current_position == value %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-        </select>
+    <div class="row g-2">
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Position (desktop)" %}</label>
+            <select name="sidebar_position_desktop" class="form-select" style="max-width:12rem">
+                {% for value, label in sidebar_positions %}
+                <option value="{{ value }}" {% if profile.sidebar_position_desktop == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Position (mobile)" %}</label>
+            <select name="sidebar_position_mobile" class="form-select" style="max-width:12rem">
+                {% for value, label in sidebar_positions %}
+                <option value="{{ value }}" {% if profile.sidebar_position_mobile == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
     </div>
-    <div class="mb-2">
+    <div class="row g-2 mt-1">
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Icon size (desktop)" %}</label>
+            <select name="icon_size_desktop" class="form-select" style="max-width:12rem">
+                {% for value, label in sizes %}
+                <option value="{{ value }}" {% if profile.icon_size_desktop == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Icon size (mobile)" %}</label>
+            <select name="icon_size_mobile" class="form-select" style="max-width:12rem">
+                {% for value, label in sizes %}
+                <option value="{{ value }}" {% if profile.icon_size_mobile == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="row g-2 mt-1">
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Text size (desktop)" %}</label>
+            <select name="text_size_desktop" class="form-select" style="max-width:12rem">
+                {% for value, label in sizes %}
+                <option value="{{ value }}" {% if profile.text_size_desktop == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-auto">
+            <label class="form-label mb-0">{% trans "Text size (mobile)" %}</label>
+            <select name="text_size_mobile" class="form-select" style="max-width:12rem">
+                {% for value, label in sizes %}
+                <option value="{{ value }}" {% if profile.text_size_mobile == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="mt-2">
         <label class="form-label mb-0">{% trans "View mode" %}</label>
-        <select name="view_mode" class="form-select" style="max-width:14rem">
+        <select name="view_mode" class="form-select" style="max-width:12rem">
             {% for value, label in view_modes %}
-            <option value="{{ value }}" {% if current_view_mode == value %}selected{% endif %}>{{ label }}</option>
+            <option value="{{ value }}" {% if profile.view_mode == value %}selected{% endif %}>{{ label }}</option>
             {% endfor %}
         </select>
     </div>

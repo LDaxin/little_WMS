@@ -16,36 +16,55 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.7"></script>
         <style>
-            :root { --sidebar-width: 56px; --sidebar-expanded: 210px; }
+            .layout { display: flex; min-height: 100vh; flex-direction: var(--dir-desktop, row); }
             .sidebar {
-                position: fixed; top: 0; bottom: 0; left: 0;
-                width: var(--sidebar-width);
+                --icon-size: var(--icon-desktop, 28px);
+                --label-size: var(--text-desktop, 0.95rem);
+                --rail: calc(var(--icon-size) + 28px);
+                --expanded: 210px;
+                flex-shrink: 0;
+                width: var(--rail);
+                height: 100vh;
+                position: sticky; top: 0;
                 background: #f8f9fa;
-                border-right: 1px solid #dee2e6;
+                box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
                 display: flex; flex-direction: column;
                 overflow-x: hidden; overflow-y: auto;
                 transition: width 0.15s ease;
                 z-index: 1030;
             }
-            .sidebar.sidebar-right { left: auto; right: 0; border-right: none; border-left: 1px solid #dee2e6; }
-            .sidebar:hover, .sidebar.expanded { width: var(--sidebar-expanded); }
+            .sidebar:hover, .sidebar.expanded { width: var(--expanded); }
             .sidebar-item {
                 display: flex; align-items: center; gap: 0.75rem;
                 padding: 0.5rem 0.75rem; color: #212529; text-decoration: none;
                 white-space: nowrap; background: none; border: 0; width: 100%; text-align: left;
             }
             .sidebar-item:hover { background: #e9ecef; }
-            .sidebar-item img { width: 28px; height: 28px; flex: 0 0 28px; }
-            .sidebar-label { opacity: 0; transition: opacity 0.15s; }
+            .sidebar-item img { width: var(--icon-size); height: var(--icon-size); flex: 0 0 var(--icon-size); }
+            .sidebar-label { font-size: var(--label-size); opacity: 0; transition: opacity 0.15s; }
             .sidebar:hover .sidebar-label, .sidebar.expanded .sidebar-label { opacity: 1; }
             .sidebar-spacer { flex: 1; }
-            .content { margin-left: var(--sidebar-width); padding: 1rem; }
-            .sidebar-right ~ .content { margin-left: 0; margin-right: var(--sidebar-width); }
+            .content { flex: 1 1 auto; min-width: 0; padding: 1rem; }
             @media (max-width: 768px) {
-                .sidebar:hover { width: var(--sidebar-width); }
+                .layout { flex-direction: var(--dir-mobile, row); }
+                .sidebar {
+                    --icon-size: var(--icon-mobile, 28px);
+                    --label-size: var(--text-mobile, 0.95rem);
+                }
+                .sidebar:hover { width: var(--rail); }
             }
-            body.view-mobile .sidebar:hover { width: var(--sidebar-width); }
-            body.view-mobile .sidebar.expanded { width: var(--sidebar-expanded); }
+            body.view-mobile .layout { flex-direction: var(--dir-mobile, row); }
+            body.view-mobile .sidebar {
+                --icon-size: var(--icon-mobile, 28px);
+                --label-size: var(--text-mobile, 0.95rem);
+            }
+            body.view-mobile .sidebar:hover { width: var(--rail); }
+            body.view-mobile .sidebar.expanded { width: var(--expanded); }
+            body.view-desktop .layout { flex-direction: var(--dir-desktop, row); }
+            body.view-desktop .sidebar {
+                --icon-size: var(--icon-desktop, 28px);
+                --label-size: var(--text-desktop, 0.95rem);
+            }
         </style>
         {% livereload_script %}
     </head>
@@ -57,71 +76,74 @@
             </div>
         </div>
 
-        {% if request.user.is_authenticated %}
-        <aside class="sidebar sidebar-{{ sidebar_position }}" id="sidebar">
-            <a class="sidebar-item" href="{% url 'hub' %}">
-                <img src="{% static 'hub/symbols/Logo.svg' %}">
-                <span class="sidebar-label">little_WMS</span>
-            </a>
-            <button type="button" class="sidebar-item" onclick="document.getElementById('sidebar').classList.toggle('expanded')">
-                <img src="{% static 'hub/symbols/Menu.svg' %}">
-                <span class="sidebar-label">{% trans "Menu" %}</span>
-            </button>
-
-            <nav class="d-flex flex-column">
-                <a class="sidebar-item" href="{% url 'dashboard' %}">
-                    <img src="{% static 'hub/symbols/Grid.svg' %}"><span class="sidebar-label">{% trans "Dashboard" %}</span>
+        <div class="layout"
+             style="--icon-desktop: {{ sidebar.icon_desktop }}; --icon-mobile: {{ sidebar.icon_mobile }}; --text-desktop: {{ sidebar.text_desktop }}; --text-mobile: {{ sidebar.text_mobile }}; --dir-desktop: {{ sidebar.dir_desktop }}; --dir-mobile: {{ sidebar.dir_mobile }};">
+            {% if request.user.is_authenticated %}
+            <aside class="sidebar" id="sidebar">
+                <a class="sidebar-item" href="{% url 'hub' %}">
+                    <img src="{% static 'hub/symbols/Logo.svg' %}">
+                    <span class="sidebar-label">little_WMS</span>
                 </a>
-                <a class="sidebar-item" href="/article/">
-                    <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Articles" %}</span>
-                </a>
-                <a class="sidebar-item" href="/storage/">
-                    <img src="{% static 'hub/symbols/Store.svg' %}"><span class="sidebar-label">{% trans "Storages" %}</span>
-                </a>
-                <a class="sidebar-item" href="/movement/">
-                    <img src="{% static 'hub/symbols/Hand.svg' %}"><span class="sidebar-label">{% trans "Movement" %}</span>
-                </a>
-            </nav>
-
-            <div class="sidebar-spacer"></div>
-
-            <div class="dropdown dropend">
-                <button class="sidebar-item" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <img src="{% static 'hub/symbols/List.svg' %}">
-                    <span class="sidebar-label">{% trans "Notifications" %}{% if unreadNotifications %} ({{ unreadNotifications }}){% endif %}</span>
+                <button type="button" class="sidebar-item" onclick="document.getElementById('sidebar').classList.toggle('expanded')">
+                    <img src="{% static 'hub/symbols/Menu.svg' %}">
+                    <span class="sidebar-label">{% trans "Menu" %}</span>
                 </button>
-                <ul class="dropdown-menu">
-                    {% for n in request.user.notifications.all|slice:":5" %}
-                    <li><a class="dropdown-item" href="{{ n.link|default:'#' }}">{{ n.title }}</a></li>
-                    {% empty %}
-                    <li><span class="dropdown-item-text text-muted">{% trans "No notifications" %}</span></li>
-                    {% endfor %}
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'notifications' %}">{% trans "View all" %}</a></li>
-                </ul>
-            </div>
 
-            <a class="sidebar-item" href="{% url 'email preferences' %}">
-                <img src="{% static 'hub/symbols/Setting.svg' %}"><span class="sidebar-label">{% trans "Preferences" %}</span>
-            </a>
-            {% if can_manage_roles %}
-            <a class="sidebar-item" href="/roles/">
-                <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Roles" %}</span>
-            </a>
+                <nav class="d-flex flex-column">
+                    <a class="sidebar-item" href="{% url 'dashboard' %}">
+                        <img src="{% static 'hub/symbols/Grid.svg' %}"><span class="sidebar-label">{% trans "Dashboard" %}</span>
+                    </a>
+                    <a class="sidebar-item" href="/article/">
+                        <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Articles" %}</span>
+                    </a>
+                    <a class="sidebar-item" href="/storage/">
+                        <img src="{% static 'hub/symbols/Store.svg' %}"><span class="sidebar-label">{% trans "Storages" %}</span>
+                    </a>
+                    <a class="sidebar-item" href="/movement/">
+                        <img src="{% static 'hub/symbols/Hand.svg' %}"><span class="sidebar-label">{% trans "Movement" %}</span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-spacer"></div>
+
+                <div class="dropdown dropend">
+                    <button class="sidebar-item" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="{% static 'hub/symbols/List.svg' %}">
+                        <span class="sidebar-label">{% trans "Notifications" %}{% if unreadNotifications %} ({{ unreadNotifications }}){% endif %}</span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% for n in request.user.notifications.all|slice:":5" %}
+                        <li><a class="dropdown-item" href="{{ n.link|default:'#' }}">{{ n.title }}</a></li>
+                        {% empty %}
+                        <li><span class="dropdown-item-text text-muted">{% trans "No notifications" %}</span></li>
+                        {% endfor %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{% url 'notifications' %}">{% trans "View all" %}</a></li>
+                    </ul>
+                </div>
+
+                <a class="sidebar-item" href="{% url 'email preferences' %}">
+                    <img src="{% static 'hub/symbols/Setting.svg' %}"><span class="sidebar-label">{% trans "Preferences" %}</span>
+                </a>
+                {% if can_manage_roles %}
+                <a class="sidebar-item" href="/roles/">
+                    <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Roles" %}</span>
+                </a>
+                {% endif %}
+                <form method="post" action="/accounts/logout/">
+                    {% csrf_token %}
+                    <button class="sidebar-item" type="submit">
+                        <img src="{% static 'hub/symbols/Signout.svg' %}"><span class="sidebar-label">{% trans "Logout" %}</span>
+                    </button>
+                </form>
+            </aside>
             {% endif %}
-            <form method="post" action="/accounts/logout/">
-                {% csrf_token %}
-                <button class="sidebar-item" type="submit">
-                    <img src="{% static 'hub/symbols/Signout.svg' %}"><span class="sidebar-label">{% trans "Logout" %}</span>
-                </button>
-            </form>
-        </aside>
-        {% endif %}
 
-        <div class="content">
-        {% block content %}
+            <div class="content">
+            {% block content %}
 
-        {% endblock %}
+            {% endblock %}
+            </div>
         </div>
 
         <script>

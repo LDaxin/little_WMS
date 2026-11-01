@@ -51,9 +51,22 @@ class EmailPreferencesViewTest(TestCase):
     def test_save_sidebar_settings(self):
         org = Organisation.objects.create(name="A", slug="a")
         UserProfile.objects.create(user=self.user, organisation=org)
-        self.client.post("/email-preferences/", {"sidebar_position": "right", "view_mode": "mobile"})
+        self.client.post("/email-preferences/", {
+            "sidebar_position_desktop": "right",
+            "sidebar_position_mobile": "left",
+            "icon_size_desktop": "large",
+            "icon_size_mobile": "small",
+            "text_size_desktop": "large",
+            "text_size_mobile": "small",
+            "view_mode": "mobile",
+        })
         profile = self.user.profiles.first()
-        self.assertEqual(profile.sidebar_position, "right")
+        self.assertEqual(profile.sidebar_position_desktop, "right")
+        self.assertEqual(profile.sidebar_position_mobile, "left")
+        self.assertEqual(profile.icon_size_desktop, "large")
+        self.assertEqual(profile.icon_size_mobile, "small")
+        self.assertEqual(profile.text_size_desktop, "large")
+        self.assertEqual(profile.text_size_mobile, "small")
         self.assertEqual(profile.view_mode, "mobile")
 
 

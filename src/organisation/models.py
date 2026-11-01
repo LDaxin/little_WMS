@@ -7,6 +7,11 @@ from django.utils import timezone
 from organisation.current import current_organisation_id
 from organisation.permissions import PERMISSIONS
 
+# Sidebar navigation settings (§12).
+SIDEBAR_POSITION_CHOICES = [("left", "Left"), ("right", "Right")]
+SIDEBAR_SIZE_CHOICES = [("small", "Small"), ("medium", "Medium"), ("large", "Large")]
+VIEW_MODE_CHOICES = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
+
 
 def _catalog_permissions():
     """The §3 catalogue as ``auth.Permission`` entries (area-prefixed codenames)."""
@@ -84,17 +89,18 @@ class UserProfile(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=current_organisation_id)
     # Preferred UI language (§14); empty = the server default.
     language = models.CharField(max_length=10, blank=True)
-    # Sidebar navigation (§12).
-    sidebar_position = models.CharField(
-        max_length=10,
-        choices=[("left", "Left"), ("right", "Right")],
-        default="left",
+    # Sidebar navigation (§12), separate for desktop and mobile.
+    sidebar_position_desktop = models.CharField(
+        max_length=10, choices=SIDEBAR_POSITION_CHOICES, default="left"
     )
-    view_mode = models.CharField(
-        max_length=10,
-        choices=[("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")],
-        default="auto",
+    sidebar_position_mobile = models.CharField(
+        max_length=10, choices=SIDEBAR_POSITION_CHOICES, default="left"
     )
+    icon_size_desktop = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
+    icon_size_mobile = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
+    text_size_desktop = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
+    text_size_mobile = models.CharField(max_length=10, choices=SIDEBAR_SIZE_CHOICES, default="medium")
+    view_mode = models.CharField(max_length=10, choices=VIEW_MODE_CHOICES, default="auto")
 
     class Meta:
         unique_together = ("user", "organisation")

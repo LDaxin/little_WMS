@@ -2,6 +2,10 @@
 
 from django.db import migrations, models
 
+POSITION = [("left", "Left"), ("right", "Right")]
+SIZE = [("small", "Small"), ("medium", "Medium"), ("large", "Large")]
+VIEW = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
+
 
 class Migration(migrations.Migration):
 
@@ -12,12 +16,37 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='userprofile',
-            name='sidebar_position',
-            field=models.CharField(choices=[('left', 'Left'), ('right', 'Right')], default='left', max_length=10),
+            name='sidebar_position_desktop',
+            field=models.CharField(choices=POSITION, default='left', max_length=10),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='sidebar_position_mobile',
+            field=models.CharField(choices=POSITION, default='left', max_length=10),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='icon_size_desktop',
+            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='icon_size_mobile',
+            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='text_size_desktop',
+            field=models.CharField(choices=SIZE, default='medium', max_length=10),
+        ),
+        migrations.AddField(
+            model_name='userprofile',
+            name='text_size_mobile',
+            field=models.CharField(choices=SIZE, default='medium', max_length=10),
         ),
         migrations.AddField(
             model_name='userprofile',
             name='view_mode',
-            field=models.CharField(choices=[('auto', 'Auto'), ('mobile', 'Always mobile'), ('desktop', 'Always desktop')], default='auto', max_length=10),
+            field=models.CharField(choices=VIEW, default='auto', max_length=10),
         ),
     ]
