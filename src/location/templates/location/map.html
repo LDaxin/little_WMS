@@ -1,0 +1,52 @@
+{% extends "hub/header.html" %}
+{% load i18n l10n %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="mb-0">{% trans "Map" %}</h4>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'locations' %}">{% trans "Manage locations" %}</a>
+</div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<div id="map" style="height: 75vh;"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    var map = L.map('map');
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        maxZoom: 19,
+        referrerPolicy: 'strict-origin-when-cross-origin',
+    }).addTo(map);
+    var markers = [];
+    {% localize off %}
+    {% for loc in locations %}
+    var popup = '<strong>{{ loc|escapejs }}</strong>';
+    {% if loc.storage_set.all %}
+    popup += '<br><span class="text-muted">{% trans "Storages" %}</span>';
+    {% for s in loc.storage_set.all %}
+    {% if s.floor_plan.image %}
+    popup += '<br><a href="{% url "floor plan" s.typ.name s.id %}">{{ s.name|escapejs }}</a>';
+    {% else %}
+    popup += '<br><a href="{% url "storage" s.typ.name s.id %}">{{ s.name|escapejs }}</a>';
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    {% if loc.occasion_set.all %}
+    popup += '<br><span class="text-muted">{% trans "Occasions" %}</span>';
+    {% for o in loc.occasion_set.all %}
+    popup += '<br><a href="{% url "occasion" o.pk %}">{{ o|escapejs }}</a>';
+    {% endfor %}
+    {% endif %}
+    popup += '<br><a class="small" href="{% url "location" loc.pk %}">{% trans "Location details" %}</a>';
+    markers.push(
+        L.marker([{{ loc.latitude }}, {{ loc.longitude }}])
+            .addTo(map)
+            .bindPopup(popup)
+    );
+    {% endfor %}
+    {% endlocalize %}
+    if (markers.length) {
+        map.fitBounds(L.featureGroup(markers).getBounds().pad(0.2));
+    } else {
+        map.setView([51.1657, 10.4515], 5);
+    }
+</script>
+{% endblock %}

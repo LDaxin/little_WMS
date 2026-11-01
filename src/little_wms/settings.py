@@ -196,6 +196,11 @@ if os.environ.get("SECURE_HTTPS"):
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# Send the origin as Referer for cross-origin requests. The OpenStreetMap tile
+# server (§15) requires a Referer; Django's default "same-origin" would omit it
+# and the tiles would be blocked.
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 # Email / SMTP (§30): configured via the environment. Without EMAIL_HOST the
 # console backend is used and email counts as not configured.
 EMAIL_HOST = os.environ.get("EMAIL_HOST", "")

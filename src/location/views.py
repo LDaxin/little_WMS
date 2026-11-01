@@ -16,7 +16,7 @@ def location(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/item.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update", "code":locationObject.code.code if locationObject.code else "", "link":("/l/" + locationObject.code.code) if locationObject.code else ""})
+        return render(request, "hub/modules/item.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update", "code":locationObject.code.code if locationObject.code else "", "link":("/l/" + locationObject.code.code) if locationObject.code else "", "mapPicker":True, "linkedStorages":locationObject.storage_set.all(), "linkedOccasions":locationObject.occasion_set.all()})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -34,7 +34,17 @@ def locationIncert(request, locationId):
 @login_required(login_url='/accounts/login/')
 @require_perm("location.view_all")
 def locations(request):
-    return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "modalId":"single", "name":"location", "type":"location", "form":[FormLocation]})
+    return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "modalId":"single", "name":"location", "type":"location", "form":[FormLocation], "add":True, "del":True})
+
+@login_required(login_url='/accounts/login/')
+@require_perm("location.view_all")
+def locationMap(request):
+    locations = (
+        Location.objects.exclude(latitude__isnull=True)
+        .exclude(longitude__isnull=True)
+        .prefetch_related("storage_set", "occasion_set")
+    )
+    return render(request, "location/map.html", context={"locations": locations})
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.create_all")

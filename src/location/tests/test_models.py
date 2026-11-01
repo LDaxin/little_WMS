@@ -37,3 +37,13 @@ class LocationModelTest(TestCase):
 
     def test_soft_delete_and_undelete(self):
         assert_soft_delete_cycle(self, self.location, Location)
+
+    def test_plus_code_derived_on_save(self):
+        loc = Location.objects.create(line1="X", latitude=52.52, longitude=13.405)
+        self.assertEqual(loc.plus_code, "9F4MGCC4+22")
+
+    def test_plus_code_not_overwritten(self):
+        loc = Location.objects.create(
+            line1="X", latitude=52.52, longitude=13.405, plus_code="CUSTOM"
+        )
+        self.assertEqual(loc.plus_code, "CUSTOM")

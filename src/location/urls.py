@@ -9,5 +9,6 @@ urlpatterns = [
     path("location/add", views.addLocation, name="add Locations"),
     path("location/del", views.delLocation, name="del Locations"),
     path("location/search", views.searchLocations, name="search"),
+    path("location/map", views.locationMap, name="location map"),
     path("location/", views.locations, name="locations"),
 ]

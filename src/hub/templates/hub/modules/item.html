@@ -25,5 +25,7 @@
     {% if tagChips %}{% include "hub/modules/tagChips.html" %}{% endif %}
     {% if assignedTo %}{% include "hub/modules/assignedTo.html" %}{% endif %}
     {% if auditTimeline %}{% include "hub/modules/auditTimeline.html" %}{% endif %}
+    {% if linkedStorages or linkedOccasions %}{% include "location/linkedObjects.html" %}{% endif %}
     {% include "hub/modules/itemForm.html" %}
+    {% if mapPicker %}{% include "location/mapPicker.html" %}{% endif %}
 {% endblock %}
