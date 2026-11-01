@@ -58,6 +58,7 @@ class Storage(SoftDeleteObject, models.Model):
         if not self.space:
             space = Space()
             space.prefix = "s0"
+            space.organisation_id = self.organisation_id or current_organisation_id()
             self.space = space
             space.save()
         super().save(*args, **kwargs)

@@ -33,4 +33,15 @@
 <h5 class="mt-4">{% trans "Backup" %}</h5>
 <p class="text-muted mb-2">{% trans "Download a full copy of the database." %}</p>
 <a class="btn btn-outline-secondary" href="{% url 'server backup' %}">{% trans "Download backup" %}</a>
+
+<h5 class="mt-4">{% trans "Organisation export" %}</h5>
+<p class="text-muted mb-2">{% trans "Export the active organisation as JSON, or import one into a new organisation." %}</p>
+<div class="d-flex gap-2 align-items-center">
+    <a class="btn btn-outline-secondary" href="{% url 'server export' %}">{% trans "Download export" %}</a>
+    <form method="post" action="{% url 'server import' %}" enctype="multipart/form-data" class="d-flex gap-2 align-items-center">
+        {% csrf_token %}
+        <input type="file" name="file" accept=".json" class="form-control form-control-sm" style="max-width:18rem">
+        <button class="btn btn-outline-secondary">{% trans "Import" %}</button>
+    </form>
+</div>
 {% endblock %}

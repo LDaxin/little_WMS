@@ -1,10 +1,12 @@
 """Roles & Permissions UI (§3), organisation selection (§22) and invitations (§23)."""
+import json
 from datetime import timedelta
 
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Permission, User
 from django.core.exceptions import PermissionDenied
+from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -445,6 +447,39 @@ def serverBackup(request):
     response = HttpResponse(backup_bytes(), content_type="application/octet-stream")
     response["Content-Disposition"] = 'attachment; filename="little_wms_backup.sqlite3"'
     return response
+
+
+@login_required(login_url='/accounts/login/')
+def serverExport(request):
+    """Download the active organisation as JSON (§17 level 2)."""
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    from organisation.export import export_organisation
+
+    data = export_organisation(active_organisation(request))
+    response = HttpResponse(
+        json.dumps(data, cls=DjangoJSONEncoder, indent=2), content_type="application/json"
+    )
+    response["Content-Disposition"] = 'attachment; filename="organisation-export.json"'
+    return response
+
+
+@login_required(login_url='/accounts/login/')
+def serverImport(request):
+    """Import an organisation from a JSON export (§17 level 2)."""
+    if not request.user.is_superuser:
+        raise PermissionDenied
+    if request.method != "POST":
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+    from organisation.export import import_organisation
+
+    upload = request.FILES.get("file")
+    if upload is not None:
+        data = json.loads(upload.read().decode("utf-8"))
+        import_organisation(data)
+    return redirect("server settings")
 
 
 def _load_defaults():
