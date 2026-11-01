@@ -15,9 +15,41 @@
         <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="https://unpkg.com/htmx.org@1.9.7"></script>
+        <style>
+            :root { --sidebar-width: 56px; --sidebar-expanded: 210px; }
+            .sidebar {
+                position: fixed; top: 0; bottom: 0; left: 0;
+                width: var(--sidebar-width);
+                background: #f8f9fa;
+                border-right: 1px solid #dee2e6;
+                display: flex; flex-direction: column;
+                overflow-x: hidden; overflow-y: auto;
+                transition: width 0.15s ease;
+                z-index: 1030;
+            }
+            .sidebar.sidebar-right { left: auto; right: 0; border-right: none; border-left: 1px solid #dee2e6; }
+            .sidebar:hover, .sidebar.expanded { width: var(--sidebar-expanded); }
+            .sidebar-item {
+                display: flex; align-items: center; gap: 0.75rem;
+                padding: 0.5rem 0.75rem; color: #212529; text-decoration: none;
+                white-space: nowrap; background: none; border: 0; width: 100%; text-align: left;
+            }
+            .sidebar-item:hover { background: #e9ecef; }
+            .sidebar-item img { width: 28px; height: 28px; flex: 0 0 28px; }
+            .sidebar-label { opacity: 0; transition: opacity 0.15s; }
+            .sidebar:hover .sidebar-label, .sidebar.expanded .sidebar-label { opacity: 1; }
+            .sidebar-spacer { flex: 1; }
+            .content { margin-left: var(--sidebar-width); padding: 1rem; }
+            .sidebar-right ~ .content { margin-left: 0; margin-right: var(--sidebar-width); }
+            @media (max-width: 768px) {
+                .sidebar:hover { width: var(--sidebar-width); }
+            }
+            body.view-mobile .sidebar:hover { width: var(--sidebar-width); }
+            body.view-mobile .sidebar.expanded { width: var(--sidebar-expanded); }
+        </style>
         {% livereload_script %}
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body class="view-{{ view_mode }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <div aria-live="polite" aria-atomic="true" class="position-relative">
             <div class="toast-container position-fixed top-0 end-0 p-3">
 
@@ -25,64 +57,68 @@
             </div>
         </div>
 
-        <nav class="navbar sticky-top bg-light">
-          <div class="container-fluid {% if not request.user.is_authenticated %} d-flex justify-content-center {% endif %}">
+        {% if request.user.is_authenticated %}
+        <aside class="sidebar sidebar-{{ sidebar_position }}" id="sidebar">
+            <a class="sidebar-item" href="{% url 'hub' %}">
+                <img src="{% static 'hub/symbols/Logo.svg' %}">
+                <span class="sidebar-label">little_WMS</span>
+            </a>
+            <button type="button" class="sidebar-item" onclick="document.getElementById('sidebar').classList.toggle('expanded')">
+                <img src="{% static 'hub/symbols/Menu.svg' %}">
+                <span class="sidebar-label">{% trans "Menu" %}</span>
+            </button>
 
-                <a class="navbar-brand">
-                    {% if symbol == None %}
-                        <img style="width:50px" src="{% static 'hub/symbols/Logo.svg' %}">
-                    {% else %}
-                        <img style="width:50px" src="{% static 'hub/symbols/'|add:symbol|add:'.svg' %}">
-                    {% endif %}
+            <nav class="d-flex flex-column">
+                <a class="sidebar-item" href="{% url 'dashboard' %}">
+                    <img src="{% static 'hub/symbols/Grid.svg' %}"><span class="sidebar-label">{% trans "Dashboard" %}</span>
                 </a>
+                <a class="sidebar-item" href="/article/">
+                    <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Articles" %}</span>
+                </a>
+                <a class="sidebar-item" href="/storage/">
+                    <img src="{% static 'hub/symbols/Store.svg' %}"><span class="sidebar-label">{% trans "Storages" %}</span>
+                </a>
+                <a class="sidebar-item" href="/movement/">
+                    <img src="{% static 'hub/symbols/Hand.svg' %}"><span class="sidebar-label">{% trans "Movement" %}</span>
+                </a>
+            </nav>
 
-                {% if request.user.is_authenticated %}
+            <div class="sidebar-spacer"></div>
 
-                {% if user_organisations %}
-                <form method="post" action="{% url 'switch organisation' %}" class="d-flex align-items-center">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    <select name="organisation" class="form-select form-select-sm" onchange="this.form.submit()">
-                        {% for org in user_organisations %}
-                        <option value="{{ org.pk }}"
-                                {% if active_organisation and org.pk == active_organisation.pk %}selected{% endif %}>{{ org.name }}</option>
-                        {% endfor %}
-                    </select>
-                </form>
-                {% endif %}
-
-                <form method="post" action="/accounts/logout/" style="display: inline;">
-                    {% csrf_token %}
-                    <button class="btn btn-light" type="submit">
-                        <img style="width:45px" src="{% static 'hub/symbols/Signout.svg' %}">
-                    </button>
-                </form>
-                <div class="dropdown">
-                    <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img style="width:45px" src="{% static 'hub/symbols/List.svg' %}">
-                        {% if unreadNotifications %}<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ unreadNotifications }}</span>{% endif %}
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        {% for n in request.user.notifications.all|slice:":5" %}
-                        <li><a class="dropdown-item" href="{{ n.link|default:'#' }}">{{ n.title }}</a></li>
-                        {% empty %}
-                        <li><span class="dropdown-item-text text-muted">{% trans "No notifications" %}</span></li>
-                        {% endfor %}
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'notifications' %}">{% trans "View all" %}</a></li>
-                    </ul>
-                </div>
-                <a class="btn btn-light" type="button" href="/accounts/password_change"><img style="width:45px" src="{% static 'hub/symbols/Setting.svg' %}"></a>
-                {% if can_manage_roles %}<a class="btn btn-light" type="button" href="/roles/">{% trans "Roles" %}</a>{% endif %}
-                {% if request.path != "/" %}
-                    <a class="btn btn-light" type="button" onClick="javascript:history.back();"><img style="width:45px" src="{% static 'hub/symbols/Back.svg' %}"></a>
-                {% endif %}
-                {% endif %}
-
+            <div class="dropdown dropend">
+                <button class="sidebar-item" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static 'hub/symbols/List.svg' %}">
+                    <span class="sidebar-label">{% trans "Notifications" %}{% if unreadNotifications %} ({{ unreadNotifications }}){% endif %}</span>
+                </button>
+                <ul class="dropdown-menu">
+                    {% for n in request.user.notifications.all|slice:":5" %}
+                    <li><a class="dropdown-item" href="{{ n.link|default:'#' }}">{{ n.title }}</a></li>
+                    {% empty %}
+                    <li><span class="dropdown-item-text text-muted">{% trans "No notifications" %}</span></li>
+                    {% endfor %}
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'notifications' %}">{% trans "View all" %}</a></li>
+                </ul>
             </div>
-        </nav>
-        
-        <div class="container-fluid">
+
+            <a class="sidebar-item" href="{% url 'email preferences' %}">
+                <img src="{% static 'hub/symbols/Setting.svg' %}"><span class="sidebar-label">{% trans "Preferences" %}</span>
+            </a>
+            {% if can_manage_roles %}
+            <a class="sidebar-item" href="/roles/">
+                <img src="{% static 'hub/symbols/List.svg' %}"><span class="sidebar-label">{% trans "Roles" %}</span>
+            </a>
+            {% endif %}
+            <form method="post" action="/accounts/logout/">
+                {% csrf_token %}
+                <button class="sidebar-item" type="submit">
+                    <img src="{% static 'hub/symbols/Signout.svg' %}"><span class="sidebar-label">{% trans "Logout" %}</span>
+                </button>
+            </form>
+        </aside>
+        {% endif %}
+
+        <div class="content">
         {% block content %}
 
         {% endblock %}

@@ -13,6 +13,24 @@
         {% endfor %}
     </select>
 
+    <h6 class="mt-4">{% trans "Navigation" %}</h6>
+    <div class="mb-2">
+        <label class="form-label mb-0">{% trans "Sidebar position" %}</label>
+        <select name="sidebar_position" class="form-select" style="max-width:14rem">
+            {% for value, label in sidebar_positions %}
+            <option value="{{ value }}" {% if current_position == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mb-2">
+        <label class="form-label mb-0">{% trans "View mode" %}</label>
+        <select name="view_mode" class="form-select" style="max-width:14rem">
+            {% for value, label in view_modes %}
+            <option value="{{ value }}" {% if current_view_mode == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <h6 class="mt-4">{% trans "Email" %}</h6>
     <p class="text-muted">{% trans "Choose which emails you want to receive. Emails are only sent to a confirmed address." %}</p>
     {% for category in categories %}

@@ -47,3 +47,21 @@ class EmailPreferencesViewTest(TestCase):
         UserProfile.objects.create(user=self.user, organisation=org)
         self.client.post("/email-preferences/", {"language": "en"})
         self.assertEqual(self.user.profiles.first().language, "en")
+
+    def test_save_sidebar_settings(self):
+        org = Organisation.objects.create(name="A", slug="a")
+        UserProfile.objects.create(user=self.user, organisation=org)
+        self.client.post("/email-preferences/", {"sidebar_position": "right", "view_mode": "mobile"})
+        profile = self.user.profiles.first()
+        self.assertEqual(profile.sidebar_position, "right")
+        self.assertEqual(profile.view_mode, "mobile")
+
+
+class SidebarTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")
+        self.client.login(username="tester", password="pw")
+
+    def test_sidebar_rendered(self):
+        response = self.client.get("/")
+        self.assertContains(response, 'class="sidebar')

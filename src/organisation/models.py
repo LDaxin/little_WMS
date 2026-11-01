@@ -84,6 +84,17 @@ class UserProfile(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, default=current_organisation_id)
     # Preferred UI language (§14); empty = the server default.
     language = models.CharField(max_length=10, blank=True)
+    # Sidebar navigation (§12).
+    sidebar_position = models.CharField(
+        max_length=10,
+        choices=[("left", "Left"), ("right", "Right")],
+        default="left",
+    )
+    view_mode = models.CharField(
+        max_length=10,
+        choices=[("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")],
+        default="auto",
+    )
 
     class Meta:
         unique_together = ("user", "organisation")

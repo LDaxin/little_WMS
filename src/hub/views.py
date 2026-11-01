@@ -99,7 +99,7 @@ def dashboard(request):
         ).order_by("calendar_entry__start_date")[:5]
 
     if has_perm(request.user, "notification.view_all", organisation):
-        context["unreadNotifications"] = request.user.notifications.filter(is_read=False)[:5]
+        context["dashboardNotifications"] = request.user.notifications.filter(is_read=False)[:5]
 
     if has_perm(request.user, "article.view_all", organisation):
         context["alerts"] = list(run_checks(organisation))[:10]
@@ -221,7 +221,13 @@ def emailPreferences(request):
         language = request.POST.get("language", "")
         if language in dict(django_settings.LANGUAGES):
             profile.language = language
-            profile.save()
+        position = request.POST.get("sidebar_position", "")
+        if position in dict(UserProfile._meta.get_field("sidebar_position").choices):
+            profile.sidebar_position = position
+        view_mode = request.POST.get("view_mode", "")
+        if view_mode in dict(UserProfile._meta.get_field("view_mode").choices):
+            profile.view_mode = view_mode
+        profile.save()
         return redirect("email preferences")
     return render(request, "hub/emailPreferences.html", {
         "categories": [
@@ -230,5 +236,9 @@ def emailPreferences(request):
         ],
         "languages": django_settings.LANGUAGES,
         "current_language": profile.language,
+        "sidebar_positions": UserProfile._meta.get_field("sidebar_position").choices,
+        "view_modes": UserProfile._meta.get_field("view_mode").choices,
+        "current_position": profile.sidebar_position,
+        "current_view_mode": profile.view_mode,
     })
 

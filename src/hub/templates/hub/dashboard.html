@@ -23,12 +23,12 @@
     </div>
     {% endif %}
 
-    {% if unreadNotifications %}
+    {% if dashboardNotifications %}
     <div class="col-md-6 mb-3">
         <div class="card">
             <div class="card-header">{% trans "Notifications" %}</div>
             <ul class="list-group list-group-flush">
-                {% for n in unreadNotifications %}
+                {% for n in dashboardNotifications %}
                 <li class="list-group-item">{% if n.link %}<a href="{{ n.link }}">{{ n.title }}</a>{% else %}{{ n.title }}{% endif %}</li>
                 {% empty %}
                 <li class="list-group-item text-muted">{% trans "None" %}</li>

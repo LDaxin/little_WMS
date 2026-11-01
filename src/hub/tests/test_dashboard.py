@@ -38,11 +38,13 @@ class DashboardTest(TestCase):
         self.assertContains(response, "Statistics")
 
     def test_widgets_hidden_without_permission(self):
-        user_with(self.org, "u", "article_view_all")
+        user = user_with(self.org, "u", "article_view_all")
         self.client.login(username="u", password="pw")
+        notify(user, "Secret notification")
         response = self.client.get("/dashboard/")
         self.assertNotContains(response, "Statistics")
-        self.assertNotContains(response, "Notifications")
+        # the dashboard notification widget is hidden (the sidebar still shows it)
+        self.assertNotContains(response, '<div class="card-header">Notifications</div>')
 
     def test_alerts_from_checks(self):
         user_with(self.org, "u", "article_view_all")
