@@ -16,6 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -40,3 +42,6 @@ urlpatterns = [
     path('', include("codeSystem.urls")),
     path('api-auth/', include('rest_framework.urls')),
 ]
+
+# Serve uploaded media in development (§15).
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

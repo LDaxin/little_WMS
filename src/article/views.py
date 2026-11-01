@@ -106,12 +106,54 @@ def article(request, typ, articleId):
             "auditLogs":AuditLog.objects.filter(
                 content_type=ContentType.objects.get_for_model(Article),
                 object_id=p.pk)[:20],
+            "imageGallery":True,
+            "images":p.images.all(),
+            "imageBaseUrl":"./%s/images/" % articleId,
         }
         if p.space and p.space.active:
             context.update(composition_context(p.space))
         return render(request, "hub/modules/item.html", context=context)
     else:
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def addArticleImage(request, typ, articleId):
+    """Upload an image to an article (§15)."""
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST" and request.FILES.get("image"):
+        ArticleImage.objects.create(
+            article=article,
+            image=request.FILES["image"],
+            caption=request.POST.get("caption", ""),
+            is_primary=not article.images.exists(),
+        )
+    return redirect("article", typ=typ, articleId=articleId)
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def deleteArticleImage(request, typ, articleId, imageId):
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST":
+        image = article.images.filter(pk=imageId).first()
+        if image:
+            image.delete()
+    return redirect("article", typ=typ, articleId=articleId)
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def setPrimaryArticleImage(request, typ, articleId, imageId):
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    if request.method == "POST":
+        article.images.update(is_primary=False)
+        article.images.filter(pk=imageId).update(is_primary=True)
+    return redirect("article", typ=typ, articleId=articleId)
 
 
 @login_required(login_url='/accounts/login/')
@@ -231,7 +273,7 @@ def articlesAll(request):
 @require_scope("article", "view")
 def searchArticlesAll(request):
     if request.method == "GET":
-        r = Article.objects.all()
+        r = Article.objects.prefetch_related("images")
         query = request.GET.get("query")
         if query:
             from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json

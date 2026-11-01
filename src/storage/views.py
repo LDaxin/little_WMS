@@ -1,6 +1,6 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from .forms import *
 from .models import *
@@ -42,11 +42,50 @@ def storage(request, typ, storageId):
                 "allTags":Tag.objects.all(),
                 "tagAddUrl":"./%s/tags/add" % storageId,
                 "tagRemoveUrl":"./%s/tags/remove" % storageId,
+                "imageGallery":True,
+                "images":storageObject.images.all(),
+                "imageBaseUrl":"./%s/images/" % storageId,
             }
             context.update(composition_context(storageObject.space))
             return render(request, "hub/modules/item.html", context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def addStorageImage(request, typ, storageId):
+    """Upload an image to a storage (§15)."""
+    storage = Storage.objects.get(pk=storageId)
+    if request.method == "POST" and request.FILES.get("image"):
+        StorageImage.objects.create(
+            storage=storage,
+            image=request.FILES["image"],
+            caption=request.POST.get("caption", ""),
+            is_primary=not storage.images.exists(),
+        )
+    return redirect("storage", typ=typ, storageId=storageId)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def deleteStorageImage(request, typ, storageId, imageId):
+    storage = Storage.objects.get(pk=storageId)
+    if request.method == "POST":
+        image = storage.images.filter(pk=imageId).first()
+        if image:
+            image.delete()
+    return redirect("storage", typ=typ, storageId=storageId)
+
+
+@login_required(login_url='/accounts/login/')
+@require_perm("storage.edit_all")
+def setPrimaryStorageImage(request, typ, storageId, imageId):
+    storage = Storage.objects.get(pk=storageId)
+    if request.method == "POST":
+        storage.images.update(is_primary=False)
+        storage.images.filter(pk=imageId).update(is_primary=True)
+    return redirect("storage", typ=typ, storageId=storageId)
     
 
 @login_required(login_url='/accounts/login/')
@@ -118,7 +157,7 @@ def storagesAll(request):
 @require_perm("storage.view_all")
 def searchStoragesAll(request):
     if request.method == "GET":
-        r = Storage.objects.all()
+        r = Storage.objects.prefetch_related("images")
         if request.GET.get("search"):
             search = request.GET["search"]
             r = r.filter(Q(name__contains=search) | Q(code__code__contains=search))
@@ -328,9 +367,9 @@ def removeStorageTag(request, typ, storageId, tagId):
 def searchStorages(request, typ):
     if request.method == "GET":
         if request.GET['search'] == "":
-            r = Storage.objects.filter(typ__name__exact=typ)
+            r = Storage.objects.filter(typ__name__exact=typ).prefetch_related("images")
         else:
-            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__name__exact=typ)
+            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__name__exact=typ).prefetch_related("images")
         return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
 
 

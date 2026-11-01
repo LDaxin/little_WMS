@@ -3,6 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core import validators
 from hub import models as hub_models
 from hub.fields import SelfForeignKey
+from hub.models import BaseImage
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from django import forms
@@ -69,4 +70,21 @@ class Storage(SoftDeleteObject, models.Model):
         else:
             name = self.name
         return name
+
+    @property
+    def primary_image(self):
+        images = list(self.images.all())
+        for image in images:
+            if image.is_primary:
+                return image
+        return images[0] if images else None
+
+
+class StorageImage(BaseImage):
+    """An image of a storage (§15)."""
+
+    storage = models.ForeignKey(Storage, on_delete=models.CASCADE, related_name="images")
+
+    class Meta:
+        ordering = ["order", "id"]
         

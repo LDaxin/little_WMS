@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
+from hub.models import BaseImage
 from tag.models import Tag
 from space.models import Space
 from organisation.current import current_organisation_id
@@ -215,6 +216,23 @@ class Article(SoftDeleteObject, models.Model):
 
     def __str__(self, *args, **kwargs):
         return self.base.name + " " + self.code.code
+
+    @property
+    def primary_image(self):
+        images = list(self.images.all())
+        for image in images:
+            if image.is_primary:
+                return image
+        return images[0] if images else None
+
+
+class ArticleImage(BaseImage):
+    """An image of an article (§15)."""
+
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="images")
+
+    class Meta:
+        ordering = ["order", "id"]
 
 
 class Stock(models.Model):

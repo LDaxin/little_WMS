@@ -41,3 +41,55 @@ class EmailPreference(models.Model):
     def __str__(self):
         return "%s: %s" % (self.category, "subscribed" if self.subscribed else "unsubscribed")
 
+
+class BaseImage(models.Model):
+    """An image attached to an object (§15).
+
+    Concrete subclasses add the owner foreign key. On save the image is scaled
+    to ``MAX_EDGE`` and a thumbnail is generated with Pillow (already required
+    by ``ImageField``).
+    """
+
+    MAX_EDGE = 1600
+    THUMB_EDGE = 300
+
+    image = models.ImageField(upload_to="images/%Y/%m/")
+    thumbnail = models.ImageField(upload_to="images/thumbs/%Y/%m/", blank=True)
+    is_primary = models.BooleanField(default=False)
+    caption = models.CharField(max_length=200, blank=True)
+    order = models.IntegerField(default=0)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.image and not self.thumbnail:
+            self._process()
+        super().save(*args, **kwargs)
+
+    def _process(self):
+        from io import BytesIO
+
+        from django.core.files.base import ContentFile
+        from PIL import Image
+
+        self.image.open()
+        img = Image.open(self.image).convert("RGB")
+        name = self.image.name
+
+        img.thumbnail((self.MAX_EDGE, self.MAX_EDGE))
+        buf = BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        self.image.save(name, ContentFile(buf.getvalue()), save=False)
+
+        thumb = img.copy()
+        thumb.thumbnail((self.THUMB_EDGE, self.THUMB_EDGE))
+        tbuf = BytesIO()
+        thumb.save(tbuf, format="JPEG", quality=85)
+        self.thumbnail.save(name, ContentFile(tbuf.getvalue()), save=False)
+
+    def delete(self, *args, **kwargs):
+        self.image.delete(save=False)
+        self.thumbnail.delete(save=False)
+        super().delete(*args, **kwargs)
+

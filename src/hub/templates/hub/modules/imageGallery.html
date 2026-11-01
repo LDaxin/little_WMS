@@ -1,0 +1,25 @@
+{% load i18n %}
+<div class="p-2">
+    <div class="d-flex flex-wrap gap-2">
+        {% for img in images %}
+        <div class="text-center">
+            <img src="{{ img.thumbnail.url }}" style="height:80px" class="rounded border">
+            {% if img.is_primary %}<div class="badge text-bg-primary">{% trans "Primary" %}</div>{% endif %}
+            <div class="btn-group btn-group-sm mt-1">
+                <form method="post" action="{{ imageBaseUrl }}{{ img.id }}/primary">{% csrf_token %}
+                    <button class="btn btn-outline-secondary" title="{% trans "Set primary" %}">&#9733;</button>
+                </form>
+                <form method="post" action="{{ imageBaseUrl }}{{ img.id }}/delete">{% csrf_token %}
+                    <button class="btn btn-outline-danger" title="{% trans "Delete" %}">&times;</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <form method="post" action="{{ imageBaseUrl }}add" enctype="multipart/form-data" class="mt-2 d-flex gap-2">
+        {% csrf_token %}
+        <input type="file" name="image" accept="image/*" capture="environment" class="form-control form-control-sm" required>
+        <input type="text" name="caption" class="form-control form-control-sm" placeholder="{% trans "Caption" %}">
+        <button class="btn btn-sm btn-primary">{% trans "Upload" %}</button>
+    </form>
+</div>
