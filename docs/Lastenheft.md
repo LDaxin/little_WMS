@@ -65,20 +65,49 @@ sections are still to be built.
 | § | Section | Spec |
 |---|---|---|
 | 1 | Multi-User Preparation | `organisations` |
+| 2 | Occasion System | `occasions`, `planning` |
 | 3 | Roles & Permissions | `roles-permissions` |
 | 4a–c | Dynamic Article Types | `article-management` |
 | 4d | Sets / Bundles | `stock-composition` |
 | 4e | Article History / Audit Trail | `audit-log` |
 | 5a | QR Sheet Printing | `qr-sheet-printing` |
 | 5b–c | QR Workflow | `qr-workflow`, `inventory` |
+| 6 | Notification System | `notifications`, `notification-rules`, `email-preferences` |
+| 7a | API-First | `api` |
+| 8 | Standard Configurations & Onboarding | `onboarding` |
+| 9 | Query Builder | `query-builder` |
+| 10 | Saved Views & Share Links | `saved-views` |
 | 11 | Movement Redesign | `movement` |
+| 12 | Mobile & Navigation | `navigation` |
 | 13 | Tags | `tags` |
+| 14 | Internationalization | `i18n` |
+| 15 | Images & Floor Plans | `images` (images only; floor plans deferred) |
+| 17 | Admin Dashboard & Backup | `dashboard`, `backup`, `organisation-export` |
+| 19 | Import | `import` |
+| 20 | Loans & Shared Pools | `loans` |
 | 21 | Storage Integrity | `movement` (store validation) |
 | 22 | Multi-Organisation Membership | `organisations` |
+| 23 | Registration, Invitations & Onboarding | `onboarding`, `invitations`, `email-verification` |
+| 24 | Dashboard | `dashboard` |
 | 25 | Article Model | `article-management` |
 | 26 | Code System & Links | `code-system` |
+| 27 | Soft-Delete & Trash | `trash` |
 | 28 | Locations | `locations` |
+| 29 | Security | `security` |
+| 30 | E-Mail / SMTP | `email` |
+| 31 | API Authentication | `api` |
 | 32 | Audit Log | `audit-log` |
+| 33 | Reporting & Statistics | `reports` |
+| 34 | PWA | `pwa` |
+| 35 | Data Protection / GDPR | `gdpr` |
+| 36 | Concurrency | `concurrency` |
+
+Supporting capabilities without a dedicated section: `hub`, `storage-management`,
+`demo-seed`.
+
+Still to be built: **7b** Testing Strategy, **7c** Migrations (safe handling),
+**15** Floor Plans / Outdoor Map, **16** Power Functions, **18** Data Migration &
+Transformation, **37** Database & Scaling.
 
 ---
 
