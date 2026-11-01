@@ -37,6 +37,12 @@ def locations(request):
     return render(request, "hub/modules/items.html", context={"symbol":"Location", 'searchFieldName':"locationSearch", "modalId":"single", "name":"location", "type":"location", "form":[FormLocation]})
 
 @login_required(login_url='/accounts/login/')
+@require_perm("location.view_all")
+def locationMap(request):
+    locations = Location.objects.exclude(latitude__isnull=True).exclude(longitude__isnull=True)
+    return render(request, "location/map.html", context={"locations": locations})
+
+@login_required(login_url='/accounts/login/')
 @require_perm("location.create_all")
 def addLocation(request):
     if request.method == "POST":

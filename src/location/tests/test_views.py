@@ -36,6 +36,44 @@ class LocationViewTest(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertIn("/accounts/login/", response["Location"])
 
+    def test_map_requires_login(self):
+        self.client.logout()
+        response = self.client.get("/location/map")
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/accounts/login/", response["Location"])
+
+    def test_map_shows_locations_with_coordinates(self):
+        Location.objects.create(line1="Mapped", latitude=52.52, longitude=13.405)
+        response = self.client.get("/location/map")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "52.52")
+        self.assertContains(response, "13.405")
+
+    def test_map_omits_locations_without_coordinates(self):
+        response = self.client.get("/location/map")
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Invalidenstr. 1")
+
+    def test_add_location_from_plus_code(self):
+        response = self.client.post(
+            "/location/add",
+            {
+                "line1": "Plus",
+                "line2": "",
+                "postal_code": "",
+                "city": "",
+                "state": "",
+                "country": "",
+                "latitude": "",
+                "longitude": "",
+                "plus_code": "9F4MGCC4+22",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        loc = Location.objects.get(line1="Plus")
+        self.assertAlmostEqual(loc.latitude, 52.5200625, places=3)
+        self.assertAlmostEqual(loc.longitude, 13.4050625, places=3)
+
     def test_add_location(self):
         response = self.client.post(
             "/location/add",

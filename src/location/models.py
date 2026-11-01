@@ -5,6 +5,7 @@ from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
 from organisation.current import current_organisation_id
 from organisation.managers import SoftDeleteOrganisationManager
+from . import pluscode
 
 # Create your models here.
 
@@ -35,6 +36,8 @@ class Location(SoftDeleteObject, models.Model):
             uCode.prefix = "l0"
             self.code = uCode
             uCode.save()
+        if self.latitude is not None and self.longitude is not None and not self.plus_code:
+            self.plus_code = pluscode.encode(self.latitude, self.longitude)
         super().save(*args, **kwargs)
 
     def __str__(self):
