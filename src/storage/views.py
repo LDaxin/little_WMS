@@ -379,7 +379,7 @@ def updateStorage(request, storageId, typ):
     storageObject = Storage.objects.get(pk=storageId)
 
     if request.method == "POST":
-        form = FormStorage(request.POST, instance=storageObject)
+        form = FormChangeStorage(request.POST, instance=storageObject)
         if form.is_valid():
             form.save()
             return toast(request, "Update", str(storageObject) + " was updated", "status")

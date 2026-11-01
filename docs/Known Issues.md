@@ -55,6 +55,7 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-018 | `Article.stored` / `hub/fields.py` `SelfForeignKey` | Cycles between articles/spaces were possible; `SelfForeignKey` silently set the value to `None` on a cycle; `Settings.storageDepth` was unused | ✅ fixed | 1.6 | `space/tests/test_services.py`, `hub/tests/test_fields.py` |
+| KI-025 | `storage/views.py` `updateStorage` | Used `FormStorage` (fields `name`, `parent`, `code`) while the storage detail page renders `FormChangeStorage` (which also has `location`) → a location selected on the storage was silently dropped on save | ✅ fixed | add-outdoor-map | `storage/tests/test_views.py` |
 
 ## Floor plans (§15)
 

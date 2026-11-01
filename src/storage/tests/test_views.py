@@ -51,6 +51,18 @@ class StorageViewTest(TestCase):
         self.storage.refresh_from_db()
         self.assertEqual(self.storage.name, "Regal A2")
 
+    def test_update_storage_location(self):
+        from location.models import Location
+
+        loc = Location.objects.create(line1="Camp", latitude=52.52, longitude=13.405)
+        response = self.client.post(
+            f"/storage/regal/{self.storage.pk}/update",
+            {"name": "Regal A", "parent": "", "location": str(loc.pk)},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.storage.refresh_from_db()
+        self.assertEqual(self.storage.location_id, loc.pk)
+
     def test_delete_storage(self):
         response = self.client.post(
             "/storage/regal/del", {f"_{self.storage.pk}": str(self.storage.pk)}
