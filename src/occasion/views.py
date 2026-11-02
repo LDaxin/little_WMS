@@ -10,7 +10,7 @@ from planning.models import CalendarEntry, RecurrenceRule
 from location.models import Location
 from organisation.decorators import require_perm
 from occasion.models import Occasion, OccasionTemplate, OccasionType, Packlist
-from occasion.services import duplicate_occasion, repeat_occasion
+from occasion.services import apply_packlist, duplicate_occasion, packlist_as_list, repeat_occasion
 
 
 def _int_or_none(value):
@@ -24,12 +24,7 @@ def _location(value):
 
 def _apply_template(occasion, template):
     """Copy a template's default packlist onto an occasion, skipping gone articles."""
-    for item in template.default_packlist:
-        article = Article.objects.filter(pk=item.get("article")).first()
-        if article:
-            Packlist.objects.create(
-                occasion=occasion, article=article, quantity=item.get("quantity") or 1
-            )
+    apply_packlist(occasion, template.default_packlist)
 
 
 def _packlist_context(occasion, error=""):
@@ -172,10 +167,7 @@ def saveOccasionAsTemplate(request, occasionId):
         OccasionTemplate.objects.create(
             name=request.POST.get("name", "").strip() or str(occ),
             occasion_type=occ.occasion_type,
-            default_packlist=[
-                {"article": entry.article_id, "quantity": entry.quantity}
-                for entry in occ.packlist.all()
-            ],
+            default_packlist=packlist_as_list(occ),
         )
     return redirect("occasion", occasionId=occ.pk)
 

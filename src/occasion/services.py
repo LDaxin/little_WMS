@@ -1,9 +1,37 @@
 """Occasion services (§2)."""
 from datetime import timedelta
 
+from article.models import Article
 from planning.models import CalendarEntry
 from planning.services import recurrence_dates
 from occasion.models import Occasion, Packlist
+
+
+def packlist_as_list(occasion):
+    """The occasion's packlist as a JSON-serialisable list of {article, quantity}.
+
+    This is the single place that knows the packlist shape used by
+    ``OccasionTemplate.default_packlist``.
+    """
+    return [{"article": e.article_id, "quantity": e.quantity} for e in occasion.packlist.all()]
+
+
+def apply_packlist(occasion, items):
+    """Create packlist entries on ``occasion`` from ``{article, quantity}`` items.
+
+    Items whose article no longer exists are skipped.
+    """
+    for item in items:
+        article = Article.objects.filter(pk=item.get("article")).first()
+        if article:
+            Packlist.objects.create(
+                occasion=occasion, article=article, quantity=item.get("quantity") or 1
+            )
+
+
+def copy_packlist(source, target):
+    """Copy the packlist of ``source`` onto ``target``."""
+    apply_packlist(target, packlist_as_list(source))
 
 
 def duplicate_occasion(occasion, shift_days=0):
@@ -24,8 +52,7 @@ def duplicate_occasion(occasion, shift_days=0):
         location=occasion.location,
         participant_count=occasion.participant_count,
     )
-    for item in occasion.packlist.all():
-        Packlist.objects.create(occasion=copy, article=item.article, quantity=item.quantity)
+    copy_packlist(occasion, copy)
     return copy
 
 
@@ -54,9 +81,6 @@ def repeat_occasion(occasion, rule):
             location=occasion.location,
             participant_count=occasion.participant_count,
         )
-        for item in occasion.packlist.all():
-            Packlist.objects.create(
-                occasion=instance, article=item.article, quantity=item.quantity
-            )
+        copy_packlist(occasion, instance)
         created += 1
     return created
