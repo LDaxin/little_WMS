@@ -16,7 +16,7 @@
                 {% trans "Invitation link:" %}
                 <a href="{% url 'invite accept' r.invitation.token %}">{% url 'invite accept' r.invitation.token %}</a>
                 <button type="button" class="btn btn-sm btn-outline-secondary"
-                        onclick="navigator.clipboard.writeText(window.location.origin + '{% url 'invite accept' r.invitation.token %}');">{% trans "Copy link" %}</button>
+                        onclick="copyToClipboard(window.location.origin + '{% url 'invite accept' r.invitation.token %}', this);">{% trans "Copy link" %}</button>
             </div>
             {% endif %}
         </span>

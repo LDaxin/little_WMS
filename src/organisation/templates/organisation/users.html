@@ -74,7 +74,7 @@
         </span>
         <span class="d-flex gap-2">
             <button type="button" class="btn btn-sm btn-outline-secondary"
-                    onclick="navigator.clipboard.writeText(window.location.origin + '/invite/{{ invitation.token }}/');">
+                    onclick="copyToClipboard(window.location.origin + '/invite/{{ invitation.token }}/', this);">
                 Copy link
             </button>
             <form method="post" action="{% url 'invite revoke' invitation.pk %}">

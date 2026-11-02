@@ -25,7 +25,7 @@
         </span>
         <span class="d-flex gap-2">
             <button type="button" class="btn btn-sm btn-outline-secondary"
-                    onclick="navigator.clipboard.writeText(window.location.origin + '{% url 'lend link' link.token %}');">
+                    onclick="copyToClipboard(window.location.origin + '{% url 'lend link' link.token %}', this);">
                 {% trans "Copy link" %}
             </button>
             {% if link.is_active %}

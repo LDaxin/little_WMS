@@ -6,7 +6,7 @@
     <div class="d-flex align-items-center gap-2 p-2">
         <span class="badge text-bg-secondary">{{ code }}</span>
         <button type="button" class="btn btn-sm btn-outline-secondary"
-                onclick="navigator.clipboard.writeText(window.location.origin + '{{ link }}');">
+                onclick="copyToClipboard(window.location.origin + '{{ link }}', this);">
             {% trans "Copy link" %}
         </button>
         <a class="btn btn-sm btn-outline-secondary" href="{{ link }}">{% trans "Open" %}</a>
