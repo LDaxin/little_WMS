@@ -16,7 +16,7 @@ Scope: the whole `ki` line (252 commits / 52 changes since `dev`).
 | RF-004 | `article/models.py`, `loans/models.py` | `Article.ownership` (`owned`/`borrowed`) is a second source of truth for "there is a loan". | Derive ownership from the open loan, or keep one canonical field. | 🔴 open |
 | RF-005 | `codeSystem/services.py`, `movement/` | Prefix→object lookup scattered across `resolve_space`, `_resolve_target`, `movementScan`, `where`, `_resolve_location`, `inventoryScan`. | One shared code resolver. | ✅ done |
 | RF-006 | `hub/csv.py`, `article/`, `storage/`, `codeSystem/`, `movement/`, `reports/` | The `HttpResponse + csv.writer` export skeleton repeated six times. | One CSV helper. | ✅ done |
-| RF-007 | all apps | 13 `*Search` views repeat the same `Q(...__contains=...)` + `results.html` pattern. | Shared search helper / template. | 🔴 open |
+| RF-007 | `hub/search.py`, all apps | 13 `*Search` views repeat the same `Q(...__contains=...)` construction. | Shared search helper. | ✅ done |
 
 ## Order
 

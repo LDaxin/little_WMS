@@ -10,6 +10,7 @@ from article.models import Article
 from storage.models import Storage
 from space.services import space_path
 from codeSystem.services import resolve_code
+from hub.search import filter_by_search
 from movement.services import MovementService, resolve_space, undo
 from movement.session import get_state, save_state, reset, get_open_session, end_open_session
 from article.services import default_locations
@@ -96,9 +97,7 @@ def whereSearch(request):
     search = request.GET.get("q", "").strip()
     results = []
     if search:
-        results = Article.objects.filter(
-            Q(base__name__contains=search) | Q(code__code__contains=search)
-        )[:20]
+        results = filter_by_search(Article.objects.all(), search, "base__name", "code__code")[:20]
     return render(request, "movement/whereResults.html", context={"results": results})
 
 
@@ -307,8 +306,8 @@ def movementSearch(request):
             ra = Article.objects.none()
             rs = Storage.objects.none()
         else:
-            ra = Article.objects.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
-            rs = Storage.objects.filter(Q(name__contains=search) | Q(code__code__contains=search))
+            ra = filter_by_search(Article.objects.all(), search, "base__name", "code__code")
+            rs = filter_by_search(Storage.objects.all(), search, "name", "code__code")
         return render(request, "movement/searchResults.html", context={"resultsA": ra, "resultsS": rs})
 
     return HttpResponseNotFound('<h1>Page not found</h1>')

@@ -1,6 +1,7 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
+from hub.search import filter_by_search
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -14,7 +15,6 @@ from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 import json
 from time import sleep
 
@@ -294,10 +294,7 @@ def storagesAll(request):
 @require_perm("storage.view_all")
 def searchStoragesAll(request):
     if request.method == "GET":
-        r = Storage.objects.prefetch_related("images")
-        if request.GET.get("search"):
-            search = request.GET["search"]
-            r = r.filter(Q(name__contains=search) | Q(code__code__contains=search))
+        r = filter_by_search(Storage.objects.prefetch_related("images"), request.GET.get("search", ""), "name", "code__code")
         return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})
 
 
@@ -432,9 +429,7 @@ def storeArticleSearch(request, typ, storageId):
     """Live suggestions for the store-article field (code or name, § code-input)."""
     query = request.GET.get("code", "").strip()
     if query:
-        articles = Article.objects.filter(
-            Q(base__name__contains=query) | Q(code__code__contains=query)
-        )[:20]
+        articles = filter_by_search(Article.objects.all(), query, "base__name", "code__code")[:20]
     else:
         articles = Article.objects.none()
     return render(request, "hub/modules/storeArticleResults.html", {
@@ -503,11 +498,11 @@ def removeStorageTag(request, typ, storageId, tagId):
 @require_perm("storage.view_all")
 def searchStorages(request, typ):
     if request.method == "GET":
-        if request.GET['search'] == "":
-            r = Storage.objects.filter(typ__name__exact=typ).prefetch_related("images")
-        else:
-            r = Storage.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']), typ__name__exact=typ).prefetch_related("images")
-        return render(request, "hub/modules/results.html", context={"results":r, "type":"storage"})
+        r = filter_by_search(
+            Storage.objects.filter(typ__name__exact=typ).prefetch_related("images"),
+            request.GET.get("search", ""), "name", "code__code",
+        )
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})
 
 
 @login_required(login_url='/accounts/login/')

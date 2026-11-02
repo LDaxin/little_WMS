@@ -1,12 +1,12 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
+from hub.search import filter_by_search
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from .forms import *
-from django.db.models import Q
 
 # Create your views here.
 
@@ -93,11 +93,5 @@ def updateLocation(request, locationId):
 @require_perm("location.view_all")
 def searchLocations(request):
     if request.method == "GET":
-        search = request.GET.get("search", "")
-        if search == "":
-            r = Location.objects.all()
-        else:
-            r = Location.objects.filter(
-                Q(line1__contains=search) | Q(city__contains=search) | Q(code__code__contains=search)
-            )
-        return render(request, "hub/modules/results.html", context={"results":r, "type":"location"})
+        r = filter_by_search(Location.objects.all(), request.GET.get("search", ""), "line1", "city", "code__code")
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "location"})

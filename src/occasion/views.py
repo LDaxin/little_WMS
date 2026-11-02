@@ -1,11 +1,11 @@
 """Occasion system (§2): plan material for an event with a packlist."""
 from django.utils.translation import gettext as _
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 
 from article.models import Article
+from hub.search import filter_by_search
 from planning.models import CalendarEntry, RecurrenceRule
 from location.models import Location
 from organisation.decorators import require_perm
@@ -226,9 +226,7 @@ def packlistSearch(request, occasionId):
     occ = get_object_or_404(Occasion, pk=occasionId)
     query = request.GET.get("code", "").strip()
     if query:
-        results = Article.objects.filter(
-            Q(base__name__contains=query) | Q(code__code__contains=query)
-        )[:20]
+        results = filter_by_search(Article.objects.all(), query, "base__name", "code__code")[:20]
     else:
         results = Article.objects.none()
     return render(request, "occasion/packlistResults.html",
