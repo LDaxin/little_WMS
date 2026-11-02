@@ -1,9 +1,9 @@
 from datetime import timedelta
-import secrets
 
 from django.db import models
 from django.utils import timezone
 
+from hub.models import TokenisedModel
 from organisation.current import current_organisation_id
 from organisation.permissions import PERMISSIONS
 
@@ -108,7 +108,7 @@ class UserProfile(models.Model):
         return "%s (%s)" % (self.user, self.role or "no role")
 
 
-class Invitation(models.Model):
+class Invitation(TokenisedModel):
     """An invitation to join an organisation with a pre-set role (§23).
 
     Link-based: the token is shareable; accepting creates a membership.
@@ -124,23 +124,19 @@ class Invitation(models.Model):
     organisation = models.ForeignKey(Organisation, on_delete=models.CASCADE, related_name="invitations")
     email = models.EmailField(blank=True)
     role = models.ForeignKey(Role, on_delete=models.SET_NULL, null=True, blank=True)
-    token = models.CharField(max_length=64, unique=True)
     invited_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
-    expires_at = models.DateTimeField()
     accepted_at = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="pending")
 
     def save(self, *args, **kwargs):
-        if not self.token:
-            self.token = secrets.token_urlsafe(32)
         if not self.expires_at:
             self.expires_at = timezone.now() + timedelta(days=7)
         super().save(*args, **kwargs)
 
     def is_valid(self):
         """A pending invitation that has not expired."""
-        return self.status == "pending" and self.expires_at > timezone.now()
+        return self.status == "pending" and not self.is_expired()
 
     def __str__(self):
         return "Invitation to %s" % self.organisation
@@ -172,7 +168,7 @@ class OrganisationRequest(models.Model):
         return self.name
 
 
-class EmailVerification(models.Model):
+class EmailVerification(TokenisedModel):
     """A user's email confirmation state (double opt-in, §30).
 
     One record per user; a new token is issued on every request.
@@ -181,13 +177,7 @@ class EmailVerification(models.Model):
     user = models.OneToOneField("auth.User", on_delete=models.CASCADE, related_name="email_verification")
     email = models.EmailField()
     verified = models.BooleanField(default=False)
-    token = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    def save(self, *args, **kwargs):
-        if not self.token:
-            self.token = secrets.token_urlsafe(32)
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return "%s (%s)" % (self.email, "verified" if self.verified else "unverified")
