@@ -119,6 +119,15 @@ class MovementScanTest(MovementTestBase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No object with code")
 
+    def test_scan_success_triggers_feedback(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        response = self.scan(article.code.code)
+        self.assertEqual(response["HX-Trigger"], "movementScan")
+
+    def test_scan_error_triggers_feedback(self):
+        response = self.scan("xx123")
+        self.assertEqual(response["HX-Trigger"], "movementError")
+
 
 class MovementStoreTest(MovementTestBase):
     def test_store_buffered_articles(self):

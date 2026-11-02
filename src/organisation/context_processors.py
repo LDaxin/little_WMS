@@ -36,4 +36,9 @@ def active_organisation(request):
         "can_manage_notification_rules": has_perm(request.user, "notification.manage_rules_all", organisation),
         "sidebar": _sidebar(profile),
         "view_mode": getattr(profile, "view_mode", "auto"),
+        "scan_feedback": {
+            "sound": getattr(profile, "sound_enabled", True),
+            "vibration": getattr(profile, "vibration_enabled", True),
+            "volume": getattr(profile, "volume", 50),
+        },
     }

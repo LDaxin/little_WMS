@@ -231,6 +231,11 @@ def emailPreferences(request):
             value = request.POST.get(field, "")
             if value.isdigit():
                 setattr(profile, field, int(value))
+        for field in ("sound_enabled", "vibration_enabled"):
+            setattr(profile, field, request.POST.get(field) == "on")
+        volume = request.POST.get("volume", "")
+        if volume.isdigit():
+            profile.volume = int(volume)
         profile.save()
         return redirect("email preferences")
     return render(request, "hub/emailPreferences.html", {

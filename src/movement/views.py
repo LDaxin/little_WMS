@@ -55,9 +55,12 @@ def _buffer_context(request, error="", success=""):
     }
 
 
-def _render_buffer(request, error="", success=""):
-    return render(request, "movement/buffer.html",
-                  context=_buffer_context(request, error=error, success=success))
+def _render_buffer(request, error="", success="", trigger=""):
+    response = render(request, "movement/buffer.html",
+                      context=_buffer_context(request, error=error, success=success))
+    if trigger:
+        response["HX-Trigger"] = trigger
+    return response
 
 
 @login_required(login_url='/accounts/login/')
@@ -130,7 +133,8 @@ def movementScan(request):
         error = e.messages[0] if e.messages else str(e)
 
     save_state(request.session, state)
-    return _render_buffer(request, error=error)
+    return _render_buffer(request, error=error,
+                          trigger="movementError" if error else "movementScan")
 
 
 @login_required(login_url='/accounts/login/')

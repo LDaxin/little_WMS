@@ -21,4 +21,41 @@
 
 {% include "movement/buffer.html" %}
 
+<script>
+(function () {
+    var sound = {{ scan_feedback.sound|yesno:"true,false" }};
+    var vibration = {{ scan_feedback.vibration|yesno:"true,false" }};
+    var volume = {{ scan_feedback.volume|default:50 }} / 100;
+
+    function beep(freq) {
+        if (!sound || volume <= 0) { return; }
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) { return; }
+        var ctx = new Ctx();
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.value = volume;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.12);
+        osc.onended = function () { ctx.close(); };
+    }
+
+    function vibrate(pattern) {
+        if (vibration && navigator.vibrate) { navigator.vibrate(pattern); }
+    }
+
+    document.body.addEventListener("movementScan", function () {
+        beep(880);
+        vibrate(80);
+    });
+    document.body.addEventListener("movementError", function () {
+        beep(220);
+        vibrate([80, 60, 80]);
+    });
+})();
+</script>
+
 {% endblock %}

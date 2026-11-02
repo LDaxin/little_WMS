@@ -100,6 +100,10 @@ class UserProfile(models.Model):
     text_size_desktop = models.IntegerField(default=16)
     text_size_mobile = models.IntegerField(default=16)
     view_mode = models.CharField(max_length=10, choices=VIEW_MODE_CHOICES, default="auto")
+    # Scan feedback (§11): sound and vibration on the movement page.
+    sound_enabled = models.BooleanField(default=True)
+    vibration_enabled = models.BooleanField(default=True)
+    volume = models.IntegerField(default=50)
 
     class Meta:
         unique_together = ("user", "organisation")

@@ -69,6 +69,18 @@ class EmailPreferencesViewTest(TestCase):
         self.assertEqual(profile.text_size_mobile, 12)
         self.assertEqual(profile.view_mode, "mobile")
 
+    def test_save_scan_feedback_settings(self):
+        org = Organisation.objects.create(name="A", slug="a")
+        UserProfile.objects.create(user=self.user, organisation=org)
+        self.client.post("/email-preferences/", {
+            "sound_enabled": "on",
+            "volume": "80",
+        })
+        profile = self.user.profiles.first()
+        self.assertTrue(profile.sound_enabled)
+        self.assertFalse(profile.vibration_enabled)
+        self.assertEqual(profile.volume, 80)
+
 
 class SidebarTest(TestCase):
     def setUp(self):
