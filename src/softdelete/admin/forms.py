@@ -31,9 +31,6 @@ class SoftDeleteObjectAdminForm(ModelForm):
             model.save()
         return model
 
-class ChangeSetAdminForm(ChangeSetForm):
-    pass
-
 class SoftDeleteRecordAdminForm(ModelForm):
     class Meta:
         model = SoftDeleteRecord

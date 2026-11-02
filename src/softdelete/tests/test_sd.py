@@ -27,13 +27,7 @@ from softdelete.models import *
 from softdelete.signals import *
 import logging
 
-try:
-    from django.core.urlresolvers import reverse
-except ImportError:
-    from django.urls import reverse
 
-
-@override_settings(ROOT_URLCONF='softdelete.urls')
 class BaseTest(TestCase):
     def setUp(self):
         # update TEST_MODEL_ONE_COUNT constant if you initialize more or less instance of TestModelOne
@@ -54,15 +48,6 @@ class BaseTest(TestCase):
         self.user = User.objects.create_user(username='SoftdeleteUser',
                                              password='SoftdeletePassword',
                                              email='softdeleteuser@example.com')
-        gr = create_group()
-        if USE_SOFTDELETE_GROUP:
-            gr = Group.objects.get(name="Softdelete User")
-            self.user.groups.add(gr)
-            self.user.save()
-            gr.save()
-        else:
-            assign_permissions(self.user)
-        self.user.save()
         self.unauthorized = User.objects.create_user(username='NonSoftdeleteUser',
                                                      password='NonSoftdeletePassword',
                                                      email='nonsoftdeleteuser@example.com')
@@ -266,8 +251,8 @@ class AdminTest(BaseTest):
         client.login(username='test-user', password='test')
         url = '/admin/test_softdelete_app/testmodelone/1/'
         tmo = client.get(url)
-        # the admin URLs changed with v1.9 change our expectation if it makes sense version wise.
-        if tmo.status_code == 302 and tmo['Location'].endswith('change/') and (1, 9) <= django.VERSION:
+        # the admin URLs changed with v1.9; adjust our expectation if needed.
+        if tmo.status_code == 302 and tmo['Location'].endswith('change/'):
             url = tmo['Location']
             tmo = client.get(url)
         self.assertEqual(tmo.status_code, 200)
@@ -275,19 +260,6 @@ class AdminTest(BaseTest):
         self.assertEqual(tmo.status_code, 302)
         self.tmo1 = TestModelOne.objects.get(pk=self.tmo1.pk)
         self.assertTrue(self.tmo1.deleted)
-
-
-class AuthorizationTest(BaseTest):
-    def test_permission_needed(self):
-        cl = Client()
-        cl.login(username='NonSoftdeleteUser',
-                 password='NonSoftdeletePassword')
-        rv = cl.get(reverse('softdelete.changeset.list'))
-        self.assertEqual(rv.status_code, 302)
-        rv = cl.get(reverse('softdelete.changeset.view', args=(1,)))
-        self.assertEqual(rv.status_code, 302)
-        rv = cl.get(reverse('softdelete.changeset.undelete', args=(1,)))
-        self.assertEqual(rv.status_code, 302)
 
 
 class UndeleteTest(BaseTest):

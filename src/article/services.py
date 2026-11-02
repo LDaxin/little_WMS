@@ -3,8 +3,6 @@
 A storage location declares what should be in it; these helpers compare the
 declared target against what is actually stored there.
 """
-from decimal import Decimal
-
 from django.db.models import Sum
 
 
@@ -65,28 +63,6 @@ def allocation(base):
     total_soll = sum(item.soll_menge or 0 for item in CompositionItem.objects.filter(base=base))
     available = Article.objects.filter(base=base).count()
     return {"soll": total_soll, "available": available, "over": total_soll > available}
-
-
-def consume(article, amount=1):
-    """Reduce the article's quantity; soft-delete it when nothing is left (§4d).
-
-    The single choke point for consuming a consumable: it takes ``amount`` from
-    the article's stock lines and deletes the article once they are empty.
-    """
-    remaining = Decimal(amount)
-    for stock in article.stocks.order_by("id"):
-        if remaining <= 0:
-            break
-        take = min(stock.menge, remaining)
-        stock.menge -= take
-        remaining -= take
-        if stock.menge <= 0:
-            stock.delete()
-        else:
-            stock.save()
-    if not article.stocks.exists():
-        article.delete()
-    return article
 
 
 def default_locations(base):

@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "livereload",
 ]
 
 if 'test' in sys.argv:
@@ -91,8 +90,12 @@ MIDDLEWARE = [
     "organisation.middleware.UserLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "livereload.middleware.LiveReloadScript",
 ]
+
+# Live reload is a development-only tool.
+if DEBUG:
+    INSTALLED_APPS.append("livereload")
+    MIDDLEWARE.append("livereload.middleware.LiveReloadScript")
 
 ROOT_URLCONF = "little_wms.urls"
 
@@ -181,11 +184,6 @@ MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/app/data/media")
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-GRAPH_MODELS = {
-    "all_applications": False,
-    "group_models": True,
-}
 
 # Security (§29): enable HTTPS-related settings when SECURE_HTTPS is set.
 if os.environ.get("SECURE_HTTPS"):

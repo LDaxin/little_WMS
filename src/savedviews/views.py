@@ -99,7 +99,7 @@ def revokeShareLink(request, linkId):
 def shareLinkView(request, token):
     """Public capability URL: show a saved view read-only (§10)."""
     from article.models import Article
-    from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+    from querybuilder.services import ARTICLE_FIELDS, QueryError, parse
 
     link = get_object_or_404(ShareLink, token=token)
     if not link.is_valid():
@@ -117,7 +117,7 @@ def shareLinkView(request, token):
 
     articles = Article.objects.all()
     try:
-        articles = articles.filter(parse_json(json.dumps(link.saved_view.query), ARTICLE_FIELDS))
+        articles = articles.filter(parse(link.saved_view.query, ARTICLE_FIELDS))
     except QueryError:
         pass
 
