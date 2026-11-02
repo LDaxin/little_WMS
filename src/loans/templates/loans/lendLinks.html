@@ -1,0 +1,39 @@
+{% extends "hub/header.html" %}
+{% load i18n %}
+
+{% block content %}
+<h4>{% trans "Lend links" %}</h4>
+<p class="text-muted">{% trans "Share a link so an external person can lend an item to your organisation." %}</p>
+
+<form method="post" class="d-flex gap-2 mb-3">
+    {% csrf_token %}
+    <input name="label" class="form-control" placeholder="{% trans "Label (optional)" %}" style="max-width:20rem">
+    <button class="btn btn-primary">{% trans "Create link" %}</button>
+</form>
+
+<ul class="list-group">
+    {% for link in links %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>
+            {% if link.label %}{{ link.label }}{% else %}{% trans "Lend link" %}{% endif %}
+            <small class="text-muted">{{ link.token }}</small>
+            {% if not link.is_active %}<span class="badge text-bg-secondary">{% trans "revoked" %}</span>{% endif %}
+        </span>
+        <span class="d-flex gap-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    onclick="copyToClipboard(window.location.origin + '{% url 'lend link' link.token %}', this);">
+                {% trans "Copy link" %}
+            </button>
+            {% if link.is_active %}
+            <form method="post" action="{% url 'revoke lend link' link.pk %}">
+                {% csrf_token %}
+                <button class="btn btn-sm btn-outline-danger">{% trans "Revoke" %}</button>
+            </form>
+            {% endif %}
+        </span>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">{% trans "No lend links" %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

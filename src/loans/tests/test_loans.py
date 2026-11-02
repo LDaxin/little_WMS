@@ -2,7 +2,7 @@ from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
 from article.models import Article, ArticleBase, ArticleType
-from loans.models import Loan, OrganisationMembership
+from loans.models import LendLink, Loan, OrganisationMembership
 from organisation.models import Organisation, Role, UserProfile
 
 
@@ -111,3 +111,85 @@ class MembershipTest(TestCase):
         membership = OrganisationMembership.objects.create(pool=pool, member=member)
         self.assertTrue(membership.can_borrow)
         self.assertFalse(membership.can_add)
+
+
+class LendLinkTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.org = Organisation.objects.first()
+
+    def _link(self, **kwargs):
+        return LendLink.objects.create(organisation=self.org, lender_name="Anna", **kwargs)
+
+    def test_create_and_revoke(self):
+        user_with(self.org, "u", "article_move_all")
+        self.client.login(username="u", password="pw")
+        self.client.post("/lend-links/", {"label": "Camp"})
+        link = LendLink.objects.get()
+        self.assertEqual(link.label, "Camp")
+        self.client.post("/lend-links/%s/revoke/" % link.pk)
+        link.refresh_from_db()
+        self.assertFalse(link.is_active)
+
+    def test_lender_details(self):
+        link = LendLink.objects.create(organisation=self.org)
+        self.client.post("/lend/%s/" % link.token, {"lender_name": "Anna", "lender_email": "a@b.st"})
+        link.refresh_from_db()
+        self.assertEqual(link.lender_name, "Anna")
+        self.assertEqual(link.lender_email, "a@b.st")
+
+    def test_add_item(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {
+            "action": "add", "name": "Zelt", "description": "blue",
+            "start_date": "2026-08-01", "end_date": "2026-08-10",
+        })
+        loan = Loan.objects.get()
+        self.assertEqual(loan.direction, "in")
+        self.assertEqual(loan.party_name, "Anna")
+        self.assertEqual(loan.article.base.name, "Zelt")
+        self.assertEqual(loan.lend_link, link)
+
+    def test_edit_item(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
+        loan = Loan.objects.get()
+        self.client.post("/lend/%s/" % link.token, {
+            "action": "edit", "loan": loan.pk, "name": "Zelt 2", "start_date": "2026-09-01",
+        })
+        loan.refresh_from_db()
+        self.assertEqual(loan.article.base.name, "Zelt 2")
+        self.assertEqual(str(loan.calendar_entry.start_date), "2026-09-01")
+
+    def test_delete_item(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
+        loan = Loan.objects.get()
+        self.client.post("/lend/%s/" % link.token, {"action": "delete", "loan": loan.pk})
+        self.assertFalse(Loan.objects.all_with_deleted().filter(pk=loan.pk).exists())
+
+    def test_delete_all(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Hammer", "start_date": "2026-08-01"})
+        self.assertEqual(link.loans.count(), 2)
+        self.client.post("/lend/%s/" % link.token, {"action": "delete_all"})
+        self.assertEqual(link.loans.count(), 0)
+
+    def test_revoke_removes_and_anonymises(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
+        loan = Loan.objects.get()
+        article_id = loan.article_id
+        user_with(self.org, "u", "article_move_all")
+        self.client.login(username="u", password="pw")
+        self.client.post("/lend-links/%s/revoke/" % link.pk)
+        self.assertFalse(Loan.objects.all_with_deleted().filter(pk=loan.pk).exists())
+        self.assertFalse(Article.objects.all_with_deleted().filter(pk=article_id).exists())
+        link.refresh_from_db()
+        self.assertEqual(link.lender_name, "")
+
+    def test_invalid_link(self):
+        link = LendLink.objects.create(organisation=self.org, is_active=False)
+        response = self.client.get("/lend/%s/" % link.token)
+        self.assertContains(response, "no longer valid")
