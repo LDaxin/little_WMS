@@ -1,8 +1,35 @@
+import secrets
+
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 from codeSystem.models import UuidCode
 from hub.fields import SelfForeignKey
+
+
+class TokenisedModel(models.Model):
+    """Abstract base for capability tokens (§10 share links, §23 invitations,
+    §30 email verification).
+
+    A unique random token is generated on first save; ``expires_at`` optionally
+    bounds the token's life.
+    """
+
+    token = models.CharField(max_length=64, unique=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return self.expires_at is not None and self.expires_at <= timezone.now()
+
 
 # Create your models here.
 class Settings(SoftDeleteObject, models.Model):

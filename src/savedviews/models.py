@@ -1,9 +1,7 @@
 from django.db import models
-from django.utils import timezone
 from softdelete.models import SoftDeleteObject
 
-import secrets
-
+from hub.models import TokenisedModel
 from organisation.current import current_organisation_id
 from organisation.managers import SoftDeleteOrganisationManager
 
@@ -31,7 +29,7 @@ class SavedView(SoftDeleteObject, models.Model):
         return "/article/%s/?view=%s" % (self.typ, self.pk)
 
 
-class ShareLink(models.Model):
+class ShareLink(TokenisedModel):
     """A capability URL sharing a saved view (§10)."""
 
     ACCESS_MODES = [
@@ -41,11 +39,9 @@ class ShareLink(models.Model):
     ]
 
     saved_view = models.ForeignKey(SavedView, on_delete=models.CASCADE, related_name="share_links")
-    token = models.CharField(max_length=64, unique=True)
     access_mode = models.CharField(max_length=10, choices=ACCESS_MODES, default="public")
     permissions = models.JSONField(default=list, blank=True)
     requires_confirmation = models.BooleanField(default=True)
-    expires_at = models.DateTimeField(null=True, blank=True)
     single_use = models.BooleanField(default=False)
     used_count = models.IntegerField(default=0)
     is_active = models.BooleanField(default=True)
@@ -53,15 +49,8 @@ class ShareLink(models.Model):
     created_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    def save(self, *args, **kwargs):
-        if not self.token:
-            self.token = secrets.token_urlsafe(32)
-        super().save(*args, **kwargs)
-
     def is_valid(self):
-        if not self.is_active:
-            return False
-        if self.expires_at and self.expires_at < timezone.now():
+        if not self.is_active or self.is_expired():
             return False
         if self.single_use and self.used_count >= 1:
             return False
