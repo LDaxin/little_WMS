@@ -12,25 +12,17 @@ from space.services import can_store, max_storage_depth
 
 
 def resolve_space(code):
-    """Resolve a scanned code to the Space it represents.
+    """Resolve a scanned code to the Space it represents (§11).
 
     ``s0`` -> Storage, ``a0`` -> container Article. Raises ValidationError for
-    anything else (centralizes the prefix logic, §11).
+    an unknown code or a code with no matching object.
     """
-    from article.models import Article
-    from storage.models import Storage
+    from codeSystem.services import resolve_code
 
-    if code.startswith("s0"):
-        try:
-            return Storage.objects.get(code__code=code).space
-        except Storage.DoesNotExist:
-            raise ValidationError("No storage with code %s" % code)
-    if code.startswith("a0"):
-        try:
-            return Article.objects.get(code__code=code).space
-        except Article.DoesNotExist:
-            raise ValidationError("No article with code %s" % code)
-    raise ValidationError("Unknown code %s" % code)
+    kind, obj = resolve_code(code)
+    if obj is None:
+        raise ValidationError("Unknown code %s" % code)
+    return obj.space
 
 
 class MovementService:

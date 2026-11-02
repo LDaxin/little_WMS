@@ -9,6 +9,7 @@ from django.db.models import Q
 from article.models import Article
 from storage.models import Storage
 from space.services import space_path
+from codeSystem.services import resolve_code
 from movement.services import MovementService, resolve_space, undo
 from movement.session import get_state, save_state, reset, get_open_session, end_open_session
 from article.services import default_locations
@@ -21,11 +22,7 @@ def _resolve_target(code):
     """The Storage/Article behind a target code, for display."""
     if not code:
         return None
-    if code.startswith("s0"):
-        return Storage.objects.filter(code__code=code).first()
-    if code.startswith("a0"):
-        return Article.objects.filter(code__code=code).first()
-    return None
+    return resolve_code(code)[1]
 
 
 def _articles_from_codes(codes):
@@ -76,9 +73,9 @@ def where(request):
     article = None
     results = []
     if query:
-        if query.startswith("a0"):
-            article = Article.objects.filter(code__code=query).first()
-        else:
+        kind, article = resolve_code(query)
+        if kind != "article":
+            article = None
             results = Article.objects.filter(
                 Q(base__name__contains=query) | Q(code__code__contains=query)
             )[:20]
@@ -115,22 +112,21 @@ def movementScan(request):
     code = request.POST.get("code", "").strip()
     error = ""
     try:
-        if code.startswith("s0"):
-            Storage.objects.get(code__code=code)
+        kind, obj = resolve_code(code)
+        if kind is None:
+            raise ValidationError("Unknown code %s" % code)
+        if obj is None:
+            error = "No object with code %s" % code
+        elif kind == "storage":
             state["target"] = code
             state["target_smart"] = False
-        elif code.startswith("a0"):
-            article = Article.objects.get(code__code=code)
-            if article.space and article.space.active and not state["target"]:
+        else:  # article
+            if obj.space and obj.space.active and not state["target"]:
                 # smart default: a container becomes the target
                 state["target"] = code
                 state["target_smart"] = True
             elif code not in state["buffer"]:
                 state["buffer"].append(code)
-        else:
-            raise ValidationError("Unknown code %s" % code)
-    except (Storage.DoesNotExist, Article.DoesNotExist):
-        error = "No object with code %s" % code
     except ValidationError as e:
         error = e.messages[0] if e.messages else str(e)
 
