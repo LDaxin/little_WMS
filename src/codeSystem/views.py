@@ -1,13 +1,13 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
+from hub.search import filter_by_search
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound, Http404
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
-from django.db.models import Q
 
 
 # Create your views here.
@@ -62,11 +62,8 @@ def codes(request):
 @require_perm("code.view_all")
 def searchCodes(request):
     if request.method == "GET":
-        if request.GET['search'] == "":
-            r = UuidCode.objects.filter(used=False)
-        else:
-            r = UuidCode.objects.filter(Q(prefix__contains=request.GET['search']) | Q(code__contains=request.GET['search']))
-        return render(request, "hub/modules/results.html", context={"results":r, "type":"code"})
+        r = filter_by_search(UuidCode.objects.filter(used=False), request.GET.get("search", ""), "prefix", "code")
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "code"})
 
 @login_required(login_url='/accounts/login/')
 @require_perm("code.view_all")

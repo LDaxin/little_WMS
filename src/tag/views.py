@@ -1,11 +1,11 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
+from hub.search import filter_by_search
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from .models import *
 from .forms import *
-from django.db.models import Q
 
 # Create your views here.
 
@@ -85,8 +85,5 @@ def updateTag(request, tagId):
 @require_perm("tag.view_all")
 def searchTags(request):
     if request.method == "GET":
-        if request.GET['search'] == "":
-            r = Tag.objects.all()
-        else:
-            r = Tag.objects.filter(Q(name__contains=request.GET['search']) | Q(code__code__contains=request.GET['search']))
-        return render(request, "hub/modules/results.html", context={"results":r, "type":"tag"})
+        r = filter_by_search(Tag.objects.all(), request.GET.get("search", ""), "name", "code__code")
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "tag"})

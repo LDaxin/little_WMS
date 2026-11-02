@@ -1,6 +1,7 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
+from hub.search import filter_by_search
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -15,7 +16,6 @@ from django.contrib.auth.models import User
 from organisation.decorators import require_perm, require_scope
 from organisation.permissions import has_scope, is_assigned_only
 from organisation.services import active_organisation
-from django.db.models import Q
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
@@ -282,9 +282,8 @@ def searchArticlesAll(request):
                 r = r.filter(parse_json(query, ARTICLE_FIELDS))
             except QueryError:
                 pass
-        elif request.GET.get("search"):
-            search = request.GET["search"]
-            r = r.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
+        else:
+            r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
         return render(request, "hub/modules/results.html", context={"results": r, "type": "article"})
 
@@ -520,12 +519,9 @@ def storeTargetSearch(request, typ, articleId):
     """Live suggestions for the store-target field (code or name, § code-input)."""
     query = request.GET.get("code", "").strip()
     if query:
-        storages = Storage.objects.filter(
-            Q(name__contains=query) | Q(code__code__contains=query)
-        )[:10]
-        containers = Article.objects.filter(
-            Q(base__name__contains=query) | Q(code__code__contains=query),
-            space__active=True,
+        storages = filter_by_search(Storage.objects.all(), query, "name", "code__code")[:10]
+        containers = filter_by_search(
+            Article.objects.filter(space__active=True), query, "base__name", "code__code"
         )[:10]
     else:
         storages = Storage.objects.none()
@@ -749,9 +745,8 @@ def searchArticle(request, typ):
                 r = r.filter(parse_json(query, ARTICLE_FIELDS))
             except QueryError:
                 pass
-        elif request.GET.get("search"):
-            search = request.GET["search"]
-            r = r.filter(Q(base__name__contains=search) | Q(code__code__contains=search))
+        else:
+            r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
         return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
 

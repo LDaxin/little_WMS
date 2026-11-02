@@ -9,7 +9,6 @@ like the movement buffer.
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
@@ -18,6 +17,7 @@ from storage.models import Storage
 from space.services import space_path
 from codeSystem.services import resolve_code
 from hub.csv import csv_response
+from hub.search import filter_by_search
 
 
 def _get_state(session):
@@ -136,12 +136,8 @@ def inventorySearch(request):
         articles = Article.objects.none()
         storages = Storage.objects.none()
     else:
-        articles = Article.objects.filter(
-            Q(base__name__contains=search) | Q(code__code__contains=search)
-        )[:20]
-        storages = Storage.objects.filter(
-            Q(name__contains=search) | Q(code__code__contains=search)
-        )[:20]
+        articles = filter_by_search(Article.objects.all(), search, "base__name", "code__code")[:20]
+        storages = filter_by_search(Storage.objects.all(), search, "name", "code__code")[:20]
     return render(request, "movement/inventoryResults.html",
                   context={"resultsA": articles, "resultsS": storages})
 
