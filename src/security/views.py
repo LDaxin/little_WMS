@@ -73,11 +73,12 @@ def myData(request):
         "loans": [
             {
                 "article": str(loan.article),
-                "lender": loan.lender_name or str(loan.lender_organisation),
-                "start": loan.start_date.isoformat(),
+                "party": loan.party_label(),
+                "direction": loan.direction,
+                "start": loan.calendar_entry.start_date.isoformat(),
                 "status": loan.status,
             }
-            for loan in Loan.objects.filter(borrower_organisation__in=organisations)
+            for loan in Loan.objects.filter(organisation__in=organisations)
         ],
     }
     response = JsonResponse(data)

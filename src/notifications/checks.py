@@ -76,30 +76,20 @@ def low_stock_findings(organisation):
 
 def return_overdue_findings(organisation):
     """Active loans whose return date has passed (§20)."""
-    from loans.models import Lending, Loan
+    from loans.models import Loan
 
     today = date.today()
-    lendings = Lending.objects.filter(
+    loans = Loan.objects.filter(
         organisation=organisation, status="active", calendar_entry__end_date__lt=today
     ).select_related("article__base", "calendar_entry")
-    for lending in lendings:
-        yield Finding(
-            trigger_type="return_overdue",
-            title=_("Loan overdue: %(name)s") % {"name": lending.article.base.name},
-            message=_("Due %(date)s, borrowed by %(who)s") % {
-                "date": lending.calendar_entry.end_date, "who": lending.borrower_name},
-            link=reverse("article", args=[lending.article.base.pType.name, lending.article.pk]),
-            dedupe_key="return_overdue:lending:%s" % lending.pk,
-        )
-
-    loans = Loan.objects.filter(
-        organisation=organisation, status="active", end_date__lt=today
-    ).select_related("article__base")
     for loan in loans:
         yield Finding(
             trigger_type="return_overdue",
-            title=_("Return overdue: %(name)s") % {"name": loan.article.base.name},
-            message=_("Due %(date)s") % {"date": loan.end_date},
+            title=_("Loan overdue: %(name)s") % {"name": loan.article.base.name},
+            message=_("Due %(date)s, %(who)s") % {
+                "date": loan.calendar_entry.end_date,
+                "who": loan.party_label(),
+            },
             link=reverse("article", args=[loan.article.base.pType.name, loan.article.pk]),
             dedupe_key="return_overdue:loan:%s" % loan.pk,
         )
