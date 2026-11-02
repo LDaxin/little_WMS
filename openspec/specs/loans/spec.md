@@ -7,7 +7,8 @@ TBD - created by archiving change add-loans. Update Purpose after archive.
 
 The system SHALL let a user record a loan of an article to a private person,
 with the borrower's name and email, a period, and an optional occasion. The loan
-period SHALL be a calendar entry of type `loan`.
+period SHALL be a calendar entry of type `loan`. This is a `Loan` with
+`direction` `out`.
 
 #### Scenario: Create a loan
 
@@ -21,12 +22,13 @@ period SHALL be a calendar entry of type `loan`.
 
 ### Requirement: Manage loans
 
-The system SHALL list loans and SHALL let a user record the return of a loan.
+The system SHALL list loans of both directions in one list and SHALL let a user
+record the return of a loan.
 
 #### Scenario: List loans
 
 - **WHEN** the user opens the loan list
-- **THEN** the loans are listed with their borrower and status
+- **THEN** the loans are listed with their party and status, both directions
 
 #### Scenario: Return a loan
 
@@ -42,13 +44,14 @@ The system SHALL list loans and SHALL let a user record the return of a loan.
 
 The system SHALL let a user record that the organisation borrows an article from
 an external person or another organisation, with the lender, an optional
-occasion, a period, and a status. The borrowed article SHALL be marked as not
-owned by the organisation.
+occasion, a period, and a status. The period SHALL be a `loan` calendar entry.
+This is a `Loan` with `direction` `in`. The borrowed article SHALL be marked as
+not owned by the organisation.
 
 #### Scenario: Borrow from a person
 
 - **WHEN** the user records a loan from an external person
-- **THEN** a loan is created and the article is marked borrowed
+- **THEN** a loan and a `loan` calendar entry are created and the article is marked borrowed
 
 #### Scenario: Borrow from an organisation
 
@@ -64,16 +67,6 @@ owned by the organisation.
 
 - **WHEN** a user without `article.move_all` records a loan
 - **THEN** the system responds with 403
-
-### Requirement: Lending out (renamed)
-
-The system SHALL keep the lending-out direction (the organisation lends an
-article to an external person) under the name `Lending`.
-
-#### Scenario: Lend out
-
-- **WHEN** the user lends an article to a person
-- **THEN** a lending is created
 
 ### Requirement: Shared pools
 
