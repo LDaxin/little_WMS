@@ -1,0 +1,32 @@
+{% extends "hub/header.html" %}
+{% load i18n %}
+
+{% block content %}
+<h4>{% trans "Lend an item" %}</h4>
+
+{% if invalid %}
+<p class="text-muted">{% trans "This link is no longer valid." %}</p>
+{% elif loan %}
+<div class="card">
+    <div class="card-body">
+        <p>{% trans "Thank you! Your item was recorded." %}</p>
+        <p>{% trans "Status" %}: <span class="badge text-bg-secondary">{{ loan.get_status_display }}</span></p>
+    </div>
+</div>
+{% else %}
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-2"><input name="name" class="form-control" placeholder="{% trans "Item name" %}" required></div>
+    <div class="mb-2"><textarea name="description" class="form-control" placeholder="{% trans "Description" %}"></textarea></div>
+    <div class="mb-2"><input name="friend_name" class="form-control" placeholder="{% trans "Your name" %}" required></div>
+    <div class="mb-2"><input name="friend_email" type="email" class="form-control" placeholder="{% trans "Your email (optional)" %}"></div>
+    <div class="mb-2 d-flex gap-2">
+        <input name="start_date" type="date" class="form-control" required>
+        <input name="end_date" type="date" class="form-control">
+    </div>
+    <div class="mb-2"><input name="photo" type="file" accept="image/*" class="form-control"></div>
+    <button class="btn btn-primary">{% trans "Lend" %}</button>
+</form>
+{% endif %}
+{% endblock %}

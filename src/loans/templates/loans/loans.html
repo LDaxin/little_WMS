@@ -2,7 +2,10 @@
 {% load i18n %}
 
 {% block content %}
-<h4>{% trans "Loans" %}</h4>
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="mb-0">{% trans "Loans" %}</h4>
+    <a class="btn btn-sm btn-outline-secondary" href="{% url 'lend links' %}">{% trans "Lend links" %}</a>
+</div>
 
 <ul class="list-group">
     {% for loan in loans %}

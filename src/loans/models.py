@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from softdelete.models import SoftDeleteObject
 
+from hub.models import TokenisedModel
 from organisation.current import current_organisation_id
 from organisation.managers import SoftDeleteOrganisationManager
 
@@ -61,3 +62,30 @@ class OrganisationMembership(models.Model):
 
     def __str__(self):
         return "%s in pool %s" % (self.member, self.pool)
+
+
+class LendLink(TokenisedModel):
+    """A capability URL for an external person to lend an item to the org (§20).
+
+    The external person opens the link, fills a form, and a borrowed article and
+    loan are created. The link is revocable and may expire.
+    """
+
+    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
+    label = models.CharField(_("Label"), max_length=100, blank=True)
+    is_active = models.BooleanField(default=True)
+    single_use = models.BooleanField(default=False)
+    used_count = models.IntegerField(default=0)
+    password_hash = models.CharField(max_length=128, blank=True)
+    created_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_valid(self):
+        if not self.is_active or self.is_expired():
+            return False
+        if self.single_use and self.used_count >= 1:
+            return False
+        return True
+
+    def __str__(self):
+        return self.label or "Lend link %s" % self.pk
