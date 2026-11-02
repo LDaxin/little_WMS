@@ -6,40 +6,19 @@ from organisation.current import current_organisation_id
 from organisation.managers import SoftDeleteOrganisationManager
 
 
-class Lending(SoftDeleteObject, models.Model):
-    """An article lent to an external person (§20).
-
-    The article stays the organisation's property; the lending records who has
-    it and until when. The period is a ``loan`` calendar entry.
-    """
-
-    STATUS_CHOICES = [
-        ("active", _("Active")),
-        ("returned", _("Returned")),
-    ]
-
-    objects = SoftDeleteOrganisationManager()
-
-    organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
-    article = models.ForeignKey("article.Article", on_delete=models.CASCADE, related_name="lendings")
-    calendar_entry = models.OneToOneField("planning.CalendarEntry", on_delete=models.CASCADE, related_name="lending")
-    borrower_name = models.CharField(_("Borrower"), max_length=200)
-    borrower_email = models.EmailField(_("Borrower email"), blank=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default="active")
-    occasion = models.ForeignKey("occasion.Occasion", null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Occasion"))
-    notes = models.TextField(_("Notes"), blank=True)
-
-    def __str__(self):
-        return "%s -> %s" % (self.article, self.borrower_name)
-
-
 class Loan(SoftDeleteObject, models.Model):
-    """The organisation borrows an article from an external lender (§20).
+    """An article moving to or from outside the organisation (§20).
 
-    The article is marked ``borrowed`` (not the organisation's property).
+    ``direction`` ``out``: the organisation lends an article to a borrower.
+    ``direction`` ``in``: the organisation borrows an article from a lender.
+    The period is a ``loan`` calendar entry, created with the loan.
     """
 
-    LENDER_TYPE_CHOICES = [
+    DIRECTION_CHOICES = [
+        ("out", _("Lent out")),
+        ("in", _("Borrowed in")),
+    ]
+    PARTY_TYPE_CHOICES = [
         ("person", _("External person")),
         ("organisation", _("Another organisation")),
     ]
@@ -53,18 +32,23 @@ class Loan(SoftDeleteObject, models.Model):
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     article = models.ForeignKey("article.Article", on_delete=models.CASCADE, related_name="loans")
-    lender_type = models.CharField(_("Lender type"), max_length=20, choices=LENDER_TYPE_CHOICES, default="person")
-    lender_name = models.CharField(_("Lender"), max_length=200, blank=True)
-    lender_organisation = models.ForeignKey("organisation.Organisation", null=True, blank=True, on_delete=models.SET_NULL, related_name="loans_out")
-    borrower_organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, related_name="loans_in", default=current_organisation_id)
-    occasion = models.ForeignKey("occasion.Occasion", null=True, blank=True, on_delete=models.SET_NULL)
-    start_date = models.DateField(_("Start date"))
-    end_date = models.DateField(_("End date"), null=True, blank=True)
+    calendar_entry = models.OneToOneField("planning.CalendarEntry", on_delete=models.CASCADE, related_name="loan")
+    direction = models.CharField(_("Direction"), max_length=3, choices=DIRECTION_CHOICES, default="out")
+    party_type = models.CharField(_("Party type"), max_length=20, choices=PARTY_TYPE_CHOICES, default="person")
+    party_name = models.CharField(_("Name"), max_length=200, blank=True)
+    party_email = models.EmailField(_("Email"), blank=True)
+    party_organisation = models.ForeignKey("organisation.Organisation", null=True, blank=True, on_delete=models.SET_NULL, related_name="loans")
+    occasion = models.ForeignKey("occasion.Occasion", null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Occasion"))
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default="active")
     notes = models.TextField(_("Notes"), blank=True)
 
+    def party_label(self):
+        """The other party: a person's name or the organisation."""
+        return self.party_name or (self.party_organisation.name if self.party_organisation else "")
+
     def __str__(self):
-        return "%s from %s" % (self.article, self.lender_name or self.lender_organisation)
+        arrow = "->" if self.direction == "out" else "<-"
+        return "%s %s %s" % (self.article, arrow, self.party_label())
 
 
 class OrganisationMembership(models.Model):

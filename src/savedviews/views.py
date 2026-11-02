@@ -125,18 +125,25 @@ def shareLinkView(request, token):
         from datetime import date
 
         from loans.models import Loan
-        from organisation.services import active_organisation
+        from planning.models import CalendarEntry
 
         for article in articles:
             if not request.POST.get("article_%s" % article.pk):
                 continue
             status = "pending" if link.requires_confirmation else "active"
+            entry = CalendarEntry.objects.create(
+                entry_type="loan",
+                title="Loan: %s from %s" % (article.base.name, link.saved_view.organisation),
+                start_date=date.today().isoformat(),
+                article=article,
+                responsible_user=request.user,
+            )
             Loan.objects.create(
                 article=article,
-                lender_type="organisation",
-                lender_organisation=link.saved_view.organisation,
-                borrower_organisation=active_organisation(request),
-                start_date=date.today().isoformat(),
+                calendar_entry=entry,
+                direction="in",
+                party_type="organisation",
+                party_organisation=link.saved_view.organisation,
                 status=status,
             )
             if status == "active":
