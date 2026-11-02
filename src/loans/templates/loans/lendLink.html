@@ -43,6 +43,14 @@
     {% endfor %}
 </ul>
 
+{% if loans %}
+<form method="post" class="mb-3">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="delete_all">
+    <button class="btn btn-sm btn-outline-danger">{% trans "Delete all items" %}</button>
+</form>
+{% endif %}
+
 <h6>{% trans "Add an item" %}</h6>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}

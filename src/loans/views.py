@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from article.models import Article, ArticleBase, ArticleImage, ArticleType, Stock
+from audit.services import log as audit_log
 from loans.models import LendLink, Loan
 from occasion.models import Occasion
 from organisation.decorators import require_scope
@@ -140,11 +141,7 @@ def lendLinkRevoke(request, linkId):
         link.lender_email = ""
         link.save()
         for loan in link.loans.all():
-            loan.party_name = ""
-            loan.party_email = ""
-            loan.save()
-            loan.article.delete()
-            loan.delete()
+            _delete_lend(loan)
     return redirect("lend links")
 
 
@@ -174,6 +171,7 @@ def _create_lend(link, request):
         end_date=request.POST.get("end_date") or None,
         article=article,
     )
+    audit_log("created", article, None, {"name": base.name})
     return Loan.objects.create(
         organisation=organisation,
         article=article,
@@ -184,6 +182,24 @@ def _create_lend(link, request):
         party_email=link.lender_email,
         lend_link=link,
     )
+
+
+def _delete_lend(loan):
+    """Remove a lent item for good and anonymise its audit trail (§20).
+
+    Mirrors the GDPR user deletion: the audit entries are anonymised and the
+    article (with its loan, calendar entry, stock and images) is hard-deleted,
+    so nothing is left in the trash.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    from audit.models import AuditLog
+
+    article = loan.article
+    AuditLog.objects.filter(
+        content_type=ContentType.objects.get_for_model(article), object_id=article.pk
+    ).update(user=None, changes={})
+    article.hard_delete()
 
 
 def _edit_lend(loan, request):
@@ -236,9 +252,12 @@ def lendLinkView(request, token):
         elif action == "delete":
             loan = link.loans.filter(pk=request.POST.get("loan")).first()
             if loan:
-                loan.article.delete()
-                loan.delete()
+                _delete_lend(loan)
                 return redirect("lend link", token=token)
+        elif action == "delete_all":
+            for loan in link.loans.all():
+                _delete_lend(loan)
+            return redirect("lend link", token=token)
 
     return render(request, "loans/lendLink.html", {
         "link": link,

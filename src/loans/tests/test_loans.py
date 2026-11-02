@@ -166,7 +166,15 @@ class LendLinkTest(TestCase):
         self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
         loan = Loan.objects.get()
         self.client.post("/lend/%s/" % link.token, {"action": "delete", "loan": loan.pk})
-        self.assertFalse(Loan.objects.filter(pk=loan.pk, deleted_at__isnull=True).exists())
+        self.assertFalse(Loan.objects.all_with_deleted().filter(pk=loan.pk).exists())
+
+    def test_delete_all(self):
+        link = self._link()
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Zelt", "start_date": "2026-08-01"})
+        self.client.post("/lend/%s/" % link.token, {"action": "add", "name": "Hammer", "start_date": "2026-08-01"})
+        self.assertEqual(link.loans.count(), 2)
+        self.client.post("/lend/%s/" % link.token, {"action": "delete_all"})
+        self.assertEqual(link.loans.count(), 0)
 
     def test_revoke_removes_and_anonymises(self):
         link = self._link()
@@ -176,8 +184,8 @@ class LendLinkTest(TestCase):
         user_with(self.org, "u", "article_move_all")
         self.client.login(username="u", password="pw")
         self.client.post("/lend-links/%s/revoke/" % link.pk)
-        self.assertFalse(Loan.objects.filter(pk=loan.pk, deleted_at__isnull=True).exists())
-        self.assertFalse(Article.objects.filter(pk=article_id, deleted_at__isnull=True).exists())
+        self.assertFalse(Loan.objects.all_with_deleted().filter(pk=loan.pk).exists())
+        self.assertFalse(Article.objects.all_with_deleted().filter(pk=article_id).exists())
         link.refresh_from_db()
         self.assertEqual(link.lender_name, "")
 
