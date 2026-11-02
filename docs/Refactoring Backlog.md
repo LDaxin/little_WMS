@@ -14,7 +14,7 @@ Scope: the whole `ki` line (252 commits / 52 changes since `dev`).
 | RF-002 | `hub/models.py`, `organisation/models.py`, `savedviews/models.py` | Token capability links built three times: `Invitation`, `ShareLink`, `EmailVerification` — each with `token = secrets.token_urlsafe(32)`, `expires_at`, `is_valid()`/status, revocation. | Shared abstract base (token + expiry + validity). | ✅ done |
 | RF-003 | `occasion/services.py`, `occasion/views.py` | The packlist shape exists twice: `Packlist` (model: occasion, article, quantity, status) and `OccasionTemplate.default_packlist` (JSON `{"article", "quantity"}`). | One serialisation for the packlist shape (template renders to the same structure). | ✅ done |
 | RF-004 | `article/models.py`, `loans/models.py` | `Article.ownership` (`owned`/`borrowed`) is a second source of truth for "there is a loan". | Derive ownership from the open loan, or keep one canonical field. | 🔴 open |
-| RF-005 | `movement/services.py`, `movement/inventory.py`, `codeSystem/views.py` | Prefix→object lookup in three places (`resolve_space`, `_resolve_location`, `resolve_code`). | One shared code resolver. | 🔴 open |
+| RF-005 | `codeSystem/services.py`, `movement/` | Prefix→object lookup scattered across `resolve_space`, `_resolve_target`, `movementScan`, `where`, `_resolve_location`, `inventoryScan`. | One shared code resolver. | ✅ done |
 | RF-006 | `codeSystem/views.py`, `reports/views.py`, `movement/inventory.py`, `storage/views.py`, `article/views.py` | The `HttpResponse + csv.writer` export skeleton repeated five times. | One CSV helper. | 🔴 open |
 | RF-007 | all apps | 13 `*Search` views repeat the same `Q(...__contains=...)` + `results.html` pattern. | Shared search helper / template. | 🔴 open |
 

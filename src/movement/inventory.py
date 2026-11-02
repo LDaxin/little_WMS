@@ -17,6 +17,7 @@ from django.shortcuts import render
 from article.models import Article, Stock
 from storage.models import Storage
 from space.services import space_path
+from codeSystem.services import resolve_code
 
 
 def _get_state(session):
@@ -36,11 +37,7 @@ def _resolve_location(code):
     """The Storage/Article behind a location code, for display."""
     if not code:
         return None
-    if code.startswith("s0"):
-        return Storage.objects.filter(code__code=code).first()
-    if code.startswith("a0"):
-        return Article.objects.filter(code__code=code).first()
-    return None
+    return resolve_code(code)[1]
 
 
 def _context(request, error="", success=""):
@@ -101,19 +98,18 @@ def inventoryScan(request):
     code = request.POST.get("code", "").strip()
     error = ""
     try:
-        if code.startswith("s0"):
-            Storage.objects.get(code__code=code)
+        kind, obj = resolve_code(code)
+        if kind is None:
+            raise ValidationError("Unknown code %s" % code)
+        if obj is None:
+            error = "No object with code %s" % code
+        elif kind == "storage":
             state["space"] = code
-        elif code.startswith("a0"):
+        else:  # article
             if not state["space"]:
                 raise ValidationError("Scan a location first")
-            Article.objects.get(code__code=code)
             if code not in state["scanned"]:
                 state["scanned"].append(code)
-        else:
-            raise ValidationError("Unknown code %s" % code)
-    except (Storage.DoesNotExist, Article.DoesNotExist):
-        error = "No object with code %s" % code
     except ValidationError as e:
         error = e.messages[0] if e.messages else str(e)
 
