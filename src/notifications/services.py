@@ -56,3 +56,27 @@ def notify_roles(organisation, codename, title, message="", link="", trigger_typ
     return [
         notify(user, title, message, link, trigger_type, dedupe_key) for user in users
     ]
+
+
+def notify_webhook(url, payload, secret=""):
+    """POST a finding as JSON to a webhook URL (§6).
+
+    Returns True on a 2xx response, False otherwise. Errors are logged, never
+    raised, so a failing webhook cannot abort the trigger command.
+    """
+    import json
+    import logging
+    import urllib.request
+
+    request = urllib.request.Request(
+        url, data=json.dumps(payload).encode("utf-8"), method="POST"
+    )
+    request.add_header("Content-Type", "application/json")
+    if secret:
+        request.add_header("X-Webhook-Secret", secret)
+    try:
+        with urllib.request.urlopen(request, timeout=5) as response:
+            return 200 <= response.status < 300
+    except Exception as error:  # noqa: BLE001 - a webhook must never abort the command
+        logging.getLogger(__name__).warning("Webhook %s failed: %s", url, error)
+        return False

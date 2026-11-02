@@ -1,4 +1,6 @@
+import json
 from datetime import date, timedelta
+from unittest import mock
 
 from django.contrib.auth.models import Permission, User
 from django.core import mail
@@ -76,6 +78,33 @@ class RuleCommandTest(TestCase):
         call_command("check_notifications")
         self.assertTrue(Notification.objects.filter(user=self.user).exists())
 
+    def test_rule_webhook(self):
+        self._expiring_article()
+        NotificationRule.objects.create(
+            organisation=self.org, trigger_type="expiry_date_reached",
+            channel_in_app=False, channel_email=False,
+            channel_webhook="https://example.com/hook", webhook_secret="s3cret",
+        )
+        with mock.patch("urllib.request.urlopen") as urlopen:
+            urlopen.return_value.__enter__.return_value.status = 200
+            call_command("check_notifications")
+        request = urlopen.call_args.args[0]
+        self.assertEqual(request.full_url, "https://example.com/hook")
+        self.assertEqual(request.headers.get("X-webhook-secret"), "s3cret")
+        self.assertEqual(json.loads(request.data)["trigger_type"], "expiry_date_reached")
+
+    def test_webhook_failure_does_not_break(self):
+        self._expiring_article()
+        rule = NotificationRule.objects.create(
+            organisation=self.org, trigger_type="expiry_date_reached",
+            channel_in_app=True, channel_email=False,
+            channel_webhook="https://example.com/hook",
+        )
+        rule.notify_users.add(self.user)
+        with mock.patch("urllib.request.urlopen", side_effect=OSError("boom")):
+            call_command("check_notifications")
+        self.assertTrue(Notification.objects.filter(user=self.user).exists())
+
 
 class RulesViewTest(TestCase):
     def setUp(self):
@@ -94,6 +123,15 @@ class RulesViewTest(TestCase):
             "trigger_type": "expiry_date_reached", "active": "on", "channel_in_app": "on",
         })
         self.assertTrue(NotificationRule.objects.filter(organisation=self.org).exists())
+
+    def test_add_rule_webhook(self):
+        self.client.post("/notifications/rules/add/", {
+            "trigger_type": "expiry_date_reached", "active": "on",
+            "channel_webhook": "https://example.com/hook", "webhook_secret": "s3cret",
+        })
+        rule = NotificationRule.objects.get(organisation=self.org)
+        self.assertEqual(rule.channel_webhook, "https://example.com/hook")
+        self.assertEqual(rule.webhook_secret, "s3cret")
 
     def test_requires_permission(self):
         User.objects.create_user("other", password="pw")

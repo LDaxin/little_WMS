@@ -16,6 +16,7 @@ class FormNotificationRule(forms.ModelForm):
         fields = [
             "trigger_type", "active", "threshold_days",
             "notify_roles", "notify_users", "channel_in_app", "channel_email",
+            "channel_webhook", "webhook_secret",
         ]
 
     def __init__(self, *args, organisation=None, **kwargs):

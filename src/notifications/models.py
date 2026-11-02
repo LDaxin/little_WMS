@@ -45,6 +45,8 @@ class NotificationRule(models.Model):
     notify_users = models.ManyToManyField("auth.User", blank=True, related_name="notification_rules")
     channel_in_app = models.BooleanField(default=True)
     channel_email = models.BooleanField(default=False)
+    channel_webhook = models.URLField(blank=True)
+    webhook_secret = models.CharField(max_length=64, blank=True)
 
     def recipients(self):
         """The users to notify: role members plus individual users."""

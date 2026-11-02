@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from notifications.checks import run_checks
 from notifications.models import NotificationRule
-from notifications.services import notify, notify_email, notify_roles
+from notifications.services import notify, notify_email, notify_roles, notify_webhook
 from organisation.models import Organisation
 
 
@@ -42,4 +43,22 @@ class Command(BaseCommand):
                     created += 1 if notify_email(
                         user, finding.title, finding.message, finding.link
                     ) else 0
+            if rule.channel_webhook:
+                notify_webhook(
+                    rule.channel_webhook, self._payload(organisation, finding),
+                    rule.webhook_secret,
+                )
         return created
+
+    def _payload(self, organisation, finding):
+        """The JSON body for a webhook (§6)."""
+        link = finding.link
+        if link and settings.SITE_URL:
+            link = settings.SITE_URL + link
+        return {
+            "trigger_type": finding.trigger_type,
+            "title": finding.title,
+            "message": finding.message,
+            "link": link,
+            "organisation": organisation.name,
+        }

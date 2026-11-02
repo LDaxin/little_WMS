@@ -20,6 +20,7 @@
             <td>
                 {% if rule.channel_in_app %}{% trans "in-app" %}{% endif %}
                 {% if rule.channel_email %}{% trans "email" %}{% endif %}
+                {% if rule.channel_webhook %}{% trans "webhook" %}{% endif %}
             </td>
             <td class="d-flex gap-2">
                 <a class="btn btn-sm btn-outline-secondary" href="{% url 'notification rule edit' rule.pk %}">{% trans "Edit" %}</a>
