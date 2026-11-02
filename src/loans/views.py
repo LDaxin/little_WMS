@@ -82,8 +82,6 @@ def borrowArticle(request, typ, articleId):
                 party_organisation=party_org,
                 occasion=_occasion(request),
             )
-            article.ownership = "borrowed"
-            article.save()
     return redirect("article", typ=typ, articleId=articleId)
 
 
@@ -94,9 +92,6 @@ def returnLoan(request, loanId):
     if request.method == "POST":
         loan.status = "returned"
         loan.save()
-        if loan.direction == "in":
-            loan.article.ownership = "owned"
-            loan.article.save()
     return redirect("loans")
 
 
@@ -107,9 +102,6 @@ def confirmLoan(request, loanId):
     if request.method == "POST":
         loan.status = "active"
         loan.save()
-        if loan.direction == "in":
-            loan.article.ownership = "borrowed"
-            loan.article.save()
     return redirect("loans")
 
 
@@ -156,7 +148,7 @@ def _create_lend(link, request):
     )
     article = Article.objects.create(
         organisation=organisation, base=base,
-        notiz=request.POST.get("description", "").strip(), ownership="borrowed",
+        notiz=request.POST.get("description", "").strip(),
     )
     Stock.objects.create(article=article, stored=None, menge=1)
     photo = request.FILES.get("photo")

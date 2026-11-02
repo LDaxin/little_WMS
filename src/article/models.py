@@ -185,12 +185,7 @@ class Article(SoftDeleteObject, models.Model):
     ist_verbrauchsartikel = models.BooleanField(default=False)
     mengeneinheit = models.CharField(_("Unit"), max_length=20, blank=True)
 
-    # Ownership (§20): owned by the organisation or borrowed from an external lender.
-    OWNERSHIP_CHOICES = [
-        ("owned", "Owned by organisation"),
-        ("borrowed", "Borrowed from external"),
-    ]
-    ownership = models.CharField(max_length=10, choices=OWNERSHIP_CHOICES, default="owned")
+    # Ownership (§20) is derived from the open loan, not stored (RF-004).
     loan_requires_confirmation = models.BooleanField(default=True)
 
     # Custom field values for article-level fields (§25)
@@ -224,6 +219,18 @@ class Article(SoftDeleteObject, models.Model):
             if image.is_primary:
                 return image
         return images[0] if images else None
+
+    @property
+    def ownership(self):
+        """Whether the article is borrowed in (§20), derived from the open loan.
+
+        Single source of truth (RF-004): an open (pending/active) loan with
+        direction ``in`` means the article is borrowed.
+        """
+        # ponytail: one query per access; annotate the queryset if a list needs it.
+        return "borrowed" if self.loans.filter(
+            direction="in", status__in=["pending", "active"]
+        ).exists() else "owned"
 
 
 class ArticleImage(BaseImage):

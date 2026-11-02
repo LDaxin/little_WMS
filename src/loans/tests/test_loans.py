@@ -87,6 +87,24 @@ class LoanTest(TestCase):
         self.article.refresh_from_db()
         self.assertEqual(self.article.ownership, "owned")
 
+    def test_lend_out_keeps_owned(self):
+        user_with(self.org, "u", "article_move_all")
+        self.client.login(username="u", password="pw")
+        self._lend()
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.ownership, "owned")
+
+    def test_pending_loan_is_borrowed(self):
+        from planning.models import CalendarEntry
+
+        entry = CalendarEntry.objects.create(
+            entry_type="loan", title="x", start_date="2026-08-01", article=self.article
+        )
+        Loan.objects.create(
+            article=self.article, calendar_entry=entry, direction="in", status="pending"
+        )
+        self.assertEqual(self.article.ownership, "borrowed")
+
     def test_list_shows_both_directions(self):
         user_with(self.org, "u", "article_move_all", "article_view_all")
         self.client.login(username="u", password="pw")

@@ -11,6 +11,9 @@ from tag.models import Tag
 
 
 class ArticleSerializer(serializers.ModelSerializer):
+    # Derived from the open loan (RF-004), so read-only.
+    ownership = serializers.CharField(read_only=True)
+
     class Meta:
         model = Article
         fields = "__all__"

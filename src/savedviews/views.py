@@ -146,9 +146,6 @@ def shareLinkView(request, token):
                 party_organisation=link.saved_view.organisation,
                 status=status,
             )
-            if status == "active":
-                article.ownership = "borrowed"
-                article.save()
         return redirect("loans")
 
     if link.single_use:
