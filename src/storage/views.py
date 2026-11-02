@@ -1,7 +1,8 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
+from hub.csv import csv_response
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.urls import reverse
 from .forms import *
 from .models import *
@@ -14,7 +15,6 @@ from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-import csv
 import json
 from time import sleep
 
@@ -513,20 +513,13 @@ def searchStorages(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportStorages(request, typ):
-    response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
-    response['Content-Disposition'] = 'attachment; filename="storages.csv"'
-
-    thereIsOne = False
-
-    writer = csv.writer(response, dialect="excel")
-    writer.writerow(['name', 'code', 'type'])
+    rows = []
     for key, value in request.POST.items():
         if key.startswith("_"):
             storage = Storage.objects.get(pk=value)
             if storage.typ.name == typ:
-                thereIsOne = True
-                writer.writerow([storage.name, storage.code.code, storage.typ.name])
-    return response
+                rows.append([storage.name, storage.code.code, storage.typ.name])
+    return csv_response("storages.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.view_all")

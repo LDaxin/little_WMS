@@ -1,15 +1,14 @@
 """Reports (§33)."""
-import csv
 from datetime import date, timedelta
 
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Count
-from django.http import HttpResponse
 from django.shortcuts import render
 
 from article.models import Article
 from audit.models import AuditLog
+from hub.csv import csv_response
 from organisation.decorators import require_perm
 
 MOVEMENT_ACTIONS = ["moved", "removed"]
@@ -75,10 +74,5 @@ def reports(request):
 @login_required(login_url='/accounts/login/')
 @require_perm("settings.view_all")
 def reportsExport(request):
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="movements.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["month", "movements"])
-    for month, count in _movements_by_month(_movements(request)):
-        writer.writerow([month, count])
-    return response
+    rows = [[month, count] for month, count in _movements_by_month(_movements(request))]
+    return csv_response("movements.csv", ["month", "movements"], rows)

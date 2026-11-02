@@ -1,13 +1,13 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
+from hub.csv import csv_response
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound, Http404
+from django.http import HttpResponseNotFound, Http404
 from .forms import *
 from .models import *
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.db.models import Q
-import csv
 
 
 # Create your views here.
@@ -94,11 +94,7 @@ def resolve_code(request, kind, code):
 @login_required(login_url='/accounts/login/')
 @require_perm("code.export_all")
 def codesExport(request):
-    response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
-    response['Content-Disposition'] = 'attachment; filename="codes.csv"'
-
-    writer = csv.writer(response, dialect="excel")
-    writer.writerow(['prefix', 'code', 'type'])
+    rows = []
     for key, value in request.POST.items():
         if key.startswith("_"):
             code = UuidCode.objects.get(pk=value)
@@ -109,5 +105,5 @@ def codesExport(request):
                     typ = "Lager"
                 else:
                     typ = "unknown"
-                writer.writerow([code.prefix, code.code, typ])
-    return response
+                rows.append([code.prefix, code.code, typ])
+    return csv_response("codes.csv", ["prefix", "code", "type"], rows, encoding="iso-8859-1")

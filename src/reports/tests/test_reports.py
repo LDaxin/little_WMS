@@ -44,5 +44,5 @@ class ReportsTest(TestCase):
         self.client.login(username="u", password="pw")
         response = self.client.get("/reports/export.csv")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
         self.assertIn("month", response.content.decode())

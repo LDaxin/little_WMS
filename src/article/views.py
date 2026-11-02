@@ -1,7 +1,8 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
+from hub.csv import csv_response
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.urls import reverse
 from decimal import Decimal, InvalidOperation
 from .models import *
@@ -15,7 +16,6 @@ from organisation.decorators import require_perm, require_scope
 from organisation.permissions import has_scope, is_assigned_only
 from organisation.services import active_organisation
 from django.db.models import Q
-import csv
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
@@ -758,23 +758,16 @@ def searchArticle(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportArticles(request, typ):
-    response = HttpResponse(content_type='text/csv; charset=iso-8859-1')
-    response['Content-Disposition'] = 'attachment; filename="articles.csv"'
-
-    thereIsOne = False
-
-    writer = csv.writer(response, dialect="excel")
-    writer.writerow(['name', 'code', 'type'])
     assigned_only = is_assigned_only(request.user, "article", "view", active_organisation(request))
+    rows = []
     for key, value in request.POST.items():
         if key.startswith("_"):
             article = Article.objects.get(pk=value)
             if assigned_only and request.user not in article.assigned_to.all():
                 continue
             if article.base.pType.name == typ:
-                thereIsOne = True
-                writer.writerow([article.base.name, article.code.code, article.base.pType.name])
-    return response
+                rows.append([article.base.name, article.code.code, article.base.pType.name])
+    return csv_response("articles.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "view")
@@ -859,10 +852,9 @@ def importConfirm(request):
 @require_perm("article.create_all")
 def importTemplate(request):
     """Downloadable CSV template (§19)."""
-    response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="article-import-template.csv"'
-    writer = csv.writer(response)
-    writer.writerow(["name", "type", "menge", "storage", "zustand"])
-    writer.writerow(["Hammer", "tool", "1", "Regal 1", "gut"])
-    return response
+    return csv_response(
+        "article-import-template.csv",
+        ["name", "type", "menge", "storage", "zustand"],
+        [["Hammer", "tool", "1", "Regal 1", "gut"]],
+    )
 

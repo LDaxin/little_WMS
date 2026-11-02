@@ -5,19 +5,19 @@ expected list is the current ``Stock`` in that location; scanned articles that
 belong elsewhere are flagged as deviations. State lives in the user's session,
 like the movement buffer.
 """
-import csv
 
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
 from django.db.models import Q
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponseNotFound
 from django.shortcuts import render
 
 from article.models import Article, Stock
 from storage.models import Storage
 from space.services import space_path
 from codeSystem.services import resolve_code
+from hub.csv import csv_response
 
 
 def _get_state(session):
@@ -149,25 +149,14 @@ def inventorySearch(request):
 @login_required(login_url='/accounts/login/')
 @require_perm("article.view_all")
 def inventoryExport(request):
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="inventory.csv"'
-    writer = csv.writer(response, dialect="excel")
-    writer.writerow(["name", "code", "status", "location"])
-
     context = _context(request)
     location = str(context["location"]) if context["location"] else ""
-    for entry in context["expected"]:
-        writer.writerow([
-            entry["article"].base.name,
-            entry["article"].code.code,
-            "found" if entry["found"] else "not found",
-            location,
-        ])
-    for deviation in context["deviations"]:
-        writer.writerow([
-            deviation["article"].base.name,
-            deviation["article"].code.code,
-            "deviation",
-            "; ".join(deviation["locations"]),
-        ])
-    return response
+    rows = [
+        [e["article"].base.name, e["article"].code.code, "found" if e["found"] else "not found", location]
+        for e in context["expected"]
+    ]
+    rows += [
+        [d["article"].base.name, d["article"].code.code, "deviation", "; ".join(d["locations"])]
+        for d in context["deviations"]
+    ]
+    return csv_response("inventory.csv", ["name", "code", "status", "location"], rows)

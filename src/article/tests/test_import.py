@@ -130,7 +130,7 @@ class ImportViewTest(TestCase):
     def test_template_download(self):
         response = self.client.get("/import/template")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertEqual(response["Content-Type"], "text/csv; charset=utf-8")
 
     def test_requires_permission(self):
         User.objects.create_user("other", password="pw")
