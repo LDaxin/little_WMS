@@ -42,6 +42,7 @@ class Loan(SoftDeleteObject, models.Model):
     occasion = models.ForeignKey("occasion.Occasion", null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Occasion"))
     status = models.CharField(_("Status"), max_length=10, choices=STATUS_CHOICES, default="active")
     notes = models.TextField(_("Notes"), blank=True)
+    lend_link = models.ForeignKey("LendLink", null=True, blank=True, on_delete=models.SET_NULL, related_name="loans")
 
     def party_label(self):
         """The other party: a person's name or the organisation."""
@@ -65,27 +66,23 @@ class OrganisationMembership(models.Model):
 
 
 class LendLink(TokenisedModel):
-    """A capability URL for an external person to lend an item to the org (§20).
+    """A capability URL for an external person to lend items to the org (§20).
 
-    The external person opens the link, fills a form, and a borrowed article and
-    loan are created. The link is revocable and may expire.
+    The external person opens the link, enters their name and email once, and
+    manages a list of items. The link stays valid until deactivated or expired.
     """
 
     organisation = models.ForeignKey("organisation.Organisation", on_delete=models.CASCADE, default=current_organisation_id)
     label = models.CharField(_("Label"), max_length=100, blank=True)
+    lender_name = models.CharField(_("Lender"), max_length=200, blank=True)
+    lender_email = models.EmailField(_("Lender email"), blank=True)
     is_active = models.BooleanField(default=True)
-    single_use = models.BooleanField(default=False)
-    used_count = models.IntegerField(default=0)
     password_hash = models.CharField(max_length=128, blank=True)
     created_by = models.ForeignKey("auth.User", null=True, blank=True, on_delete=models.SET_NULL)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_valid(self):
-        if not self.is_active or self.is_expired():
-            return False
-        if self.single_use and self.used_count >= 1:
-            return False
-        return True
+        return self.is_active and not self.is_expired()
 
     def __str__(self):
         return self.label or "Lend link %s" % self.pk

@@ -2,31 +2,59 @@
 {% load i18n %}
 
 {% block content %}
-<h4>{% trans "Lend an item" %}</h4>
+<h4>{% trans "Lend items" %}</h4>
 
 {% if invalid %}
 <p class="text-muted">{% trans "This link is no longer valid." %}</p>
-{% elif loan %}
-<div class="card">
-    <div class="card-body">
-        <p>{% trans "Thank you! Your item was recorded." %}</p>
-        <p>{% trans "Status" %}: <span class="badge text-bg-secondary">{{ loan.get_status_display }}</span></p>
-    </div>
-</div>
+{% elif not link.lender_name %}
+{% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+<p>{% trans "Please tell us who you are." %}</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="mb-2"><input name="lender_name" class="form-control" placeholder="{% trans "Your name" %}" required></div>
+    <div class="mb-2"><input name="lender_email" type="email" class="form-control" placeholder="{% trans "Your email (optional)" %}"></div>
+    <button class="btn btn-primary">{% trans "Continue" %}</button>
+</form>
 {% else %}
 {% if error %}<div class="alert alert-danger py-1">{{ error }}</div>{% endif %}
+
+<ul class="list-group mb-3">
+    {% for loan in loans %}
+    <li class="list-group-item">
+        <form method="post" class="d-flex gap-2 align-items-center flex-wrap">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="loan" value="{{ loan.pk }}">
+            <input name="name" class="form-control form-control-sm" value="{{ loan.article.base.name }}" style="max-width:12rem">
+            <input name="description" class="form-control form-control-sm" value="{{ loan.article.notiz }}" placeholder="{% trans "Description" %}">
+            <input name="start_date" type="date" class="form-control form-control-sm" value="{{ loan.calendar_entry.start_date|date:'Y-m-d' }}" style="max-width:10rem">
+            <input name="end_date" type="date" class="form-control form-control-sm" value="{{ loan.calendar_entry.end_date|date:'Y-m-d' }}" style="max-width:10rem">
+            <button class="btn btn-sm btn-outline-secondary">{% trans "Save" %}</button>
+        </form>
+        <form method="post" class="mt-1">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="loan" value="{{ loan.pk }}">
+            <button class="btn btn-sm btn-outline-danger">{% trans "Delete" %}</button>
+        </form>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">{% trans "No items yet." %}</li>
+    {% endfor %}
+</ul>
+
+<h6>{% trans "Add an item" %}</h6>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    <input type="hidden" name="action" value="add">
     <div class="mb-2"><input name="name" class="form-control" placeholder="{% trans "Item name" %}" required></div>
     <div class="mb-2"><textarea name="description" class="form-control" placeholder="{% trans "Description" %}"></textarea></div>
-    <div class="mb-2"><input name="friend_name" class="form-control" placeholder="{% trans "Your name" %}" required></div>
-    <div class="mb-2"><input name="friend_email" type="email" class="form-control" placeholder="{% trans "Your email (optional)" %}"></div>
     <div class="mb-2 d-flex gap-2">
         <input name="start_date" type="date" class="form-control" required>
         <input name="end_date" type="date" class="form-control">
     </div>
     <div class="mb-2"><input name="photo" type="file" accept="image/*" class="form-control"></div>
-    <button class="btn btn-primary">{% trans "Lend" %}</button>
+    <button class="btn btn-primary">{% trans "Add" %}</button>
 </form>
 {% endif %}
 {% endblock %}

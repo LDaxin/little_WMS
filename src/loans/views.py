@@ -121,7 +121,6 @@ def lendLinks(request):
         LendLink.objects.create(
             organisation=organisation,
             label=request.POST.get("label", "").strip(),
-            single_use=request.POST.get("single_use") == "on",
             created_by=request.user,
         )
         return redirect("lend links")
@@ -133,10 +132,19 @@ def lendLinks(request):
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "move")
 def lendLinkRevoke(request, linkId):
+    """Deactivate a lend link: remove its items and anonymise the lender (§20)."""
     link = get_object_or_404(LendLink, pk=linkId, organisation=active_organisation(request))
     if request.method == "POST":
         link.is_active = False
+        link.lender_name = ""
+        link.lender_email = ""
         link.save()
+        for loan in link.loans.all():
+            loan.party_name = ""
+            loan.party_email = ""
+            loan.save()
+            loan.article.delete()
+            loan.delete()
     return redirect("lend links")
 
 
@@ -161,7 +169,7 @@ def _create_lend(link, request):
     entry = CalendarEntry.objects.create(
         organisation=organisation,
         entry_type="loan",
-        title="Loan: %s from %s" % (base.name, request.POST["friend_name"].strip()),
+        title="Loan: %s from %s" % (base.name, link.lender_name),
         start_date=request.POST["start_date"],
         end_date=request.POST.get("end_date") or None,
         article=article,
@@ -172,38 +180,68 @@ def _create_lend(link, request):
         calendar_entry=entry,
         direction="in",
         party_type="person",
-        party_name=request.POST["friend_name"].strip(),
-        party_email=request.POST.get("friend_email", "").strip(),
+        party_name=link.lender_name,
+        party_email=link.lender_email,
+        lend_link=link,
     )
 
 
+def _edit_lend(loan, request):
+    """Update a lent item's name, description and period (§20)."""
+    name = request.POST.get("name", "").strip()
+    if name and len(name) <= 20:
+        loan.article.base.name = name
+        loan.article.base.save()
+    loan.article.notiz = request.POST.get("description", "").strip()
+    loan.article.save()
+    entry = loan.calendar_entry
+    if request.POST.get("start_date"):
+        entry.start_date = request.POST["start_date"]
+    entry.end_date = request.POST.get("end_date") or None
+    entry.save()
+
+
 def lendLinkView(request, token):
-    """Public capability URL: an external person lends an item (§20)."""
+    """Public capability URL: an external person manages their lent items (§20)."""
     link = get_object_or_404(LendLink, token=token)
     if not link.is_valid():
         return render(request, "loans/lendLink.html", {"link": link, "invalid": True})
 
-    session_key = "lend_%s" % link.pk
-    loan_id = request.session.get(session_key)
-    if loan_id:
-        return render(request, "loans/lendLink.html", {
-            "link": link, "loan": Loan.objects.filter(pk=loan_id).first(),
-        })
-
     error = ""
     if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        friend = request.POST.get("friend_name", "").strip()
-        start = request.POST.get("start_date", "")
-        if not name or not friend or not start:
-            error = "Please fill in the item name, your name, and the start date."
-        elif len(name) > 20:
-            error = "The item name is too long (max 20 characters)."
-        else:
-            loan = _create_lend(link, request)
-            request.session[session_key] = loan.pk
-            if link.single_use:
-                link.used_count += 1
+        action = request.POST.get("action")
+        if not link.lender_name:
+            name = request.POST.get("lender_name", "").strip()
+            if name:
+                link.lender_name = name
+                link.lender_email = request.POST.get("lender_email", "").strip()
                 link.save()
-            return redirect("lend link", token=token)
-    return render(request, "loans/lendLink.html", {"link": link, "error": error})
+                return redirect("lend link", token=token)
+            error = "Please enter your name."
+        elif action == "add":
+            name = request.POST.get("name", "").strip()
+            start = request.POST.get("start_date", "")
+            if not name or not start:
+                error = "Please fill in the item name and the start date."
+            elif len(name) > 20:
+                error = "The item name is too long (max 20 characters)."
+            else:
+                _create_lend(link, request)
+                return redirect("lend link", token=token)
+        elif action == "edit":
+            loan = link.loans.filter(pk=request.POST.get("loan")).first()
+            if loan:
+                _edit_lend(loan, request)
+                return redirect("lend link", token=token)
+        elif action == "delete":
+            loan = link.loans.filter(pk=request.POST.get("loan")).first()
+            if loan:
+                loan.article.delete()
+                loan.delete()
+                return redirect("lend link", token=token)
+
+    return render(request, "loans/lendLink.html", {
+        "link": link,
+        "loans": link.loans.select_related("article__base", "calendar_entry"),
+        "error": error,
+    })

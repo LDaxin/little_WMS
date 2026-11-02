@@ -2,7 +2,7 @@
 
 `ShareLink` (§10) shares a saved view and lets a logged-in user borrow the
 organisation's articles (org-to-org). §20's friend scenario is the reverse: an
-external person lends an item in, without an account. `hub.models.TokenisedModel`
+external person lends items in, without an account. `hub.models.TokenisedModel`
 provides the token + expiry base; `ArticleImage` provides the photo.
 
 ## Goals / Non-Goals
@@ -10,8 +10,8 @@ provides the token + expiry base; `ArticleImage` provides the photo.
 **Goals:**
 
 - A capability link an organisation member creates for external lending.
-- A public form that creates a borrowed article + loan + calendar entry.
-- The external person sees the loan status.
+- A public page where the external person manages a list of items.
+- Deactivation removes the items and anonymises the lender's data.
 
 **Non-Goals:**
 
@@ -24,25 +24,30 @@ provides the token + expiry base; `ArticleImage` provides the photo.
 ### Decision 1: A dedicated `LendLink` model
 
 `LendLink` extends `TokenisedModel` (token + expiry) with `organisation`,
-`label`, `is_active`, `single_use`, `used_count`, `password_hash`, `created_by`.
-It is separate from `ShareLink` because it is not tied to a saved view.
+`label`, `lender_name`, `lender_email`, `is_active`, `password_hash`,
+`created_by`. The lender's identity is stored on the link (entered once).
 
-### Decision 2: A dedicated "borrowed" article type
+### Decision 2: `Loan.lend_link` links the items
+
+Each lent item is a `Loan` with `lend_link` set, so the public page can list and
+manage exactly the link's items.
+
+### Decision 3: A dedicated "borrowed" article type
 
 The lent item becomes an `Article` under a per-organisation `borrowed`
 `ArticleType` (`get_or_create`), so the external person does not have to pick
 from the organisation's types.
 
-### Decision 3: Session-based status
+### Decision 4: Deactivation mirrors the GDPR user deletion
 
-After submitting, the loan id is stored in the session under the link, so
-re-opening the link shows the loan status instead of the form.
+Deactivating a link soft-deletes the items' articles and loans and clears the
+lender's name/email, like `security.views.deleteUser` anonymises a deleted user.
 
 ## Risks / Trade-offs
 
 - [Article name length] → `ArticleBase.name` is 20 chars; the form validates it.
-- [Spam] → links are revocable and may expire; a password is optional.
+- [Spam] → links are deactivatable and may expire; a password is optional.
 
 ## Migration Plan
 
-- New table `loans_lendlink`; no data migration. Rollback: drop the table.
+- New table `loans_lendlink`; `Loan` gains `lend_link`. Rollback: drop both.

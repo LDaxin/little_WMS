@@ -3,42 +3,54 @@
 ### Requirement: Create a lend link
 
 The system SHALL let an organisation member create a capability link that an
-external person can use to lend an item to the organisation. The link SHALL be
-revocable and MAY expire.
+external person can use to lend items to the organisation. The link SHALL stay
+valid until it is deactivated or expires.
 
 #### Scenario: Create a link
 
 - **WHEN** a member creates a lend link
 - **THEN** a link with a token is created
 
-#### Scenario: Revoke a link
+### Requirement: Manage lent items via the link
 
-- **WHEN** a member revokes a lend link
-- **THEN** the link is no longer valid
+The system SHALL show a public page for a valid lend link where the external
+person enters their name and email once, then manages a list of items: adding,
+editing (name, description, period) and deleting them. Each item SHALL create a
+borrowed article, a loan (direction `in`, party type `person`) and a `loan`
+calendar entry.
 
-### Requirement: Lend an item via the link
+#### Scenario: Enter the lender details
 
-The system SHALL show a public form for a valid lend link where an external
-person enters the item name, a description, a period, and an optional photo.
-Submitting SHALL create a borrowed article, a loan (direction `in`, party type
-`person`) and a `loan` calendar entry.
+- **WHEN** the external person opens the link for the first time
+- **THEN** they are asked for their name and email
 
-#### Scenario: Submit the form
+#### Scenario: Add an item
 
-- **WHEN** an external person submits the lend form
+- **WHEN** the external person adds an item
 - **THEN** a borrowed article, a loan and a calendar entry are created
+
+#### Scenario: Edit an item
+
+- **WHEN** the external person edits an item's name, description or period
+- **THEN** the article and calendar entry are updated
+
+#### Scenario: Delete an item
+
+- **WHEN** the external person deletes an item
+- **THEN** the article and loan are removed
 
 #### Scenario: Invalid link
 
-- **WHEN** a lend link is invalid (revoked or expired)
-- **THEN** the form is not shown
+- **WHEN** a lend link is invalid (deactivated or expired)
+- **THEN** the page is not shown
 
-### Requirement: See the loan status
+### Requirement: Deactivate a lend link
 
-The system SHALL show the external person the status of the loan they created
-through the link.
+The system SHALL let an organisation member deactivate a lend link. Deactivating
+SHALL remove the link's items from the system and anonymise the lender's
+personal data.
 
-#### Scenario: Status after lending
+#### Scenario: Deactivate
 
-- **WHEN** the external person opens the link after lending
-- **THEN** the loan's status is shown
+- **WHEN** a member deactivates a lend link
+- **THEN** the link's items are removed and the lender's name and email are anonymised
