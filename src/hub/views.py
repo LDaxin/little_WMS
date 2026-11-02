@@ -231,7 +231,7 @@ def emailPreferences(request):
             value = request.POST.get(field, "")
             if value.isdigit():
                 setattr(profile, field, int(value))
-        for field in ("sound_enabled", "vibration_enabled"):
+        for field in ("sound_enabled", "vibration_enabled", "image_on_scan"):
             setattr(profile, field, request.POST.get(field) == "on")
         volume = request.POST.get("volume", "")
         if volume.isdigit():

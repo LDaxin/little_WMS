@@ -39,6 +39,7 @@
     {% with active=buffer|last %}
     <div class="card mb-2 border-primary">
         <div class="card-body">
+            {% if scan_feedback.image %}{% with img=active.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" style="height:80px" class="rounded border me-2">{% endif %}{% endwith %}{% endif %}
             <strong>{% trans "Active:" %}</strong> {{ active.base.name }}
             <div class="mt-1 d-flex gap-2">
                 <button type="button" class="btn btn-sm btn-outline-danger"

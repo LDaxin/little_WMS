@@ -104,6 +104,8 @@ class UserProfile(models.Model):
     sound_enabled = models.BooleanField(default=True)
     vibration_enabled = models.BooleanField(default=True)
     volume = models.IntegerField(default=50)
+    # Visual confirmation on scan (§15): show the article's image.
+    image_on_scan = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ("user", "organisation")

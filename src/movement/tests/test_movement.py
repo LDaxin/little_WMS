@@ -1,9 +1,14 @@
-from django.contrib.auth.models import User
-from django.test import TestCase
+import shutil
+import tempfile
 
-from article.models import Article, ArticleBase, ArticleType, Stock
+from django.contrib.auth.models import User
+from django.test import TestCase, override_settings
+
+from article.models import Article, ArticleBase, ArticleImage, ArticleType, Stock
+from article.tests.test_images import image_file
 from audit.models import AuditLog
 from movement.models import MovementSession
+from organisation.models import Organisation, UserProfile
 from space.models import Space
 from storage.models import Storage, StorageType
 
@@ -127,6 +132,36 @@ class MovementScanTest(MovementTestBase):
     def test_scan_error_triggers_feedback(self):
         response = self.scan("xx123")
         self.assertEqual(response["HX-Trigger"], "movementError")
+
+
+class MovementScanImageTest(MovementTestBase):
+    def setUp(self):
+        super().setUp()
+        self.media = tempfile.mkdtemp()
+        self.override = override_settings(MEDIA_ROOT=self.media)
+        self.override.enable()
+
+    def tearDown(self):
+        self.override.disable()
+        shutil.rmtree(self.media, ignore_errors=True)
+
+    def test_scan_shows_primary_image(self):
+        article = make_article("Hammer", self.article_type, space_active=False)
+        img = ArticleImage.objects.create(
+            article=article, image=image_file(), is_primary=True
+        )
+        response = self.scan(article.code.code)
+        self.assertContains(response, img.thumbnail.url)
+
+    def test_scan_image_off(self):
+        org = Organisation.objects.get(pk=1)
+        UserProfile.objects.create(user=self.user, organisation=org, image_on_scan=False)
+        article = make_article("Hammer", self.article_type, space_active=False)
+        img = ArticleImage.objects.create(
+            article=article, image=image_file(), is_primary=True
+        )
+        response = self.scan(article.code.code)
+        self.assertNotContains(response, img.thumbnail.url)
 
 
 class MovementStoreTest(MovementTestBase):

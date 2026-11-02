@@ -74,11 +74,13 @@ class EmailPreferencesViewTest(TestCase):
         UserProfile.objects.create(user=self.user, organisation=org)
         self.client.post("/email-preferences/", {
             "sound_enabled": "on",
+            "image_on_scan": "on",
             "volume": "80",
         })
         profile = self.user.profiles.first()
         self.assertTrue(profile.sound_enabled)
         self.assertFalse(profile.vibration_enabled)
+        self.assertTrue(profile.image_on_scan)
         self.assertEqual(profile.volume, 80)
 
 

@@ -40,5 +40,6 @@ def active_organisation(request):
             "sound": getattr(profile, "sound_enabled", True),
             "vibration": getattr(profile, "vibration_enabled", True),
             "volume": getattr(profile, "volume", 50),
+            "image": getattr(profile, "image_on_scan", True),
         },
     }
