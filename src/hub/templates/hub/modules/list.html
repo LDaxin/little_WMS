@@ -5,6 +5,7 @@
 <div id="listBody" data-list-mode="{{ list_view_mode }}">
 {% if list_view_mode == "cards" %}
     {% include "hub/modules/listCards.html" %}
+    {% include "hub/modules/listControl.html" %}
 {% else %}
 <table class="table" id="resultsTable">
     <thead>
@@ -29,7 +30,7 @@
 </table>
 {% endif %}
 </div>
-{% include "hub/modules/listControl.html" %}
+{% if list_view_mode != "cards" %}{% include "hub/modules/listControl.html" %}{% endif %}
 <script>
     $("#checkAll").click(function() {
         $("input[type=checkbox]").prop("checked", $(this).prop("checked"));

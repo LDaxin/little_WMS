@@ -4,6 +4,34 @@ from django.test import TestCase
 from storage.models import Storage, StorageType
 
 
+def _ids_inside(content, container_id):
+    """Ids of elements nested inside ``#<container_id>`` (rough HTML nesting)."""
+    from html.parser import HTMLParser
+
+    void = {"input", "br", "img", "meta", "link", "hr"}
+
+    class Nesting(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.stack = []
+            self.found = []
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if tag not in void:
+                self.stack.append(attrs.get("id"))
+            if attrs.get("id") and container_id in self.stack:
+                self.found.append(attrs["id"])
+
+        def handle_endtag(self, tag):
+            if tag not in void and self.stack:
+                self.stack.pop()
+
+    parser = Nesting()
+    parser.feed(content)
+    return parser.found
+
+
 class AllStoragesTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -86,3 +114,12 @@ class AllStoragesTest(TestCase):
         self.assertContains(response, 'id="modeInput" name="mode" value=""')
         response = self.client.get("/storage/room/search", HTTP_X_VIEW_MODE="mobile")
         self.assertContains(response, "card-title")
+
+    def test_cards_load_more_at_end_of_list(self):
+        storage_type = StorageType.objects.get(name="room")
+        for i in range(51):
+            Storage.objects.create(name="S%03d" % i, typ=storage_type)
+        response = self.client.get("/storage/search", {"mode": "cards"})
+        self.assertIn("listControl", _ids_inside(response.content.decode(), "listBody"))
+        response = self.client.get("/storage/search", {"mode": "table"})
+        self.assertNotIn("listControl", _ids_inside(response.content.decode(), "listBody"))
