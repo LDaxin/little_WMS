@@ -11,7 +11,7 @@
             qtype="search" 
             placeholder="{% trans "Search" %}" 
             hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
-            hx-get="{% if savedQuery %}./search?query={{ savedQuery|urlencode }}{% else %}./search{% endif %}" 
+            hx-get="./search?{% if savedQuery %}query={{ savedQuery|urlencode }}&{% endif %}sort={{ sort }}&cols={{ cols }}" 
             hx-trigger="load, keyup changed delay:500ms, refresh" 
             hx-target="{% if list_type %}#list{% else %}#results{% endif %}"> 
         <div id="QRButtonDiv{{searchFieldName}}">

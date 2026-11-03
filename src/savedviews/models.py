@@ -17,6 +17,9 @@ class SavedView(SoftDeleteObject, models.Model):
     description = models.TextField(blank=True)
     typ = models.CharField(max_length=20, blank=True)
     query = models.JSONField(default=dict, blank=True)
+    sort = models.CharField(max_length=50, blank=True)
+    columns = models.JSONField(default=list, blank=True)
+    display_mode = models.CharField(max_length=10, blank=True)
     is_shared = models.BooleanField(default=False)
     show_on_dashboard = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -26,7 +29,13 @@ class SavedView(SoftDeleteObject, models.Model):
 
     @property
     def applyUrl(self):
-        return "/article/%s/?view=%s" % (self.typ, self.pk)
+        params = []
+        if self.sort:
+            params.append("sort=%s" % self.sort)
+        if self.columns:
+            params.append("cols=%s" % ",".join(self.columns))
+        suffix = ("&" + "&".join(params)) if params else ""
+        return "/article/%s/?view=%s%s" % (self.typ, self.pk, suffix)
 
 
 class ShareLink(TokenisedModel):

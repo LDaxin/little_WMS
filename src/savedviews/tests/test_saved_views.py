@@ -36,6 +36,15 @@ class SavedViewTest(TestCase):
         self.assertEqual(view.owner, self.user)
         self.assertEqual(view.typ, "tent")
 
+    def test_save_view_with_sort_and_columns(self):
+        self.client.post("/views/save/", {
+            "name": "My view", "query": '{"type": "AND", "conditions": []}', "typ": "tent",
+            "sort": "name", "cols": "name,code",
+        })
+        view = SavedView.objects.get()
+        self.assertEqual(view.sort, "name")
+        self.assertEqual(view.columns, ["name", "code"])
+
     def test_list_own_and_shared(self):
         SavedView.objects.create(owner=self.user, name="Mine", typ="tent", organisation=self.org)
         other = User.objects.create_user("other", password="pw")

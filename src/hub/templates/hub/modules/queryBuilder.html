@@ -18,6 +18,8 @@
         <input type="hidden" name="query" id="qbSaveQuery">
         <input type="hidden" name="typ" value="{{ name }}">
         <input type="hidden" name="next" value="{{ request.path }}">
+        <input type="hidden" name="sort" value="{{ sort }}">
+        <input type="hidden" name="cols" value="{{ cols }}">
         <input name="name" class="form-control form-control-sm" placeholder="{% trans "View name" %}" style="max-width:14rem">
         <label class="form-check-label d-flex align-items-center gap-1"><input type="checkbox" name="is_shared" class="form-check-input"> {% trans "Share" %}</label>
         <button class="btn btn-sm btn-outline-primary">{% trans "Save as View" %}</button>

@@ -43,6 +43,9 @@ def saveSavedView(request):
                 name=name,
                 typ=request.POST.get("typ", ""),
                 query=parsed,
+                sort=request.POST.get("sort", ""),
+                columns=[c for c in request.POST.get("cols", "").split(",") if c],
+                display_mode=request.POST.get("display_mode", ""),
                 is_shared=request.POST.get("is_shared") == "on",
             )
     return redirect(request.POST.get("next") or "saved views")
