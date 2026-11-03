@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from article.models import Stock
+from article.models import Article
 from hub import columns
 from storage.models import Storage
 
@@ -18,11 +18,11 @@ class ColumnRegistryTest(TestCase):
                 self.assertIn(c.key, available)
 
     def test_column_lookup(self):
-        self.assertEqual(columns.column("article", "name").path, "article__base__name")
+        self.assertEqual(columns.column("article", "name").path, "base__name")
         self.assertIsNone(columns.column("article", "nope"))
 
     def test_sort_path(self):
-        self.assertEqual(columns.sort_path("article", "name"), "article__base__name")
+        self.assertEqual(columns.sort_path("article", "name"), "base__name")
         self.assertIsNone(columns.sort_path("article", "location"))
         self.assertIsNone(columns.sort_path("article", "nope"))
 
@@ -39,7 +39,7 @@ class ColumnRegistryTest(TestCase):
     def test_sortable_paths_are_valid(self):
         for c in columns.columns("article"):
             if c.sortable:
-                Stock.objects.order_by(c.path).first()
+                Article.objects.order_by(c.path).first()
         for c in columns.columns("storage"):
             if c.sortable:
                 Storage.objects.order_by(c.path).first()

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
+from storage.models import Storage, StorageType
 
 
 class AllArticlesTest(TestCase):
@@ -26,3 +27,21 @@ class AllArticlesTest(TestCase):
     def test_search_all_links_to_detail(self):
         response = self.client.get("/article/search", {"search": "Jurte"})
         self.assertContains(response, "/article/tent/%s" % self.article.pk)
+
+    def test_search_all_groups_by_location(self):
+        storage_type = StorageType.objects.create(name="room", symbol="RA")
+        first = Storage.objects.create(name="Regal A", typ=storage_type)
+        second = Storage.objects.create(name="Regal B", typ=storage_type)
+        Stock.objects.create(article=self.article, stored=first.space, menge=2)
+        Stock.objects.create(article=self.article, stored=second.space, menge=1)
+        response = self.client.get("/article/search", {"search": "Jurte"})
+        self.assertContains(response, "Regal A")
+        self.assertContains(response, "Regal B")
+
+    def test_search_all_single_location_one_row(self):
+        storage_type = StorageType.objects.create(name="room", symbol="RA")
+        storage = Storage.objects.create(name="Regal A", typ=storage_type)
+        Stock.objects.create(article=self.article, stored=storage.space, menge=2)
+        response = self.client.get("/article/search", {"search": "Jurte"})
+        self.assertContains(response, "Regal A")
+        self.assertContains(response, "table-group-single")

@@ -1,0 +1,2 @@
+{% load list_columns %}
+{% if value %}<span class="badge bg-{{ value|condition_color }}">{{ value|condition_label }}</span>{% endif %}

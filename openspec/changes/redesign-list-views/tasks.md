@@ -7,10 +7,10 @@
 
 ## 2. Table rendering from the registry
 
-- [ ] 2.1 The result partial renders header + rows from the registry
-- [ ] 2.2 The result partial owns the whole list (header + rows)
-- [ ] 2.3 Article list as a grouped stock list (one row per article/location, first row total, collapsible)
-- [ ] 2.4 Storage list from the registry
+- [x] 2.1 The result partial renders header + rows from the registry
+- [x] 2.2 The result partial owns the whole list (header + rows)
+- [x] 2.3 Article list as a grouped stock list (one row per article/location, first row total, collapsible)
+- [x] 2.4 Storage list from the registry
 
 ## 3. Sorting
 
@@ -46,3 +46,8 @@
 - [ ] 8.1 Tests for registry, sorting, pagination, grouping, cards, selection
 - [ ] 8.2 Full suite green in Docker
 - [ ] 8.3 Rebuild + restart
+
+## 9. Scrollable list
+
+- [ ] 9.1 The list has its own scroll area (only the rows scroll)
+- [ ] 9.2 Sticky header; aligned with the sidebar and the action bar

@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
+from hub.columns import default_columns
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -261,6 +262,7 @@ def storages(request, typ):
             "symbol":storageTypeObject.symbol,
             "searchFieldName":"storageSearch" + storageTypeObject.name,
             'type':"storage",
+            "list_type":"storage",
             "name":typ,
             "form":[FormStorage()],
             "typ":typ,
@@ -280,6 +282,7 @@ def storagesAll(request):
         "symbol": "Logo",
         "searchFieldName": "storageSearchAll",
         "type": "storage",
+        "list_type": "storage",
         "name": "",
         "form": [],
         "typ": "",
@@ -299,7 +302,12 @@ def searchStoragesAll(request):
             Storage.objects.select_related("typ").prefetch_related("images"),
             request.GET.get("search", ""), "name", "code__code",
         )
-        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage", "show_type": True})
+        return render(request, "hub/modules/list.html", context={
+            "list_type": "storage",
+            "columns": default_columns("storage"),
+            "rows": r,
+            "selectable": True,
+        })
 
 
 @login_required(login_url='/accounts/login/')
@@ -506,7 +514,12 @@ def searchStorages(request, typ):
             Storage.objects.filter(typ__name__exact=typ).select_related("typ").prefetch_related("images"),
             request.GET.get("search", ""), "name", "code__code",
         )
-        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})
+        return render(request, "hub/modules/list.html", context={
+            "list_type": "storage",
+            "columns": default_columns("storage"),
+            "rows": r,
+            "selectable": True,
+        })
 
 
 @login_required(login_url='/accounts/login/')

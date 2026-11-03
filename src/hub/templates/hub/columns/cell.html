@@ -1,0 +1,5 @@
+{% if col.renderer == "badge" %}{% include "hub/columns/badge.html" %}
+{% elif col.renderer == "location" %}{% include "hub/columns/location.html" %}
+{% elif col.renderer == "quantity" %}{% include "hub/columns/quantity.html" %}
+{% elif col.renderer == "image" %}{% include "hub/columns/image.html" %}
+{% else %}{% include "hub/columns/text.html" %}{% endif %}

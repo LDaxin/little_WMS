@@ -2,6 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
+from hub.columns import default_columns
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -231,6 +232,7 @@ def articles(request, typ):
             "symbol":t.symbol,
             "searchFieldName":"articleSearch" + t.name,
             'type':"article",
+            "list_type":"article",
             "name":typ,
             "form":[FormArticleBase(prefix="base", article_type=t), FormArticle(prefix="article", article_type=t)],
             "typ":typ,
@@ -259,6 +261,7 @@ def articlesAll(request):
         "symbol": "Logo",
         "searchFieldName": "articleSearchAll",
         "type": "article",
+        "list_type": "article",
         "name": "",
         "form": [],
         "typ": "",
@@ -270,11 +273,27 @@ def articlesAll(request):
     })
 
 
+def _article_groups(articles):
+    """Group articles into stock rows for the list (§ list-views)."""
+    groups = []
+    for article in articles:
+        stocks = list(article.stocks.all())
+        groups.append({
+            "article": article,
+            "rows": stocks,
+            "total": sum((s.menge for s in stocks), Decimal("0")),
+            "shown": len(stocks),
+            "total_locations": len(stocks),
+            "partial": False,
+        })
+    return groups
+
+
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "view")
 def searchArticlesAll(request):
     if request.method == "GET":
-        r = Article.objects.select_related("base__pType").prefetch_related("images")
+        r = Article.objects.select_related("base__pType").prefetch_related("stocks__stored", "images")
         query = request.GET.get("query")
         if query:
             from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
@@ -286,7 +305,12 @@ def searchArticlesAll(request):
         else:
             r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
-        return render(request, "hub/modules/results.html", context={"results": r, "type": "article", "show_type": True})
+        return render(request, "hub/modules/list.html", context={
+            "list_type": "article",
+            "columns": default_columns("article"),
+            "groups": _article_groups(r),
+            "selectable": True,
+        })
 
 
 @login_required(login_url='/accounts/login/')
@@ -737,7 +761,7 @@ def setGlobalMinimum(request, spaceId, itemId):
 @require_scope("article", "view")
 def searchArticle(request, typ):
     if request.method == "GET":
-        r = Article.objects.filter(base__pType__name__exact=typ).select_related("base__pType")
+        r = Article.objects.filter(base__pType__name__exact=typ).select_related("base__pType").prefetch_related("stocks__stored", "images")
         query = request.GET.get("query")
         if query:
             from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
@@ -749,7 +773,12 @@ def searchArticle(request, typ):
         else:
             r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
-        return render(request, "hub/modules/results.html", context={"results":r, "type":"article"})
+        return render(request, "hub/modules/list.html", context={
+            "list_type": "article",
+            "columns": default_columns("article"),
+            "groups": _article_groups(r),
+            "selectable": True,
+        })
 
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")

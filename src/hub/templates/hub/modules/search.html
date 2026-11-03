@@ -13,7 +13,7 @@
             hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
             hx-get="{% if savedQuery %}./search?query={{ savedQuery|urlencode }}{% else %}./search{% endif %}" 
             hx-trigger="load, keyup changed delay:500ms, refresh" 
-            hx-target="#results"> 
+            hx-target="{% if list_type %}#list{% else %}#results{% endif %}"> 
         <div id="QRButtonDiv{{searchFieldName}}">
             <form>
                 <button 
@@ -42,6 +42,9 @@
 
 <!-- ____________________________Result Table______________________________________ -->
 
+{% if list_type %}
+<div id="list"></div>
+{% else %}
 <table class="table" id="resultsTable">
     <thead>
         <tr>
@@ -77,3 +80,4 @@
 </tbody>
 
 </table>
+{% endif %}

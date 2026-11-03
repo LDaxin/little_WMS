@@ -1,0 +1,10 @@
+{% load static list_columns %}
+<tr id="{{ row.id }}_item">
+    {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ row.pk }}" id="{{ row.id }}"></td>{% endif %}
+    {% for col in columns %}<td>{% cell row col %}</td>{% endfor %}
+    <td>
+        <a class="btn btn-light" href="{% url 'storage' typ=row.typ.name storageId=row.pk %}">
+            <img style="width:10px" src="{% static 'hub/symbols/Pencil.svg' %}">
+        </a>
+    </td>
+</tr>

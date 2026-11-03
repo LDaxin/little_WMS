@@ -112,3 +112,14 @@ long-press. "Select all" SHALL mean all matches, not only the loaded rows.
 
 - **WHEN** the user chooses "select all"
 - **THEN** the bulk action applies to every matching row, not only the loaded ones
+
+### Requirement: The list header stays visible
+
+The system SHALL give the list its own scroll area so that only the rows scroll,
+not the page, and SHALL keep the header visible while the rows scroll.
+
+#### Scenario: Scroll the rows
+
+- **WHEN** the list is longer than the viewport
+- **THEN** the header stays visible and only the rows scroll
+
