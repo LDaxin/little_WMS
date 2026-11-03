@@ -73,3 +73,9 @@ class AllArticlesTest(TestCase):
         response = self.client.get("/article/search", {"cols": "name,quantity"})
         self.assertContains(response, "Quantity")
         self.assertNotContains(response, "Condition")
+
+    def test_search_all_hides_stock_rows_without_stock_columns(self):
+        self._stock(self.article, "Regal A", 2)
+        self._stock(self.article, "Regal B", 1)
+        response = self.client.get("/article/search", {"cols": "name,code"})
+        self.assertNotContains(response, "Regal A")

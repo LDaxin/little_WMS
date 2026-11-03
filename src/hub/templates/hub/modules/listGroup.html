@@ -29,6 +29,7 @@
     </td>
 </tr>
 {% endwith %}
+{% if columns|has_level:"stock" %}
 {% for stock in group.rows %}
 <tr class="table-group-row" data-group="{{ group.article.pk }}">
     {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ stock.pk }}"></td>{% endif %}
@@ -36,4 +37,5 @@
     <td></td>
 </tr>
 {% endfor %}
+{% endif %}
 {% endif %}
