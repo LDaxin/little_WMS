@@ -73,6 +73,11 @@
             body.selecting .stretched-link { pointer-events: none; }
             body.selecting .card { cursor: pointer; }
             .card.selected { border-color: var(--bs-primary); box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); }
+            body:has(#list) .layout { height: 100vh; }
+            body:has(#list) .content { display: flex; flex-direction: column; overflow: hidden; }
+            body:has(#list) #list { flex: 1 1 auto; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 5rem; }
+            body:has(#list) #listBody { flex: 1 1 auto; overflow-y: auto; }
+            body:has(#list) #resultsTable thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
         </style>
         {% livereload_script %}
     </head>

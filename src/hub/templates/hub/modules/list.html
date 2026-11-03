@@ -1,4 +1,5 @@
 {% load i18n %}
+<div id="listBody">
 {% if list_view_mode == "cards" %}
     {% include "hub/modules/listCards.html" %}
 {% else %}
@@ -24,6 +25,7 @@
     </tbody>
 </table>
 {% endif %}
+</div>
 {% include "hub/modules/listControl.html" %}
 <script>
     $("#checkAll").click(function() {

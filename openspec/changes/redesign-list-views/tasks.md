@@ -50,5 +50,5 @@
 
 ## 9. Scrollable list
 
-- [ ] 9.1 The list has its own scroll area (only the rows scroll)
-- [ ] 9.2 Sticky header; aligned with the sidebar and the action bar
+- [x] 9.1 The list has its own scroll area (only the rows scroll)
+- [x] 9.2 Sticky header; aligned with the sidebar and the action bar

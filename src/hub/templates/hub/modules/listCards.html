@@ -1,7 +1,3 @@
 <div id="results" class="row g-2">
-    {% if groups %}
-        {% for group in groups %}{% include "hub/modules/listGroupCard.html" %}{% endfor %}
-    {% else %}
-        {% for row in rows %}{% include "hub/modules/listCard.html" %}{% endfor %}
-    {% endif %}
+    {% include "hub/modules/listCardItems.html" %}
 </div>
