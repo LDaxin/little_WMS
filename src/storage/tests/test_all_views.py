@@ -80,3 +80,9 @@ class AllStoragesTest(TestCase):
         response = self.client.post("/qr/print", {"type": "storage", "typ": "room", "all": "1"})
         self.assertContains(response, "Lager")
         self.assertContains(response, "AAA")
+
+    def test_list_default_applies_on_mobile(self):
+        response = self.client.get("/storage/room/")
+        self.assertContains(response, 'id="modeInput" name="mode" value=""')
+        response = self.client.get("/storage/room/search", HTTP_X_VIEW_MODE="mobile")
+        self.assertContains(response, "card-title")

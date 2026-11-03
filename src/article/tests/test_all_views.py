@@ -183,3 +183,19 @@ class AllArticlesTest(TestCase):
         response = self.client.post("/qr/print", {"type": "article", "typ": "tent", "all": "1"})
         self.assertContains(response, "Jurte")
         self.assertContains(response, "Alpha")
+
+    def test_list_default_applies_on_mobile(self):
+        self._stock(self.article)
+        # the page must not pin an explicit mode — that would override the setting
+        response = self.client.get("/article/tent/")
+        self.assertContains(response, 'id="modeInput" name="mode" value=""')
+        # a mobile client with no explicit mode gets the configured default (cards)
+        response = self.client.get("/article/tent/search", HTTP_X_VIEW_MODE="mobile")
+        self.assertContains(response, "card-title")
+
+    def test_explicit_mode_wins_over_default(self):
+        self._stock(self.article)
+        response = self.client.get(
+            "/article/tent/search", {"mode": "table"}, HTTP_X_VIEW_MODE="mobile"
+        )
+        self.assertContains(response, "resultsTable")

@@ -39,7 +39,7 @@
 {% if list_type %}
 <input type="hidden" id="sortInput" name="sort" value="{{ sort }}">
 <input type="hidden" id="colsInput" name="cols" value="{{ cols }}">
-<input type="hidden" id="modeInput" name="mode" value="{{ list_view_mode }}">
+<input type="hidden" id="modeInput" name="mode" value="{{ request.GET.mode }}">
 <div class="d-flex align-items-center gap-2 ms-2 mb-2">
     <div class="dropdown">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{% trans "Columns" %}</button>
@@ -59,9 +59,9 @@
         </div>
     </div>
     <div class="btn-group btn-group-sm">
-        <button type="button" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+        <button type="button" id="listModeTable" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
                 hx-get="./search?mode=table" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Table" %}</button>
-        <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+        <button type="button" id="listModeCards" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
                 hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Cards" %}</button>
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary"

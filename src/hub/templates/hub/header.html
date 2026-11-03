@@ -272,6 +272,18 @@
                 document.body.classList.toggle("selecting");
                 updateSelectCount();
             }
+            function updateModeButtons() {
+                var body = document.getElementById("listBody");
+                var table = document.getElementById("listModeTable");
+                var cards = document.getElementById("listModeCards");
+                if (!body || !table || !cards) { return; }
+                var mode = body.dataset.listMode;
+                table.classList.toggle("btn-primary", mode === "table");
+                table.classList.toggle("btn-outline-secondary", mode !== "table");
+                cards.classList.toggle("btn-primary", mode === "cards");
+                cards.classList.toggle("btn-outline-secondary", mode !== "cards");
+            }
+            document.body.addEventListener("htmx:afterSwap", updateModeButtons);
             document.body.addEventListener("click", function(event) {
                 if (!document.body.classList.contains("selecting")) { return; }
                 var card = event.target.closest(".card");
