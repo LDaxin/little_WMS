@@ -183,6 +183,10 @@
             if ("serviceWorker" in navigator) {
                 navigator.serviceWorker.register("/sw.js");
             }
+            document.body.addEventListener("htmx:configRequest", function(event) {
+                event.detail.headers["X-View-Mode"] =
+                    window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
+            });
         </script>
 
 

@@ -32,9 +32,9 @@
 
 ## 6. Cards and view mode
 
-- [ ] 6.1 Card partial (article, storage)
-- [ ] 6.2 `X-View-Mode` client hint; `view_mode` wins
-- [ ] 6.3 Desktop table/card toggle
+- [x] 6.1 Card partial (article, storage)
+- [x] 6.2 `X-View-Mode` client hint; `view_mode` wins
+- [x] 6.3 Desktop table/card toggle
 
 ## 7. Bulk selection
 

@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
-from hub.columns import default_columns, order_by, selected_columns
+from hub.columns import default_columns, order_by, resolve_view_mode, selected_columns
 from hub.columns import columns as all_columns
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
@@ -241,6 +241,7 @@ def articles(request, typ):
             "available_columns": all_columns("article"),
             "columns": selected_columns("article", request.GET.get("cols"), active_profile(request)),
             "cols": request.GET.get("cols", ""),
+            "list_view_mode": resolve_view_mode(request),
             "sort": request.GET.get("sort", ""),
             "name":typ,
             "form":[FormArticleBase(prefix="base", article_type=t), FormArticle(prefix="article", article_type=t)],
@@ -274,6 +275,7 @@ def articlesAll(request):
         "available_columns": all_columns("article"),
         "columns": selected_columns("article", request.GET.get("cols"), active_profile(request)),
         "cols": request.GET.get("cols", ""),
+        "list_view_mode": resolve_view_mode(request),
         "sort": request.GET.get("sort", ""),
         "name": "",
         "form": [],
@@ -339,6 +341,7 @@ def _article_list_context(request, stocks, search_field):
         "selectable": True,
         "sort": request.GET.get("sort", ""),
         "cols": cols,
+        "list_view_mode": resolve_view_mode(request),
         "searchFieldName": search_field,
         "page": page,
     }

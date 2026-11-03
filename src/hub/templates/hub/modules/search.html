@@ -37,21 +37,30 @@
 
 {% if list_type %}
 <input type="hidden" id="colsInput" name="cols" value="{{ cols }}">
-<div class="dropdown ms-2 mb-2">
-    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{% trans "Columns" %}</button>
-    <div class="dropdown-menu p-2">
-        {% for col in available_columns %}
-        <div class="form-check">
-            <input class="form-check-input col-check" type="checkbox" value="{{ col.key }}" id="col-{{ col.key }}" {% if col in columns %}checked{% endif %}>
-            <label class="form-check-label" for="col-{{ col.key }}">{{ col.label }}</label>
+<input type="hidden" id="modeInput" name="mode" value="{{ list_view_mode }}">
+<div class="d-flex align-items-center gap-2 ms-2 mb-2">
+    <div class="dropdown">
+        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{% trans "Columns" %}</button>
+        <div class="dropdown-menu p-2">
+            {% for col in available_columns %}
+            <div class="form-check">
+                <input class="form-check-input col-check" type="checkbox" value="{{ col.key }}" id="col-{{ col.key }}" {% if col in columns %}checked{% endif %}>
+                <label class="form-check-label" for="col-{{ col.key }}">{{ col.label }}</label>
+            </div>
+            {% endfor %}
+            <button type="button" class="btn btn-sm btn-primary mt-2"
+                    hx-get="./search" hx-target="#list" hx-include="#{{ searchFieldName }}"
+                    hx-vals='js:{cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(",")}'>{% trans "Apply" %}</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                    hx-post="{% url 'save default columns' %}"
+                    hx-vals='js:{list_type: "{{ list_type }}", cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(","), next: "{{ request.path }}"}'>{% trans "Save as default" %}</button>
         </div>
-        {% endfor %}
-        <button type="button" class="btn btn-sm btn-primary mt-2"
-                hx-get="./search" hx-target="#list" hx-include="#{{ searchFieldName }}"
-                hx-vals='js:{cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(",")}'>{% trans "Apply" %}</button>
-        <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
-                hx-post="{% url 'save default columns' %}"
-                hx-vals='js:{list_type: "{{ list_type }}", cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(","), next: "{{ request.path }}"}'>{% trans "Save as default" %}</button>
+    </div>
+    <div class="btn-group btn-group-sm">
+        <button type="button" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                hx-get="./search?mode=table" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Table" %}</button>
+        <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+                hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Cards" %}</button>
     </div>
 </div>
 {% endif %}

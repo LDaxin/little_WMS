@@ -1,0 +1,14 @@
+{% load i18n list_columns %}
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card h-100">
+        {% with img=group.article.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" class="card-img-top" style="object-fit:cover;height:120px">{% endif %}{% endwith %}
+        <div class="card-body">
+            <h6 class="card-title mb-1">{{ group.article.base.name }}</h6>
+            <div class="small text-muted">{{ group.article.code.code }}</div>
+            <div class="small">{{ group.article.base.pType.name }}</div>
+            <div class="small">{{ group.total }} {{ group.article.mengeneinheit }} &middot; {{ group.total_locations }} {% trans "locations" %}</div>
+            <span class="badge bg-{{ group.article.zustand|condition_color }}">{{ group.article.zustand|condition_label }}</span>
+        </div>
+        <a class="stretched-link" href="{% url 'article' typ=group.article.base.pType.name articleId=group.article.pk %}"></a>
+    </div>
+</div>

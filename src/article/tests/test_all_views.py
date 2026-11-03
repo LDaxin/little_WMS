@@ -79,3 +79,13 @@ class AllArticlesTest(TestCase):
         self._stock(self.article, "Regal B", 1)
         response = self.client.get("/article/search", {"cols": "name,code"})
         self.assertNotContains(response, "Regal A")
+
+    def test_search_all_cards_mode(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"mode": "cards"})
+        self.assertContains(response, "card-title")
+
+    def test_search_all_table_mode(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"mode": "table"})
+        self.assertContains(response, "resultsTable")

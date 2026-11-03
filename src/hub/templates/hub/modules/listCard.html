@@ -1,0 +1,13 @@
+<div class="col-12 col-md-6 col-lg-4">
+    <div class="card h-100">
+        {% with img=row.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" class="card-img-top" style="object-fit:cover;height:120px">{% endif %}{% endwith %}
+        <div class="card-body">
+            <h6 class="card-title mb-1">{{ row.name }}</h6>
+            <div class="small text-muted">{{ row.code.code }}</div>
+            <div class="small">{{ row.typ.name }}</div>
+            {% if row.parent %}<div class="small">{{ row.parent }}</div>{% endif %}
+            {% if row.location %}<div class="small">{{ row.location }}</div>{% endif %}
+        </div>
+        <a class="stretched-link" href="{% url 'storage' typ=row.typ.name storageId=row.pk %}"></a>
+    </div>
+</div>

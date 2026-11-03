@@ -1,2 +1,6 @@
-{% include "hub/modules/listRows.html" %}
+{% if list_view_mode == "cards" %}
+    {% include "hub/modules/listCards.html" %}
+{% else %}
+    {% include "hub/modules/listRows.html" %}
+{% endif %}
 {% include "hub/modules/listControl.html" with append=True %}

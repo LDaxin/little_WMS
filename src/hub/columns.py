@@ -137,3 +137,23 @@ def order_by(queryset, list_type, sort):
     if not path:
         return queryset.order_by("pk")
     return queryset.order_by(("-" if descending else "") + path)
+
+
+def resolve_view_mode(request):
+    """The effective list mode: ``table`` or ``cards`` (§ list-views).
+
+    The ``mode`` parameter wins (the manual toggle); then the user's view-mode
+    setting; then the client hint (``X-View-Mode``); default table.
+    """
+    from organisation.services import active_profile
+
+    mode = request.GET.get("mode", "")
+    if mode in ("table", "cards"):
+        return mode
+    setting = getattr(active_profile(request), "view_mode", "auto") or "auto"
+    if setting == "mobile":
+        return "cards"
+    if setting == "desktop":
+        return "table"
+    hint = request.headers.get("X-View-Mode", "")
+    return "cards" if hint == "mobile" else "table"
