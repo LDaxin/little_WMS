@@ -94,13 +94,21 @@ def default_columns(list_type):
     return [c for c in LIST_TYPES[list_type] if c.default]
 
 
-def selected_columns(list_type, cols):
-    """The columns for a comma-separated ``cols`` string, or the defaults."""
-    if not cols:
-        return default_columns(list_type)
-    chosen = [column(list_type, key) for key in cols.split(",")]
-    chosen = [c for c in chosen if c]
-    return chosen or default_columns(list_type)
+def selected_columns(list_type, cols, profile=None):
+    """The columns for a ``cols`` string, the user's default, or the registry default."""
+    if cols:
+        chosen = [column(list_type, key) for key in cols.split(",")]
+        chosen = [c for c in chosen if c]
+        if chosen:
+            return chosen
+    if profile is not None:
+        default = (getattr(profile, "list_columns", None) or {}).get(list_type)
+        if default:
+            chosen = [column(list_type, key) for key in default]
+            chosen = [c for c in chosen if c]
+            if chosen:
+                return chosen
+    return default_columns(list_type)
 
 
 def column(list_type, key):

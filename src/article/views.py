@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from organisation.decorators import require_perm, require_scope
 from organisation.permissions import has_scope, is_assigned_only
-from organisation.services import active_organisation
+from organisation.services import active_organisation, active_profile
 from storage.models import *
 from tag.models import Tag
 from movement.services import MovementService, resolve_space
@@ -239,7 +239,7 @@ def articles(request, typ):
             'type':"article",
             "list_type":"article",
             "available_columns": all_columns("article"),
-            "columns": selected_columns("article", request.GET.get("cols")),
+            "columns": selected_columns("article", request.GET.get("cols"), active_profile(request)),
             "cols": request.GET.get("cols", ""),
             "sort": request.GET.get("sort", ""),
             "name":typ,
@@ -272,7 +272,7 @@ def articlesAll(request):
         "type": "article",
         "list_type": "article",
         "available_columns": all_columns("article"),
-        "columns": selected_columns("article", request.GET.get("cols")),
+        "columns": selected_columns("article", request.GET.get("cols"), active_profile(request)),
         "cols": request.GET.get("cols", ""),
         "sort": request.GET.get("sort", ""),
         "name": "",
@@ -334,7 +334,7 @@ def _article_list_context(request, stocks, search_field):
     cols = request.GET.get("cols", "")
     return {
         "list_type": "article",
-        "columns": selected_columns("article", cols),
+        "columns": selected_columns("article", cols, active_profile(request)),
         "groups": _article_groups(page.object_list, totals, counts),
         "selectable": True,
         "sort": request.GET.get("sort", ""),

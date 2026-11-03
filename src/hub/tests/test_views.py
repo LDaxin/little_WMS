@@ -84,6 +84,18 @@ class EmailPreferencesViewTest(TestCase):
         self.assertEqual(profile.volume, 80)
 
 
+class DefaultColumnsTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user("u", "u@example.com", "pw")
+        self.client.login(username="u", password="pw")
+
+    def test_save_default_columns(self):
+        org = Organisation.objects.create(name="A", slug="a")
+        UserProfile.objects.create(user=self.user, organisation=org)
+        self.client.post("/list-columns/default/", {"list_type": "article", "cols": "name,code"})
+        self.assertEqual(self.user.profiles.first().list_columns, {"article": ["name", "code"]})
+
+
 class SidebarTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_superuser("tester", "tester@example.com", "pw")

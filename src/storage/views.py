@@ -16,6 +16,7 @@ from tag.models import Tag
 from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
+from organisation.services import active_profile
 from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator
 import json
@@ -268,7 +269,7 @@ def storages(request, typ):
             'type':"storage",
             "list_type":"storage",
             "available_columns": all_columns("storage"),
-            "columns": selected_columns("storage", request.GET.get("cols")),
+            "columns": selected_columns("storage", request.GET.get("cols"), active_profile(request)),
             "cols": request.GET.get("cols", ""),
             "sort": request.GET.get("sort", ""),
             "name":typ,
@@ -292,7 +293,7 @@ def storagesAll(request):
         "type": "storage",
         "list_type": "storage",
         "available_columns": all_columns("storage"),
-        "columns": selected_columns("storage", request.GET.get("cols")),
+        "columns": selected_columns("storage", request.GET.get("cols"), active_profile(request)),
         "cols": request.GET.get("cols", ""),
         "sort": request.GET.get("sort", ""),
         "name": "",
@@ -321,7 +322,7 @@ def searchStoragesAll(request):
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
         return render(request, template, context={
             "list_type": "storage",
-            "columns": selected_columns("storage", cols),
+            "columns": selected_columns("storage", cols, active_profile(request)),
             "rows": page.object_list,
             "selectable": True,
             "sort": sort,
@@ -542,7 +543,7 @@ def searchStorages(request, typ):
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
         return render(request, template, context={
             "list_type": "storage",
-            "columns": selected_columns("storage", cols),
+            "columns": selected_columns("storage", cols, active_profile(request)),
             "rows": page.object_list,
             "selectable": True,
             "sort": sort,

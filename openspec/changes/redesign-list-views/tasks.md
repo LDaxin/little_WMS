@@ -28,7 +28,7 @@
 
 - [x] 5.1 `sort`/`cols`/`page` in URL parameters
 - [x] 5.2 `SavedView.sort`, `columns`, `display_mode` + apply
-- [ ] 5.3 Per-user default column selection
+- [x] 5.3 Per-user default column selection
 
 ## 6. Cards and view mode
 

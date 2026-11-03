@@ -250,3 +250,18 @@ def emailPreferences(request):
         "view_modes": VIEW_MODE_CHOICES,
     })
 
+
+@login_required(login_url='/accounts/login/')
+def saveDefaultColumns(request):
+    """Save the current column selection as the user's default (§ list-views)."""
+    if request.method == "POST":
+        from organisation.services import active_profile
+
+        list_type = request.POST.get("list_type", "")
+        profile = active_profile(request)
+        if profile is not None and list_type:
+            cols = [c for c in request.POST.get("cols", "").split(",") if c]
+            profile.list_columns = {**(profile.list_columns or {}), list_type: cols}
+            profile.save()
+    return redirect(request.POST.get("next") or "hub")
+

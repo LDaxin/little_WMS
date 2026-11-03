@@ -29,3 +29,14 @@ def active_organisation(request):
 def set_active_organisation(request, organisation):
     request.session[SESSION_KEY] = organisation.pk
     request.session.modified = True
+
+
+def active_profile(request):
+    """The user's profile in the active organisation, or None."""
+    from organisation.models import UserProfile
+
+    if not request.user.is_authenticated:
+        return None
+    return UserProfile.objects.filter(
+        user=request.user, organisation=active_organisation(request)
+    ).first()

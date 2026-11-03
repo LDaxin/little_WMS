@@ -49,6 +49,9 @@
         <button type="button" class="btn btn-sm btn-primary mt-2"
                 hx-get="./search" hx-target="#list" hx-include="#{{ searchFieldName }}"
                 hx-vals='js:{cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(",")}'>{% trans "Apply" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
+                hx-post="{% url 'save default columns' %}"
+                hx-vals='js:{list_type: "{{ list_type }}", cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(","), next: "{{ request.path }}"}'>{% trans "Save as default" %}</button>
     </div>
 </div>
 {% endif %}

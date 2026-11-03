@@ -106,6 +106,8 @@ class UserProfile(models.Model):
     volume = models.IntegerField(default=50)
     # Visual confirmation on scan (§15): show the article's image.
     image_on_scan = models.BooleanField(default=True)
+    # Per-list-type default column selection (§ list-views).
+    list_columns = models.JSONField(default=dict, blank=True)
 
     class Meta:
         unique_together = ("user", "organisation")
