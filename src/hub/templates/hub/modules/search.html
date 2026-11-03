@@ -11,7 +11,8 @@
             qtype="search" 
             placeholder="{% trans "Search" %}" 
             hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
-            hx-get="./search?{% if savedQuery %}query={{ savedQuery|urlencode }}&{% endif %}sort={{ sort }}&cols={{ cols }}" 
+            hx-get="./search{% if savedQuery %}?query={{ savedQuery|urlencode }}{% endif %}" 
+            {% if list_type %}hx-include="#sortInput, #colsInput, #modeInput"{% endif %}
             hx-trigger="load, keyup changed delay:500ms, refresh" 
             hx-target="{% if list_type %}#list{% else %}#results{% endif %}"> 
         <div id="QRButtonDiv{{searchFieldName}}">
@@ -36,6 +37,7 @@
 </div>
 
 {% if list_type %}
+<input type="hidden" id="sortInput" name="sort" value="{{ sort }}">
 <input type="hidden" id="colsInput" name="cols" value="{{ cols }}">
 <input type="hidden" id="modeInput" name="mode" value="{{ list_view_mode }}">
 <div class="d-flex align-items-center gap-2 ms-2 mb-2">
@@ -49,7 +51,7 @@
             </div>
             {% endfor %}
             <button type="button" class="btn btn-sm btn-primary mt-2"
-                    hx-get="./search?sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}"
+                    hx-get="./search" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #modeInput"
                     hx-vals='js:{cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(",")}'>{% trans "Apply" %}</button>
             <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
                     hx-post="{% url 'save default columns' %}"
@@ -58,9 +60,9 @@
     </div>
     <div class="btn-group btn-group-sm">
         <button type="button" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
-                hx-get="./search?mode=table&sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Table" %}</button>
+                hx-get="./search?mode=table" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Table" %}</button>
         <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
-                hx-get="./search?mode=cards&sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Cards" %}</button>
+                hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Cards" %}</button>
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary"
             onclick="toggleSelectMode()">{% trans "Select" %} (<span id="selectCount">0</span>)</button>

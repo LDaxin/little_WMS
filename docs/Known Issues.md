@@ -93,6 +93,8 @@ will make that test fail and force it to be updated.
 | ID | Location | Symptom | Status | Found in | Test |
 |---|---|---|---|---|---|
 | KI-026 | `hub/modules/results.html` | The detail link was relative (`./<id>`), so on the "all" pages (`/article/`, `/storage/`) it resolved to `/article/<id>` / `/storage/<id>` — no matching route (the detail URL needs the type) → broken link. | ✅ fixed | ki | `article/tests/test_all_views.py`, `storage/tests/test_all_views.py` |
+| KI-027 | `article/views.py` `_article_stocks` | The advanced-search query was validated against a prefixed field map (`article__base__name`) while the query used unprefixed names (`base__name`) → every query raised `QueryError`, which was swallowed, so the advanced search never filtered. | ✅ fixed | redesign-list-views | `article/tests/test_all_views.py`, `querybuilder/tests/test_parser.py` |
+| KI-028 | `hub/modules/search.html`, `hub/modules/list.html` | The list state (`sort`, `cols`, `mode`) lived in static hidden inputs and in the search input's URL, rendered once; htmx swaps never updated them → after sorting, typing a filter reset the sort; after changing columns/mode, paging reverted them. | ✅ fixed | redesign-list-views | `article/tests/test_all_views.py` |
 
 ## Frontend / Assets
 

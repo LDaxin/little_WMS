@@ -52,6 +52,14 @@ class ParserTest(TestCase):
         q = parse_json('{"field": "base__name", "op": "contains", "value": "Ham"}', ARTICLE_FIELDS)
         self.assertEqual(q, Q(base__name__icontains="Ham"))
 
+    def test_parse_with_prefix(self):
+        q = parse({"field": "base__name", "op": "contains", "value": "Ham"}, ARTICLE_FIELDS, prefix="article__")
+        self.assertEqual(q, Q(article__base__name__icontains="Ham"))
+
+    def test_parse_json_with_prefix(self):
+        q = parse_json('{"field": "base__name", "op": "contains", "value": "Ham"}', ARTICLE_FIELDS, prefix="article__")
+        self.assertEqual(q, Q(article__base__name__icontains="Ham"))
+
     def test_parse_json_invalid(self):
         with self.assertRaises(QueryError):
             parse_json("{not json", ARTICLE_FIELDS)

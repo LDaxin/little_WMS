@@ -5,7 +5,7 @@
         <button type="button" class="btn-close" onclick="qbToggle()"></button>
     </div>
     <div id="qbRoot" class="mt-2"></div>
-    <form id="qbForm" hx-get="./search" hx-target="#list" class="mt-2 d-flex gap-2">
+    <form id="qbForm" hx-get="./search" hx-target="#list" hx-include="#sortInput, #colsInput, #modeInput" class="mt-2 d-flex gap-2">
         <input type="hidden" name="query" id="qbQueryInput">
         <button type="button" class="btn btn-sm btn-outline-primary" onclick="qbAddCondition(qbState)">+ {% trans "Condition" %}</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="qbAddGroup(qbState)">+ {% trans "Group" %}</button>

@@ -103,3 +103,23 @@ class AllArticlesTest(TestCase):
         self._stock(alpha, "Regal B", 1)
         content = self.client.get("/article/search", {"sort": "quantity"}).content.decode()
         self.assertLess(content.index("Alpha"), content.index("Jurte"))
+
+    def test_search_all_advanced_query_filters(self):
+        import json
+
+        self._stock(self.article)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha)
+        query = json.dumps({"type": "AND", "conditions": [
+            {"field": "base__name", "op": "contains", "value": "Jurte"}]})
+        response = self.client.get("/article/search", {"query": query})
+        self.assertContains(response, "Jurte")
+        self.assertNotContains(response, "Alpha")
+
+    def test_search_all_renders_state_inputs(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"sort": "name", "cols": "name,code"})
+        self.assertContains(response, 'id="sortInput" name="sort" value="name"')
+        self.assertContains(response, 'id="colsInput" name="cols" value="name,code"')

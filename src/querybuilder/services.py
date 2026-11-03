@@ -46,7 +46,7 @@ OPERATORS = {
 NEGATED = {"ne", "empty", "is_false"}
 
 
-def _condition(node, fields):
+def _condition(node, fields, prefix=""):
     field = node.get("field")
     op = node.get("op")
     value = node.get("value")
@@ -62,19 +62,23 @@ def _condition(node, fields):
         value = True
     elif op == "is_false":
         value = False
-    q = Q(**{"%s__%s" % (field, lookup): value})
+    q = Q(**{"%s%s__%s" % (prefix, field, lookup): value})
     if op in NEGATED or node.get("negate"):
         q = ~q
     return q
 
 
-def parse(node, fields):
-    """Translate a query node into a ``Q`` object."""
+def parse(node, fields, prefix=""):
+    """Translate a query node into a ``Q`` object.
+
+    ``prefix`` is prepended to every field path, so the same query can be run
+    against a related model (e.g. ``article__`` on a ``Stock`` queryset).
+    """
     if "conditions" in node:
         op = (node.get("type") or "AND").upper()
         q = None
         for child in node["conditions"]:
-            child_q = parse(child, fields)
+            child_q = parse(child, fields, prefix)
             if q is None:
                 q = child_q
             elif op == "OR":
@@ -86,10 +90,10 @@ def parse(node, fields):
         if node.get("negate"):
             q = ~q
         return q
-    return _condition(node, fields)
+    return _condition(node, fields, prefix)
 
 
-def parse_json(text, fields):
+def parse_json(text, fields, prefix=""):
     """Parse a JSON query string into a ``Q`` object."""
     if not text:
         return Q()
@@ -97,4 +101,4 @@ def parse_json(text, fields):
         node = json.loads(text)
     except (TypeError, ValueError):
         raise QueryError("invalid query")
-    return parse(node, fields)
+    return parse(node, fields, prefix)

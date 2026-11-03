@@ -1,4 +1,7 @@
 {% load i18n %}
+<input type="hidden" id="sortInput" name="sort" value="{{ sort }}" hx-swap-oob="true">
+<input type="hidden" id="colsInput" name="cols" value="{{ cols }}" hx-swap-oob="true">
+<input type="hidden" id="modeInput" name="mode" value="{{ list_view_mode }}" hx-swap-oob="true">
 <div id="listBody">
 {% if list_view_mode == "cards" %}
     {% include "hub/modules/listCards.html" %}

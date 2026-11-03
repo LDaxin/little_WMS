@@ -295,9 +295,8 @@ def _article_stocks(request):
     stocks = Stock.objects.select_related("article__base__pType", "article__code", "stored")
     query = request.GET.get("query")
     if query:
-        fields = {"article__" + key: value for key, value in ARTICLE_FIELDS.items()}
         try:
-            stocks = stocks.filter(parse_json(query, fields))
+            stocks = stocks.filter(parse_json(query, ARTICLE_FIELDS, prefix="article__"))
         except QueryError:
             pass
     else:
