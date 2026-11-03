@@ -50,12 +50,14 @@
             </th>
         {% if type == "article" %}
             <th scope="col">{% trans "Name" %}</th>
+            {% if show_type %}<th scope="col">{% trans "Type" %}</th>{% endif %}
 
         {% elif type == "location" %}
             <th scope="col">{% trans "Name" %}</th>
 
         {% elif type == "storage" %}
             <th scope="col">{% trans "Name" %}</th>
+            {% if show_type %}<th scope="col">{% trans "Type" %}</th>{% endif %}
 
         {% elif type == "code" %}
             <th scope="col">{% trans "Code" %}</th>

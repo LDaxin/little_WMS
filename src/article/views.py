@@ -262,6 +262,7 @@ def articlesAll(request):
         "name": "",
         "form": [],
         "typ": "",
+        "show_type": True,
         "add": False,
         "del": False,
         "export": False,
@@ -273,7 +274,7 @@ def articlesAll(request):
 @require_scope("article", "view")
 def searchArticlesAll(request):
     if request.method == "GET":
-        r = Article.objects.prefetch_related("images")
+        r = Article.objects.select_related("base__pType").prefetch_related("images")
         query = request.GET.get("query")
         if query:
             from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
@@ -285,7 +286,7 @@ def searchArticlesAll(request):
         else:
             r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
-        return render(request, "hub/modules/results.html", context={"results": r, "type": "article"})
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "article", "show_type": True})
 
 
 @login_required(login_url='/accounts/login/')
@@ -736,7 +737,7 @@ def setGlobalMinimum(request, spaceId, itemId):
 @require_scope("article", "view")
 def searchArticle(request, typ):
     if request.method == "GET":
-        r = Article.objects.filter(base__pType__name__exact=typ)
+        r = Article.objects.filter(base__pType__name__exact=typ).select_related("base__pType")
         query = request.GET.get("query")
         if query:
             from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json

@@ -11,6 +11,7 @@
                 {% with img=r.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" style="height:32px" class="me-2 rounded">{% endif %}{% endwith %}
                 {{ r.base.name }}
             </td>
+            {% if show_type %}<td>{{ r.base.pType.name }}</td>{% endif %}
 
             {% elif type == "location" %}
             <td>{{ r }}</td>
@@ -23,6 +24,7 @@
                 {% with img=r.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" style="height:32px" class="me-2 rounded">{% endif %}{% endwith %}
                 {{ r }}
             </td>
+            {% if show_type %}<td>{{ r.typ.name }}</td>{% endif %}
             
             {% elif type == "code" %}
             <td>{{ r.code }}</td>
@@ -34,7 +36,7 @@
 
             {% if type != "code" %}
             <td>
-                <a type="button" class="btn btn-light" href="./{{ r.id }}" >
+                <a type="button" class="btn btn-light" href="{% if type == 'article' %}/article/{{ r.base.pType.name }}/{{ r.id }}{% elif type == 'storage' %}/storage/{{ r.typ.name }}/{{ r.id }}{% else %}./{{ r.id }}{% endif %}" >
                     <img style="width:10px" src="{% static 'hub/symbols/Pencil.svg' %}">
                 </a>
             </td>

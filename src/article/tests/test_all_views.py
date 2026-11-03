@@ -22,3 +22,7 @@ class AllArticlesTest(TestCase):
         response = self.client.get("/article/search", {"search": "Jurte"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Jurte")
+
+    def test_search_all_links_to_detail(self):
+        response = self.client.get("/article/search", {"search": "Jurte"})
+        self.assertContains(response, "/article/tent/%s" % self.article.pk)

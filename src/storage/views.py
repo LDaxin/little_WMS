@@ -283,6 +283,7 @@ def storagesAll(request):
         "name": "",
         "form": [],
         "typ": "",
+        "show_type": True,
         "add": False,
         "del": False,
         "export": False,
@@ -294,8 +295,11 @@ def storagesAll(request):
 @require_perm("storage.view_all")
 def searchStoragesAll(request):
     if request.method == "GET":
-        r = filter_by_search(Storage.objects.prefetch_related("images"), request.GET.get("search", ""), "name", "code__code")
-        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})
+        r = filter_by_search(
+            Storage.objects.select_related("typ").prefetch_related("images"),
+            request.GET.get("search", ""), "name", "code__code",
+        )
+        return render(request, "hub/modules/results.html", context={"results": r, "type": "storage", "show_type": True})
 
 
 @login_required(login_url='/accounts/login/')
@@ -499,7 +503,7 @@ def removeStorageTag(request, typ, storageId, tagId):
 def searchStorages(request, typ):
     if request.method == "GET":
         r = filter_by_search(
-            Storage.objects.filter(typ__name__exact=typ).prefetch_related("images"),
+            Storage.objects.filter(typ__name__exact=typ).select_related("typ").prefetch_related("images"),
             request.GET.get("search", ""), "name", "code__code",
         )
         return render(request, "hub/modules/results.html", context={"results": r, "type": "storage"})

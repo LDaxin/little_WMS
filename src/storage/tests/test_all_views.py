@@ -21,3 +21,7 @@ class AllStoragesTest(TestCase):
         response = self.client.get("/storage/search", {"search": "Lager"})
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Lager")
+
+    def test_search_all_links_to_detail(self):
+        response = self.client.get("/storage/search", {"search": "Lager"})
+        self.assertContains(response, "/storage/room/%s" % self.storage.pk)
