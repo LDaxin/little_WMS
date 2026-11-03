@@ -94,3 +94,12 @@ class AllArticlesTest(TestCase):
         self._stock(self.article)
         response = self.client.get("/article/search", {"mode": "cards"})
         self.assertContains(response, "card-check")
+
+    def test_search_all_sorts_by_quantity(self):
+        self._stock(self.article, "Regal A", 5)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha, "Regal B", 1)
+        content = self.client.get("/article/search", {"sort": "quantity"}).content.decode()
+        self.assertLess(content.index("Alpha"), content.index("Jurte"))

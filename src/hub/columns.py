@@ -53,7 +53,7 @@ ARTICLE_COLUMNS = [
     Column("location", _("Location"), "stored", level="stock", renderer=LOCATION,
            sortable=False, default=True),
     Column("quantity", _("Quantity"), "menge", level="stock", renderer=QUANTITY,
-           sortable=False, default=True),
+           default=True),
     Column("expiry", _("Expiry"), "article__ablaufdatum"),
     Column("value", _("Purchase value"), "article__anschaffungswert"),
     Column("purchase_date", _("Purchase date"), "article__kaufdatum"),

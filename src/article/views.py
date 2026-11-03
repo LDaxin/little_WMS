@@ -334,12 +334,15 @@ def _article_list_context(request, stocks, search_field):
     counts = dict(stocks.order_by().values_list("article_id").annotate(n=Count("id")))
     page = Paginator(stocks, PAGE_SIZE).get_page(request.GET.get("page"))
     cols = request.GET.get("cols", "")
+    sort = request.GET.get("sort", "")
     return {
         "list_type": "article",
         "columns": selected_columns("article", cols, active_profile(request)),
         "groups": _article_groups(page.object_list, totals, counts),
+        "rows": page.object_list,
+        "flat": sort.lstrip("-") == "quantity",
         "selectable": True,
-        "sort": request.GET.get("sort", ""),
+        "sort": sort,
         "cols": cols,
         "list_view_mode": resolve_view_mode(request),
         "searchFieldName": search_field,

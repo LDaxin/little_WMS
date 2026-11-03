@@ -16,7 +16,7 @@
 
 - [x] 3.1 `sort` URL parameter → `order_by` via the registry
 - [x] 3.2 Sortable header links with direction toggle
-- [ ] 3.3 Sort by quantity (stock level) via an annotation
+- [x] 3.3 Sort by quantity (stock level) via an annotation
 
 ## 4. Pagination
 

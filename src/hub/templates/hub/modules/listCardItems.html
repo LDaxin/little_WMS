@@ -1,4 +1,6 @@
-{% if groups %}
+{% if flat %}
+    {% for stock in rows %}{% include "hub/modules/listStockCard.html" %}{% endfor %}
+{% elif groups %}
     {% for group in groups %}{% include "hub/modules/listGroupCard.html" %}{% endfor %}
 {% else %}
     {% for row in rows %}{% include "hub/modules/listCard.html" %}{% endfor %}
