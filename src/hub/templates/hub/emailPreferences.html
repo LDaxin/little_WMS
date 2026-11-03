@@ -68,6 +68,22 @@
             {% endfor %}
         </select>
     </div>
+    <div class="mt-2">
+        <label class="form-label mb-0">{% trans "List view (desktop)" %}</label>
+        <select name="list_view_desktop" class="form-select" style="max-width:12rem">
+            {% for value, label in list_views %}
+            <option value="{{ value }}" {% if profile.list_view_desktop == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="mt-2">
+        <label class="form-label mb-0">{% trans "List view (mobile)" %}</label>
+        <select name="list_view_mobile" class="form-select" style="max-width:12rem">
+            {% for value, label in list_views %}
+            <option value="{{ value }}" {% if profile.list_view_mobile == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
     <h6 class="mt-4">{% trans "Scan feedback" %}</h6>
     <div class="form-check">

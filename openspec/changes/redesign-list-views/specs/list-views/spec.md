@@ -4,29 +4,34 @@
 
 The system SHALL render a list as a table or as cards from the same query. The
 result partial SHALL own the whole list (header and rows, or the card grid). The
-user's view-mode setting SHALL decide the rendering; when it is `auto`, the
-client SHALL send a view-mode hint and the server SHALL render accordingly.
-Desktop SHALL offer a manual table/card toggle.
+user's per-device list-view setting SHALL decide the rendering (`table` or
+`cards`); the device comes from the view-mode setting, or the client hint when
+it is `auto`. The table/card toggle SHALL be available on every device.
 
 #### Scenario: Desktop table
 
-- **WHEN** the view mode is desktop
+- **WHEN** the desktop list view is table
 - **THEN** the list is rendered as a table
 
 #### Scenario: Mobile cards
 
-- **WHEN** the view mode is mobile
+- **WHEN** the mobile list view is cards
 - **THEN** the list is rendered as cards
 
 #### Scenario: Auto follows the client
 
 - **WHEN** the view mode is auto and the client reports a mobile viewport
-- **THEN** the list is rendered as cards
+- **THEN** the mobile list view is used
 
 #### Scenario: Setting wins
 
-- **WHEN** the user has forced "always desktop"
+- **WHEN** the user has set the desktop list view to table
 - **THEN** the table is rendered regardless of the client hint
+
+#### Scenario: Toggle on every device
+
+- **WHEN** the user toggles the table/card switch
+- **THEN** the list is rendered in the chosen mode on any device
 
 ### Requirement: Configurable columns
 

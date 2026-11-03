@@ -83,6 +83,16 @@ class EmailPreferencesViewTest(TestCase):
         self.assertTrue(profile.image_on_scan)
         self.assertEqual(profile.volume, 80)
 
+    def test_save_list_view(self):
+        org = Organisation.objects.create(name="A", slug="a")
+        UserProfile.objects.create(user=self.user, organisation=org)
+        self.client.post("/email-preferences/", {
+            "list_view_desktop": "cards", "list_view_mobile": "table",
+        })
+        profile = self.user.profiles.first()
+        self.assertEqual(profile.list_view_desktop, "cards")
+        self.assertEqual(profile.list_view_mobile, "table")
+
 
 class DefaultColumnsTest(TestCase):
     def setUp(self):

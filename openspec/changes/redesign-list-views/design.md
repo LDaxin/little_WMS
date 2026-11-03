@@ -34,10 +34,11 @@ the card grid), so header and rows cannot drift.
 
 ### Decision 2: View mode resolution
 
-The user's `view_mode` setting wins. When it is `auto`, the client sends a
-`X-View-Mode` header (from `window.matchMedia`) on the HTMX request and the
-server renders accordingly. Desktop additionally offers a manual table/card
-toggle.
+The user's per-device list-view setting (`list_view_desktop` /
+`list_view_mobile`, each `table` or `cards`) decides the rendering. The device
+comes from the view-mode setting, or the client hint (`X-View-Mode`, from
+`window.matchMedia`) when it is `auto`. The table/card toggle is available on
+every device and overrides the setting for the current request.
 
 ### Decision 3: Column registry in code, selection in data
 

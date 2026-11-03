@@ -10,6 +10,8 @@ from organisation.permissions import PERMISSIONS
 # Sidebar navigation settings (§12).
 SIDEBAR_POSITION_CHOICES = [("left", "Left"), ("right", "Right")]
 VIEW_MODE_CHOICES = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
+# Default list rendering (§ list-views), separate for desktop and mobile.
+LIST_VIEW_CHOICES = [("table", "Table"), ("cards", "Cards")]
 
 
 def _catalog_permissions():
@@ -100,6 +102,9 @@ class UserProfile(models.Model):
     text_size_desktop = models.IntegerField(default=16)
     text_size_mobile = models.IntegerField(default=16)
     view_mode = models.CharField(max_length=10, choices=VIEW_MODE_CHOICES, default="auto")
+    # Default list rendering (§ list-views), separate for desktop and mobile.
+    list_view_desktop = models.CharField(max_length=10, choices=LIST_VIEW_CHOICES, default="table")
+    list_view_mobile = models.CharField(max_length=10, choices=LIST_VIEW_CHOICES, default="cards")
     # Scan feedback (§11): sound and vibration on the movement page.
     sound_enabled = models.BooleanField(default=True)
     vibration_enabled = models.BooleanField(default=True)
