@@ -10,7 +10,7 @@
             type="search" 
             qtype="search" 
             placeholder="{% trans "Search" %}" 
-            hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
+            hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});clearSelectAll();' 
             hx-get="./search{% if savedQuery %}?query={{ savedQuery|urlencode }}{% endif %}" 
             {% if list_type %}hx-include="#sortInput, #colsInput, #modeInput"{% endif %}
             hx-trigger="load, keyup changed delay:500ms, refresh" 
@@ -66,6 +66,10 @@
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary"
             onclick="toggleSelectMode()">{% trans "Select" %} (<span id="selectCount">0</span>)</button>
+    {% if del or export or qr %}
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAllButton"
+            onclick="toggleSelectAll()">{% trans "Select all" %}</button>
+    {% endif %}
 </div>
 {% endif %}
 

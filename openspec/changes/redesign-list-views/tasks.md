@@ -40,13 +40,13 @@
 
 - [x] 7.1 Desktop checkbox column
 - [x] 7.2 Mobile selection mode (button + long-press) + action bar
-- [ ] 7.3 "Select all" = all matches (server-side)
+- [x] 7.3 "Select all" = all matches (server-side)
 
 ## 8. Verify
 
-- [ ] 8.1 Tests for registry, sorting, pagination, grouping, cards, selection
-- [ ] 8.2 Full suite green in Docker
-- [ ] 8.3 Rebuild + restart
+- [x] 8.1 Tests for registry, sorting, pagination, grouping, cards, selection
+- [x] 8.2 Full suite green in Docker
+- [x] 8.3 Rebuild + restart
 
 ## 9. Scrollable list
 

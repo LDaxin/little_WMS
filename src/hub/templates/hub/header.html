@@ -196,9 +196,75 @@
                 event.detail.headers["X-View-Mode"] =
                     window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
             });
+            function listFilterValues() {
+                var search = document.querySelector("input[qtype=search]");
+                var qb = document.getElementById("qbQueryInput");
+                var sort = document.getElementById("sortInput");
+                return {
+                    search: search ? search.value : "",
+                    query: qb ? qb.value : "",
+                    sort: sort ? sort.value : "",
+                };
+            }
+            function updateSelectAll() {
+                var on = document.body.classList.contains("select-all");
+                var values = listFilterValues();
+                ["qrForm", "exportForm", "delForm"].forEach(function (id) {
+                    var form = document.getElementById(id);
+                    if (!form) { return; }
+                    form.querySelectorAll(".selectAllInput").forEach(function (el) { el.remove(); });
+                    if (on) {
+                        [["all", "1"], ["search", values.search], ["query", values.query],
+                         ["sort", values.sort]].forEach(function (pair) {
+                            var input = document.createElement("input");
+                            input.type = "hidden";
+                            input.name = pair[0];
+                            input.value = pair[1];
+                            input.className = "selectAllInput";
+                            form.appendChild(input);
+                        });
+                    }
+                });
+                var button = document.getElementById("selectAllButton");
+                if (button) {
+                    button.classList.toggle("btn-primary", on);
+                    button.classList.toggle("btn-outline-secondary", !on);
+                }
+                ["qrList", "exportList", "delList"].forEach(function (id) {
+                    var list = document.getElementById(id);
+                    if (!list) { return; }
+                    list.querySelectorAll(".selectAllItem").forEach(function (el) { el.remove(); });
+                    if (on) {
+                        var li = document.createElement("li");
+                        li.className = "selectAllItem text-muted";
+                        li.textContent = "{% trans 'All matching items' %}";
+                        list.appendChild(li);
+                    }
+                });
+            }
+            function toggleSelectAll() {
+                var on = document.body.classList.toggle("select-all");
+                if (on) {
+                    document.querySelectorAll(".checkboxlist:checked").forEach(function (c) {
+                        c.checked = false;
+                        if (c.closest(".card")) { c.closest(".card").classList.remove("selected"); }
+                    });
+                }
+                updateSelectAll();
+                updateSelectCount();
+            }
+            function clearSelectAll() {
+                if (!document.body.classList.contains("select-all")) { return; }
+                document.body.classList.remove("select-all");
+                updateSelectAll();
+            }
             function updateSelectCount() {
-                var n = document.querySelectorAll(".card-check:checked").length;
                 var el = document.getElementById("selectCount");
+                if (document.body.classList.contains("select-all")) {
+                    if (el) { el.textContent = "all"; }
+                    return 0;
+                }
+                var n = document.querySelectorAll(".card-check:checked").length;
                 if (el) { el.textContent = n; }
                 return n;
             }
@@ -210,9 +276,11 @@
                 if (!document.body.classList.contains("selecting")) { return; }
                 var card = event.target.closest(".card");
                 if (!card) { return; }
+                if (document.body.classList.contains("select-all")) { clearSelectAll(); }
                 var check = card.querySelector(".card-check");
                 if (!check) { return; }
                 check.checked = !check.checked;
+                $(check).trigger("change");
                 card.classList.toggle("selected", check.checked);
                 if (updateSelectCount() === 0) { document.body.classList.remove("selecting"); }
             });
@@ -222,8 +290,9 @@
                 if (!card) { return; }
                 cardPressTimer = setTimeout(function() {
                     document.body.classList.add("selecting");
+                    if (document.body.classList.contains("select-all")) { clearSelectAll(); }
                     var check = card.querySelector(".card-check");
-                    if (check) { check.checked = true; }
+                    if (check) { check.checked = true; $(check).trigger("change"); }
                     card.classList.add("selected");
                     updateSelectCount();
                 }, 500);
@@ -232,6 +301,13 @@
             document.body.addEventListener("touchmove", function() { clearTimeout(cardPressTimer); });
             document.body.addEventListener("contextmenu", function(event) {
                 if (event.target.closest(".card")) { event.preventDefault(); }
+            });
+            document.body.addEventListener("change", function(event) {
+                var target = event.target;
+                if (target.id === "checkAll" ||
+                    (target.classList && target.classList.contains("checkboxlist"))) {
+                    clearSelectAll();
+                }
             });
         </script>
 

@@ -288,12 +288,17 @@ def articlesAll(request):
     })
 
 
-def _article_stocks(request):
-    """The filtered, sorted stock queryset for the article list (§ list-views)."""
+def _article_stocks(request, params=None):
+    """The filtered, sorted stock queryset for the article list (§ list-views).
+
+    ``params`` defaults to the query string; bulk actions pass their POST data
+    so "select all matches" re-runs the same filter server-side.
+    """
     from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
 
+    params = request.GET if params is None else params
     stocks = Stock.objects.select_related("article__base__pType", "article__code", "stored")
-    query = request.GET.get("query")
+    query = params.get("query")
     if query:
         try:
             stocks = stocks.filter(parse_json(query, ARTICLE_FIELDS, prefix="article__"))
@@ -301,11 +306,29 @@ def _article_stocks(request):
             pass
     else:
         stocks = filter_by_search(
-            stocks, request.GET.get("search", ""), "article__base__name", "article__code__code"
+            stocks, params.get("search", ""), "article__base__name", "article__code__code"
         )
     if is_assigned_only(request.user, "article", "view", active_organisation(request)):
         stocks = stocks.filter(article__assigned_to=request.user)
-    return order_by(stocks, "article", request.GET.get("sort", ""))
+    return order_by(stocks, "article", params.get("sort", ""))
+
+
+def _selected_articles(request, typ):
+    """The articles a bulk action applies to (§ list-views).
+
+    With ``all`` in the POST the current filter is re-run server-side (all
+    matches, not only the loaded rows); otherwise the explicit ``_<id>`` values.
+    """
+    if request.POST.get("all"):
+        ids = _article_stocks(request, request.POST).filter(
+            article__base__pType__name__exact=typ
+        ).values_list("article_id", flat=True)
+        return Article.objects.filter(pk__in=list(ids))
+    ids = [value for key, value in request.POST.items() if key.startswith("_")]
+    articles = Article.objects.filter(pk__in=ids, base__pType__name__exact=typ)
+    if is_assigned_only(request.user, "article", "view", active_organisation(request)):
+        articles = articles.filter(assigned_to=request.user)
+    return articles
 
 
 def _article_groups(stocks, totals, counts):
@@ -438,16 +461,8 @@ def delArticle(request, typ):
         return toast(request, _("Error"), _("no article type named ") + typ, "alert")
     else:
         if request.method == "POST":
-            delList = []
             delListReturn = ""
-            for key, value in request.POST.items():
-                if key.startswith("_"):
-                    try:
-                        pa = Article.objects.filter(base__pType__name__exact=typ, pk=value).first()
-                        delList.append(pa)
-                    except Exception as e:
-                        return toast(request, "Error", e, "alert")
-            for i in delList:
+            for i in list(_selected_articles(request, typ)):
                 _require_article(request, "delete", i)
                 delListReturn = delListReturn + i.__str__() + " "
                 audit_log("deleted", i, request.user)
@@ -814,15 +829,10 @@ def searchArticle(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportArticles(request, typ):
-    assigned_only = is_assigned_only(request.user, "article", "view", active_organisation(request))
-    rows = []
-    for key, value in request.POST.items():
-        if key.startswith("_"):
-            article = Article.objects.get(pk=value)
-            if assigned_only and request.user not in article.assigned_to.all():
-                continue
-            if article.base.pType.name == typ:
-                rows.append([article.base.name, article.code.code, article.base.pType.name])
+    rows = [
+        [article.base.name, article.code.code, article.base.pType.name]
+        for article in _selected_articles(request, typ)
+    ]
     return csv_response("articles.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')

@@ -309,16 +309,34 @@ def storagesAll(request):
     })
 
 
+def _storage_list(request, params=None, typ=None):
+    """The filtered, sorted storage queryset for the storage list (§ list-views).
+
+    ``params`` defaults to the query string; bulk actions pass their POST data
+    so "select all matches" re-runs the same filter server-side.
+    """
+    params = request.GET if params is None else params
+    qs = Storage.objects.select_related("typ").prefetch_related("images")
+    if typ:
+        qs = qs.filter(typ__name__exact=typ)
+    qs = filter_by_search(qs, params.get("search", ""), "name", "code__code")
+    return order_by(qs, "storage", params.get("sort", ""))
+
+
+def _selected_storages(request, typ):
+    """The storages a bulk action applies to (§ list-views)."""
+    if request.POST.get("all"):
+        return _storage_list(request, request.POST, typ)
+    ids = [value for key, value in request.POST.items() if key.startswith("_")]
+    return Storage.objects.filter(pk__in=ids, typ__name__exact=typ)
+
+
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.view_all")
 def searchStoragesAll(request):
     if request.method == "GET":
-        r = filter_by_search(
-            Storage.objects.select_related("typ").prefetch_related("images"),
-            request.GET.get("search", ""), "name", "code__code",
-        )
+        r = _storage_list(request)
         sort = request.GET.get("sort", "")
-        r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
         cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
@@ -388,21 +406,17 @@ def addStorage(request, typ):
 @require_perm("storage.delete_all")
 def delStorage(request, typ):
     if request.method == "POST":
-        delList = []
         delListReturn = ""
-        childList = []
-        for key, value in request.POST.items():
-            if key[0:1] == '_':
-                try:
-                    pa = Storage.objects.filter(pk=value).first()
-                    ch = Storage.objects.filter(parent__pk=value)
-                    delListReturn = delListReturn + pa.__str__() + ", "
-                    for i in ch:
-                        i.parent = None
-                        i.save()
-                    pa.delete()
-                except Exception as e:
-                    return toast(request, "Error", e, "alert")
+        try:
+            for pa in list(_selected_storages(request, typ)):
+                ch = Storage.objects.filter(parent__pk=pa.pk)
+                delListReturn = delListReturn + pa.__str__() + ", "
+                for i in ch:
+                    i.parent = None
+                    i.save()
+                pa.delete()
+        except Exception as e:
+            return toast(request, "Error", e, "alert")
 
         return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
     return toast(request, _("Error"), _("something went wrong"), "alert")
@@ -535,12 +549,8 @@ def removeStorageTag(request, typ, storageId, tagId):
 @require_perm("storage.view_all")
 def searchStorages(request, typ):
     if request.method == "GET":
-        r = filter_by_search(
-            Storage.objects.filter(typ__name__exact=typ).select_related("typ").prefetch_related("images"),
-            request.GET.get("search", ""), "name", "code__code",
-        )
+        r = _storage_list(request, typ=typ)
         sort = request.GET.get("sort", "")
-        r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
         cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
@@ -560,12 +570,10 @@ def searchStorages(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportStorages(request, typ):
-    rows = []
-    for key, value in request.POST.items():
-        if key.startswith("_"):
-            storage = Storage.objects.get(pk=value)
-            if storage.typ.name == typ:
-                rows.append([storage.name, storage.code.code, storage.typ.name])
+    rows = [
+        [storage.name, storage.code.code, storage.typ.name]
+        for storage in _selected_storages(request, typ)
+    ]
     return csv_response("storages.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')

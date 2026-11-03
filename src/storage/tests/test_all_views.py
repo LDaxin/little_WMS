@@ -46,3 +46,37 @@ class AllStoragesTest(TestCase):
             Storage.objects.create(name="S%03d" % i, typ=storage_type)
         response = self.client.get("/storage/search", {"sort": "name"})
         self.assertContains(response, "sort=name")
+
+    def test_select_all_control_present(self):
+        response = self.client.get("/storage/room/")
+        self.assertContains(response, "selectAllButton")
+
+    def test_bulk_delete_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        other = Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/storage/room/del", {"all": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Storage.objects.all().filter(pk=self.storage.pk).exists())
+        self.assertFalse(Storage.objects.all().filter(pk=other.pk).exists())
+
+    def test_bulk_delete_all_matches_respects_search(self):
+        storage_type = StorageType.objects.get(name="room")
+        other = Storage.objects.create(name="AAA", typ=storage_type)
+        self.client.post("/storage/room/del", {"all": "1", "search": "Lager"})
+        self.assertFalse(Storage.objects.all().filter(pk=self.storage.pk).exists())
+        self.assertTrue(Storage.objects.all().filter(pk=other.pk).exists())
+
+    def test_bulk_export_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/storage/room/export", {"all": "1"})
+        content = response.content.decode("iso-8859-1")
+        self.assertIn("Lager", content)
+        self.assertIn("AAA", content)
+
+    def test_bulk_qr_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/qr/print", {"type": "storage", "typ": "room", "all": "1"})
+        self.assertContains(response, "Lager")
+        self.assertContains(response, "AAA")
