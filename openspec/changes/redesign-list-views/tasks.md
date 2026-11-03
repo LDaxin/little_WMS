@@ -16,12 +16,13 @@
 
 - [x] 3.1 `sort` URL parameter → `order_by` via the registry
 - [x] 3.2 Sortable header links with direction toggle
+- [ ] 3.3 Sort by quantity (stock level) via an annotation
 
 ## 4. Pagination
 
-- [ ] 4.1 Server-side `?page=N`
-- [ ] 4.2 Desktop page numbers (replace)
-- [ ] 4.3 Mobile "load more" (append)
+- [x] 4.1 Server-side `?page=N`
+- [x] 4.2 Desktop page numbers (replace)
+- [x] 4.3 Mobile "load more" (append)
 
 ## 5. View state
 

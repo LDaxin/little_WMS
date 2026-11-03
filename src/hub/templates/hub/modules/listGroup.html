@@ -3,7 +3,7 @@
 {% with stock=group.rows|first %}
 <tr class="table-group-single" data-group="{{ group.article.pk }}">
     {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ group.article.pk }}"></td>{% endif %}
-    {% for col in columns %}<td>{% if col.level == "article" %}{% cell group.article col %}{% else %}{% cell stock col %}{% endif %}</td>{% endfor %}
+    {% for col in columns %}<td>{% cell stock col %}</td>{% endfor %}
     <td>
         <a class="btn btn-light" href="{% url 'article' typ=group.article.base.pType.name articleId=group.article.pk %}">
             <img style="width:10px" src="{% static 'hub/symbols/Pencil.svg' %}">
@@ -12,11 +12,12 @@
 </tr>
 {% endwith %}
 {% else %}
+{% with first=group.rows|first %}
 <tr class="table-group-start" data-group="{{ group.article.pk }}">
     {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ group.article.pk }}"></td>{% endif %}
     {% for col in columns %}
     <td>
-        {% if col.level == "article" %}{% cell group.article col %}
+        {% if col.level == "article" %}{% cell first col %}
         {% elif col.key == "quantity" %}{{ group.total }}{% if group.partial %} <small class="text-muted">({{ group.shown }}/{{ group.total_locations }})</small>{% endif %}
         {% endif %}
     </td>
@@ -27,6 +28,7 @@
         </a>
     </td>
 </tr>
+{% endwith %}
 {% for stock in group.rows %}
 <tr class="table-group-row" data-group="{{ group.article.pk }}">
     {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ stock.pk }}"></td>{% endif %}

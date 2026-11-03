@@ -43,27 +43,27 @@ def resolve(obj, path):
     return obj
 
 
-# The article list is a stock list: article-level columns resolve on the
-# ``Article``, stock-level columns on the ``Stock``.
+# The article list is a stock list: the queryset and the row object are
+# ``Stock``; article-level columns reach through ``article__``.
 ARTICLE_COLUMNS = [
-    Column("name", _("Name"), "base__name", default=True),
-    Column("code", _("Code"), "code__code", default=True),
-    Column("type", _("Type"), "base__pType__name", default=True),
-    Column("condition", _("Condition"), "zustand", renderer=BADGE, default=True),
+    Column("name", _("Name"), "article__base__name", default=True),
+    Column("code", _("Code"), "article__code__code", default=True),
+    Column("type", _("Type"), "article__base__pType__name", default=True),
+    Column("condition", _("Condition"), "article__zustand", renderer=BADGE, default=True),
     Column("location", _("Location"), "stored", level="stock", renderer=LOCATION,
            sortable=False, default=True),
     Column("quantity", _("Quantity"), "menge", level="stock", renderer=QUANTITY,
            sortable=False, default=True),
-    Column("expiry", _("Expiry"), "ablaufdatum"),
-    Column("value", _("Purchase value"), "anschaffungswert"),
-    Column("purchase_date", _("Purchase date"), "kaufdatum"),
-    Column("weight", _("Weight"), "gewicht_gramm"),
-    Column("unit", _("Unit"), "mengeneinheit", sortable=False),
-    Column("tags", _("Tags"), "tags", sortable=False),
-    Column("assignees", _("Assigned to"), "assigned_to", sortable=False),
-    Column("minimum", _("Minimum stock"), "base__mindestbestand"),
-    Column("ownership", _("Ownership"), "ownership", sortable=False),
-    Column("note", _("Note"), "notiz", sortable=False),
+    Column("expiry", _("Expiry"), "article__ablaufdatum"),
+    Column("value", _("Purchase value"), "article__anschaffungswert"),
+    Column("purchase_date", _("Purchase date"), "article__kaufdatum"),
+    Column("weight", _("Weight"), "article__gewicht_gramm"),
+    Column("unit", _("Unit"), "article__mengeneinheit", sortable=False),
+    Column("tags", _("Tags"), "article__tags", sortable=False),
+    Column("assignees", _("Assigned to"), "article__assigned_to", sortable=False),
+    Column("minimum", _("Minimum stock"), "article__base__mindestbestand"),
+    Column("ownership", _("Ownership"), "article__ownership", sortable=False),
+    Column("note", _("Note"), "article__notiz", sortable=False),
 ]
 
 # The storage list: the row object is a ``Storage``.
@@ -109,11 +109,14 @@ def sort_path(list_type, key):
 
 
 def order_by(queryset, list_type, sort):
-    """Apply a ``sort`` parameter (``key`` or ``-key``) to a queryset."""
+    """Apply a ``sort`` parameter (``key`` or ``-key``) to a queryset.
+
+    Falls back to the primary key so pagination is stable.
+    """
     if not sort:
-        return queryset
+        return queryset.order_by("pk")
     descending = sort.startswith("-")
     path = sort_path(list_type, sort.lstrip("-"))
     if not path:
-        return queryset
+        return queryset.order_by("pk")
     return queryset.order_by(("-" if descending else "") + path)

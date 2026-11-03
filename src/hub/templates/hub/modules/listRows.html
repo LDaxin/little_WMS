@@ -1,0 +1,5 @@
+{% if groups %}
+    {% for group in groups %}{% include "hub/modules/listGroup.html" %}{% endfor %}
+{% else %}
+    {% for row in rows %}{% include "hub/modules/listRow.html" %}{% endfor %}
+{% endif %}

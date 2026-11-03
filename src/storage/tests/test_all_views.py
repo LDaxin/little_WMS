@@ -31,3 +31,10 @@ class AllStoragesTest(TestCase):
         Storage.objects.create(name="AAA", typ=storage_type)
         content = self.client.get("/storage/search", {"sort": "name"}).content.decode()
         self.assertLess(content.index("AAA"), content.index("Lager"))
+
+    def test_search_all_paginates(self):
+        storage_type = StorageType.objects.get(name="room")
+        for i in range(51):
+            Storage.objects.create(name="S%03d" % i, typ=storage_type)
+        response = self.client.get("/storage/search")
+        self.assertContains(response, "listControl")

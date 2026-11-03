@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Permission, User
 from django.test import TestCase
 
-from article.models import Article, ArticleBase, ArticleType
+from article.models import Article, ArticleBase, ArticleType, Stock
 from organisation.models import Role, UserProfile
 
 
@@ -19,6 +19,7 @@ class AssignedScopeTest(TestCase):
         article_type = ArticleType.objects.create(name="werkzeug", symbol="WZ")
         base = ArticleBase.objects.create(name="Hammer", pType=article_type)
         cls.article = Article.objects.create(base=base)
+        Stock.objects.create(article=cls.article, stored=None, menge=1)
 
     def detail_url(self):
         return "/article/werkzeug/%s/" % self.article.pk

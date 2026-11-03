@@ -25,6 +25,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 from audit.models import AuditLog
 from audit.services import log as audit_log
+from django.core.paginator import Paginator
+from django.db.models import Count, Sum
+
+PAGE_SIZE = 50
 
 
 def _article_terms(article):
@@ -273,48 +277,69 @@ def articlesAll(request):
     })
 
 
-def _article_groups(articles):
-    """Group articles into stock rows for the list (§ list-views)."""
+def _article_stocks(request):
+    """The filtered, sorted stock queryset for the article list (§ list-views)."""
+    from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
+
+    stocks = Stock.objects.select_related("article__base__pType", "article__code", "stored")
+    query = request.GET.get("query")
+    if query:
+        fields = {"article__" + key: value for key, value in ARTICLE_FIELDS.items()}
+        try:
+            stocks = stocks.filter(parse_json(query, fields))
+        except QueryError:
+            pass
+    else:
+        stocks = filter_by_search(
+            stocks, request.GET.get("search", ""), "article__base__name", "article__code__code"
+        )
+    if is_assigned_only(request.user, "article", "view", active_organisation(request)):
+        stocks = stocks.filter(article__assigned_to=request.user)
+    return order_by(stocks, "article", request.GET.get("sort", ""))
+
+
+def _article_groups(stocks, totals, counts):
+    """Group stock rows by article for the list (§ list-views)."""
     groups = []
-    for article in articles:
-        stocks = list(article.stocks.all())
-        groups.append({
-            "article": article,
-            "rows": stocks,
-            "total": sum((s.menge for s in stocks), Decimal("0")),
-            "shown": len(stocks),
-            "total_locations": len(stocks),
-            "partial": False,
-        })
+    by_article = {}
+    for stock in stocks:
+        article = stock.article
+        group = by_article.get(article.pk)
+        if group is None:
+            group = {"article": article, "rows": [], "total": totals.get(article.pk, 0)}
+            by_article[article.pk] = group
+            groups.append(group)
+        group["rows"].append(stock)
+    for group in groups:
+        group["shown"] = len(group["rows"])
+        group["total_locations"] = counts.get(group["article"].pk, group["shown"])
+        group["partial"] = group["shown"] < group["total_locations"]
     return groups
+
+
+def _article_list_context(request, stocks, search_field):
+    """The list context for the article stock list (§ list-views)."""
+    totals = dict(stocks.order_by().values_list("article_id").annotate(total=Sum("menge")))
+    counts = dict(stocks.order_by().values_list("article_id").annotate(n=Count("id")))
+    page = Paginator(stocks, PAGE_SIZE).get_page(request.GET.get("page"))
+    return {
+        "list_type": "article",
+        "columns": default_columns("article"),
+        "groups": _article_groups(page.object_list, totals, counts),
+        "selectable": True,
+        "sort": request.GET.get("sort", ""),
+        "searchFieldName": search_field,
+        "page": page,
+    }
 
 
 @login_required(login_url='/accounts/login/')
 @require_scope("article", "view")
 def searchArticlesAll(request):
     if request.method == "GET":
-        r = Article.objects.select_related("base__pType").prefetch_related("stocks__stored", "images")
-        query = request.GET.get("query")
-        if query:
-            from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
-
-            try:
-                r = r.filter(parse_json(query, ARTICLE_FIELDS))
-            except QueryError:
-                pass
-        else:
-            r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
-        r = _scoped_articles(r, request)
-        sort = request.GET.get("sort", "")
-        r = order_by(r, "article", sort)
-        return render(request, "hub/modules/list.html", context={
-            "list_type": "article",
-            "columns": default_columns("article"),
-            "groups": _article_groups(r),
-            "selectable": True,
-            "sort": sort,
-            "searchFieldName": "articleSearchAll",
-        })
+        context = _article_list_context(request, _article_stocks(request), "articleSearchAll")
+        template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
+        return render(request, template, context=context)
 
 
 @login_required(login_url='/accounts/login/')
@@ -765,28 +790,10 @@ def setGlobalMinimum(request, spaceId, itemId):
 @require_scope("article", "view")
 def searchArticle(request, typ):
     if request.method == "GET":
-        r = Article.objects.filter(base__pType__name__exact=typ).select_related("base__pType").prefetch_related("stocks__stored", "images")
-        query = request.GET.get("query")
-        if query:
-            from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
-
-            try:
-                r = r.filter(parse_json(query, ARTICLE_FIELDS))
-            except QueryError:
-                pass
-        else:
-            r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
-        r = _scoped_articles(r, request)
-        sort = request.GET.get("sort", "")
-        r = order_by(r, "article", sort)
-        return render(request, "hub/modules/list.html", context={
-            "list_type": "article",
-            "columns": default_columns("article"),
-            "groups": _article_groups(r),
-            "selectable": True,
-            "sort": sort,
-            "searchFieldName": "articleSearch" + typ,
-        })
+        stocks = _article_stocks(request).filter(article__base__pType__name__exact=typ)
+        context = _article_list_context(request, stocks, "articleSearch" + typ)
+        template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
+        return render(request, template, context=context)
 
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")

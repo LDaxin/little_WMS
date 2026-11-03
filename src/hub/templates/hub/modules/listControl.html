@@ -1,0 +1,25 @@
+{% load i18n %}
+{% if page and page.paginator.num_pages > 1 %}
+<div id="listControl" class="d-flex justify-content-center align-items-center gap-2 mt-2"{% if append %} hx-swap-oob="true"{% endif %}>
+    {% if view_mode == "mobile" %}
+        {% if page.has_next %}
+        <button type="button" class="btn btn-outline-primary"
+                hx-get="./search?page={{ page.next_page_number }}&append=1"
+                hx-target="#results" hx-swap="beforeend"
+                hx-include="#{{ searchFieldName }}, #qbQueryInput">{% trans "Load more" %}</button>
+        {% endif %}
+    {% else %}
+        {% if page.has_previous %}
+        <button type="button" class="btn btn-outline-secondary"
+                hx-get="./search?page={{ page.previous_page_number }}"
+                hx-target="#list" hx-include="#{{ searchFieldName }}, #qbQueryInput">‹</button>
+        {% endif %}
+        <span>{{ page.number }} / {{ page.paginator.num_pages }}</span>
+        {% if page.has_next %}
+        <button type="button" class="btn btn-outline-secondary"
+                hx-get="./search?page={{ page.next_page_number }}"
+                hx-target="#list" hx-include="#{{ searchFieldName }}, #qbQueryInput">›</button>
+        {% endif %}
+    {% endif %}
+</div>
+{% endif %}

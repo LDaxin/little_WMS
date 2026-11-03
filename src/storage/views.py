@@ -16,8 +16,11 @@ from movement.services import MovementService
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
 from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 import json
 from time import sleep
+
+PAGE_SIZE = 50
 
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.view_all")
@@ -304,13 +307,16 @@ def searchStoragesAll(request):
         )
         sort = request.GET.get("sort", "")
         r = order_by(r, "storage", sort)
-        return render(request, "hub/modules/list.html", context={
+        page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
+        template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
+        return render(request, template, context={
             "list_type": "storage",
             "columns": default_columns("storage"),
-            "rows": r,
+            "rows": page.object_list,
             "selectable": True,
             "sort": sort,
             "searchFieldName": "storageSearchAll",
+            "page": page,
         })
 
 
@@ -520,13 +526,16 @@ def searchStorages(request, typ):
         )
         sort = request.GET.get("sort", "")
         r = order_by(r, "storage", sort)
-        return render(request, "hub/modules/list.html", context={
+        page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
+        template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
+        return render(request, template, context={
             "list_type": "storage",
             "columns": default_columns("storage"),
-            "rows": r,
+            "rows": page.object_list,
             "selectable": True,
             "sort": sort,
             "searchFieldName": "storageSearch" + typ,
+            "page": page,
         })
 
 
