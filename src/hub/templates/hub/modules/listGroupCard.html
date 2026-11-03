@@ -3,6 +3,7 @@
     <div class="card h-100">
         {% with img=group.article.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" class="card-img-top" style="object-fit:cover;height:120px">{% endif %}{% endwith %}
         <div class="card-body">
+            <input class="checkboxlist form-check-input card-check" type="checkbox" value="{{ group.article }}" id="{{ group.article.id }}">
             <h6 class="card-title mb-1">{{ group.article.base.name }}</h6>
             <div class="small text-muted">{{ group.article.code.code }}</div>
             <div class="small">{{ group.article.base.pType.name }}</div>

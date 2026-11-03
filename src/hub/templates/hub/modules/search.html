@@ -62,6 +62,8 @@
         <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
                 hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Cards" %}</button>
     </div>
+    <button type="button" class="btn btn-sm btn-outline-secondary"
+            onclick="toggleSelectMode()">{% trans "Select" %} (<span id="selectCount">0</span>)</button>
 </div>
 {% endif %}
 

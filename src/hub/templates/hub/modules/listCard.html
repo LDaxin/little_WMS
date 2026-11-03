@@ -2,6 +2,7 @@
     <div class="card h-100">
         {% with img=row.primary_image %}{% if img %}<img src="{{ img.thumbnail.url }}" class="card-img-top" style="object-fit:cover;height:120px">{% endif %}{% endwith %}
         <div class="card-body">
+            <input class="checkboxlist form-check-input card-check" type="checkbox" value="{{ row }}" id="{{ row.id }}">
             <h6 class="card-title mb-1">{{ row.name }}</h6>
             <div class="small text-muted">{{ row.code.code }}</div>
             <div class="small">{{ row.typ.name }}</div>

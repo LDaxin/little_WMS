@@ -38,8 +38,8 @@
 
 ## 7. Bulk selection
 
-- [ ] 7.1 Desktop checkbox column
-- [ ] 7.2 Mobile selection mode (button + long-press) + action bar
+- [x] 7.1 Desktop checkbox column
+- [x] 7.2 Mobile selection mode (button + long-press) + action bar
 - [ ] 7.3 "Select all" = all matches (server-side)
 
 ## 8. Verify

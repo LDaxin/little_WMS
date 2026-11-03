@@ -89,3 +89,8 @@ class AllArticlesTest(TestCase):
         self._stock(self.article)
         response = self.client.get("/article/search", {"mode": "table"})
         self.assertContains(response, "resultsTable")
+
+    def test_search_all_cards_have_checkbox(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"mode": "cards"})
+        self.assertContains(response, "card-check")

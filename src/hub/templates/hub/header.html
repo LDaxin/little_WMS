@@ -69,6 +69,10 @@
                 --icon-size: var(--icon-desktop, 28px);
                 --label-size: var(--text-desktop, 0.95rem);
             }
+            .card-check { display: none; }
+            body.selecting .stretched-link { pointer-events: none; }
+            body.selecting .card { cursor: pointer; }
+            .card.selected { border-color: var(--bs-primary); box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); }
         </style>
         {% livereload_script %}
     </head>
@@ -186,6 +190,43 @@
             document.body.addEventListener("htmx:configRequest", function(event) {
                 event.detail.headers["X-View-Mode"] =
                     window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
+            });
+            function updateSelectCount() {
+                var n = document.querySelectorAll(".card-check:checked").length;
+                var el = document.getElementById("selectCount");
+                if (el) { el.textContent = n; }
+                return n;
+            }
+            function toggleSelectMode() {
+                document.body.classList.toggle("selecting");
+                updateSelectCount();
+            }
+            document.body.addEventListener("click", function(event) {
+                if (!document.body.classList.contains("selecting")) { return; }
+                var card = event.target.closest(".card");
+                if (!card) { return; }
+                var check = card.querySelector(".card-check");
+                if (!check) { return; }
+                check.checked = !check.checked;
+                card.classList.toggle("selected", check.checked);
+                if (updateSelectCount() === 0) { document.body.classList.remove("selecting"); }
+            });
+            var cardPressTimer;
+            document.body.addEventListener("touchstart", function(event) {
+                var card = event.target.closest(".card");
+                if (!card) { return; }
+                cardPressTimer = setTimeout(function() {
+                    document.body.classList.add("selecting");
+                    var check = card.querySelector(".card-check");
+                    if (check) { check.checked = true; }
+                    card.classList.add("selected");
+                    updateSelectCount();
+                }, 500);
+            });
+            document.body.addEventListener("touchend", function() { clearTimeout(cardPressTimer); });
+            document.body.addEventListener("touchmove", function() { clearTimeout(cardPressTimer); });
+            document.body.addEventListener("contextmenu", function(event) {
+                if (event.target.closest(".card")) { event.preventDefault(); }
             });
         </script>
 
