@@ -4,17 +4,17 @@
     {% if list_view_mode == "cards" %}
         {% if page.has_next %}
         <button type="button" class="btn btn-outline-primary"
-                hx-get="./search?page={{ page.next_page_number }}&append=1"
+                hx-get="./search?page={{ page.next_page_number }}&append=1&sort={{ sort }}"
                 hx-target="#results" hx-swap="beforeend"
                 hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">{% trans "Load more" %}</button>
         {% endif %}
     {% else %}
         {% if page.has_previous %}
         <button type="button" class="btn btn-sm btn-outline-secondary"
-                hx-get="./search?page=1" hx-target="#list"
+                hx-get="./search?page=1&sort={{ sort }}" hx-target="#list"
                 hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">«</button>
         <button type="button" class="btn btn-sm btn-outline-secondary"
-                hx-get="./search?page={{ page.previous_page_number }}" hx-target="#list"
+                hx-get="./search?page={{ page.previous_page_number }}&sort={{ sort }}" hx-target="#list"
                 hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">‹</button>
         {% endif %}
         {% for num in page|elided_page_range %}
@@ -24,16 +24,16 @@
             <span class="btn btn-sm btn-primary">{{ num }}</span>
             {% else %}
             <button type="button" class="btn btn-sm btn-outline-secondary"
-                    hx-get="./search?page={{ num }}" hx-target="#list"
+                    hx-get="./search?page={{ num }}&sort={{ sort }}" hx-target="#list"
                     hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">{{ num }}</button>
             {% endif %}
         {% endfor %}
         {% if page.has_next %}
         <button type="button" class="btn btn-sm btn-outline-secondary"
-                hx-get="./search?page={{ page.next_page_number }}" hx-target="#list"
+                hx-get="./search?page={{ page.next_page_number }}&sort={{ sort }}" hx-target="#list"
                 hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">›</button>
         <button type="button" class="btn btn-sm btn-outline-secondary"
-                hx-get="./search?page={{ page.paginator.num_pages }}" hx-target="#list"
+                hx-get="./search?page={{ page.paginator.num_pages }}&sort={{ sort }}" hx-target="#list"
                 hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput, #modeInput">»</button>
         {% endif %}
     {% endif %}

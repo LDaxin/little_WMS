@@ -39,3 +39,10 @@ class AllStoragesTest(TestCase):
         response = self.client.get("/storage/search")
         self.assertContains(response, "listControl")
         self.assertContains(response, "page=2")
+
+    def test_search_all_pagination_keeps_sort(self):
+        storage_type = StorageType.objects.get(name="room")
+        for i in range(51):
+            Storage.objects.create(name="S%03d" % i, typ=storage_type)
+        response = self.client.get("/storage/search", {"sort": "name"})
+        self.assertContains(response, "sort=name")

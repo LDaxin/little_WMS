@@ -49,7 +49,7 @@
             </div>
             {% endfor %}
             <button type="button" class="btn btn-sm btn-primary mt-2"
-                    hx-get="./search" hx-target="#list" hx-include="#{{ searchFieldName }}"
+                    hx-get="./search?sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}"
                     hx-vals='js:{cols: [...document.querySelectorAll(".col-check:checked")].map(c => c.value).join(",")}'>{% trans "Apply" %}</button>
             <button type="button" class="btn btn-sm btn-outline-secondary mt-2"
                     hx-post="{% url 'save default columns' %}"
@@ -58,9 +58,9 @@
     </div>
     <div class="btn-group btn-group-sm">
         <button type="button" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
-                hx-get="./search?mode=table" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Table" %}</button>
+                hx-get="./search?mode=table&sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Table" %}</button>
         <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
-                hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Cards" %}</button>
+                hx-get="./search?mode=cards&sort={{ sort }}" hx-target="#list" hx-include="#{{ searchFieldName }}, #colsInput">{% trans "Cards" %}</button>
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary"
             onclick="toggleSelectMode()">{% trans "Select" %} (<span id="selectCount">0</span>)</button>
