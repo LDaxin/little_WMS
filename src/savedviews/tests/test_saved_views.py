@@ -135,3 +135,28 @@ class ShareLinkTest(TestCase):
         article = Article.objects.first()
         self.client.post("/s/%s/" % link.token, {"article_%s" % article.pk: "on"})
         self.assertFalse(Loan.objects.exists())
+
+    def test_anonymous_uses_link_permissions(self):
+        self.client.logout()
+        link = ShareLink.objects.create(saved_view=self.view, permissions=["view", "borrow"])
+        response = self.client.get("/s/%s/" % link.token)
+        self.assertContains(response, "Jurte")
+        self.assertNotContains(response, "Borrow selected")
+
+    def test_link_mode_uses_link_permissions(self):
+        link = ShareLink.objects.create(saved_view=self.view, permissions=["view", "borrow"])
+        response = self.client.get("/s/%s/" % link.token)
+        self.assertContains(response, "Borrow selected")
+
+    def test_mine_mode_uses_role(self):
+        link = ShareLink.objects.create(saved_view=self.view, permissions=["view", "borrow"])
+        self.client.post("/s/%s/mode/" % link.token, {"mode": "mine"})
+        response = self.client.get("/s/%s/" % link.token)
+        self.assertNotContains(response, "Borrow selected")
+
+    def test_toggle_switches_mode(self):
+        link = ShareLink.objects.create(saved_view=self.view, permissions=["view", "borrow"])
+        self.client.post("/s/%s/mode/" % link.token, {"mode": "mine"})
+        self.assertEqual(self.client.session["share_%s_mode" % link.pk], "mine")
+        self.client.post("/s/%s/mode/" % link.token, {"mode": "link"})
+        self.assertEqual(self.client.session["share_%s_mode" % link.pk], "link")

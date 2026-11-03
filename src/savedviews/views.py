@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from organisation.decorators import require_scope
+from organisation.permissions import has_perm
 from savedviews.models import SavedView, ShareLink
 
 
@@ -96,6 +97,23 @@ def revokeShareLink(request, linkId):
     return redirect("saved views")
 
 
+def _share_mode(request, link):
+    """The permission source for a share view: the link or the user's role (§10)."""
+    if not request.user.is_authenticated:
+        return "link"
+    return request.session.get("share_%s_mode" % link.pk, "link")
+
+
+def shareLinkMode(request, token):
+    """Switch a share view between the link's permissions and the user's role (§10)."""
+    link = get_object_or_404(ShareLink, token=token)
+    if request.method == "POST" and request.user.is_authenticated:
+        mode = request.POST.get("mode", "link")
+        if mode in ("link", "mine"):
+            request.session["share_%s_mode" % link.pk] = mode
+    return redirect("share link", token=token)
+
+
 def shareLinkView(request, token):
     """Public capability URL: show a saved view read-only (§10)."""
     from article.models import Article
@@ -121,7 +139,12 @@ def shareLinkView(request, token):
     except QueryError:
         pass
 
-    if request.method == "POST" and link.can_borrow() and request.user.is_authenticated:
+    mode = _share_mode(request, link)
+    can_borrow = request.user.is_authenticated and has_perm(
+        request.user, "article.move_all", link=link if mode == "link" else None
+    )
+
+    if request.method == "POST" and can_borrow:
         from datetime import date
 
         from loans.models import Loan
@@ -152,4 +175,6 @@ def shareLinkView(request, token):
         link.used_count += 1
         link.save()
 
-    return render(request, "savedviews/shareView.html", {"link": link, "articles": articles})
+    return render(request, "savedviews/shareView.html", {
+        "link": link, "articles": articles, "can_borrow": can_borrow, "mode": mode,
+    })

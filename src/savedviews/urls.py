@@ -11,4 +11,5 @@ urlpatterns = [
     path("views/<int:viewId>/share/", views.shareSavedView, name="share saved view"),
     path("share-links/<int:linkId>/revoke/", views.revokeShareLink, name="revoke share link"),
     path("s/<str:token>/", views.shareLinkView, name="share link"),
+    path("s/<str:token>/mode/", views.shareLinkMode, name="share link mode"),
 ]

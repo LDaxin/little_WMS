@@ -4,19 +4,29 @@
 {% block content %}
 <h4>{{ link.saved_view.name }}</h4>
 
+{% if request.user.is_authenticated %}
+<form method="post" action="{% url 'share link mode' link.token %}" class="mb-2">
+    {% csrf_token %}
+    <div class="btn-group btn-group-sm" role="group">
+        <button name="mode" value="link" class="btn {% if mode == 'link' %}btn-primary{% else %}btn-outline-primary{% endif %}">{% trans "Link permissions" %}</button>
+        <button name="mode" value="mine" class="btn {% if mode == 'mine' %}btn-primary{% else %}btn-outline-primary{% endif %}">{% trans "My permissions" %}</button>
+    </div>
+</form>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
     <table class="table">
         <thead>
             <tr>
-                {% if link.can_borrow and request.user.is_authenticated %}<th></th>{% endif %}
+                {% if can_borrow %}<th></th>{% endif %}
                 <th>{% trans "Name" %}</th><th>{% trans "Code" %}</th>
             </tr>
         </thead>
         <tbody>
             {% for article in articles %}
             <tr>
-                {% if link.can_borrow and request.user.is_authenticated %}
+                {% if can_borrow %}
                 <td><input type="checkbox" name="article_{{ article.pk }}" class="form-check-input"></td>
                 {% endif %}
                 <td>{{ article.base.name }}</td><td>{{ article.code.code }}</td>
@@ -26,7 +36,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if link.can_borrow and request.user.is_authenticated %}
+    {% if can_borrow %}
     <button class="btn btn-primary">{% trans "Borrow selected" %}</button>
     {% endif %}
 </form>

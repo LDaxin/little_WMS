@@ -56,8 +56,12 @@ class ShareLink(TokenisedModel):
             return False
         return True
 
+    def can(self, action):
+        """Whether the link grants ``action`` (§10)."""
+        return action in (self.permissions or [])
+
     def can_borrow(self):
-        return "borrow" in (self.permissions or [])
+        return self.can("borrow")
 
     def __str__(self):
         return "Share link for %s" % self.saved_view

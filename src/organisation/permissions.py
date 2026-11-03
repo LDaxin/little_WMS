@@ -44,6 +44,18 @@ def codename(perm):
     return "%s_%s" % (area, action_scope)
 
 
+# Share-link actions (§10) mapped to catalogue codenames.
+LINK_ACTIONS = {
+    "view": "article.view_all",
+    "borrow": "article.move_all",
+}
+
+
+def link_codenames(permissions):
+    """The catalogue codenames a share link's action list grants (§10)."""
+    return {codename(LINK_ACTIONS[action]) for action in (permissions or []) if action in LINK_ACTIONS}
+
+
 def template_codenames(permissions):
     """``{"article": ["view_all"]}`` -> ``["article_view_all"]``."""
     return [
@@ -61,12 +73,15 @@ def _profile(user, organisation=None):
     return profiles.first()
 
 
-def has_perm(user, perm, organisation=None):
+def has_perm(user, perm, organisation=None, link=None):
     """Check a permission string like ``article.view_all`` (§3).
 
     Evaluated against the user's role in ``organisation`` (or their first
-    membership when none is given).
+    membership when none is given). When ``link`` is given, the link's
+    permissions are used instead of the role (§10).
     """
+    if link is not None:
+        return codename(perm) in link_codenames(link.permissions)
     if user is None or not getattr(user, "is_authenticated", False):
         return False
     if user.is_superuser:
