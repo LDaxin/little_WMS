@@ -38,3 +38,4 @@ class AllStoragesTest(TestCase):
             Storage.objects.create(name="S%03d" % i, typ=storage_type)
         response = self.client.get("/storage/search")
         self.assertContains(response, "listControl")
+        self.assertContains(response, "page=2")

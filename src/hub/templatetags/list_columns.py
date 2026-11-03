@@ -32,3 +32,9 @@ def condition_label(value):
     from article.models import ZUSTAND_CHOICES
 
     return dict(ZUSTAND_CHOICES).get(value, value)
+
+
+@register.filter
+def elided_page_range(page):
+    """Page numbers around the current page, with gaps elided (§ list-views)."""
+    return page.paginator.get_elided_page_range(page.number, on_each_side=2, on_ends=1)

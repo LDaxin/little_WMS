@@ -1,6 +1,6 @@
-{% load i18n %}
+{% load i18n list_columns %}
 {% if page and page.paginator.num_pages > 1 %}
-<div id="listControl" class="d-flex justify-content-center align-items-center gap-2 mt-2"{% if append %} hx-swap-oob="true"{% endif %}>
+<div id="listControl" class="d-flex justify-content-center align-items-center gap-1 mt-2"{% if append %} hx-swap-oob="true"{% endif %}>
     {% if view_mode == "mobile" %}
         {% if page.has_next %}
         <button type="button" class="btn btn-outline-primary"
@@ -10,15 +10,31 @@
         {% endif %}
     {% else %}
         {% if page.has_previous %}
-        <button type="button" class="btn btn-outline-secondary"
-                hx-get="./search?page={{ page.previous_page_number }}"
-                hx-target="#list" hx-include="#{{ searchFieldName }}, #qbQueryInput">‹</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                hx-get="./search?page=1" hx-target="#list"
+                hx-include="#{{ searchFieldName }}, #qbQueryInput">«</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                hx-get="./search?page={{ page.previous_page_number }}" hx-target="#list"
+                hx-include="#{{ searchFieldName }}, #qbQueryInput">‹</button>
         {% endif %}
-        <span>{{ page.number }} / {{ page.paginator.num_pages }}</span>
+        {% for num in page|elided_page_range %}
+            {% if num == page.paginator.ELLIPSIS %}
+            <span class="btn btn-sm disabled">…</span>
+            {% elif num == page.number %}
+            <span class="btn btn-sm btn-primary">{{ num }}</span>
+            {% else %}
+            <button type="button" class="btn btn-sm btn-outline-secondary"
+                    hx-get="./search?page={{ num }}" hx-target="#list"
+                    hx-include="#{{ searchFieldName }}, #qbQueryInput">{{ num }}</button>
+            {% endif %}
+        {% endfor %}
         {% if page.has_next %}
-        <button type="button" class="btn btn-outline-secondary"
-                hx-get="./search?page={{ page.next_page_number }}"
-                hx-target="#list" hx-include="#{{ searchFieldName }}, #qbQueryInput">›</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                hx-get="./search?page={{ page.next_page_number }}" hx-target="#list"
+                hx-include="#{{ searchFieldName }}, #qbQueryInput">›</button>
+        <button type="button" class="btn btn-sm btn-outline-secondary"
+                hx-get="./search?page={{ page.paginator.num_pages }}" hx-target="#list"
+                hx-include="#{{ searchFieldName }}, #qbQueryInput">»</button>
         {% endif %}
     {% endif %}
 </div>
