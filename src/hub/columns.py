@@ -94,6 +94,15 @@ def default_columns(list_type):
     return [c for c in LIST_TYPES[list_type] if c.default]
 
 
+def selected_columns(list_type, cols):
+    """The columns for a comma-separated ``cols`` string, or the defaults."""
+    if not cols:
+        return default_columns(list_type)
+    chosen = [column(list_type, key) for key in cols.split(",")]
+    chosen = [c for c in chosen if c]
+    return chosen or default_columns(list_type)
+
+
 def column(list_type, key):
     """One column by key, or None."""
     for c in LIST_TYPES[list_type]:

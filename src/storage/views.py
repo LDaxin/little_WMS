@@ -2,7 +2,8 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
-from hub.columns import default_columns, order_by
+from hub.columns import default_columns, order_by, selected_columns
+from hub.columns import columns as all_columns
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -266,6 +267,9 @@ def storages(request, typ):
             "searchFieldName":"storageSearch" + storageTypeObject.name,
             'type':"storage",
             "list_type":"storage",
+            "available_columns": all_columns("storage"),
+            "columns": selected_columns("storage", request.GET.get("cols")),
+            "cols": request.GET.get("cols", ""),
             "name":typ,
             "form":[FormStorage()],
             "typ":typ,
@@ -286,6 +290,9 @@ def storagesAll(request):
         "searchFieldName": "storageSearchAll",
         "type": "storage",
         "list_type": "storage",
+        "available_columns": all_columns("storage"),
+        "columns": selected_columns("storage", request.GET.get("cols")),
+        "cols": request.GET.get("cols", ""),
         "name": "",
         "form": [],
         "typ": "",
@@ -308,13 +315,15 @@ def searchStoragesAll(request):
         sort = request.GET.get("sort", "")
         r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
+        cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
         return render(request, template, context={
             "list_type": "storage",
-            "columns": default_columns("storage"),
+            "columns": selected_columns("storage", cols),
             "rows": page.object_list,
             "selectable": True,
             "sort": sort,
+            "cols": cols,
             "searchFieldName": "storageSearchAll",
             "page": page,
         })
@@ -527,13 +536,15 @@ def searchStorages(request, typ):
         sort = request.GET.get("sort", "")
         r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
+        cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
         return render(request, template, context={
             "list_type": "storage",
-            "columns": default_columns("storage"),
+            "columns": selected_columns("storage", cols),
             "rows": page.object_list,
             "selectable": True,
             "sort": sort,
+            "cols": cols,
             "searchFieldName": "storageSearch" + typ,
             "page": page,
         })

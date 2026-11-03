@@ -6,16 +6,16 @@
         <button type="button" class="btn btn-outline-primary"
                 hx-get="./search?page={{ page.next_page_number }}&append=1"
                 hx-target="#results" hx-swap="beforeend"
-                hx-include="#{{ searchFieldName }}, #qbQueryInput">{% trans "Load more" %}</button>
+                hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">{% trans "Load more" %}</button>
         {% endif %}
     {% else %}
         {% if page.has_previous %}
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 hx-get="./search?page=1" hx-target="#list"
-                hx-include="#{{ searchFieldName }}, #qbQueryInput">«</button>
+                hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">«</button>
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 hx-get="./search?page={{ page.previous_page_number }}" hx-target="#list"
-                hx-include="#{{ searchFieldName }}, #qbQueryInput">‹</button>
+                hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">‹</button>
         {% endif %}
         {% for num in page|elided_page_range %}
             {% if num == page.paginator.ELLIPSIS %}
@@ -25,16 +25,16 @@
             {% else %}
             <button type="button" class="btn btn-sm btn-outline-secondary"
                     hx-get="./search?page={{ num }}" hx-target="#list"
-                    hx-include="#{{ searchFieldName }}, #qbQueryInput">{{ num }}</button>
+                    hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">{{ num }}</button>
             {% endif %}
         {% endfor %}
         {% if page.has_next %}
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 hx-get="./search?page={{ page.next_page_number }}" hx-target="#list"
-                hx-include="#{{ searchFieldName }}, #qbQueryInput">›</button>
+                hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">›</button>
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 hx-get="./search?page={{ page.paginator.num_pages }}" hx-target="#list"
-                hx-include="#{{ searchFieldName }}, #qbQueryInput">»</button>
+                hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput">»</button>
         {% endif %}
     {% endif %}
 </div>

@@ -7,7 +7,7 @@
             <th scope="col">
                 {% if col.sortable %}
                 <a href="#" hx-get="./search?sort={% if sort == col.key %}-{{ col.key }}{% else %}{{ col.key }}{% endif %}"
-                   hx-include="#{{ searchFieldName }}, #qbQueryInput" hx-target="#list" hx-swap="innerHTML">
+                   hx-include="#{{ searchFieldName }}, #qbQueryInput, #colsInput" hx-target="#list" hx-swap="innerHTML">
                     {{ col.label }}{% if sort == col.key %} ▲{% elif sort == "-"|add:col.key %} ▼{% endif %}
                 </a>
                 {% else %}{{ col.label }}{% endif %}

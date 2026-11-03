@@ -67,3 +67,9 @@ class AllArticlesTest(TestCase):
         self._stock(alpha)
         content = self.client.get("/article/search", {"sort": "-name"}).content.decode()
         self.assertLess(content.index("Jurte"), content.index("Alpha"))
+
+    def test_search_all_selects_columns(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"cols": "name,quantity"})
+        self.assertContains(response, "Quantity")
+        self.assertNotContains(response, "Condition")

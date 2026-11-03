@@ -26,7 +26,7 @@
 
 ## 5. View state
 
-- [ ] 5.1 `sort`/`cols`/`page` in URL parameters
+- [x] 5.1 `sort`/`cols`/`page` in URL parameters
 - [ ] 5.2 `SavedView.sort`, `columns`, `display_mode` + apply
 - [ ] 5.3 Per-user default column selection
 

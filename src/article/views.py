@@ -2,7 +2,8 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
-from hub.columns import default_columns, order_by
+from hub.columns import default_columns, order_by, selected_columns
+from hub.columns import columns as all_columns
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -237,6 +238,9 @@ def articles(request, typ):
             "searchFieldName":"articleSearch" + t.name,
             'type':"article",
             "list_type":"article",
+            "available_columns": all_columns("article"),
+            "columns": selected_columns("article", request.GET.get("cols")),
+            "cols": request.GET.get("cols", ""),
             "name":typ,
             "form":[FormArticleBase(prefix="base", article_type=t), FormArticle(prefix="article", article_type=t)],
             "typ":typ,
@@ -266,6 +270,9 @@ def articlesAll(request):
         "searchFieldName": "articleSearchAll",
         "type": "article",
         "list_type": "article",
+        "available_columns": all_columns("article"),
+        "columns": selected_columns("article", request.GET.get("cols")),
+        "cols": request.GET.get("cols", ""),
         "name": "",
         "form": [],
         "typ": "",
@@ -322,12 +329,14 @@ def _article_list_context(request, stocks, search_field):
     totals = dict(stocks.order_by().values_list("article_id").annotate(total=Sum("menge")))
     counts = dict(stocks.order_by().values_list("article_id").annotate(n=Count("id")))
     page = Paginator(stocks, PAGE_SIZE).get_page(request.GET.get("page"))
+    cols = request.GET.get("cols", "")
     return {
         "list_type": "article",
-        "columns": default_columns("article"),
+        "columns": selected_columns("article", cols),
         "groups": _article_groups(page.object_list, totals, counts),
         "selectable": True,
         "sort": request.GET.get("sort", ""),
+        "cols": cols,
         "searchFieldName": search_field,
         "page": page,
     }
