@@ -45,3 +45,15 @@ class AllArticlesTest(TestCase):
         response = self.client.get("/article/search", {"search": "Jurte"})
         self.assertContains(response, "Regal A")
         self.assertContains(response, "table-group-single")
+
+    def test_search_all_sorts_by_name(self):
+        article_type = ArticleType.objects.get(name="tent")
+        Article.objects.create(base=ArticleBase.objects.create(name="Alpha", pType=article_type))
+        content = self.client.get("/article/search", {"sort": "name"}).content.decode()
+        self.assertLess(content.index("Alpha"), content.index("Jurte"))
+
+    def test_search_all_sorts_descending(self):
+        article_type = ArticleType.objects.get(name="tent")
+        Article.objects.create(base=ArticleBase.objects.create(name="Alpha", pType=article_type))
+        content = self.client.get("/article/search", {"sort": "-name"}).content.decode()
+        self.assertLess(content.index("Jurte"), content.index("Alpha"))

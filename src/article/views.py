@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
-from hub.columns import default_columns
+from hub.columns import default_columns, order_by
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -305,11 +305,15 @@ def searchArticlesAll(request):
         else:
             r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
+        sort = request.GET.get("sort", "")
+        r = order_by(r, "article", sort)
         return render(request, "hub/modules/list.html", context={
             "list_type": "article",
             "columns": default_columns("article"),
             "groups": _article_groups(r),
             "selectable": True,
+            "sort": sort,
+            "searchFieldName": "articleSearchAll",
         })
 
 
@@ -773,11 +777,15 @@ def searchArticle(request, typ):
         else:
             r = filter_by_search(r, request.GET.get("search", ""), "base__name", "code__code")
         r = _scoped_articles(r, request)
+        sort = request.GET.get("sort", "")
+        r = order_by(r, "article", sort)
         return render(request, "hub/modules/list.html", context={
             "list_type": "article",
             "columns": default_columns("article"),
             "groups": _article_groups(r),
             "selectable": True,
+            "sort": sort,
+            "searchFieldName": "articleSearch" + typ,
         })
 
 @login_required(login_url='/accounts/login/')

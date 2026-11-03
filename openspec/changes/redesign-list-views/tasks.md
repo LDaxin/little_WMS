@@ -14,8 +14,8 @@
 
 ## 3. Sorting
 
-- [ ] 3.1 `sort` URL parameter → `order_by` via the registry
-- [ ] 3.2 Sortable header links with direction toggle
+- [x] 3.1 `sort` URL parameter → `order_by` via the registry
+- [x] 3.2 Sortable header links with direction toggle
 
 ## 4. Pagination
 

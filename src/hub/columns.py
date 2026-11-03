@@ -106,3 +106,14 @@ def sort_path(list_type, key):
     """The ORM path to order by for ``key``, or None when not sortable."""
     c = column(list_type, key)
     return c.path if c and c.sortable else None
+
+
+def order_by(queryset, list_type, sort):
+    """Apply a ``sort`` parameter (``key`` or ``-key``) to a queryset."""
+    if not sort:
+        return queryset
+    descending = sort.startswith("-")
+    path = sort_path(list_type, sort.lstrip("-"))
+    if not path:
+        return queryset
+    return queryset.order_by(("-" if descending else "") + path)

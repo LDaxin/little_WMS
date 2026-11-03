@@ -25,3 +25,9 @@ class AllStoragesTest(TestCase):
     def test_search_all_links_to_detail(self):
         response = self.client.get("/storage/search", {"search": "Lager"})
         self.assertContains(response, "/storage/room/%s" % self.storage.pk)
+
+    def test_search_all_sorts_by_name(self):
+        storage_type = StorageType.objects.get(name="room")
+        Storage.objects.create(name="AAA", typ=storage_type)
+        content = self.client.get("/storage/search", {"sort": "name"}).content.decode()
+        self.assertLess(content.index("AAA"), content.index("Lager"))

@@ -2,7 +2,7 @@ from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.csv import csv_response
 from hub.search import filter_by_search
-from hub.columns import default_columns
+from hub.columns import default_columns, order_by
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -302,11 +302,15 @@ def searchStoragesAll(request):
             Storage.objects.select_related("typ").prefetch_related("images"),
             request.GET.get("search", ""), "name", "code__code",
         )
+        sort = request.GET.get("sort", "")
+        r = order_by(r, "storage", sort)
         return render(request, "hub/modules/list.html", context={
             "list_type": "storage",
             "columns": default_columns("storage"),
             "rows": r,
             "selectable": True,
+            "sort": sort,
+            "searchFieldName": "storageSearchAll",
         })
 
 
@@ -514,11 +518,15 @@ def searchStorages(request, typ):
             Storage.objects.filter(typ__name__exact=typ).select_related("typ").prefetch_related("images"),
             request.GET.get("search", ""), "name", "code__code",
         )
+        sort = request.GET.get("sort", "")
+        r = order_by(r, "storage", sort)
         return render(request, "hub/modules/list.html", context={
             "list_type": "storage",
             "columns": default_columns("storage"),
             "rows": r,
             "selectable": True,
+            "sort": sort,
+            "searchFieldName": "storageSearch" + typ,
         })
 
 
