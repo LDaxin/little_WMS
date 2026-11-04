@@ -16,7 +16,7 @@ def location(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/item.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update", "code":locationObject.code.code if locationObject.code else "", "link":("/l/" + locationObject.code.code) if locationObject.code else "", "mapPicker":True, "linkedStorages":locationObject.storage_set.all(), "linkedOccasions":locationObject.occasion_set.all()})
+        return render(request, "hub/modules/item.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update", "updateUrl":"/location/%s/update" % locationId, "code":locationObject.code.code if locationObject.code else "", "link":("/l/" + locationObject.code.code) if locationObject.code else "", "mapPicker":True, "linkedStorages":locationObject.storage_set.all(), "linkedOccasions":locationObject.occasion_set.all()})
     except:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 

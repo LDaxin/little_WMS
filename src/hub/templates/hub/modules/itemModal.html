@@ -1,0 +1,7 @@
+{% include "hub/modules/itemContent.html" %}
+<script>
+    (function () {
+        var el = document.getElementById("modal{{ modalId }}");
+        if (el) { bootstrap.Modal.getOrCreateInstance(el).show(); }
+    })();
+</script>

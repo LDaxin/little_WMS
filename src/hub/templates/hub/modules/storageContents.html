@@ -31,7 +31,7 @@
                    hx-get="{{ storeSearchUrl }}" hx-target="#storeResults" hx-swap="innerHTML"
                    hx-trigger="input changed delay:300ms">
             <input name="amount" type="number" min="1" class="form-control" style="max-width:5rem" placeholder="{% trans "Qty" %}">
-            {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl="./scanner/storeCode/toggle" %}
+            {% include "hub/modules/qrScanner.html" with input="storeCode" scannerUrl=storeScannerUrl %}
             <button type="submit" class="btn btn-success">{% trans "Store here" %}</button>
         </div>
         <div id="scannerDivstoreCode"></div>

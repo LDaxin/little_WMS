@@ -10,6 +10,7 @@
             <div class="small">{{ group.total }} {{ group.article.mengeneinheit }} &middot; {{ group.total_locations }} {% trans "locations" %}</div>
             <span class="badge bg-{{ group.article.zustand|condition_color }}">{{ group.article.zustand|condition_label }}</span>
         </div>
-        <a class="stretched-link" href="{% url 'article' typ=group.article.base.pType.name articleId=group.article.pk %}"></a>
+        <a class="stretched-link" href="{% url 'article' typ=group.article.base.pType.name articleId=group.article.pk %}"
+           hx-get="{% url 'article' typ=group.article.base.pType.name articleId=group.article.pk %}" hx-target="#modalBodysingle" hx-swap="innerHTML"></a>
     </div>
 </div>

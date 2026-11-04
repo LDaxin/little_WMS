@@ -9,6 +9,7 @@
             {% if row.parent %}<div class="small">{{ row.parent }}</div>{% endif %}
             {% if row.location %}<div class="small">{{ row.location }}</div>{% endif %}
         </div>
-        <a class="stretched-link" href="{% url 'storage' typ=row.typ.name storageId=row.pk %}"></a>
+        <a class="stretched-link" href="{% url 'storage' typ=row.typ.name storageId=row.pk %}"
+           hx-get="{% url 'storage' typ=row.typ.name storageId=row.pk %}" hx-target="#modalBodysingle" hx-swap="innerHTML"></a>
     </div>
 </div>

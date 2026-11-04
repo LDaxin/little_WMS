@@ -3,7 +3,8 @@
     {% if selectable %}<td><input class="checkboxlist form-check-input" type="checkbox" value="{{ stock.pk }}"></td>{% endif %}
     {% for col in columns %}<td>{% cell stock col %}</td>{% endfor %}
     <td>
-        <a class="btn btn-light" href="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}">
+        <a class="btn btn-light" href="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}"
+           hx-get="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}" hx-target="#modalBodysingle" hx-swap="innerHTML">
             <img style="width:10px" src="{% static 'hub/symbols/Pencil.svg' %}">
         </a>
     </td>
