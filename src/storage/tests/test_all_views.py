@@ -1,35 +1,8 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from hub.tests.html import ids_inside
 from storage.models import Storage, StorageType
-
-
-def _ids_inside(content, container_id):
-    """Ids of elements nested inside ``#<container_id>`` (rough HTML nesting)."""
-    from html.parser import HTMLParser
-
-    void = {"input", "br", "img", "meta", "link", "hr"}
-
-    class Nesting(HTMLParser):
-        def __init__(self):
-            super().__init__()
-            self.stack = []
-            self.found = []
-
-        def handle_starttag(self, tag, attrs):
-            attrs = dict(attrs)
-            if tag not in void:
-                self.stack.append(attrs.get("id"))
-            if attrs.get("id") and container_id in self.stack:
-                self.found.append(attrs["id"])
-
-        def handle_endtag(self, tag):
-            if tag not in void and self.stack:
-                self.stack.pop()
-
-    parser = Nesting()
-    parser.feed(content)
-    return parser.found
 
 
 class AllStoragesTest(TestCase):
@@ -120,6 +93,6 @@ class AllStoragesTest(TestCase):
         for i in range(51):
             Storage.objects.create(name="S%03d" % i, typ=storage_type)
         response = self.client.get("/storage/search", {"mode": "cards"})
-        self.assertIn("listControl", _ids_inside(response.content.decode(), "listBody"))
+        self.assertIn("listControl", ids_inside(response.content.decode(), "listBody"))
         response = self.client.get("/storage/search", {"mode": "table"})
-        self.assertNotIn("listControl", _ids_inside(response.content.decode(), "listBody"))
+        self.assertNotIn("listControl", ids_inside(response.content.decode(), "listBody"))

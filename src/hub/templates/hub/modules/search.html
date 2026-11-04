@@ -1,7 +1,8 @@
 {% load i18n %}
 <!-- ____________________________Search Bar______________________________________ -->
 
-<div class="d-flex p-2">
+<div id="listControls">
+<div class="d-flex p-2 position-relative" id="listSearchRow">
     <div class="input-group">
         <input 
             id={{searchFieldName}} 
@@ -30,17 +31,18 @@
                 <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
             </form>
         </div>
+        {% if type == "article" %}
+        <button type="button" class="btn btn-outline-secondary" id="qbToggleButton" onclick="qbToggle()">{% trans "Advanced" %}</button>
+        {% endif %}
     </div>
-</div>
-
-<div id="scannerDiv{{searchFieldName}}">
+    {% if type == "article" %}{% include "hub/modules/queryBuilder.html" %}{% endif %}
 </div>
 
 {% if list_type %}
 <input type="hidden" id="sortInput" name="sort" value="{{ sort }}">
 <input type="hidden" id="colsInput" name="cols" value="{{ cols }}">
 <input type="hidden" id="modeInput" name="mode" value="{{ request.GET.mode }}">
-<div class="d-flex align-items-center gap-2 ms-2 mb-2">
+<div id="listControlBar" class="d-flex align-items-center gap-2 ms-2 mb-2">
     <div class="dropdown">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{% trans "Columns" %}</button>
         <div class="dropdown-menu p-2">
@@ -72,11 +74,10 @@
     {% endif %}
 </div>
 {% endif %}
+</div>
 
-{% if type == "article" %}
-<button type="button" class="btn btn-sm btn-outline-secondary ms-2 mb-2" onclick="qbToggle()">{% trans "Advanced" %}</button>
-{% include "hub/modules/queryBuilder.html" %}
-{% endif %}
+<div id="scannerDiv{{searchFieldName}}">
+</div>
 
 <!-- ____________________________Result Table______________________________________ -->
 
