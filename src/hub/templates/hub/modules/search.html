@@ -1,7 +1,8 @@
 {% load i18n %}
 <!-- ____________________________Search Bar______________________________________ -->
 
-<div class="d-flex p-2">
+<div id="listControls">
+<div class="d-flex p-2 position-relative" id="listSearchRow">
     <div class="input-group">
         <input 
             id={{searchFieldName}} 
@@ -10,12 +11,12 @@
             type="search" 
             qtype="search" 
             placeholder="{% trans "Search" %}" 
-            hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});' 
+            hx-on:htmx:before-request='$("#checkAll").prop("checked", false);$(".checkboxlist").each(function(){$("."+ this.id +"_").remove();});clearSelectAll();' 
             hx-get="./search{% if savedQuery %}?query={{ savedQuery|urlencode }}{% endif %}" 
             {% if list_type %}hx-include="#sortInput, #colsInput, #modeInput"{% endif %}
             hx-trigger="load, keyup changed delay:500ms, refresh" 
             hx-target="{% if list_type %}#list{% else %}#results{% endif %}"> 
-        <div id="QRButtonDiv{{searchFieldName}}">
+        <div id="QRButtonDiv{{searchFieldName}}" class="search-side-btn">
             <form>
                 <button 
                     id="QRButton{{searchFieldName}}" 
@@ -30,17 +31,18 @@
                 <input class="visually-hidden" id="activ-scanner-input" name="active_scanner">
             </form>
         </div>
+        {% if type == "article" %}
+        <button type="button" class="btn btn-outline-secondary search-side-btn" id="qbToggleButton" onclick="qbToggle()">{% trans "Advanced" %}</button>
+        {% endif %}
     </div>
-</div>
-
-<div id="scannerDiv{{searchFieldName}}">
+    {% if type == "article" %}{% include "hub/modules/queryBuilder.html" %}{% endif %}
 </div>
 
 {% if list_type %}
 <input type="hidden" id="sortInput" name="sort" value="{{ sort }}">
 <input type="hidden" id="colsInput" name="cols" value="{{ cols }}">
-<input type="hidden" id="modeInput" name="mode" value="{{ list_view_mode }}">
-<div class="d-flex align-items-center gap-2 ms-2 mb-2">
+<input type="hidden" id="modeInput" name="mode" value="{{ request.GET.mode }}">
+<div id="listControlBar" class="d-flex align-items-center gap-2 ms-2 mb-2">
     <div class="dropdown">
         <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{% trans "Columns" %}</button>
         <div class="dropdown-menu p-2">
@@ -59,20 +61,23 @@
         </div>
     </div>
     <div class="btn-group btn-group-sm">
-        <button type="button" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+        <button type="button" id="listModeTable" class="btn {% if list_view_mode == 'table' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
                 hx-get="./search?mode=table" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Table" %}</button>
-        <button type="button" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
+        <button type="button" id="listModeCards" class="btn {% if list_view_mode == 'cards' %}btn-primary{% else %}btn-outline-secondary{% endif %}"
                 hx-get="./search?mode=cards" hx-target="#list" hx-include="#{{ searchFieldName }}, #sortInput, #colsInput">{% trans "Cards" %}</button>
     </div>
     <button type="button" class="btn btn-sm btn-outline-secondary"
             onclick="toggleSelectMode()">{% trans "Select" %} (<span id="selectCount">0</span>)</button>
+    {% if del or export or qr %}
+    <button type="button" class="btn btn-sm btn-outline-secondary" id="selectAllButton"
+            onclick="toggleSelectAll()">{% trans "Select all" %}</button>
+    {% endif %}
 </div>
 {% endif %}
+</div>
 
-{% if type == "article" %}
-<button type="button" class="btn btn-sm btn-outline-secondary ms-2 mb-2" onclick="qbToggle()">{% trans "Advanced" %}</button>
-{% include "hub/modules/queryBuilder.html" %}
-{% endif %}
+<div id="scannerDiv{{searchFieldName}}">
+</div>
 
 <!-- ____________________________Result Table______________________________________ -->
 

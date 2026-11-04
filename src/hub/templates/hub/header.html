@@ -73,15 +73,49 @@
             body.selecting .stretched-link { pointer-events: none; }
             body.selecting .card { cursor: pointer; }
             .card.selected { border-color: var(--bs-primary); box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); }
-            body:has(#list) .layout { height: 100vh; }
+            body:has(#list) .layout { height: var(--app-height, 100vh); min-height: 0; }
+            body:has(#list) .sidebar { height: var(--app-height, 100vh); }
+            html:has(#list), body:has(#list) { height: var(--app-height, 100vh); overflow: hidden; overscroll-behavior: none; }
             body:has(#list) .content { display: flex; flex-direction: column; overflow: hidden; }
             body:has(#list) #list { flex: 1 1 auto; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 5rem; }
             body:has(#list) #listBody { flex: 1 1 auto; overflow-y: auto; }
             body:has(#list) #resultsTable thead th { position: sticky; top: 0; background: #fff; z-index: 1; }
+            /* list controls (§ list-view-controls) */
+            body:has(#list) #listControls { display: flex; flex-direction: column; flex-shrink: 0; position: relative; z-index: 2; }
+            body:has(#list) [id^="scannerDiv"] { flex-shrink: 0; }
+            body:has(#list) #queryBuilder { position: absolute; left: 0; right: 0; top: 100%; max-height: 70vh; overflow: auto; background: #fff; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); z-index: 1050; }
+            body.keyboard-open:has(#list) #listControls { padding-bottom: 0; }
+            body.keyboard-open:has(#list) #listControlBar { display: none; }
+            @media (max-width: 768px) {
+                body:has(#list) #list { order: 1; padding-bottom: 0; }
+                body:has(#list) #listControls { order: 2; padding-bottom: 5rem; margin-top: 0.75rem; }
+                body:has(#list) #listSearchRow { order: 2; }
+                body:has(#list) #listControlBar { order: 1; }
+                body:has(#list) #queryBuilder { top: auto; bottom: 100%; }
+                body.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-end; }
+                body.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 2; border-radius: 0 .375rem .375rem 0; }
+                body.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 1; }
+            }
+            body.view-mobile:has(#list) #list { order: 1; padding-bottom: 0; }
+            body.view-mobile:has(#list) #listControls { order: 2; padding-bottom: 5rem; margin-top: 0.75rem; }
+            body.view-mobile:has(#list) #listSearchRow { order: 2; }
+            body.view-mobile:has(#list) #listControlBar { order: 1; }
+            body.view-mobile:has(#list) #queryBuilder { top: auto; bottom: 100%; }
+            body.view-mobile.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-end; }
+            body.view-mobile.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 2; border-radius: 0 .375rem .375rem 0; }
+            body.view-mobile.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 1; }
+            body.view-desktop:has(#list) #list { order: 0; padding-bottom: 5rem; }
+            body.view-desktop:has(#list) #listControls { order: 0; padding-bottom: 0; margin-top: 0; }
+            body.view-desktop:has(#list) #listSearchRow { order: 0; }
+            body.view-desktop:has(#list) #listControlBar { order: 0; }
+            body.view-desktop:has(#list) #queryBuilder { top: 100%; bottom: auto; }
+            body.view-desktop.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-start; }
+            body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 0; border-radius: .375rem 0 0 .375rem; }
+            body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 0; }
         </style>
         {% livereload_script %}
     </head>
-    <body class="view-{{ view_mode }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body class="view-{{ view_mode }} sidebar-mobile-{{ sidebar.side_mobile }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <div aria-live="polite" aria-atomic="true" class="position-relative">
             <div class="toast-container position-fixed top-0 end-0 p-3">
 
@@ -196,9 +230,117 @@
                 event.detail.headers["X-View-Mode"] =
                     window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
             });
+            var viewportBase = 0;
+            function syncViewport() {
+                var vv = window.visualViewport;
+                if (!vv) { return; }
+                document.documentElement.style.setProperty("--app-height", vv.height + "px");
+                viewportBase = Math.max(viewportBase, window.innerHeight, vv.height);
+                var mobile = window.matchMedia("(max-width: 768px)").matches
+                    || document.body.classList.contains("view-mobile");
+                document.body.classList.toggle("keyboard-open", mobile && viewportBase - vv.height > 150);
+            }
+            syncViewport();
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener("resize", syncViewport);
+                window.visualViewport.addEventListener("scroll", syncViewport);
+            }
+            window.addEventListener("resize", syncViewport);
+            document.body.addEventListener("detail-updated", function () {
+                var modal = document.getElementById("modalsingle");
+                if (modal) { bootstrap.Modal.getOrCreateInstance(modal).hide(); }
+                var search = document.querySelector("input[qtype=search]");
+                if (search) { htmx.trigger(search, "refresh"); }
+            });
+            window.addEventListener("orientationchange", function () {
+                viewportBase = 0;
+                setTimeout(syncViewport, 300);
+            });
+            (function viewportDebug() {
+                if (!/[?&]vkdebug/.test(window.location.search)) { return; }
+                var el = document.createElement("pre");
+                el.style.cssText = "position:fixed;top:0;left:0;z-index:99999;background:#000;color:#0f0;font:12px monospace;padding:4px;margin:0";
+                document.body.appendChild(el);
+                setInterval(function () {
+                    var vv = window.visualViewport;
+                    el.textContent = "innerH " + window.innerHeight
+                        + " vvH " + (vv ? Math.round(vv.height) : "-")
+                        + " vvTop " + (vv ? Math.round(vv.offsetTop) : "-")
+                        + " app " + getComputedStyle(document.documentElement).getPropertyValue("--app-height")
+                        + " kb " + document.body.classList.contains("keyboard-open")
+                        + " docH " + document.documentElement.scrollHeight
+                        + " y " + Math.round(window.scrollY);
+                }, 250);
+            })();
+            function listFilterValues() {
+                var search = document.querySelector("input[qtype=search]");
+                var qb = document.getElementById("qbQueryInput");
+                var sort = document.getElementById("sortInput");
+                return {
+                    search: search ? search.value : "",
+                    query: qb ? qb.value : "",
+                    sort: sort ? sort.value : "",
+                };
+            }
+            function updateSelectAll() {
+                var on = document.body.classList.contains("select-all");
+                var values = listFilterValues();
+                ["qrForm", "exportForm", "delForm"].forEach(function (id) {
+                    var form = document.getElementById(id);
+                    if (!form) { return; }
+                    form.querySelectorAll(".selectAllInput").forEach(function (el) { el.remove(); });
+                    if (on) {
+                        [["all", "1"], ["search", values.search], ["query", values.query],
+                         ["sort", values.sort]].forEach(function (pair) {
+                            var input = document.createElement("input");
+                            input.type = "hidden";
+                            input.name = pair[0];
+                            input.value = pair[1];
+                            input.className = "selectAllInput";
+                            form.appendChild(input);
+                        });
+                    }
+                });
+                var button = document.getElementById("selectAllButton");
+                if (button) {
+                    button.classList.toggle("btn-primary", on);
+                    button.classList.toggle("btn-outline-secondary", !on);
+                }
+                ["qrList", "exportList", "delList"].forEach(function (id) {
+                    var list = document.getElementById(id);
+                    if (!list) { return; }
+                    list.querySelectorAll(".selectAllItem").forEach(function (el) { el.remove(); });
+                    if (on) {
+                        var li = document.createElement("li");
+                        li.className = "selectAllItem text-muted";
+                        li.textContent = "{% trans 'All matching items' %}";
+                        list.appendChild(li);
+                    }
+                });
+            }
+            function toggleSelectAll() {
+                var on = document.body.classList.toggle("select-all");
+                if (on) {
+                    document.querySelectorAll(".checkboxlist:checked").forEach(function (c) {
+                        c.checked = false;
+                        if (c.closest(".card")) { c.closest(".card").classList.remove("selected"); }
+                    });
+                }
+                updateSelectAll();
+                updateSelectCount();
+            }
+            function clearSelectAll() {
+                if (!document.body.classList.contains("select-all")) { return; }
+                document.body.classList.remove("select-all");
+                updateSelectAll();
+            }
             function updateSelectCount() {
-                var n = document.querySelectorAll(".card-check:checked").length;
                 var el = document.getElementById("selectCount");
+                if (document.body.classList.contains("select-all")) {
+                    if (el) { el.textContent = "all"; }
+                    return 0;
+                }
+                var n = document.querySelectorAll(".card-check:checked").length;
                 if (el) { el.textContent = n; }
                 return n;
             }
@@ -206,13 +348,27 @@
                 document.body.classList.toggle("selecting");
                 updateSelectCount();
             }
+            function updateModeButtons() {
+                var body = document.getElementById("listBody");
+                var table = document.getElementById("listModeTable");
+                var cards = document.getElementById("listModeCards");
+                if (!body || !table || !cards) { return; }
+                var mode = body.dataset.listMode;
+                table.classList.toggle("btn-primary", mode === "table");
+                table.classList.toggle("btn-outline-secondary", mode !== "table");
+                cards.classList.toggle("btn-primary", mode === "cards");
+                cards.classList.toggle("btn-outline-secondary", mode !== "cards");
+            }
+            document.body.addEventListener("htmx:afterSwap", updateModeButtons);
             document.body.addEventListener("click", function(event) {
                 if (!document.body.classList.contains("selecting")) { return; }
                 var card = event.target.closest(".card");
                 if (!card) { return; }
+                if (document.body.classList.contains("select-all")) { clearSelectAll(); }
                 var check = card.querySelector(".card-check");
                 if (!check) { return; }
                 check.checked = !check.checked;
+                $(check).trigger("change");
                 card.classList.toggle("selected", check.checked);
                 if (updateSelectCount() === 0) { document.body.classList.remove("selecting"); }
             });
@@ -222,8 +378,9 @@
                 if (!card) { return; }
                 cardPressTimer = setTimeout(function() {
                     document.body.classList.add("selecting");
+                    if (document.body.classList.contains("select-all")) { clearSelectAll(); }
                     var check = card.querySelector(".card-check");
-                    if (check) { check.checked = true; }
+                    if (check) { check.checked = true; $(check).trigger("change"); }
                     card.classList.add("selected");
                     updateSelectCount();
                 }, 500);
@@ -232,6 +389,13 @@
             document.body.addEventListener("touchmove", function() { clearTimeout(cardPressTimer); });
             document.body.addEventListener("contextmenu", function(event) {
                 if (event.target.closest(".card")) { event.preventDefault(); }
+            });
+            document.body.addEventListener("change", function(event) {
+                var target = event.target;
+                if (target.id === "checkAll" ||
+                    (target.classList && target.classList.contains("checkboxlist"))) {
+                    clearSelectAll();
+                }
             });
         </script>
 

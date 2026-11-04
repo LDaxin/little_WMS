@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.test import TestCase
 
+from hub.tests.html import ids_inside
 from storage.models import Storage, StorageType
 
 
@@ -46,3 +47,52 @@ class AllStoragesTest(TestCase):
             Storage.objects.create(name="S%03d" % i, typ=storage_type)
         response = self.client.get("/storage/search", {"sort": "name"})
         self.assertContains(response, "sort=name")
+
+    def test_select_all_control_present(self):
+        response = self.client.get("/storage/room/")
+        self.assertContains(response, "selectAllButton")
+
+    def test_bulk_delete_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        other = Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/storage/room/del", {"all": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Storage.objects.all().filter(pk=self.storage.pk).exists())
+        self.assertFalse(Storage.objects.all().filter(pk=other.pk).exists())
+
+    def test_bulk_delete_all_matches_respects_search(self):
+        storage_type = StorageType.objects.get(name="room")
+        other = Storage.objects.create(name="AAA", typ=storage_type)
+        self.client.post("/storage/room/del", {"all": "1", "search": "Lager"})
+        self.assertFalse(Storage.objects.all().filter(pk=self.storage.pk).exists())
+        self.assertTrue(Storage.objects.all().filter(pk=other.pk).exists())
+
+    def test_bulk_export_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/storage/room/export", {"all": "1"})
+        content = response.content.decode("iso-8859-1")
+        self.assertIn("Lager", content)
+        self.assertIn("AAA", content)
+
+    def test_bulk_qr_all_matches(self):
+        storage_type = StorageType.objects.get(name="room")
+        Storage.objects.create(name="AAA", typ=storage_type)
+        response = self.client.post("/qr/print", {"type": "storage", "typ": "room", "all": "1"})
+        self.assertContains(response, "Lager")
+        self.assertContains(response, "AAA")
+
+    def test_list_default_applies_on_mobile(self):
+        response = self.client.get("/storage/room/")
+        self.assertContains(response, 'id="modeInput" name="mode" value=""')
+        response = self.client.get("/storage/room/search", HTTP_X_VIEW_MODE="mobile")
+        self.assertContains(response, "card-title")
+
+    def test_cards_load_more_at_end_of_list(self):
+        storage_type = StorageType.objects.get(name="room")
+        for i in range(51):
+            Storage.objects.create(name="S%03d" % i, typ=storage_type)
+        response = self.client.get("/storage/search", {"mode": "cards"})
+        self.assertIn("listControl", ids_inside(response.content.decode(), "listBody"))
+        response = self.client.get("/storage/search", {"mode": "table"})
+        self.assertNotIn("listControl", ids_inside(response.content.decode(), "listBody"))

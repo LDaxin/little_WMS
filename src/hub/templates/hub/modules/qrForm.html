@@ -5,6 +5,7 @@
     <form method="POST" action="/qr/print" target="_blank" id="qrForm">
         {% csrf_token %}
         <input type="hidden" name="type" value="{{ type }}">
+        <input type="hidden" name="typ" value="{{ typ }}">
         <div class="mb-2">
             <label class="form-label">{% trans "Format" %}</label>
             <select name="format" class="form-select">

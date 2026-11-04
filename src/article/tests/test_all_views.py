@@ -123,3 +123,79 @@ class AllArticlesTest(TestCase):
         response = self.client.get("/article/search", {"sort": "name", "cols": "name,code"})
         self.assertContains(response, 'id="sortInput" name="sort" value="name"')
         self.assertContains(response, 'id="colsInput" name="cols" value="name,code"')
+
+    def test_search_all_paginates(self):
+        for i in range(51):
+            base = ArticleBase.objects.create(name="Item %03d" % i, pType=self.article_type)
+            self._stock(Article.objects.create(base=base))
+        response = self.client.get("/article/search")
+        self.assertContains(response, "listControl")
+        self.assertContains(response, "page=2")
+
+    def test_search_all_append_rows_only(self):
+        self._stock(self.article)
+        response = self.client.get("/article/search", {"append": "1"})
+        self.assertNotContains(response, "resultsTable")
+        self.assertContains(response, "Jurte")
+
+    def test_select_all_control_present(self):
+        response = self.client.get("/article/tent/")
+        self.assertContains(response, "selectAllButton")
+
+    def test_bulk_delete_all_matches(self):
+        self._stock(self.article)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha)
+        response = self.client.post("/article/tent/del", {"all": "1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Article.objects.all().filter(pk=self.article.pk).exists())
+        self.assertFalse(Article.objects.all().filter(pk=alpha.pk).exists())
+
+    def test_bulk_delete_all_matches_respects_search(self):
+        self._stock(self.article)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha)
+        self.client.post("/article/tent/del", {"all": "1", "search": "Jurte"})
+        self.assertFalse(Article.objects.all().filter(pk=self.article.pk).exists())
+        self.assertTrue(Article.objects.all().filter(pk=alpha.pk).exists())
+
+    def test_bulk_export_all_matches(self):
+        self._stock(self.article)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha)
+        response = self.client.post("/article/tent/export", {"all": "1"})
+        content = response.content.decode("iso-8859-1")
+        self.assertIn("Jurte", content)
+        self.assertIn("Alpha", content)
+
+    def test_bulk_qr_all_matches(self):
+        self._stock(self.article)
+        alpha = Article.objects.create(
+            base=ArticleBase.objects.create(name="Alpha", pType=self.article_type)
+        )
+        self._stock(alpha)
+        response = self.client.post("/qr/print", {"type": "article", "typ": "tent", "all": "1"})
+        self.assertContains(response, "Jurte")
+        self.assertContains(response, "Alpha")
+
+    def test_list_default_applies_on_mobile(self):
+        self._stock(self.article)
+        # the page must not pin an explicit mode — that would override the setting
+        response = self.client.get("/article/tent/")
+        self.assertContains(response, 'id="modeInput" name="mode" value=""')
+        # a mobile client with no explicit mode gets the configured default (cards)
+        response = self.client.get("/article/tent/search", HTTP_X_VIEW_MODE="mobile")
+        self.assertContains(response, "card-title")
+
+    def test_explicit_mode_wins_over_default(self):
+        self._stock(self.article)
+        response = self.client.get(
+            "/article/tent/search", {"mode": "table"}, HTTP_X_VIEW_MODE="mobile"
+        )
+        self.assertContains(response, "resultsTable")

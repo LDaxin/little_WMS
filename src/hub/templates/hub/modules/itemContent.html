@@ -1,0 +1,27 @@
+{% load i18n %}
+{% if link %}
+<div class="d-flex align-items-center gap-2 p-2">
+    <span class="badge text-bg-secondary">{{ code }}</span>
+    <button type="button" class="btn btn-sm btn-outline-secondary"
+            onclick="copyToClipboard(window.location.origin + '{{ link }}', this);">
+        {% trans "Copy link" %}
+    </button>
+    <a class="btn btn-sm btn-outline-secondary" href="{{ link }}">{% trans "Open" %}</a>
+</div>
+{% endif %}
+{% if storeActions %}{% include "hub/modules/storeActions.html" %}{% endif %}
+{% if floorPlanUrl %}
+<div class="p-2">
+    <a class="btn btn-sm btn-outline-secondary" href="{{ floorPlanUrl }}">{% trans "Floor plan" %}</a>
+</div>
+{% endif %}
+{% if imageGallery %}{% include "hub/modules/imageGallery.html" %}{% endif %}
+{% if storageContents %}{% include "hub/modules/storageContents.html" %}{% endif %}
+{% if articleCalendar %}{% include "hub/modules/articleCalendar.html" %}{% endif %}
+{% if showComposition %}{% include "hub/modules/composition.html" %}{% endif %}
+{% if tagChips %}{% include "hub/modules/tagChips.html" %}{% endif %}
+{% if assignedTo %}{% include "hub/modules/assignedTo.html" %}{% endif %}
+{% if auditTimeline %}{% include "hub/modules/auditTimeline.html" %}{% endif %}
+{% if linkedStorages or linkedOccasions %}{% include "location/linkedObjects.html" %}{% endif %}
+{% include "hub/modules/itemForm.html" %}
+{% if mapPicker %}{% include "location/mapPicker.html" %}{% endif %}

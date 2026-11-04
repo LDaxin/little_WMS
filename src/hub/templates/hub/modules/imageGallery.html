@@ -1,22 +1,22 @@
 {% load i18n %}
-<div class="p-2">
+<div id="imageGallery" class="p-2">
     <div class="d-flex flex-wrap gap-2">
         {% for img in images %}
         <div class="text-center">
             <img src="{{ img.thumbnail.url }}" style="height:80px" class="rounded border">
             {% if img.is_primary %}<div class="badge text-bg-primary">{% trans "Primary" %}</div>{% endif %}
             <div class="btn-group btn-group-sm mt-1">
-                <form method="post" action="{{ imageBaseUrl }}{{ img.id }}/primary">{% csrf_token %}
+                <form hx-post="{{ imageBaseUrl }}{{ img.id }}/primary" hx-target="#imageGallery" hx-swap="outerHTML">{% csrf_token %}
                     <button class="btn btn-outline-secondary" title="{% trans "Set primary" %}">&#9733;</button>
                 </form>
-                <form method="post" action="{{ imageBaseUrl }}{{ img.id }}/delete">{% csrf_token %}
+                <form hx-post="{{ imageBaseUrl }}{{ img.id }}/delete" hx-target="#imageGallery" hx-swap="outerHTML">{% csrf_token %}
                     <button class="btn btn-outline-danger" title="{% trans "Delete" %}">&times;</button>
                 </form>
             </div>
         </div>
         {% endfor %}
     </div>
-    <form method="post" action="{{ imageBaseUrl }}add" enctype="multipart/form-data" class="mt-2 d-flex gap-2">
+    <form hx-post="{{ imageBaseUrl }}add" hx-encoding="multipart/form-data" hx-target="#imageGallery" hx-swap="outerHTML" class="mt-2 d-flex gap-2">
         {% csrf_token %}
         <input type="file" name="image" accept="image/*" class="form-control form-control-sm" required>
         <input type="text" name="caption" class="form-control form-control-sm" placeholder="{% trans "Caption" %}">

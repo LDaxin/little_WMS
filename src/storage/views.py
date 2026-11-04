@@ -24,6 +24,11 @@ from time import sleep
 
 PAGE_SIZE = 50
 
+
+def _storage_base(typ, storage_id):
+    """Absolute base URL of a storage's detail (works from any list page)."""
+    return reverse("storages", args=[typ]) + str(storage_id)
+
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.view_all")
 def storage(request, typ, storageId):
@@ -31,6 +36,7 @@ def storage(request, typ, storageId):
 
         if storageObject.typ.name == typ:
             instancedStorageForum = FormChangeStorage(instance=storageObject)
+            base = _storage_base(typ, storageId)
             context = {
                 "symbol":storageObject.typ.symbol,
                 "searchFieldName":"storageSearch" + storageObject.typ.name,
@@ -43,20 +49,25 @@ def storage(request, typ, storageId):
                 "link":("/s/" + storageObject.code.code) if storageObject.code else "",
                 "storageContents":True,
                 "contents":Stock.objects.filter(stored=storageObject.space),
-                "storeUrl":"./%s/store" % storageId,
-                "removeUrl":"./%s/remove" % storageId,
+                "storeUrl":base + "/store",
+                "removeUrl":base + "/remove",
+                "storeSearchUrl":base + "/store-search",
+                "storeScannerUrl":base[:base.rfind("/")] + "/scanner/storeCode/toggle",
                 "tagChips":True,
                 "tags":storageObject.tags.all(),
                 "allTags":Tag.objects.all(),
-                "tagAddUrl":"./%s/tags/add" % storageId,
-                "tagRemoveUrl":"./%s/tags/remove" % storageId,
+                "tagAddUrl":base + "/tags/add",
+                "tagRemoveUrl":base + "/tags/remove",
                 "imageGallery":True,
                 "images":storageObject.images.all(),
-                "imageBaseUrl":"./%s/images/" % storageId,
-                "floorPlanUrl":"./%s/plan" % storageId,
+                "imageBaseUrl":base + "/images/",
+                "floorPlanUrl":base + "/plan",
+                "updateUrl":base + "/update",
+                "scannerBaseUrl":"/storage/%s/scanner" % typ,
             }
             context.update(composition_context(storageObject.space))
-            return render(request, "hub/modules/item.html", context=context)
+            template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
+            return render(request, template, context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
 
@@ -73,6 +84,10 @@ def addStorageImage(request, typ, storageId):
             caption=request.POST.get("caption", ""),
             is_primary=not storage.images.exists(),
         )
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": storage.images.all(),
+                       "imageBaseUrl": _storage_base(typ, storageId) + "/images/"})
     return redirect("storage", typ=typ, storageId=storageId)
 
 
@@ -84,6 +99,10 @@ def deleteStorageImage(request, typ, storageId, imageId):
         image = storage.images.filter(pk=imageId).first()
         if image:
             image.delete()
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": storage.images.all(),
+                       "imageBaseUrl": _storage_base(typ, storageId) + "/images/"})
     return redirect("storage", typ=typ, storageId=storageId)
 
 
@@ -94,6 +113,10 @@ def setPrimaryStorageImage(request, typ, storageId, imageId):
     if request.method == "POST":
         storage.images.update(is_primary=False)
         storage.images.filter(pk=imageId).update(is_primary=True)
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": storage.images.all(),
+                       "imageBaseUrl": _storage_base(typ, storageId) + "/images/"})
     return redirect("storage", typ=typ, storageId=storageId)
 
 
@@ -245,7 +268,9 @@ def storageIncert(request, typ, storageId):
                 "form":[instancedStorageForum],
                 "typ":typ,
                 "actionType":"update",
-                "id":storageId
+                "id":storageId,
+                "updateUrl":_storage_base(typ, storageId) + "/update",
+                "scannerBaseUrl":"/storage/%s/scanner" % typ,
             }
             return render(request, "hub/modules/itemForm.html", context=context)
         else:
@@ -309,16 +334,34 @@ def storagesAll(request):
     })
 
 
+def _storage_list(request, params=None, typ=None):
+    """The filtered, sorted storage queryset for the storage list (§ list-views).
+
+    ``params`` defaults to the query string; bulk actions pass their POST data
+    so "select all matches" re-runs the same filter server-side.
+    """
+    params = request.GET if params is None else params
+    qs = Storage.objects.select_related("typ").prefetch_related("images")
+    if typ:
+        qs = qs.filter(typ__name__exact=typ)
+    qs = filter_by_search(qs, params.get("search", ""), "name", "code__code")
+    return order_by(qs, "storage", params.get("sort", ""))
+
+
+def _selected_storages(request, typ):
+    """The storages a bulk action applies to (§ list-views)."""
+    if request.POST.get("all"):
+        return _storage_list(request, request.POST, typ)
+    ids = [value for key, value in request.POST.items() if key.startswith("_")]
+    return Storage.objects.filter(pk__in=ids, typ__name__exact=typ)
+
+
 @login_required(login_url='/accounts/login/')
 @require_perm("storage.view_all")
 def searchStoragesAll(request):
     if request.method == "GET":
-        r = filter_by_search(
-            Storage.objects.select_related("typ").prefetch_related("images"),
-            request.GET.get("search", ""), "name", "code__code",
-        )
+        r = _storage_list(request)
         sort = request.GET.get("sort", "")
-        r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
         cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
@@ -388,21 +431,17 @@ def addStorage(request, typ):
 @require_perm("storage.delete_all")
 def delStorage(request, typ):
     if request.method == "POST":
-        delList = []
         delListReturn = ""
-        childList = []
-        for key, value in request.POST.items():
-            if key[0:1] == '_':
-                try:
-                    pa = Storage.objects.filter(pk=value).first()
-                    ch = Storage.objects.filter(parent__pk=value)
-                    delListReturn = delListReturn + pa.__str__() + ", "
-                    for i in ch:
-                        i.parent = None
-                        i.save()
-                    pa.delete()
-                except Exception as e:
-                    return toast(request, "Error", e, "alert")
+        try:
+            for pa in list(_selected_storages(request, typ)):
+                ch = Storage.objects.filter(parent__pk=pa.pk)
+                delListReturn = delListReturn + pa.__str__() + ", "
+                for i in ch:
+                    i.parent = None
+                    i.save()
+                pa.delete()
+        except Exception as e:
+            return toast(request, "Error", e, "alert")
 
         return toast(request, "Delete", delListReturn, "status", template="hub/modules/itemDelete.html")
     return toast(request, _("Error"), _("something went wrong"), "alert")
@@ -416,19 +455,22 @@ def updateStorage(request, storageId, typ):
         form = FormChangeStorage(request.POST, instance=storageObject)
         if form.is_valid():
             form.save()
-            return toast(request, "Update", str(storageObject) + " was updated", "status")
+            response = toast(request, "Update", str(storageObject) + " was updated", "status")
+            response["HX-Trigger"] = "detail-updated"
+            return response
         return toast(request, _("Error"), _("something went wrong"), "alert")
 
 
-def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning="", forceCode=""):
+def _storage_contents_context(storage, base, error="", warning="", forceCode=""):
     return {
         "contents": Stock.objects.filter(stored=storage.space).select_related("article__base"),
-        "storeUrl": storeUrl,
-        "removeUrl": removeUrl,
-        "storeSearchUrl": storeUrl + "-search",
+        "storeUrl": base + "/store",
+        "removeUrl": base + "/remove",
+        "storeSearchUrl": base + "/store-search",
         "storeError": error,
         "storeWarning": warning,
         "forceCode": forceCode,
+        "storeScannerUrl": base[:base.rfind("/")] + "/scanner/storeCode/toggle",
     }
 
 
@@ -436,8 +478,7 @@ def _storage_contents_context(storage, storeUrl, removeUrl, error="", warning=""
 @require_perm("article.move_all")
 def storeInStorage(request, typ, storageId):
     storage = Storage.objects.get(pk=storageId)
-    storeUrl = "./%s/store" % storageId
-    removeUrl = "./%s/remove" % storageId
+    base = _storage_base(typ, storageId)
     if request.method == "POST":
         code = request.POST.get("code", "")
         try:
@@ -445,7 +486,7 @@ def storeInStorage(request, typ, storageId):
             warning = composition_warning(storage.space, article)
             if warning and not request.POST.get("force"):
                 return render(request, "hub/modules/storageContents.html",
-                              context=_storage_contents_context(storage, storeUrl, removeUrl,
+                              context=_storage_contents_context(storage, base,
                                                                 warning=warning, forceCode=code))
             amount = request.POST.get("amount", "").strip()
             amount = int(amount) if amount.isdigit() else None
@@ -456,7 +497,7 @@ def storeInStorage(request, typ, storageId):
         except ValidationError as e:
             error = e.messages[0] if e.messages else str(e)
         return render(request, "hub/modules/storageContents.html",
-                      context=_storage_contents_context(storage, storeUrl, removeUrl, error))
+                      context=_storage_contents_context(storage, base, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -471,7 +512,7 @@ def storeArticleSearch(request, typ, storageId):
         articles = Article.objects.none()
     return render(request, "hub/modules/storeArticleResults.html", {
         "articles": articles,
-        "storeUrl": "./%s/store" % storageId,
+        "storeUrl": _storage_base(typ, storageId) + "/store",
     })
 
 
@@ -479,22 +520,21 @@ def storeArticleSearch(request, typ, storageId):
 @require_perm("article.move_all")
 def removeFromStorage(request, typ, storageId, articleId):
     storage = Storage.objects.get(pk=storageId)
-    storeUrl = "./%s/store" % storageId
-    removeUrl = "./%s/remove" % storageId
+    base = _storage_base(typ, storageId)
     if request.method == "POST":
         article = Article.objects.get(pk=articleId)
         MovementService.remove_article(article, space=storage.space, user=request.user)
         return render(request, "hub/modules/storageContents.html",
-                      context=_storage_contents_context(storage, storeUrl, removeUrl))
+                      context=_storage_contents_context(storage, base))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
-def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
+def _tag_chips_context(obj, base, error=""):
     return {
         "tags": obj.tags.all(),
         "allTags": Tag.objects.all(),
-        "tagAddUrl": tagAddUrl,
-        "tagRemoveUrl": tagRemoveUrl,
+        "tagAddUrl": base + "/tags/add",
+        "tagRemoveUrl": base + "/tags/remove",
         "tagError": error,
     }
 
@@ -503,8 +543,7 @@ def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
 @require_perm("storage.edit_all")
 def addStorageTag(request, typ, storageId):
     storage = Storage.objects.get(pk=storageId)
-    tagAddUrl = "./%s/tags/add" % storageId
-    tagRemoveUrl = "./%s/tags/remove" % storageId
+    base = _storage_base(typ, storageId)
     if request.method == "POST":
         name = request.POST.get("tag", "").strip()
         tag = Tag.objects.filter(name__iexact=name).first()
@@ -514,7 +553,7 @@ def addStorageTag(request, typ, storageId):
             storage.tags.add(tag)
             error = ""
         return render(request, "hub/modules/tagChips.html",
-                      context=_tag_chips_context(storage, tagAddUrl, tagRemoveUrl, error))
+                      context=_tag_chips_context(storage, base, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -522,12 +561,11 @@ def addStorageTag(request, typ, storageId):
 @require_perm("storage.edit_all")
 def removeStorageTag(request, typ, storageId, tagId):
     storage = Storage.objects.get(pk=storageId)
-    tagAddUrl = "./%s/tags/add" % storageId
-    tagRemoveUrl = "./%s/tags/remove" % storageId
+    base = _storage_base(typ, storageId)
     if request.method == "POST":
         storage.tags.remove(Tag.objects.get(pk=tagId))
         return render(request, "hub/modules/tagChips.html",
-                      context=_tag_chips_context(storage, tagAddUrl, tagRemoveUrl))
+                      context=_tag_chips_context(storage, base))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -535,12 +573,8 @@ def removeStorageTag(request, typ, storageId, tagId):
 @require_perm("storage.view_all")
 def searchStorages(request, typ):
     if request.method == "GET":
-        r = filter_by_search(
-            Storage.objects.filter(typ__name__exact=typ).select_related("typ").prefetch_related("images"),
-            request.GET.get("search", ""), "name", "code__code",
-        )
+        r = _storage_list(request, typ=typ)
         sort = request.GET.get("sort", "")
-        r = order_by(r, "storage", sort)
         page = Paginator(r, PAGE_SIZE).get_page(request.GET.get("page"))
         cols = request.GET.get("cols", "")
         template = "hub/modules/listAppend.html" if request.GET.get("append") else "hub/modules/list.html"
@@ -560,12 +594,10 @@ def searchStorages(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportStorages(request, typ):
-    rows = []
-    for key, value in request.POST.items():
-        if key.startswith("_"):
-            storage = Storage.objects.get(pk=value)
-            if storage.typ.name == typ:
-                rows.append([storage.name, storage.code.code, storage.typ.name])
+    rows = [
+        [storage.name, storage.code.code, storage.typ.name]
+        for storage in _selected_storages(request, typ)
+    ]
     return csv_response("storages.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')

@@ -10,6 +10,7 @@
             <div class="small">{{ stock.stored|space_path }} &middot; {{ stock.menge }}</div>
             <span class="badge bg-{{ stock.article.zustand|condition_color }}">{{ stock.article.zustand|condition_label }}</span>
         </div>
-        <a class="stretched-link" href="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}"></a>
+        <a class="stretched-link" href="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}"
+           hx-get="{% url 'article' typ=stock.article.base.pType.name articleId=stock.article.pk %}" hx-target="#modalBodysingle" hx-swap="innerHTML"></a>
     </div>
 </div>

@@ -32,6 +32,11 @@ from django.db.models import Count, Sum
 PAGE_SIZE = 50
 
 
+def _article_base(typ, article_id):
+    """Absolute base URL of an article's detail (works from any list page)."""
+    return reverse("articles", args=[typ]) + str(article_id)
+
+
 def _article_terms(article):
     """The article's dated terms for the mini calendar (§2)."""
     from occasion.models import Packlist
@@ -83,6 +88,7 @@ def article(request, typ, articleId):
         bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
         par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
 
+        base = _article_base(typ, articleId)
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -97,28 +103,31 @@ def article(request, typ, articleId):
             "storeActions":True,
             "articleCalendar":True,
             "articleTerms":_article_terms(p),
-            **_store_actions_context(p, "./%s/store" % articleId, "./%s/remove" % articleId),
+            **_store_actions_context(p, base),
             "tagChips":True,
             "tags":p.tags.all(),
             "allTags":Tag.objects.all(),
-            "tagAddUrl":"./%s/tags/add" % articleId,
-            "tagRemoveUrl":"./%s/tags/remove" % articleId,
+            "tagAddUrl":base + "/tags/add",
+            "tagRemoveUrl":base + "/tags/remove",
             "assignedTo":True,
             "assignees":p.assigned_to.all(),
             "allUsers":User.objects.all(),
-            "assignUrl":"./%s/assign" % articleId,
-            "unassignUrl":"./%s/unassign" % articleId,
+            "assignUrl":base + "/assign",
+            "unassignUrl":base + "/unassign",
             "auditTimeline":True,
             "auditLogs":AuditLog.objects.filter(
                 content_type=ContentType.objects.get_for_model(Article),
                 object_id=p.pk)[:20],
             "imageGallery":True,
             "images":p.images.all(),
-            "imageBaseUrl":"./%s/images/" % articleId,
+            "imageBaseUrl":base + "/images/",
+            "updateUrl":base + "/update",
+            "scannerBaseUrl":"/article/%s/scanner" % typ,
         }
         if p.space and p.space.active:
             context.update(composition_context(p.space))
-        return render(request, "hub/modules/item.html", context=context)
+        template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
+        return render(request, template, context=context)
     else:
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
 
@@ -136,6 +145,10 @@ def addArticleImage(request, typ, articleId):
             caption=request.POST.get("caption", ""),
             is_primary=not article.images.exists(),
         )
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": article.images.all(),
+                       "imageBaseUrl": _article_base(typ, articleId) + "/images/"})
     return redirect("article", typ=typ, articleId=articleId)
 
 
@@ -148,6 +161,10 @@ def deleteArticleImage(request, typ, articleId, imageId):
         image = article.images.filter(pk=imageId).first()
         if image:
             image.delete()
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": article.images.all(),
+                       "imageBaseUrl": _article_base(typ, articleId) + "/images/"})
     return redirect("article", typ=typ, articleId=articleId)
 
 
@@ -159,6 +176,10 @@ def setPrimaryArticleImage(request, typ, articleId, imageId):
     if request.method == "POST":
         article.images.update(is_primary=False)
         article.images.filter(pk=imageId).update(is_primary=True)
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/imageGallery.html",
+                      {"images": article.images.all(),
+                       "imageBaseUrl": _article_base(typ, articleId) + "/images/"})
     return redirect("article", typ=typ, articleId=articleId)
 
 
@@ -181,6 +202,9 @@ def addMaintenance(request, typ, articleId):
                 article=article,
                 responsible_user=request.user,
             )
+    if request.headers.get("HX-Request"):
+        return render(request, "hub/modules/articleCalendar.html",
+                      {"articleTerms": _article_terms(article), "typ": typ, "id": articleId})
     return redirect("article", typ=typ, articleId=articleId)
 
 @login_required(login_url='/accounts/login/')
@@ -288,12 +312,17 @@ def articlesAll(request):
     })
 
 
-def _article_stocks(request):
-    """The filtered, sorted stock queryset for the article list (§ list-views)."""
+def _article_stocks(request, params=None):
+    """The filtered, sorted stock queryset for the article list (§ list-views).
+
+    ``params`` defaults to the query string; bulk actions pass their POST data
+    so "select all matches" re-runs the same filter server-side.
+    """
     from querybuilder.services import ARTICLE_FIELDS, QueryError, parse_json
 
+    params = request.GET if params is None else params
     stocks = Stock.objects.select_related("article__base__pType", "article__code", "stored")
-    query = request.GET.get("query")
+    query = params.get("query")
     if query:
         try:
             stocks = stocks.filter(parse_json(query, ARTICLE_FIELDS, prefix="article__"))
@@ -301,11 +330,29 @@ def _article_stocks(request):
             pass
     else:
         stocks = filter_by_search(
-            stocks, request.GET.get("search", ""), "article__base__name", "article__code__code"
+            stocks, params.get("search", ""), "article__base__name", "article__code__code"
         )
     if is_assigned_only(request.user, "article", "view", active_organisation(request)):
         stocks = stocks.filter(article__assigned_to=request.user)
-    return order_by(stocks, "article", request.GET.get("sort", ""))
+    return order_by(stocks, "article", params.get("sort", ""))
+
+
+def _selected_articles(request, typ):
+    """The articles a bulk action applies to (§ list-views).
+
+    With ``all`` in the POST the current filter is re-run server-side (all
+    matches, not only the loaded rows); otherwise the explicit ``_<id>`` values.
+    """
+    if request.POST.get("all"):
+        ids = _article_stocks(request, request.POST).filter(
+            article__base__pType__name__exact=typ
+        ).values_list("article_id", flat=True)
+        return Article.objects.filter(pk__in=list(ids))
+    ids = [value for key, value in request.POST.items() if key.startswith("_")]
+    articles = Article.objects.filter(pk__in=ids, base__pType__name__exact=typ)
+    if is_assigned_only(request.user, "article", "view", active_organisation(request)):
+        articles = articles.filter(assigned_to=request.user)
+    return articles
 
 
 def _article_groups(stocks, totals, counts):
@@ -438,16 +485,8 @@ def delArticle(request, typ):
         return toast(request, _("Error"), _("no article type named ") + typ, "alert")
     else:
         if request.method == "POST":
-            delList = []
             delListReturn = ""
-            for key, value in request.POST.items():
-                if key.startswith("_"):
-                    try:
-                        pa = Article.objects.filter(base__pType__name__exact=typ, pk=value).first()
-                        delList.append(pa)
-                    except Exception as e:
-                        return toast(request, "Error", e, "alert")
-            for i in delList:
+            for i in list(_selected_articles(request, typ)):
                 _require_article(request, "delete", i)
                 delListReturn = delListReturn + i.__str__() + " "
                 audit_log("deleted", i, request.user)
@@ -498,22 +537,25 @@ def updateArticle(request, typ, articleId):
                     stock.menge = menge
                     stock.save()
 
-            return toast(request, _("Update"), _("article was updated"), "status")
+            response = toast(request, _("Update"), _("article was updated"), "status")
+            response["HX-Trigger"] = "detail-updated"
+            return response
         return toast(request, _("Error"), _("something went wrong"), "alert")
 
-def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", forceCode=""):
+def _store_actions_context(article, base, error="", warning="", forceCode=""):
     return {
         "stocks": article.stocks.exclude(stored=None),
         "not_stored": sum(s.menge for s in article.stocks.filter(stored=None)),
-        "storeUrl": storeUrl,
-        "removeUrl": removeUrl,
-        "storeSearchUrl": storeUrl + "-search",
+        "storeUrl": base + "/store",
+        "removeUrl": base + "/remove",
+        "storeSearchUrl": base + "/store-search",
         "storeError": error,
         "storeWarning": warning,
         "forceCode": forceCode,
         "mergeable": article.base.pType.allow_merge_split,
         "defaultLocations": default_locations(article.base),
-        "storeDefaultUrl": "./%s/store-default" % article.pk,
+        "storeDefaultUrl": base + "/store-default",
+        "storeScannerUrl": base[:base.rfind("/")] + "/scanner/storeCode/toggle",
     }
 
 
@@ -522,8 +564,7 @@ def _store_actions_context(article, storeUrl, removeUrl, error="", warning="", f
 def storeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     _require_article(request, "move", article)
-    storeUrl = "./%s/store" % articleId
-    removeUrl = "./%s/remove" % articleId
+    base = _article_base(typ, articleId)
     if request.method == "POST":
         code = request.POST.get("code", "")
         try:
@@ -531,7 +572,7 @@ def storeArticle(request, typ, articleId):
             warning = composition_warning(target, article)
             if warning and not request.POST.get("force"):
                 return render(request, "hub/modules/storeActions.html",
-                              context=_store_actions_context(article, storeUrl, removeUrl,
+                              context=_store_actions_context(article, base,
                                                              warning=warning, forceCode=code))
             amount = _int_or_none(request.POST.get("amount"))
             MovementService.store_article(article, target, request.user, amount=amount)
@@ -539,7 +580,7 @@ def storeArticle(request, typ, articleId):
         except ValidationError as e:
             error = e.messages[0] if e.messages else str(e)
         return render(request, "hub/modules/storeActions.html",
-                      context=_store_actions_context(article, storeUrl, removeUrl, error))
+                      context=_store_actions_context(article, base, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -548,14 +589,13 @@ def storeArticle(request, typ, articleId):
 def removeArticle(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     _require_article(request, "move", article)
-    storeUrl = "./%s/store" % articleId
-    removeUrl = "./%s/remove" % articleId
+    base = _article_base(typ, articleId)
     if request.method == "POST":
         stock = Stock.objects.filter(pk=request.POST.get("stock"), article=article).first()
         MovementService.remove_article(
             article, space=stock.stored if stock else None, user=request.user)
         return render(request, "hub/modules/storeActions.html",
-                      context=_store_actions_context(article, storeUrl, removeUrl))
+                      context=_store_actions_context(article, base))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -564,8 +604,7 @@ def removeArticle(request, typ, articleId):
 def storeToDefault(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     _require_article(request, "move", article)
-    storeUrl = "./%s/store" % articleId
-    removeUrl = "./%s/remove" % articleId
+    base = _article_base(typ, articleId)
     if request.method == "POST":
         targets = default_locations(article.base)
         if not targets:
@@ -579,7 +618,7 @@ def storeToDefault(request, typ, articleId):
         if request.POST.get("next"):
             return redirect(request.POST["next"])
         return render(request, "hub/modules/storeActions.html",
-                      context=_store_actions_context(article, storeUrl, removeUrl, error))
+                      context=_store_actions_context(article, base, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -599,16 +638,16 @@ def storeTargetSearch(request, typ, articleId):
     return render(request, "hub/modules/storeTargetResults.html", {
         "storages": storages,
         "containers": containers,
-        "storeUrl": "./%s/store" % articleId,
+        "storeUrl": _article_base(typ, articleId) + "/store",
     })
 
 
-def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
+def _tag_chips_context(obj, base, error=""):
     return {
         "tags": obj.tags.all(),
         "allTags": Tag.objects.all(),
-        "tagAddUrl": tagAddUrl,
-        "tagRemoveUrl": tagRemoveUrl,
+        "tagAddUrl": base + "/tags/add",
+        "tagRemoveUrl": base + "/tags/remove",
         "tagError": error,
     }
 
@@ -618,8 +657,7 @@ def _tag_chips_context(obj, tagAddUrl, tagRemoveUrl, error=""):
 def addArticleTag(request, typ, articleId):
     article = Article.objects.get(pk=articleId)
     _require_article(request, "edit", article)
-    tagAddUrl = "./%s/tags/add" % articleId
-    tagRemoveUrl = "./%s/tags/remove" % articleId
+    base = _article_base(typ, articleId)
     if request.method == "POST":
         name = request.POST.get("tag", "").strip()
         tag = Tag.objects.filter(name__iexact=name).first()
@@ -629,7 +667,7 @@ def addArticleTag(request, typ, articleId):
             article.tags.add(tag)
             error = ""
         return render(request, "hub/modules/tagChips.html",
-                      context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl, error))
+                      context=_tag_chips_context(article, base, error))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -638,21 +676,21 @@ def addArticleTag(request, typ, articleId):
 def removeArticleTag(request, typ, articleId, tagId):
     article = Article.objects.get(pk=articleId)
     _require_article(request, "edit", article)
-    tagAddUrl = "./%s/tags/add" % articleId
-    tagRemoveUrl = "./%s/tags/remove" % articleId
+    base = _article_base(typ, articleId)
     if request.method == "POST":
         article.tags.remove(Tag.objects.get(pk=tagId))
         return render(request, "hub/modules/tagChips.html",
-                      context=_tag_chips_context(article, tagAddUrl, tagRemoveUrl))
+                      context=_tag_chips_context(article, base))
     return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
-def _assigned_context(article):
+def _assigned_context(article, typ):
+    base = _article_base(typ, article.pk)
     return {
         "assignees": article.assigned_to.all(),
         "allUsers": User.objects.all(),
-        "assignUrl": "./%s/assign" % article.pk,
-        "unassignUrl": "./%s/unassign" % article.pk,
+        "assignUrl": base + "/assign",
+        "unassignUrl": base + "/unassign",
     }
 
 
@@ -665,7 +703,7 @@ def assignArticle(request, typ, articleId):
         user = User.objects.filter(pk=request.POST.get("user")).first()
         if user is not None:
             article.assigned_to.add(user)
-    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article))
+    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article, typ))
 
 
 @login_required(login_url='/accounts/login/')
@@ -677,7 +715,7 @@ def unassignArticle(request, typ, articleId, userId):
         user = User.objects.filter(pk=userId).first()
         if user is not None:
             article.assigned_to.remove(user)
-    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article))
+    return render(request, "hub/modules/assignedTo.html", context=_assigned_context(article, typ))
 
 
 def _int_or_none(value):
@@ -814,15 +852,10 @@ def searchArticle(request, typ):
 @login_required(login_url='/accounts/login/')
 @require_perm("export.csv_all")
 def exportArticles(request, typ):
-    assigned_only = is_assigned_only(request.user, "article", "view", active_organisation(request))
-    rows = []
-    for key, value in request.POST.items():
-        if key.startswith("_"):
-            article = Article.objects.get(pk=value)
-            if assigned_only and request.user not in article.assigned_to.all():
-                continue
-            if article.base.pType.name == typ:
-                rows.append([article.base.name, article.code.code, article.base.pType.name])
+    rows = [
+        [article.base.name, article.code.code, article.base.pType.name]
+        for article in _selected_articles(request, typ)
+    ]
     return csv_response("articles.csv", ["name", "code", "type"], rows, encoding="iso-8859-1")
 
 @login_required(login_url='/accounts/login/')

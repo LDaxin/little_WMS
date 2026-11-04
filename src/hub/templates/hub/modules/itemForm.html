@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<form method="POST" action="./{{id}}/{{ actionType }}" id="{{id}}{{ actionType }}Form">
+<form method="POST" action="{{ updateUrl }}" id="{{id}}{{ actionType }}Form">
     {% csrf_token %}
     <input type="hidden" name="version" value="{{ version }}">
 
@@ -20,7 +20,7 @@
                             id="QRButton{{field.auto_id}}" 
                             class="btn btn-primary scanner" 
                             type="button" 
-                            hx-post="./scanner/{{field.auto_id}}/toggle" 
+                            hx-post="{{ scannerBaseUrl }}/{{field.auto_id}}/toggle" 
                             hx-swap="outerHTML"
                             hx-target="#scannerDiv{{field.auto_id}}" 
                             hx-trigger="click">
@@ -41,7 +41,7 @@
                 {% endif %}
         {% endfor %}
     {% endfor %}
-    <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="./{{id}}/{{ actionType }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
+    <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="{{ updateUrl }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
 </form>
 
 <script>
