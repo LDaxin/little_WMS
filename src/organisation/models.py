@@ -12,6 +12,8 @@ SIDEBAR_POSITION_CHOICES = [("left", "Left"), ("right", "Right")]
 VIEW_MODE_CHOICES = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", "Always desktop")]
 # Default list rendering (§ list-views), separate for desktop and mobile.
 LIST_VIEW_CHOICES = [("table", "Table"), ("cards", "Cards")]
+# Default detail layout on desktop (§ detail-view); mobile always uses the accordion.
+DETAIL_LAYOUT_CHOICES = [("accordion", "Accordion"), ("tabs", "Tabs")]
 
 
 def _catalog_permissions():
@@ -105,6 +107,10 @@ class UserProfile(models.Model):
     # Default list rendering (§ list-views), separate for desktop and mobile.
     list_view_desktop = models.CharField(max_length=10, choices=LIST_VIEW_CHOICES, default="table")
     list_view_mobile = models.CharField(max_length=10, choices=LIST_VIEW_CHOICES, default="cards")
+    # Default detail layout on desktop (§ detail-view); mobile always uses the accordion.
+    detail_layout_desktop = models.CharField(
+        max_length=10, choices=DETAIL_LAYOUT_CHOICES, default="accordion"
+    )
     # Scan feedback (§11): sound and vibration on the movement page.
     sound_enabled = models.BooleanField(default=True)
     vibration_enabled = models.BooleanField(default=True)

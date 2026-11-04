@@ -84,6 +84,14 @@
             {% endfor %}
         </select>
     </div>
+    <div class="mt-2">
+        <label class="form-label mb-0">{% trans "Detail layout (desktop)" %}</label>
+        <select name="detail_layout_desktop" class="form-select" style="max-width:12rem">
+            {% for value, label in detail_layouts %}
+            <option value="{{ value }}" {% if profile.detail_layout_desktop == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
 
     <h6 class="mt-4">{% trans "Scan feedback" %}</h6>
     <div class="form-check">
