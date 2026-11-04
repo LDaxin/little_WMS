@@ -16,7 +16,7 @@
             {% if list_type %}hx-include="#sortInput, #colsInput, #modeInput"{% endif %}
             hx-trigger="load, keyup changed delay:500ms, refresh" 
             hx-target="{% if list_type %}#list{% else %}#results{% endif %}"> 
-        <div id="QRButtonDiv{{searchFieldName}}">
+        <div id="QRButtonDiv{{searchFieldName}}" class="search-side-btn">
             <form>
                 <button 
                     id="QRButton{{searchFieldName}}" 
@@ -32,7 +32,7 @@
             </form>
         </div>
         {% if type == "article" %}
-        <button type="button" class="btn btn-outline-secondary" id="qbToggleButton" onclick="qbToggle()">{% trans "Advanced" %}</button>
+        <button type="button" class="btn btn-outline-secondary search-side-btn" id="qbToggleButton" onclick="qbToggle()">{% trans "Advanced" %}</button>
         {% endif %}
     </div>
     {% if type == "article" %}{% include "hub/modules/queryBuilder.html" %}{% endif %}

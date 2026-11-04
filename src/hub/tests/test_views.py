@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 
 from hub.mail import is_subscribed
+from organisation.context_processors import _sidebar
 from organisation.models import Organisation, UserProfile
 
 
@@ -119,3 +120,13 @@ class SidebarTest(TestCase):
         response = self.client.get("/")
         self.assertContains(response, "--text-desktop: 16px")
         self.assertContains(response, "font-size: var(--text-desktop")
+
+    def test_body_has_mobile_side_class(self):
+        self.assertContains(self.client.get("/"), "sidebar-mobile-left")
+
+    def test_mobile_side_follows_the_setting(self):
+        from types import SimpleNamespace
+
+        self.assertEqual(_sidebar(None)["side_mobile"], "left")
+        right = SimpleNamespace(sidebar_position_mobile="right")
+        self.assertEqual(_sidebar(right)["side_mobile"], "right")

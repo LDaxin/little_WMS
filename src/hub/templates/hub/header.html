@@ -88,21 +88,30 @@
                 body:has(#list) #listSearchRow { order: 2; }
                 body:has(#list) #listControlBar { order: 1; }
                 body:has(#list) #queryBuilder { top: auto; bottom: 100%; }
+                body.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-end; }
+                body.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 2; border-radius: 0 .375rem .375rem 0; }
+                body.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 1; }
             }
             body.view-mobile:has(#list) #list { order: 1; padding-bottom: 0; }
             body.view-mobile:has(#list) #listControls { order: 2; padding-bottom: 5rem; }
             body.view-mobile:has(#list) #listSearchRow { order: 2; }
             body.view-mobile:has(#list) #listControlBar { order: 1; }
             body.view-mobile:has(#list) #queryBuilder { top: auto; bottom: 100%; }
+            body.view-mobile.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-end; }
+            body.view-mobile.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 2; border-radius: 0 .375rem .375rem 0; }
+            body.view-mobile.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 1; }
             body.view-desktop:has(#list) #list { order: 0; padding-bottom: 5rem; }
             body.view-desktop:has(#list) #listControls { order: 0; padding-bottom: 0; }
             body.view-desktop:has(#list) #listSearchRow { order: 0; }
             body.view-desktop:has(#list) #listControlBar { order: 0; }
             body.view-desktop:has(#list) #queryBuilder { top: 100%; bottom: auto; }
+            body.view-desktop.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-start; }
+            body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 0; border-radius: .375rem 0 0 .375rem; }
+            body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 0; }
         </style>
         {% livereload_script %}
     </head>
-    <body class="view-{{ view_mode }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <body class="view-{{ view_mode }} sidebar-mobile-{{ sidebar.side_mobile }}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <div aria-live="polite" aria-atomic="true" class="position-relative">
             <div class="toast-container position-fixed top-0 end-0 p-3">
 

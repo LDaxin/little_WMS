@@ -15,6 +15,7 @@ def _sidebar(profile):
         "text_mobile": "%dpx" % text_mobile,
         "dir_desktop": "row" if pos_desktop == "left" else "row-reverse",
         "dir_mobile": "row" if pos_mobile == "left" else "row-reverse",
+        "side_mobile": "left" if pos_mobile == "left" else "right",
     }
 
 

@@ -62,3 +62,27 @@ bar sits.
 
 - **WHEN** a desktop user opens the QR scanner
 - **THEN** the scanner panel is shown above the list
+
+### Requirement: Mobile controls follow the sidebar side
+
+In the mobile layout the system SHALL align the control bar and the search-field
+buttons (QR, advanced) to the side of the sidebar — a left sidebar puts them on
+the left, a right sidebar on the right — so a left-handed user reaches them with
+the thumb. This SHALL follow the existing per-device sidebar position; no
+separate setting is introduced.
+
+#### Scenario: Right sidebar
+
+- **WHEN** the mobile sidebar is on the right
+- **THEN** the control bar and the search-field buttons are aligned to the right
+
+#### Scenario: Left sidebar
+
+- **WHEN** the mobile sidebar is on the left
+- **THEN** the control bar and the search-field buttons are aligned to the left
+
+#### Scenario: Desktop unchanged
+
+- **WHEN** the desktop layout is shown
+- **THEN** the control placement does not follow the sidebar side
+

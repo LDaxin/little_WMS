@@ -60,6 +60,21 @@ Move `#scannerDiv<field>` out of the search area to directly above `#list`, so
 the scanner opens above the list regardless of where the search bar sits. The
 QR button keeps targeting the same element id.
 
+### Decision 5: Mobile controls follow the sidebar side
+
+In the mobile layout, align the control bar and the search-field buttons (QR,
+advanced) to the sidebar side. Derive the side from the existing per-device
+sidebar position (`sidebar_position_mobile`) — exposed as a `sidebar-mobile-*`
+class on `<body>` and selected via the existing `@media (max-width: 768px)` /
+`body.view-mobile` / `body.view-desktop` pattern. A right sidebar right-aligns
+the control bar (`justify-content: flex-end`); a left sidebar moves the search
+buttons before the input (`order`) so they sit on the left, adjusting the input's
+border radius. No new setting: the sidebar position already expresses the user's
+handedness preference.
+
+(Alternative: a separate "controls side" setting — rejected as YAGNI; it can be
+added later if the two need to diverge.)
+
 ## Risks / Trade-offs
 
 - [Advanced panel clipped by `overflow:hidden` on `.content`] → anchor the
