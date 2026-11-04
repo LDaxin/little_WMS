@@ -75,6 +75,19 @@ handedness preference.
 (Alternative: a separate "controls side" setting — rejected as YAGNI; it can be
 added later if the two need to diverge.)
 
+### Decision 6: Size the mobile list to the visual viewport
+
+`height: 100vh` ignores the on-screen keyboard, so the browser pans the document
+to reveal the bottom search field and the results scroll off the top. Set a
+`--app-height` from `window.visualViewport.height` (VisualViewport API —
+supported by Firefox Android, Chrome/Android and Safari) and use it for the list
+layout height. Detect the keyboard as a drop of more than 150 px from the largest
+viewport height seen (reset on rotation) and add a `keyboard-open` class that
+collapses the control bar, so the results keep the room.
+
+(Alternative: Chrome-only `VirtualKeyboard` API / `env(keyboard-inset-height)` —
+rejected, not cross-browser.)
+
 ## Risks / Trade-offs
 
 - [Advanced panel clipped by `overflow:hidden` on `.content`] → anchor the

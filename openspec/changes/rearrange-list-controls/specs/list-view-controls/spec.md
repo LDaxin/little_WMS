@@ -86,3 +86,20 @@ separate setting is introduced.
 - **WHEN** the desktop layout is shown
 - **THEN** the control placement does not follow the sidebar side
 
+### Requirement: Mobile list stays visible while typing
+
+The mobile list layout SHALL size itself to the visible viewport so the pinned
+search bar sits above the on-screen keyboard and the results stay visible. While
+the keyboard is open the control bar SHALL collapse.
+
+#### Scenario: Keyboard open keeps the results visible
+
+- **WHEN** a mobile user focuses the search field and the on-screen keyboard opens
+- **THEN** the pinned controls sit above the keyboard and the results remain visible above them
+
+#### Scenario: Control bar collapses
+
+- **WHEN** the on-screen keyboard is open
+- **THEN** the control bar is hidden so the results get the room
+
+

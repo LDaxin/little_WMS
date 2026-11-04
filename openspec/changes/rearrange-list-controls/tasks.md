@@ -26,3 +26,9 @@
 
 - [ ] 5.1 Owner: on a device with a camera, verify the QR scanner opens above the list and scans (could not be tested here — no camera)
 
+## 6. Mobile keyboard
+
+- [x] 6.1 Size the list layout from `window.visualViewport.height` (`--app-height`) instead of `100vh`
+- [x] 6.2 Detect the on-screen keyboard and collapse the control bar (`keyboard-open`)
+- [ ] 6.3 Owner: on a phone (Firefox/Chrome/Safari), verify with the keyboard open that the results stay visible above the search bar
+

@@ -73,7 +73,7 @@
             body.selecting .stretched-link { pointer-events: none; }
             body.selecting .card { cursor: pointer; }
             .card.selected { border-color: var(--bs-primary); box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25); }
-            body:has(#list) .layout { height: 100vh; }
+            body:has(#list) .layout { height: var(--app-height, 100vh); }
             body:has(#list) .content { display: flex; flex-direction: column; overflow: hidden; }
             body:has(#list) #list { flex: 1 1 auto; overflow: hidden; display: flex; flex-direction: column; padding-bottom: 5rem; }
             body:has(#list) #listBody { flex: 1 1 auto; overflow-y: auto; }
@@ -82,6 +82,8 @@
             body:has(#list) #listControls { display: flex; flex-direction: column; flex-shrink: 0; position: relative; z-index: 2; }
             body:has(#list) [id^="scannerDiv"] { flex-shrink: 0; }
             body:has(#list) #queryBuilder { position: absolute; left: 0; right: 0; top: 100%; max-height: 70vh; overflow: auto; background: #fff; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); z-index: 1050; }
+            body.keyboard-open:has(#list) #listControls { padding-bottom: 0; }
+            body.keyboard-open:has(#list) #listControlBar { display: none; }
             @media (max-width: 768px) {
                 body:has(#list) #list { order: 1; padding-bottom: 0; }
                 body:has(#list) #listControls { order: 2; padding-bottom: 5rem; }
@@ -225,6 +227,26 @@
             document.body.addEventListener("htmx:configRequest", function(event) {
                 event.detail.headers["X-View-Mode"] =
                     window.matchMedia("(max-width: 768px)").matches ? "mobile" : "desktop";
+            });
+            var viewportBase = 0;
+            function syncViewport() {
+                var vv = window.visualViewport;
+                if (!vv) { return; }
+                document.documentElement.style.setProperty("--app-height", vv.height + "px");
+                viewportBase = Math.max(viewportBase, window.innerHeight, vv.height);
+                var mobile = window.matchMedia("(max-width: 768px)").matches
+                    || document.body.classList.contains("view-mobile");
+                document.body.classList.toggle("keyboard-open", mobile && viewportBase - vv.height > 150);
+            }
+            syncViewport();
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener("resize", syncViewport);
+                window.visualViewport.addEventListener("scroll", syncViewport);
+            }
+            window.addEventListener("resize", syncViewport);
+            window.addEventListener("orientationchange", function () {
+                viewportBase = 0;
+                setTimeout(syncViewport, 300);
             });
             function listFilterValues() {
                 var search = document.querySelector("input[qtype=search]");
