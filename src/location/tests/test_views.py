@@ -130,7 +130,7 @@ class LocationViewTest(TestCase):
         self.assertContains(response, "Summer Camp")
 
     def test_location_detail_has_map_picker(self):
-        response = self.client.get(f"/location/{self.location.pk}")
+        response = self.client.get(f"/location/{self.location.pk}/i")
         self.assertContains(response, "locationPicker")
 
     def test_location_list_has_add_button(self):
