@@ -1,6 +1,7 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.search import filter_by_search
+from hub.columns import is_mobile, resolve_detail_layout
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import *
@@ -16,9 +17,56 @@ def location(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/item.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update", "updateUrl":"/location/%s/update" % locationId, "code":locationObject.code.code if locationObject.code else "", "link":("/l/" + locationObject.code.code) if locationObject.code else "", "mapPicker":True, "linkedStorages":locationObject.storage_set.all(), "linkedOccasions":locationObject.occasion_set.all()})
-    except:
+        detailUrl = "/location/%s" % locationId
+        linkedStorages = locationObject.storage_set.all()
+        linkedOccasions = locationObject.occasion_set.all()
+        context = {
+            "symbol": "Location",
+            "id": locationId,
+            "searchFieldName": "locationSearch",
+            "modalId": "single",
+            "form": [locationForm],
+            "actionType": "update",
+            "updateUrl": "/location/%s/update" % locationId,
+            "code": locationObject.code.code if locationObject.code else "",
+            "link": ("/l/" + locationObject.code.code) if locationObject.code else "",
+            "linkedStorages": linkedStorages,
+            "linkedOccasions": linkedOccasions,
+            "detailUrl": detailUrl,
+            "editUrl": detailUrl + "/i",
+            "readUrl": detailUrl + "?fields=read",
+            "detailHeader": {
+                "name": str(locationObject),
+                "code": locationObject.code.code if locationObject.code else "",
+                "type": _("Location"),
+                "image": None,
+                "link": ("/l/" + locationObject.code.code) if locationObject.code else "",
+                "store": False,
+            },
+        }
+        context["detailLayout"] = resolve_detail_layout(request)
+        context["detailLayoutSwitchable"] = not is_mobile(request)
+        context["detailSections"] = _location_sections(linkedStorages, linkedOccasions)
+        if request.GET.get("fields") == "read":
+            return render(request, "hub/modules/itemSummary.html", context=context)
+        if request.GET.get("fields") == "sections":
+            return render(request, "hub/modules/itemSections.html", context=context)
+        template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
+        return render(request, template, context=context)
+    except Location.DoesNotExist:
         return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def _location_sections(linkedStorages, linkedOccasions):
+    """The collapsible detail sections for a location (§ detail-view)."""
+    sections = []
+    count = len(linkedStorages) + len(linkedOccasions)
+    if count:
+        sections.append({"key": "linked", "label": _("Linked objects"),
+                         "count": count,
+                         "template": "location/linkedObjects.html"})
+    return sections
+
 
 @login_required(login_url='/accounts/login/')
 @require_perm("location.edit_all")
@@ -26,8 +74,20 @@ def locationIncert(request, locationId):
     try:
         locationObject = Location.objects.get(pk=locationId)
         locationForm = FormLocation(instance=locationObject)
-        return render(request, "hub/modules/itemForm.html", context={"symbol":"Location", "id":locationId, "searchFieldName":"locationSearch", "modalId":"single", "form":[locationForm], "actionType":"update"})
-    except:
+        detailUrl = "/location/%s" % locationId
+        context = {
+            "symbol": "Location",
+            "id": locationId,
+            "searchFieldName": "locationSearch",
+            "modalId": "single",
+            "form": [locationForm],
+            "actionType": "update",
+            "updateUrl": "/location/%s/update" % locationId,
+            "readUrl": detailUrl + "?fields=read",
+            "mapPicker": True,
+        }
+        return render(request, "hub/modules/itemForm.html", context=context)
+    except Location.DoesNotExist:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
@@ -86,7 +146,9 @@ def updateLocation(request, locationId):
         locationForm = FormLocation(request.POST, instance=locationObject)
         if locationForm.is_valid():
             locationForm.save()
-            return toast(request, _("Update Succses"), _("Location was updated"), "status")
+            response = toast(request, _("Update Succses"), _("Location was updated"), "status")
+            response["HX-Trigger"] = "detail-updated"
+            return response
         return toast(request, _("Error"), _("thething went wrong"), "alert")
 
 @login_required(login_url='/accounts/login/')

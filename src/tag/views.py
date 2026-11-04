@@ -1,6 +1,7 @@
 from django.utils.translation import gettext as _
 from hub.toasts import toast
 from hub.search import filter_by_search
+from hub.columns import is_mobile, resolve_detail_layout
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from organisation.decorators import require_perm
@@ -15,8 +16,37 @@ def tag(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
         tagForm = FormChangeTag(instance=tagObject)
-        return render(request, "hub/modules/item.html", context={"symbol":"Tag", "searchFieldName":"tagSearch", "id":tagId, "modalId":"single", "form":[tagForm], "actionType":"update"})
-    except:
+        detailUrl = "/tag/%s" % tagId
+        context = {
+            "symbol": "Tag",
+            "searchFieldName": "tagSearch",
+            "id": tagId,
+            "modalId": "single",
+            "form": [tagForm],
+            "actionType": "update",
+            "updateUrl": "/tag/%s/update" % tagId,
+            "detailUrl": detailUrl,
+            "editUrl": detailUrl + "/i",
+            "readUrl": detailUrl + "?fields=read",
+            "detailHeader": {
+                "name": tagObject.name,
+                "code": "",
+                "type": _("Tag"),
+                "image": None,
+                "link": "",
+                "store": False,
+            },
+        }
+        context["detailLayout"] = resolve_detail_layout(request)
+        context["detailLayoutSwitchable"] = not is_mobile(request)
+        context["detailSections"] = []
+        if request.GET.get("fields") == "read":
+            return render(request, "hub/modules/itemSummary.html", context=context)
+        if request.GET.get("fields") == "sections":
+            return render(request, "hub/modules/itemSections.html", context=context)
+        template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
+        return render(request, template, context=context)
+    except Tag.DoesNotExist:
         return HttpResponseNotFound('<h1>Page not found</h1>')
     
 
@@ -26,8 +56,18 @@ def tagIncert(request, tagId):
     try:
         tagObject = Tag.objects.get(pk=tagId)
         tagForm = FormChangeTag(instance=tagObject)
-        return render(request, "hub/modules/itemForm.html", context={"searchFieldName":"tagSearch",  "id":tagId, "modalId":"single", "form":[tagForm], "actionType":"update"})
-    except:
+        detailUrl = "/tag/%s" % tagId
+        context = {
+            "searchFieldName": "tagSearch",
+            "id": tagId,
+            "modalId": "single",
+            "form": [tagForm],
+            "actionType": "update",
+            "updateUrl": "/tag/%s/update" % tagId,
+            "readUrl": detailUrl + "?fields=read",
+        }
+        return render(request, "hub/modules/itemForm.html", context=context)
+    except Tag.DoesNotExist:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 @login_required(login_url='/accounts/login/')
@@ -79,7 +119,9 @@ def updateTag(request, tagId):
         tagForm = FormTag(request.POST, instance=tagObject)
         if tagForm.is_valid():
             tagForm.save()
-            return toast(request, _("Update Succses"), _("Tag was updated."), "status")
+            response = toast(request, _("Update Succses"), _("Tag was updated."), "status")
+            response["HX-Trigger"] = "detail-updated"
+            return response
 
 @login_required(login_url='/accounts/login/')
 @require_perm("tag.view_all")

@@ -246,11 +246,30 @@
                 window.visualViewport.addEventListener("scroll", syncViewport);
             }
             window.addEventListener("resize", syncViewport);
-            document.body.addEventListener("detail-updated", function () {
-                var modal = document.getElementById("modalsingle");
-                if (modal) { bootstrap.Modal.getOrCreateInstance(modal).hide(); }
+            function refreshList() {
                 var search = document.querySelector("input[qtype=search]");
                 if (search) { htmx.trigger(search, "refresh"); }
+            }
+            function openDetailSection(key) {
+                var el = document.getElementById("section-" + key);
+                if (!el) { return; }
+                if (el.tagName === "DETAILS") {
+                    el.open = true;
+                } else {
+                    var trigger = document.querySelector('[data-bs-target="#section-' + key + '"]');
+                    if (trigger) { bootstrap.Tab.getOrCreateInstance(trigger).show(); }
+                }
+                el.scrollIntoView({block: "nearest"});
+            }
+            document.body.addEventListener("detail-updated", function () {
+                var fields = document.getElementById("detailFields");
+                if (fields && fields.dataset.readUrl) {
+                    htmx.ajax("GET", fields.dataset.readUrl, {target: "#detailFields", swap: "outerHTML"});
+                }
+                refreshList();
+            });
+            document.body.addEventListener("hidden.bs.modal", function (event) {
+                if (event.target && event.target.id === "modalsingle") { refreshList(); }
             });
             window.addEventListener("orientationchange", function () {
                 viewportBase = 0;

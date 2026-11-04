@@ -162,3 +162,37 @@ def resolve_view_mode(request):
     field = "list_view_mobile" if device == "mobile" else "list_view_desktop"
     default = "cards" if device == "mobile" else "table"
     return getattr(profile, field, default) or default
+
+
+def is_mobile(request):
+    """Whether the client counts as mobile (§ detail-view, § list-views).
+
+    The view-mode setting wins (``mobile``/``desktop``); when it is ``auto`` the
+    client hint decides.
+    """
+    from organisation.services import active_profile
+
+    profile = active_profile(request)
+    setting = getattr(profile, "view_mode", "auto") or "auto"
+    if setting == "mobile":
+        return True
+    if setting == "desktop":
+        return False
+    return request.headers.get("X-View-Mode") == "mobile"
+
+
+def resolve_detail_layout(request):
+    """The effective detail layout: ``accordion`` or ``tabs`` (§ detail-view).
+
+    Mobile always uses the accordion. On desktop the ``layout`` parameter wins
+    (the manual toggle); then the ``detail_layout_desktop`` setting.
+    """
+    from organisation.services import active_profile
+
+    if is_mobile(request):
+        return "accordion"
+    layout = request.GET.get("layout", "")
+    if layout in ("accordion", "tabs"):
+        return layout
+    profile = active_profile(request)
+    return getattr(profile, "detail_layout_desktop", "accordion") or "accordion"

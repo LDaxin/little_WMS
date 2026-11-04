@@ -4,6 +4,7 @@ from hub.csv import csv_response
 from hub.search import filter_by_search
 from hub.columns import default_columns, order_by, resolve_view_mode, selected_columns
 from hub.columns import columns as all_columns
+from hub.columns import is_mobile, resolve_detail_layout
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -89,6 +90,10 @@ def article(request, typ, articleId):
         par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
 
         base = _article_base(typ, articleId)
+        articleTerms = _article_terms(p)
+        auditLogs = AuditLog.objects.filter(
+            content_type=ContentType.objects.get_for_model(Article),
+            object_id=p.pk)[:20]
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -102,7 +107,7 @@ def article(request, typ, articleId):
             "version":p.version,
             "storeActions":True,
             "articleCalendar":True,
-            "articleTerms":_article_terms(p),
+            "articleTerms":articleTerms,
             **_store_actions_context(p, base),
             "tagChips":True,
             "tags":p.tags.all(),
@@ -115,21 +120,71 @@ def article(request, typ, articleId):
             "assignUrl":base + "/assign",
             "unassignUrl":base + "/unassign",
             "auditTimeline":True,
-            "auditLogs":AuditLog.objects.filter(
-                content_type=ContentType.objects.get_for_model(Article),
-                object_id=p.pk)[:20],
+            "auditLogs":auditLogs,
             "imageGallery":True,
             "images":p.images.all(),
             "imageBaseUrl":base + "/images/",
             "updateUrl":base + "/update",
             "scannerBaseUrl":"/article/%s/scanner" % typ,
+            "detailUrl":base,
+            "editUrl":base + "/i",
+            "readUrl":base + "?fields=read",
+            "detailHeader":{
+                "name":p.base.name,
+                "code":p.code.code if p.code else "",
+                "type":p.base.pType.name,
+                "image":p.primary_image,
+                "link":("/a/" + p.code.code) if p.code else "",
+                "store":True,
+            },
         }
         if p.space and p.space.active:
             context.update(composition_context(p.space))
+        context["detailLayout"] = resolve_detail_layout(request)
+        context["detailLayoutSwitchable"] = not is_mobile(request)
+        context["detailSections"] = _article_sections(p, context)
+        if request.GET.get("fields") == "read":
+            return render(request, "hub/modules/itemSummary.html", context=context)
+        if request.GET.get("fields") == "sections":
+            return render(request, "hub/modules/itemSections.html", context=context)
         template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
         return render(request, template, context=context)
     else:
         return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)
+
+
+def _article_sections(p, context):
+    """The collapsible detail sections for an article (§ detail-view)."""
+    sections = []
+    if context.get("storeActions"):
+        sections.append({"key": "store", "label": _("Stock"),
+                         "count": p.stocks.exclude(stored=None).count(),
+                         "template": "hub/modules/storeActions.html"})
+    if context.get("imageGallery"):
+        sections.append({"key": "images", "label": _("Images"),
+                         "count": p.images.count(),
+                         "template": "hub/modules/imageGallery.html"})
+    if context.get("articleCalendar"):
+        sections.append({"key": "calendar", "label": _("Calendar"),
+                         "count": len(context.get("articleTerms") or []),
+                         "template": "hub/modules/articleCalendar.html"})
+    if context.get("showComposition"):
+        sections.append({"key": "composition", "label": _("Composition"),
+                         "count": len(context.get("compositionStatus") or []),
+                         "template": "hub/modules/composition.html"})
+    if context.get("tagChips"):
+        sections.append({"key": "tags", "label": _("Tags"),
+                         "count": p.tags.count(),
+                         "template": "hub/modules/tagChips.html"})
+    if context.get("assignedTo"):
+        sections.append({"key": "assigned", "label": _("Assigned to"),
+                         "count": p.assigned_to.count(),
+                         "template": "hub/modules/assignedTo.html"})
+    if context.get("auditTimeline"):
+        sections.append({"key": "history", "label": _("History"),
+                         "count": len(context.get("auditLogs") or []),
+                         "template": "hub/modules/auditTimeline.html"})
+    return sections
 
 
 @login_required(login_url='/accounts/login/')
@@ -236,15 +291,21 @@ def articleIncert(request, typ, articleId):
         return HttpResponseNotFound('<h1>Page not found</h1>')
     _require_article(request, "edit", p)
     if p.base.pType.name == typ:
+        base = _article_base(typ, articleId)
+        bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
         par = FormChangeArticle(instance=p, article_type=p.base.pType)
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
             "id":articleId,
             "modalId":"single",
-            "form":[par],
+            "form":[bpar,par],
             "actionType":"update",
             "typ":typ,
+            "version":p.version,
+            "updateUrl":base + "/update",
+            "readUrl":base + "?fields=read",
+            "scannerBaseUrl":"/article/%s/scanner" % typ,
         }
         return render(request, "hub/modules/itemForm.html", context=context)
     return HttpResponseNotFound('<h1>wrong type</h1>' + typ + p.base.pType.name)

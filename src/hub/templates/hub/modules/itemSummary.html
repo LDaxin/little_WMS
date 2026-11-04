@@ -1,0 +1,11 @@
+{% load i18n %}
+<div id="detailFields" data-read-url="{{ readUrl }}">
+    <dl class="row mb-0">
+        {% for p_form in form %}
+            {% for field in p_form %}
+            <dt class="col-5 col-sm-4 fw-normal text-muted">{{ field.label }}</dt>
+            <dd class="col-7 col-sm-8">{{ field.value|default_if_none:"—" }}</dd>
+            {% endfor %}
+        {% endfor %}
+    </dl>
+</div>

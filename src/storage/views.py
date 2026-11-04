@@ -4,6 +4,7 @@ from hub.csv import csv_response
 from hub.search import filter_by_search
 from hub.columns import default_columns, order_by, resolve_view_mode, selected_columns
 from hub.columns import columns as all_columns
+from hub.columns import is_mobile, resolve_detail_layout
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
@@ -64,12 +65,54 @@ def storage(request, typ, storageId):
                 "floorPlanUrl":base + "/plan",
                 "updateUrl":base + "/update",
                 "scannerBaseUrl":"/storage/%s/scanner" % typ,
+                "detailUrl":base,
+                "editUrl":base + "/i",
+                "readUrl":base + "?fields=read",
+                "detailHeader":{
+                    "name":storageObject.name,
+                    "code":storageObject.code.code if storageObject.code else "",
+                    "type":storageObject.typ.name,
+                    "image":storageObject.primary_image,
+                    "link":("/s/" + storageObject.code.code) if storageObject.code else "",
+                    "floorPlan":base + "/plan",
+                    "store":True,
+                    "storeSection":"contents",
+                },
             }
             context.update(composition_context(storageObject.space))
+            context["detailLayout"] = resolve_detail_layout(request)
+            context["detailLayoutSwitchable"] = not is_mobile(request)
+            context["detailSections"] = _storage_sections(storageObject, context)
+            if request.GET.get("fields") == "read":
+                return render(request, "hub/modules/itemSummary.html", context=context)
+            if request.GET.get("fields") == "sections":
+                return render(request, "hub/modules/itemSections.html", context=context)
             template = "hub/modules/itemModal.html" if request.headers.get("HX-Request") else "hub/modules/item.html"
             return render(request, template, context=context)
         else:
             return HttpResponseNotFound('<h1>wrong type</h1>' + typ + storageObject.typ.name)
+
+
+def _storage_sections(storageObject, context):
+    """The collapsible detail sections for a storage (§ detail-view)."""
+    sections = []
+    if context.get("storageContents"):
+        sections.append({"key": "contents", "label": _("Contents"),
+                         "count": len(context.get("contents") or []),
+                         "template": "hub/modules/storageContents.html"})
+    if context.get("imageGallery"):
+        sections.append({"key": "images", "label": _("Images"),
+                         "count": storageObject.images.count(),
+                         "template": "hub/modules/imageGallery.html"})
+    if context.get("tagChips"):
+        sections.append({"key": "tags", "label": _("Tags"),
+                         "count": storageObject.tags.count(),
+                         "template": "hub/modules/tagChips.html"})
+    if context.get("showComposition"):
+        sections.append({"key": "composition", "label": _("Composition"),
+                         "count": len(context.get("compositionStatus") or []),
+                         "template": "hub/modules/composition.html"})
+    return sections
 
 
 @login_required(login_url='/accounts/login/')
@@ -270,6 +313,7 @@ def storageIncert(request, typ, storageId):
                 "actionType":"update",
                 "id":storageId,
                 "updateUrl":_storage_base(typ, storageId) + "/update",
+                "readUrl":_storage_base(typ, storageId) + "?fields=read",
                 "scannerBaseUrl":"/storage/%s/scanner" % typ,
             }
             return render(request, "hub/modules/itemForm.html", context=context)

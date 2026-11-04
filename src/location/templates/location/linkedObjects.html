@@ -1,7 +1,5 @@
 {% load i18n %}
-{% if linkedStorages or linkedOccasions %}
-<div class="card mb-2">
-    <div class="card-header">{% trans "Linked objects" %}</div>
+<div id="linkedObjects">
     <ul class="list-group list-group-flush">
         {% for s in linkedStorages %}
         <li class="list-group-item">
@@ -17,4 +15,3 @@
         {% endfor %}
     </ul>
 </div>
-{% endif %}

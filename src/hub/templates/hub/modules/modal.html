@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="modal fade" id="modal{{modalId}}" tabindex="-1" aria-labelledby="modal{{modalId}}" aria-hidden="true" >
-    <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-scrollable {% block dialog_class %}{% endblock %}">
         <div class="modal-content">
 
             <div class="modal-header">

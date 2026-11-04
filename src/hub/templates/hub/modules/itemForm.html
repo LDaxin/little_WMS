@@ -1,5 +1,6 @@
 {% load i18n %}
 
+<div id="detailFields" data-read-url="{{ readUrl }}">
 <form method="POST" action="{{ updateUrl }}" id="{{id}}{{ actionType }}Form">
     {% csrf_token %}
     <input type="hidden" name="version" value="{{ version }}">
@@ -42,7 +43,11 @@
         {% endfor %}
     {% endfor %}
     <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="{{ updateUrl }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
+    <button type="button" class="btn btn-secondary" id="{{actionType}}Cancel"
+            hx-get="{{ readUrl }}" hx-target="#detailFields" hx-swap="outerHTML">{% trans "Cancel" %}</button>
 </form>
+{% if mapPicker %}{% include "location/mapPicker.html" %}{% endif %}
+</div>
 
 <script>
     $("#id_tag_change").select2({
