@@ -2128,3 +2128,44 @@ msgstr "Symbol"
 #| msgid "updated"
 msgid "Tag was updated."
 msgstr "aktualisiert"
+
+#: hub/templates/hub/emailPreferences.html
+msgid "List view (desktop)"
+msgstr "Listenansicht (Desktop)"
+
+#: hub/templates/hub/emailPreferences.html
+msgid "List view (mobile)"
+msgstr "Listenansicht (Mobil)"
+
+#: hub/templates/hub/emailPreferences.html
+msgid "Detail layout (desktop)"
+msgstr "Detail-Layout (Desktop)"
+
+#: hub/templates/hub/modules/itemSections.html
+msgid "Accordion"
+msgstr "Akkordeon"
+
+#: hub/templates/hub/modules/itemSections.html
+msgid "Tabs"
+msgstr "Tabs"
+
+#: article/views.py storage/views.py
+msgid "Stock"
+msgstr "Bestand"
+
+#: article/views.py storage/views.py
+msgid "Images"
+msgstr "Bilder"
+
+#: article/views.py
+msgid "Tags"
+msgstr "Tags"
+
+#: location/views.py
+msgid "Linked objects"
+msgstr "Verknüpfte Objekte"
+
+#: hub/templates/hub/modules/itemHeader.html
+msgid "Floor plan"
+msgstr "Grundriss"
+
