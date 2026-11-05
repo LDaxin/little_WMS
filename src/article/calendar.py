@@ -168,8 +168,9 @@ def month_grid(year, month, items, today=None):
     for week in weeks:
         week["lane_count"] = _assign_lanes(week["segments"])
         for seg in week["segments"]:
-            seg["left_pct"] = seg["col_s"] / 7 * 100
-            seg["width_pct"] = (seg["col_e"] - seg["col_s"] + 1) / 7 * 100
+            # dot decimals: the template would otherwise localise the CSS values
+            seg["left_pct"] = "%.4f" % (seg["col_s"] / 7 * 100)
+            seg["width_pct"] = "%.4f" % ((seg["col_e"] - seg["col_s"] + 1) / 7 * 100)
 
     return {
         "year": year,

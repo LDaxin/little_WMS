@@ -81,6 +81,19 @@ class DetailCalendarTest(TestCase):
         )
         self.assertContains(self._detail(), "cal-dot")
 
+    def test_bar_css_is_not_localised(self):
+        from django.utils import translation
+
+        CalendarEntry.objects.create(
+            entry_type="maintenance", title="Repair",
+            start_date=_this_month(1), end_date=_this_month(5), article=self.article,
+        )
+        with translation.override("de"):
+            content = self._detail().content.decode()
+        bars = [line for line in content.splitlines() if 'style="left:' in line]
+        self.assertTrue(bars)
+        self.assertNotIn(",", "".join(bars))
+
     def test_switch_to_list_shows_the_list(self):
         CalendarEntry.objects.create(
             entry_type="maintenance", title="Sharpen",
