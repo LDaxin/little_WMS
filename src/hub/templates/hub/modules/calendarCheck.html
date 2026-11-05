@@ -1,0 +1,27 @@
+{% load i18n %}
+<div class="p-3">
+    {% if conflicts %}
+    <h6>{% trans "Reservation already exists" %}</h6>
+    <ul class="list-group">
+        {% for c in conflicts %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span><span class="cal-dot" style="background: {{ c.color }}"></span> {{ c.title }}</span>
+            <span class="text-muted small">{{ c.start|date:"Y-m-d" }}{% if c.end != c.start %} &ndash; {{ c.end|date:"Y-m-d" }}{% endif %}</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <h6>{% blocktrans with a=start|date:"Y-m-d" b=end|date:"Y-m-d" %}Create a term {{ a }} &ndash; {{ b }}{% endblocktrans %}</h6>
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                hx-get="{{ calendarActionUrl }}?action=maintenance&start={{ start|date:'Y-m-d' }}&end={{ end|date:'Y-m-d' }}"
+                hx-target="#calendarOverlayBody" hx-swap="innerHTML">{% trans "Maintenance" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                hx-get="{{ calendarActionUrl }}?action=lend&start={{ start|date:'Y-m-d' }}&end={{ end|date:'Y-m-d' }}"
+                hx-target="#calendarOverlayBody" hx-swap="innerHTML">{% trans "Lend" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-primary"
+                hx-get="{{ calendarActionUrl }}?action=borrow&start={{ start|date:'Y-m-d' }}&end={{ end|date:'Y-m-d' }}"
+                hx-target="#calendarOverlayBody" hx-swap="innerHTML">{% trans "Borrow" %}</button>
+    </div>
+    {% endif %}
+</div>

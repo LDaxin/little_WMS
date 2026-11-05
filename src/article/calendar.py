@@ -125,6 +125,7 @@ def month_grid(year, month, items, today=None):
                 "day": day.day,
                 "in_month": day.month == month,
                 "is_today": day == today,
+                "has_term": False,
                 "dots": [],
             })
         weeks.append({"cells": cells, "segments": [], "lane_count": 0})
@@ -136,6 +137,10 @@ def month_grid(year, month, items, today=None):
             begin, end = end, begin
         if end < start or begin > last:
             continue
+        for week in weeks:
+            for cell in week["cells"]:
+                if begin <= cell["date"] <= end:
+                    cell["has_term"] = True
         if begin == end:
             for week in weeks:
                 for cell in week["cells"]:

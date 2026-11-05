@@ -1,5 +1,5 @@
 {% load i18n %}
-<div id="articleCalendar">
+<div id="articleCalendar" data-check-url="{{ calendarCheckUrl }}">
     <div class="d-flex justify-content-center mb-2">
         <div class="btn-group btn-group-sm" role="group">
             <button type="button"
@@ -25,7 +25,8 @@
         {% endfor %}
     </ul>
     {% else %}
-    <div class="d-flex justify-content-end mb-1">
+    <div class="d-flex justify-content-end mb-1 gap-1">
+        <button type="button" id="calCancel" class="btn btn-sm btn-outline-danger" hidden onclick="calCancelSelection()">&times;</button>
         <button type="button" class="btn btn-sm btn-outline-secondary" onclick="calScrollToday()">{% trans "Today" %}</button>
     </div>
     <div class="cal-scroll" id="calScroll">
@@ -67,4 +68,11 @@
         <input name="end_date" type="date" class="form-control form-control-sm" style="max-width:10rem">
         <button class="btn btn-sm btn-outline-secondary">{% trans "Borrow" %}</button>
     </form>
+
+    <div id="calendarOverlay" class="cal-overlay" hidden onclick="if(event.target===this)calCloseOverlay()">
+        <div class="cal-overlay-panel">
+            <button type="button" class="cal-overlay-close" onclick="calCloseOverlay()" aria-label="{% trans 'Close' %}">&times;</button>
+            <div id="calendarOverlayBody"></div>
+        </div>
+    </div>
 </div>

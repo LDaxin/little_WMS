@@ -178,6 +178,13 @@
             .cal-legend .cal-dot { margin-right: .2rem; }
             .cal-scroll { max-height: 60vh; overflow-y: auto; overflow-x: hidden; position: relative; }
             .cal-sentinel { height: 1px; }
+            .cal-day { cursor: pointer; }
+            .cal-day-has { font-weight: 600; }
+            .cal-day.cal-selected { background: #cfe2ff; }
+            .cal-overlay { position: fixed; inset: 0; z-index: 2200; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; background: rgba(0, 0, 0, 0.5); }
+            .cal-overlay[hidden] { display: none; }
+            .cal-overlay-panel { position: relative; width: 100%; max-width: 28rem; max-height: 90vh; overflow-y: auto; background: #fff; border-radius: .5rem; box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.3); }
+            .cal-overlay-close { position: absolute; top: .25rem; right: .5rem; z-index: 2; font-size: 1.5rem; line-height: 1; color: #6c757d; background: none; border: 0; }
         </style>
         {% livereload_script %}
     </head>
@@ -346,6 +353,64 @@
                 var el = document.getElementById("cal-month-" + now.getFullYear() + "-" + (now.getMonth() + 1));
                 if (el) { el.scrollIntoView({block: "start"}); }
             }
+            var calSel = null;
+            function calPick(cell) {
+                var picked = cell.dataset.date;
+                if (calSel && !calSel.end) {
+                    calSel.end = picked;
+                } else {
+                    calSel = {start: picked, end: null};
+                }
+                calHighlight();
+                if (calSel.end) { calCheck(); }
+            }
+            function calHighlight() {
+                var cancel = document.getElementById("calCancel");
+                if (cancel) { cancel.hidden = !calSel; }
+                document.querySelectorAll(".cal-day.cal-selected").forEach(function (el) {
+                    el.classList.remove("cal-selected");
+                });
+                if (!calSel) { return; }
+                var a = calSel.start, b = calSel.end || calSel.start;
+                if (a > b) { var t = a; a = b; b = t; }
+                document.querySelectorAll(".cal-day[data-date]").forEach(function (el) {
+                    if (el.dataset.date >= a && el.dataset.date <= b) { el.classList.add("cal-selected"); }
+                });
+            }
+            function calCheck() {
+                var a = calSel.start, b = calSel.end;
+                if (a > b) { var t = a; a = b; b = t; }
+                var root = document.getElementById("articleCalendar");
+                var url = root && root.dataset.checkUrl;
+                if (!url) { return; }
+                htmx.ajax("GET", url + "?start=" + a + "&end=" + b, {target: "#calendarOverlayBody", swap: "innerHTML"});
+                calOpenOverlay();
+            }
+            function calOpenOverlay() {
+                var overlay = document.getElementById("calendarOverlay");
+                if (overlay) { overlay.hidden = false; }
+            }
+            function calCloseOverlay() {
+                var overlay = document.getElementById("calendarOverlay");
+                if (overlay) { overlay.hidden = true; }
+                calSel = null;
+                calHighlight();
+            }
+            function calCancelSelection() {
+                calSel = null;
+                calHighlight();
+            }
+            document.addEventListener("click", function (event) {
+                if (!calSel) { return; }
+                if (event.target.closest(".cal-day") || event.target.closest("#calendarOverlay") || event.target.closest("#calCancel")) { return; }
+                calCancelSelection();
+            });
+            document.body.addEventListener("htmx:afterRequest", function (event) {
+                var elt = event.detail.elt;
+                if (elt && elt.classList && elt.classList.contains("calActionForm") && event.detail.successful) {
+                    calCloseOverlay();
+                }
+            });
             document.body.addEventListener("htmx:beforeSwap", function (event) {
                 var elt = event.detail.elt;
                 if (elt && elt.classList && elt.classList.contains("cal-sentinel-top")) {

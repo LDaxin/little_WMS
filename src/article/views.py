@@ -91,6 +91,8 @@ def _calendar_context(article, request, typ, view=None):
         "detailCalendarView": view or resolve_detail_calendar_view(request),
         "calendarUrl": _article_base(typ, article.pk) + "/calendar",
         "calendarMonthUrl": _article_base(typ, article.pk) + "/calendar/month",
+        "calendarCheckUrl": _article_base(typ, article.pk) + "/calendar/check",
+        "calendarActionUrl": _article_base(typ, article.pk) + "/calendar/action",
     }
 
 
@@ -326,6 +328,65 @@ def articleCalendarMonth(request, typ, articleId):
         "prev": _year_month(*shift_month(year, month, -1)),
         "next": _year_month(*shift_month(year, month, 1)),
         "calendarMonthUrl": _article_base(typ, article.pk) + "/calendar/month",
+    })
+
+
+def _parse_range(request):
+    """The ``start``/``end`` dates of a request, ordered, or (None, None)."""
+    from datetime import datetime
+
+    raw_start = request.GET.get("start", "")
+    raw_end = request.GET.get("end", "") or raw_start
+    try:
+        start = datetime.strptime(raw_start, "%Y-%m-%d").date()
+        end = datetime.strptime(raw_end, "%Y-%m-%d").date()
+    except ValueError:
+        return None, None
+    return (end, start) if end < start else (start, end)
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articleCalendarCheck(request, typ, articleId):
+    """Check a selected period for conflicts (§ detail-calendar)."""
+    from .calendar import calendar_items
+
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "view", article)
+    start, end = _parse_range(request)
+    if start is None:
+        return HttpResponseNotFound("<h1>bad range</h1>")
+    conflicts = [
+        item for item in calendar_items(article)
+        if item["start"] <= end and item["end"] >= start
+    ]
+    return render(request, "hub/modules/calendarCheck.html", {
+        "start": start,
+        "end": end,
+        "conflicts": conflicts,
+        "calendarActionUrl": _article_base(typ, article.pk) + "/calendar/action",
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def articleCalendarAction(request, typ, articleId):
+    """Render the pre-filled form for the chosen action (§ detail-calendar)."""
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    start, end = _parse_range(request)
+    action = request.GET.get("action", "")
+    if start is None or action not in ("maintenance", "lend", "borrow"):
+        return HttpResponseNotFound("<h1>bad action</h1>")
+    return render(request, "hub/modules/calendarActionForm.html", {
+        "action": action,
+        "start": start,
+        "end": end,
+        "typ": typ,
+        "id": article.pk,
+        "maintenanceUrl": reverse("add maintenance", args=[typ, article.pk]),
+        "lendUrl": reverse("lend article", args=[typ, article.pk]),
+        "borrowUrl": reverse("borrow article", args=[typ, article.pk]),
     })
 
 

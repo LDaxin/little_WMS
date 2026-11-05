@@ -8,7 +8,8 @@
     <div class="cal-week" style="--lanes: {{ week.lane_count }}">
         <div class="cal-days">
             {% for cell in week.cells %}
-            <div class="cal-day{% if not cell.in_month %} cal-day-out{% endif %}{% if cell.is_today %} cal-day-today{% endif %}">
+            <div class="cal-day{% if not cell.in_month %} cal-day-out{% endif %}{% if cell.is_today %} cal-day-today{% endif %}{% if cell.has_term %} cal-day-has{% endif %}"
+                 data-date="{{ cell.date|date:'Y-m-d' }}" onclick="calPick(this)">
                 <span class="cal-daynum">{{ cell.day }}</span>
                 {% for dot in cell.dots %}<span class="cal-dot" style="background: {{ dot.color }}" title="{{ dot.title }}"></span>{% endfor %}
             </div>

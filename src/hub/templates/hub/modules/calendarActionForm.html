@@ -1,0 +1,38 @@
+{% load i18n %}
+<div class="p-3">
+    {% if action == "maintenance" %}
+    <h6>{% trans "Add maintenance" %}</h6>
+    <form class="calActionForm" method="post" action="{{ maintenanceUrl }}"
+          hx-post="{{ maintenanceUrl }}" hx-target="#articleCalendar" hx-swap="outerHTML">
+        {% csrf_token %}
+        <input name="title" class="form-control mb-2" placeholder="{% trans "Maintenance" %}">
+        <input name="due_date" type="date" class="form-control mb-2" value="{{ start|date:'Y-m-d' }}">
+        <button class="btn btn-success btn-sm">{% trans "Add maintenance" %}</button>
+    </form>
+    {% elif action == "lend" %}
+    <h6>{% trans "Lend" %}</h6>
+    <form class="calActionForm" method="post" action="{{ lendUrl }}"
+          hx-post="{{ lendUrl }}" hx-target="#articleCalendar" hx-swap="outerHTML">
+        {% csrf_token %}
+        <input name="borrower_name" class="form-control mb-2" placeholder="{% trans "Borrower" %}">
+        <input name="borrower_email" type="email" class="form-control mb-2" placeholder="{% trans "Email" %}">
+        <input name="start_date" type="date" class="form-control mb-2" value="{{ start|date:'Y-m-d' }}">
+        <input name="end_date" type="date" class="form-control mb-2" value="{{ end|date:'Y-m-d' }}">
+        <button class="btn btn-success btn-sm">{% trans "Lend" %}</button>
+    </form>
+    {% elif action == "borrow" %}
+    <h6>{% trans "Borrow" %}</h6>
+    <form class="calActionForm" method="post" action="{{ borrowUrl }}"
+          hx-post="{{ borrowUrl }}" hx-target="#articleCalendar" hx-swap="outerHTML">
+        {% csrf_token %}
+        <select name="lender_type" class="form-select mb-2">
+            <option value="person">{% trans "Person" %}</option>
+            <option value="organisation">{% trans "Organisation" %}</option>
+        </select>
+        <input name="lender_name" class="form-control mb-2" placeholder="{% trans "Lender" %}">
+        <input name="start_date" type="date" class="form-control mb-2" value="{{ start|date:'Y-m-d' }}">
+        <input name="end_date" type="date" class="form-control mb-2" value="{{ end|date:'Y-m-d' }}">
+        <button class="btn btn-success btn-sm">{% trans "Borrow" %}</button>
+    </form>
+    {% endif %}
+</div>

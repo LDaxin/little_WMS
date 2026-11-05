@@ -15,10 +15,10 @@
 
 ## 3. Period selection and term creation (point 3)
 
-- [ ] 3.1 Client-side selection in the grid: first tap, same day (single), other day (range), × / outside to cancel
-- [ ] 3.2 Add an endpoint that checks a selected period for overlaps with the article's entries and returns the conflict popup or the action chooser
-- [ ] 3.3 Action chooser (maintenance / lend / borrow) opens the matching form in an overlay, pre-filled with the dates
-- [ ] 3.4 On save, create the entry and refresh the calendar
+- [x] 3.1 Client-side selection in the grid: first tap, same day (single), other day (range), × / outside to cancel
+- [x] 3.2 Add an endpoint that checks a selected period for overlaps with the article's entries and returns the conflict popup or the action chooser
+- [x] 3.3 Action chooser (maintenance / lend / borrow) opens the matching form in an overlay, pre-filled with the dates
+- [x] 3.4 On save, create the entry and refresh the calendar
 
 ## 4. Term preview, open, edit, delete (point 4)
 
