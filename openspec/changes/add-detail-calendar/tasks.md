@@ -28,6 +28,6 @@
 
 ## 5. Tests and verification
 
-- [ ] 5.1 Tests: month grid (bars/dots, colours), lazy loading, the conflict check, entry edit/delete, switch resolution
-- [ ] 5.2 Run the full suite in Docker; must be green
-- [ ] 5.3 Rebuild Docker and report how to test
+- [x] 5.1 Tests: month grid (bars/dots, colours), lazy loading, the conflict check, entry edit/delete, switch resolution
+- [x] 5.2 Run the full suite in Docker; must be green
+- [x] 5.3 Rebuild Docker and report how to test
