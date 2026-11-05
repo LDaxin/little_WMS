@@ -42,3 +42,9 @@
 - [x] 6.1 Rebuild `itemHeader.html`: name row on top, image (~110 px, rounded) left with type / condition / tags / quantity·locations stacked right, code and action row below
 - [x] 6.2 Extend the article `detailHeader` context with condition, total quantity, unit, storage-location count and tags
 - [x] 6.3 Keep the existing actions (copy link, floor plan, store, edit) and add an "Open" action (full detail page); hide article-only fields for Storage/Location/Tag
+
+## 7. Field area (read + edit)
+
+- [x] 7.1 Rebuild `itemForm.html` to the same label/value grid as the summary; drop `form-floating` and `input-group-text`, keep the `stored`/`code` QR branch and the scanner/info divs
+- [x] 7.2 Give widgets a Bootstrap class by type (`form-control` / `form-select` / `form-check-input`) in one shared helper (`hub/forms.py`); booleans render as a checkbox/switch
+- [x] 7.3 Format the read-only values (`field_display`): choice labels, ✓/— for booleans, — for empty, join multi-values

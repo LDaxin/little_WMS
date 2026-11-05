@@ -2,6 +2,7 @@ from django import forms
 from .models import *
 from codeSystem.models import *
 from space.models import *
+from hub.forms import apply_field_classes
 
 
 def custom_form_field(definition):
@@ -96,8 +97,7 @@ class FormArticle(CustomFieldsMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormArticle, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
         self.fields['code'].queryset = UuidCode.objects.filter(prefix="a0", used=False)
 
 
@@ -111,8 +111,7 @@ class FormChangeArticle(CustomFieldsMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormChangeArticle, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
         #self.fields['Space'].widget.attrs['id'] = 'id_space_change'
 
 class FormArticleBase(CustomFieldsMixin, forms.ModelForm):
@@ -124,8 +123,7 @@ class FormArticleBase(CustomFieldsMixin, forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormArticleBase, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
 
 
 class ArticleTypeForm(forms.ModelForm):

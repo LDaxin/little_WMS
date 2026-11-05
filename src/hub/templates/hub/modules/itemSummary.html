@@ -1,11 +1,13 @@
-{% load i18n %}
+{% load i18n list_columns %}
 <div id="detailFields" data-read-url="{{ readUrl }}">
-    <dl class="row mb-0">
-        {% for p_form in form %}
-            {% for field in p_form %}
-            <dt class="col-5 col-sm-4 fw-normal text-muted">{{ field.label }}</dt>
-            <dd class="col-7 col-sm-8">{{ field.value|default_if_none:"—" }}</dd>
-            {% endfor %}
+    {% for p_form in form %}
+        {% for field in p_form %}
+        <div class="row mb-2">
+            <div class="col-5 col-sm-4 fw-normal text-muted">{{ field.label }}</div>
+            <div class="col-7 col-sm-8">
+                <div class="detailValue">{{ field|field_display }}</div>
+            </div>
+        </div>
         {% endfor %}
-    </dl>
+    {% endfor %}
 </div>

@@ -112,6 +112,24 @@
             body.view-desktop.sidebar-mobile-right:has(#list) #listControlBar { justify-content: flex-start; }
             body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > input { order: 0; border-radius: .375rem 0 0 .375rem; }
             body.view-desktop.sidebar-mobile-left:has(#list) #listSearchRow .input-group > .search-side-btn { order: 0; }
+            /* detail field area: compact underlined inputs (§ detail-view) */
+            #detailFields .detailValue {
+                padding: .125rem .25rem;
+                border-bottom: 1px solid transparent;
+            }
+            #detailFields .form-control,
+            #detailFields .form-select {
+                border: 0;
+                border-bottom: 1px solid #dee2e6;
+                border-radius: 0;
+                padding: .125rem .25rem;
+                background: transparent;
+            }
+            #detailFields .form-control:focus,
+            #detailFields .form-select:focus {
+                border-bottom-color: #0d6efd;
+                box-shadow: none;
+            }
         </style>
         {% livereload_script %}
     </head>

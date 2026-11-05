@@ -141,6 +141,30 @@ in the same order as the read-only summary.
 - **WHEN** the user edits the fields
 - **THEN** the form shows the same fields in the same order as the read-only summary
 
+### Requirement: The field area uses one row layout for read and edit
+
+The field area SHALL render each field as a row with the label in a left column
+and the value (read) or the input (edit) in a right column. The read-only
+summary and the form SHALL use the same row layout, so the view does not change
+when entering edit. Inputs SHALL use a subtle border; checkboxes SHALL render as
+a checkbox/switch and selects as selects. The summary SHALL show choice labels,
+a check for a true boolean and a dash for an empty value.
+
+#### Scenario: Same row layout in read and edit
+
+- **WHEN** the user enters edit
+- **THEN** each field keeps its label column and its value/input column position
+
+#### Scenario: Inputs are not Bootstrap input-groups
+
+- **WHEN** the user edits
+- **THEN** each input has a subtle border, without an attached label box or a floating label
+
+#### Scenario: Read-only values are human-readable
+
+- **WHEN** the summary shows a choice, a boolean or an empty value
+- **THEN** it shows the choice's label, a check or dash for the boolean, or a dash for the empty value
+
 ### Requirement: All shared detail views use the framework
 
 The framework SHALL apply to every detail view that shares the detail templates:

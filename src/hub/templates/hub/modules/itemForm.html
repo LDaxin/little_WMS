@@ -7,44 +7,42 @@
 
     {% for p_form in form %}
         {% for field in p_form %}
-        
-            <div class="form-floating mb-2">
-                <div class="input-group">
-                    <span class="input-group-text">{{ field.label }}</span>
-
-                    {{ field.error }}
-                    {{ field }}
-                    
-                    {% if field.name == "stored" or field.name == "code"%}
+        <div class="row mb-2">
+            <label class="col-5 col-sm-4 fw-normal text-muted" for="{{ field.auto_id }}">{{ field.label }}</label>
+            <div class="col-7 col-sm-8">
+                {% if field.field.widget.input_type == "checkbox" %}
+                <div class="form-check form-switch pt-2">{{ field }}</div>
+                {% else %}
+                <div class="d-flex align-items-start gap-1">
+                    <div class="flex-grow-1 min-w-0">{{ field }}</div>
+                    {% if field.name == "stored" or field.name == "code" %}
                     <div id="QRButtonDiv{{field.auto_id}}">
-                        <button 
-                            id="QRButton{{field.auto_id}}" 
-                            class="btn btn-primary scanner" 
-                            type="button" 
-                            hx-post="{{ scannerBaseUrl }}/{{field.auto_id}}/toggle" 
+                        <button
+                            id="QRButton{{field.auto_id}}"
+                            class="btn btn-outline-secondary scanner"
+                            type="button"
+                            hx-post="{{ scannerBaseUrl }}/{{field.auto_id}}/toggle"
                             hx-swap="outerHTML"
-                            hx-target="#scannerDiv{{field.auto_id}}" 
+                            hx-target="#scannerDiv{{field.auto_id}}"
                             hx-trigger="click">
                             {% trans "QR" %}
                         </button>
                     </div>
+                    {% endif %}
                 </div>
-            </div>
-
-            <div id="infoDiv{{field.auto_id}}">
-            </div>
-
-            <div id="scannerDiv{{field.auto_id}}">
-            </div>
-                {% else %}
-                </div>
-            </div>
                 {% endif %}
+                {{ field.error }}
+                <div id="infoDiv{{field.auto_id}}"></div>
+                <div id="scannerDiv{{field.auto_id}}"></div>
+            </div>
+        </div>
         {% endfor %}
     {% endfor %}
-    <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="{{ updateUrl }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
-    <button type="button" class="btn btn-secondary" id="{{actionType}}Cancel"
-            hx-get="{{ readUrl }}" hx-target="#detailFields" hx-swap="outerHTML">{% trans "Cancel" %}</button>
+    <div class="d-flex gap-1">
+        <button type="submit" class="btn btn-success" id="{{actionType}}Button" hx-trigger="click" hx-post="{{ updateUrl }}" hx-swap="afterbegin" hx-target=".toast-container">{{actionType}}</button>
+        <button type="button" class="btn btn-secondary" id="{{actionType}}Cancel"
+                hx-get="{{ readUrl }}" hx-target="#detailFields" hx-swap="outerHTML">{% trans "Cancel" %}</button>
+    </div>
 </form>
 {% if mapPicker %}{% include "location/mapPicker.html" %}{% endif %}
 </div>

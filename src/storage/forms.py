@@ -1,6 +1,7 @@
 from django import forms
 from .models import *
 from codeSystem.models import *
+from hub.forms import apply_field_classes
 
 
 class FormStorage(forms.ModelForm):
@@ -11,8 +12,7 @@ class FormStorage(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormStorage, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
         self.fields['code'].queryset = UuidCode.objects.filter(prefix="s0", used=False)
 
 class FormChangeStorage(forms.ModelForm):
@@ -22,8 +22,7 @@ class FormChangeStorage(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormChangeStorage, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
         self.fields['parent'].widget.attrs['id'] = 'id_parent_change'
 
 

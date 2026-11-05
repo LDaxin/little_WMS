@@ -56,3 +56,22 @@ def symbol_svg(symbol):
         return ""
     path = "hub/symbols/%s.svg" % symbol
     return static(path) if finders.find(path) else ""
+
+
+@register.filter
+def field_display(field):
+    """Human-readable value of a bound field for the read-only summary.
+
+    Choice values show their label, booleans a check/dash, empty a dash
+    (§ detail-view field area).
+    """
+    value = field.value()
+    if value in (None, "", []):
+        return "—"
+    if isinstance(value, bool):
+        return "✓" if value else "—"
+    choices = getattr(field.field, "choices", None)
+    mapping = dict(choices) if choices else {}
+    if isinstance(value, (list, tuple)):
+        return ", ".join(str(mapping.get(item, item)) for item in value) or "—"
+    return mapping.get(value, value)

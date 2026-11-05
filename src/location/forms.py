@@ -2,6 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from .models import *
 from . import pluscode
+from hub.forms import apply_field_classes
 
 class FormLocation(forms.ModelForm):
     class Meta:
@@ -20,8 +21,7 @@ class FormLocation(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FormLocation, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
 
     def clean(self):
         cleaned = super().clean()

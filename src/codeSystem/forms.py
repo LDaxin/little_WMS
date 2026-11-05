@@ -1,5 +1,6 @@
 from django import forms
 from .models import *
+from hub.forms import apply_field_classes
 
 types = (
     (1 , "Article"), 
@@ -13,5 +14,4 @@ class FormCode(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super(FormCode, self).__init__(*args, **kwargs)
-        for visible in self.visible_fields():
-            visible.field.widget.attrs["class"]= "form-control"
+        apply_field_classes(self)
