@@ -22,9 +22,9 @@
 
 ## 4. Term preview, open, edit, delete (point 4)
 
-- [ ] 4.1 Preview a day's terms on tap; open the term in an overlay on the second tap
-- [ ] 4.2 Add endpoints to edit (title/start/end) and delete a `CalendarEntry`
-- [ ] 4.3 Entry overlay: edit form plus delete; an occasion links to its page; the expiry date is display-only with a link to the article field
+- [x] 4.1 Preview a day's terms on tap; open the term in an overlay on the second tap
+- [x] 4.2 Add endpoints to edit (title/start/end) and delete a `CalendarEntry`
+- [x] 4.3 Entry overlay: edit form plus delete; an occasion links to its page; the expiry date is display-only with a link to the article field
 
 ## 5. Tests and verification
 

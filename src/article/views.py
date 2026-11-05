@@ -93,6 +93,7 @@ def _calendar_context(article, request, typ, view=None):
         "calendarMonthUrl": _article_base(typ, article.pk) + "/calendar/month",
         "calendarCheckUrl": _article_base(typ, article.pk) + "/calendar/check",
         "calendarActionUrl": _article_base(typ, article.pk) + "/calendar/action",
+        "calendarDayUrl": _article_base(typ, article.pk) + "/calendar/day",
     }
 
 
@@ -388,6 +389,108 @@ def articleCalendarAction(request, typ, articleId):
         "lendUrl": reverse("lend article", args=[typ, article.pk]),
         "borrowUrl": reverse("borrow article", args=[typ, article.pk]),
     })
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articleCalendarDay(request, typ, articleId):
+    """Preview the terms on one day (§ detail-calendar)."""
+    from datetime import datetime
+
+    from .calendar import calendar_items
+
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "view", article)
+    try:
+        day = datetime.strptime(request.GET.get("date", ""), "%Y-%m-%d").date()
+    except ValueError:
+        return HttpResponseNotFound("<h1>bad date</h1>")
+    terms = [item for item in calendar_items(article) if item["start"] <= day <= item["end"]]
+    return render(request, "hub/modules/calendarDay.html", {
+        "day": day,
+        "terms": terms,
+        "calendarEntryUrl": _article_base(typ, article.pk) + "/calendar/entry",
+    })
+
+
+def _entry_from_request(request, article):
+    """The article's calendar entry named in the request, or None (§ detail-calendar)."""
+    from .calendar import calendar_items
+
+    ident = request.POST.get("entry") or request.GET.get("entry") or ""
+    for item in calendar_items(article):
+        if item["id"] == ident:
+            return item["entry"]
+    return None
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articleCalendarEntry(request, typ, articleId):
+    """Open one term: an edit form, an occasion link, or the expiry (§ detail-calendar)."""
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "view", article)
+    if (request.GET.get("entry") or "") == "expiry":
+        return render(request, "hub/modules/calendarEntry.html", {
+            "kind": "expiry",
+            "title": _("Expires"),
+            "start": article.ablaufdatum,
+            "detailUrl": _article_base(typ, article.pk),
+        })
+    entry = _entry_from_request(request, article)
+    if entry is None:
+        return HttpResponseNotFound("<h1>not found</h1>")
+    occasion = getattr(entry, "occasion", None)
+    base = _article_base(typ, article.pk)
+    return render(request, "hub/modules/calendarEntry.html", {
+        "kind": "occasion" if occasion else "entry",
+        "title": entry.title,
+        "start": entry.start_date,
+        "end": entry.end_date or entry.start_date,
+        "entryId": "entry-%s" % entry.pk,
+        "url": reverse("occasion", args=[occasion.pk]) if occasion else "",
+        "saveUrl": base + "/calendar/entry/save",
+        "deleteUrl": base + "/calendar/entry/delete",
+    })
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def articleCalendarEntrySave(request, typ, articleId):
+    """Save a term's title and dates (§ detail-calendar)."""
+    from datetime import datetime
+
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    entry = _entry_from_request(request, article)
+    if entry is not None and getattr(entry, "occasion", None) is not None:
+        entry = None  # occasions are edited on their own page
+    if entry is not None and request.method == "POST":
+        title = request.POST.get("title", "").strip()
+        if title:
+            entry.title = title
+        try:
+            entry.start_date = datetime.strptime(request.POST.get("start", ""), "%Y-%m-%d").date()
+        except ValueError:
+            pass
+        end = request.POST.get("end", "")
+        entry.end_date = datetime.strptime(end, "%Y-%m-%d").date() if end else None
+        entry.save()
+    return render(request, "hub/modules/articleCalendar.html", _calendar_context(article, request, typ))
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "edit")
+def articleCalendarEntryDelete(request, typ, articleId):
+    """Delete a term (§ detail-calendar)."""
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "edit", article)
+    entry = _entry_from_request(request, article)
+    if entry is not None and getattr(entry, "occasion", None) is not None:
+        entry = None  # occasions are edited on their own page
+    if entry is not None and request.method == "POST":
+        entry.delete()
+    return render(request, "hub/modules/articleCalendar.html", _calendar_context(article, request, typ))
 
 
 @login_required(login_url='/accounts/login/')

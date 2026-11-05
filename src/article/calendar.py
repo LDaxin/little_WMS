@@ -50,6 +50,7 @@ def calendar_items(article):
     for entry in article.calendar_entries.select_related("loan").all():
         kind = _kind(entry)
         items.append({
+            "id": "entry-%s" % entry.pk,
             "type": kind,
             "title": entry.title,
             "start": entry.start_date,
@@ -64,6 +65,7 @@ def calendar_items(article):
         occasion = packed.occasion
         entry = occasion.calendar_entry
         items.append({
+            "id": "entry-%s" % entry.pk,
             "type": "occasion",
             "title": entry.title,
             "start": entry.start_date,
@@ -74,6 +76,7 @@ def calendar_items(article):
         })
     if article.ablaufdatum:
         items.append({
+            "id": "expiry",
             "type": "expiry",
             "title": _("Expires"),
             "start": article.ablaufdatum,

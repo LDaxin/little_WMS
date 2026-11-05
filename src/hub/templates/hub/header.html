@@ -354,15 +354,39 @@
                 if (el) { el.scrollIntoView({block: "start"}); }
             }
             var calSel = null;
+            var calPreviewDate = null;
             function calPick(cell) {
                 var picked = cell.dataset.date;
                 if (calSel && !calSel.end) {
                     calSel.end = picked;
-                } else {
-                    calSel = {start: picked, end: null};
+                    calHighlight();
+                    calCheck();
+                    return;
                 }
+                if (cell.classList.contains("cal-day-has")) {
+                    if (calPreviewDate === picked) {
+                        var term = document.querySelector("#calendarOverlayBody .cal-term");
+                        if (term) { calOpenTerm(term); return; }
+                    }
+                    calPreviewDate = picked;
+                    calOpenPreview(picked);
+                    return;
+                }
+                calSel = {start: picked, end: null};
                 calHighlight();
-                if (calSel.end) { calCheck(); }
+            }
+            function calOpenPreview(date) {
+                var root = document.getElementById("articleCalendar");
+                var url = root && root.dataset.dayUrl;
+                if (!url) { return; }
+                htmx.ajax("GET", url + "?date=" + date, {target: "#calendarOverlayBody", swap: "innerHTML"});
+                calOpenOverlay();
+            }
+            function calOpenTerm(button) {
+                var url = button && button.dataset.entryUrl;
+                if (!url) { return; }
+                htmx.ajax("GET", url, {target: "#calendarOverlayBody", swap: "innerHTML"});
+                calOpenOverlay();
             }
             function calHighlight() {
                 var cancel = document.getElementById("calCancel");
@@ -394,6 +418,7 @@
                 var overlay = document.getElementById("calendarOverlay");
                 if (overlay) { overlay.hidden = true; }
                 calSel = null;
+                calPreviewDate = null;
                 calHighlight();
             }
             function calCancelSelection() {

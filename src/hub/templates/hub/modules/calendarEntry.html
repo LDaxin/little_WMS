@@ -1,0 +1,30 @@
+{% load i18n %}
+<div class="p-3">
+    {% if kind == "expiry" %}
+    <h6>{% trans "Expires" %}</h6>
+    <p>{{ start|date:"Y-m-d" }}</p>
+    <a class="btn btn-sm btn-outline-primary" href="{{ detailUrl }}">{% trans "To the article" %}</a>
+    {% elif kind == "occasion" %}
+    <h6>{{ title }}</h6>
+    <p class="text-muted">{{ start|date:"Y-m-d" }}{% if end != start %} &ndash; {{ end|date:"Y-m-d" }}{% endif %}</p>
+    <a class="btn btn-sm btn-outline-primary" href="{{ url }}">{% trans "To the occasion" %}</a>
+    {% else %}
+    <h6>{{ title }}</h6>
+    <form class="calActionForm" method="post" action="{{ saveUrl }}"
+          hx-post="{{ saveUrl }}" hx-target="#articleCalendar" hx-swap="outerHTML">
+        {% csrf_token %}
+        <input type="hidden" name="entry" value="{{ entryId }}">
+        <input name="title" class="form-control mb-2" value="{{ title }}">
+        <input name="start" type="date" class="form-control mb-2" value="{{ start|date:'Y-m-d' }}">
+        <input name="end" type="date" class="form-control mb-2" value="{{ end|date:'Y-m-d' }}">
+        <button class="btn btn-success btn-sm">{% trans "Save" %}</button>
+    </form>
+    <form class="calActionForm mt-2" method="post" action="{{ deleteUrl }}"
+          hx-post="{{ deleteUrl }}" hx-target="#articleCalendar" hx-swap="outerHTML"
+          hx-confirm="{% trans 'Delete this term?' %}">
+        {% csrf_token %}
+        <input type="hidden" name="entry" value="{{ entryId }}">
+        <button class="btn btn-outline-danger btn-sm">{% trans "Delete" %}</button>
+    </form>
+    {% endif %}
+</div>

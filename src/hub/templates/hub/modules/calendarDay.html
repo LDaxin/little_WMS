@@ -1,0 +1,17 @@
+{% load i18n %}
+<div class="p-3">
+    <h6>{{ day|date:"D, d.m.Y" }}</h6>
+    <div class="list-group">
+        {% for term in terms %}
+        <button type="button"
+                class="list-group-item list-group-item-action cal-term d-flex justify-content-between align-items-center"
+                data-entry-url="{{ calendarEntryUrl }}?entry={{ term.id }}"
+                onclick="calOpenTerm(this)">
+            <span><span class="cal-dot" style="background: {{ term.color }}"></span> {{ term.title }}</span>
+            <span class="text-muted small">{{ term.start|date:"Y-m-d" }}{% if term.end != term.start %} &ndash; {{ term.end|date:"Y-m-d" }}{% endif %}</span>
+        </button>
+        {% empty %}
+        <div class="text-muted">{% trans "No terms" %}</div>
+        {% endfor %}
+    </div>
+</div>

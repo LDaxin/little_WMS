@@ -105,9 +105,9 @@ the matching form in a popup, pre-filled with the period's dates.
 
 Tapping a day with an existing term SHALL show a preview of that day's terms;
 tapping again SHALL open the term in a popup. The popup SHALL let the user edit
-the entry's title and dates and delete it. An occasion term SHALL additionally
-link to its occasion; the expiry date SHALL be shown but edited as the article's
-field.
+and delete a maintenance or loan term's title and dates. An occasion term SHALL
+only link to its occasion; the expiry date SHALL be shown with a link to the
+article.
 
 #### Scenario: Preview then open
 
@@ -116,12 +116,12 @@ field.
 
 #### Scenario: Editing a term
 
-- **WHEN** the user changes the title or dates in the popup
+- **WHEN** the user changes a maintenance or loan term's title or dates in the popup
 - **THEN** the calendar entry is updated and the grid reflects it
 
 #### Scenario: Deleting a term
 
-- **WHEN** the user deletes a term in the popup
+- **WHEN** the user deletes a maintenance or loan term in the popup
 - **THEN** the calendar entry is removed and the grid reflects it
 
 #### Scenario: Occasion links to its page
