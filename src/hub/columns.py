@@ -196,3 +196,18 @@ def resolve_detail_layout(request):
         return layout
     profile = active_profile(request)
     return getattr(profile, "detail_layout_desktop", "accordion") or "accordion"
+
+
+def resolve_detail_calendar_view(request):
+    """The effective detail calendar view: ``calendar`` or ``list`` (§ detail-calendar).
+
+    The ``calendar_view`` parameter wins (the manual switch); then the
+    ``detail_calendar_view`` setting; default ``calendar``.
+    """
+    from organisation.services import active_profile
+
+    view = request.GET.get("calendar_view", "")
+    if view in ("calendar", "list"):
+        return view
+    profile = active_profile(request)
+    return getattr(profile, "detail_calendar_view", "calendar") or "calendar"

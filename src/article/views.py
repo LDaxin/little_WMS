@@ -4,10 +4,11 @@ from hub.csv import csv_response
 from hub.search import filter_by_search
 from hub.columns import default_columns, order_by, resolve_view_mode, selected_columns
 from hub.columns import columns as all_columns
-from hub.columns import is_mobile, resolve_detail_layout
+from hub.columns import is_mobile, resolve_detail_calendar_view, resolve_detail_layout
 from django.shortcuts import render, redirect
 from django.http import HttpResponseNotFound
 from django.urls import reverse
+from datetime import date
 from decimal import Decimal, InvalidOperation
 from .models import *
 from codeSystem.models import *
@@ -59,6 +60,27 @@ def _article_terms(article):
         terms.append({"date": entry.start_date, "label": entry.title, "url": None})
     terms.sort(key=lambda term: term["date"])
     return terms
+
+
+def _calendar_context(article, request, typ, view=None):
+    """The context for the article calendar module (§ detail-calendar)."""
+    from .calendar import TERM_COLORS, TERM_LABELS, calendar_items, month_strip
+
+    items = calendar_items(article)
+    today = date.today()
+    return {
+        "typ": typ,
+        "id": article.pk,
+        "articleTerms": _article_terms(article),
+        "calendarItems": items,
+        "calendarMonths": month_strip(today.year, today.month, items),
+        "calendarLegend": [
+            {"label": TERM_LABELS[kind], "color": TERM_COLORS[kind]}
+            for kind in ("occasion", "maintenance", "lend", "borrow", "expiry")
+        ],
+        "detailCalendarView": view or resolve_detail_calendar_view(request),
+        "calendarUrl": _article_base(typ, article.pk) + "/calendar",
+    }
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -155,6 +177,7 @@ def article(request, typ, articleId):
             context.update(composition_context(p.space))
         context["detailLayout"] = resolve_detail_layout(request)
         context["detailLayoutSwitchable"] = not is_mobile(request)
+        context.update(_calendar_context(p, request, typ))
         context["detailSections"] = _article_sections(p, context)
         if request.GET.get("fields") == "read":
             return render(request, "hub/modules/itemSummary.html", context=context)
@@ -252,6 +275,22 @@ def setPrimaryArticleImage(request, typ, articleId, imageId):
 
 
 @login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articleCalendar(request, typ, articleId):
+    """Render the calendar module and remember the grid/list choice (§ detail-calendar)."""
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "view", article)
+    view = request.POST.get("view") or request.GET.get("calendar_view") or ""
+    if request.method == "POST" and view in ("calendar", "list"):
+        profile = active_profile(request)
+        if profile:
+            profile.detail_calendar_view = view
+            profile.save(update_fields=["detail_calendar_view"])
+    return render(request, "hub/modules/articleCalendar.html",
+                  _calendar_context(article, request, typ, view=view or None))
+
+
+@login_required(login_url='/accounts/login/')
 @require_scope("article", "edit")
 def addMaintenance(request, typ, articleId):
     """Record a maintenance due date for an article (§2)."""
@@ -272,7 +311,7 @@ def addMaintenance(request, typ, articleId):
             )
     if request.headers.get("HX-Request"):
         return render(request, "hub/modules/articleCalendar.html",
-                      {"articleTerms": _article_terms(article), "typ": typ, "id": articleId})
+                      _calendar_context(article, request, typ))
     return redirect("article", typ=typ, articleId=articleId)
 
 @login_required(login_url='/accounts/login/')

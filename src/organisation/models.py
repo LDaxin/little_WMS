@@ -14,6 +14,8 @@ VIEW_MODE_CHOICES = [("auto", "Auto"), ("mobile", "Always mobile"), ("desktop", 
 LIST_VIEW_CHOICES = [("table", "Table"), ("cards", "Cards")]
 # Default detail layout on desktop (§ detail-view); mobile always uses the accordion.
 DETAIL_LAYOUT_CHOICES = [("accordion", "Accordion"), ("tabs", "Tabs")]
+# Default detail calendar view (§ detail-calendar): month grid or list.
+DETAIL_CALENDAR_VIEW_CHOICES = [("calendar", "Calendar"), ("list", "List")]
 
 
 def _catalog_permissions():
@@ -110,6 +112,10 @@ class UserProfile(models.Model):
     # Default detail layout on desktop (§ detail-view); mobile always uses the accordion.
     detail_layout_desktop = models.CharField(
         max_length=10, choices=DETAIL_LAYOUT_CHOICES, default="accordion"
+    )
+    # Default detail calendar view (§ detail-calendar): month grid or list.
+    detail_calendar_view = models.CharField(
+        max_length=10, choices=DETAIL_CALENDAR_VIEW_CHOICES, default="calendar"
     )
     # Scan feedback (§11): sound and vibration on the movement page.
     sound_enabled = models.BooleanField(default=True)

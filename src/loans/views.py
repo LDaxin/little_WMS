@@ -50,9 +50,9 @@ def lendArticle(request, typ, articleId):
                 occasion=_occasion(request),
             )
     if request.headers.get("HX-Request"):
-        from article.views import _article_terms
+        from article.views import _calendar_context
         return render(request, "hub/modules/articleCalendar.html",
-                      {"articleTerms": _article_terms(article), "typ": typ, "id": articleId})
+                      _calendar_context(article, request, typ))
     return redirect("article", typ=typ, articleId=articleId)
 
 
@@ -87,9 +87,9 @@ def borrowArticle(request, typ, articleId):
                 occasion=_occasion(request),
             )
     if request.headers.get("HX-Request"):
-        from article.views import _article_terms
+        from article.views import _calendar_context
         return render(request, "hub/modules/articleCalendar.html",
-                      {"articleTerms": _article_terms(article), "typ": typ, "id": articleId})
+                      _calendar_context(article, request, typ))
     return redirect("article", typ=typ, articleId=articleId)
 
 

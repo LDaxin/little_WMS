@@ -19,7 +19,7 @@ class ArticleMiniCalendarTest(TestCase):
         self.article = Article.objects.create(base=self.base)
 
     def _detail(self):
-        return self.client.get("/article/werkzeug/%s" % self.article.pk)
+        return self.client.get("/article/werkzeug/%s?calendar_view=list" % self.article.pk)
 
     def test_occasion_term(self):
         entry = CalendarEntry.objects.create(title="Sommerlager", start_date="2026-07-01")

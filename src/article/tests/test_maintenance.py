@@ -40,7 +40,7 @@ class MaintenanceTest(TestCase):
         CalendarEntry.objects.create(
             entry_type="maintenance", title="Sharpen", start_date="2026-08-01", article=self.article
         )
-        response = self.client.get("/article/werkzeug/%s" % self.article.pk)
+        response = self.client.get("/article/werkzeug/%s?calendar_view=list" % self.article.pk)
         self.assertContains(response, "Maintenance: Sharpen")
 
     def test_maintenance_in_calendar(self):

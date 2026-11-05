@@ -1,10 +1,10 @@
 ## 1. Calendar data and month grid (point 1)
 
-- [ ] 1.1 Add a `detail_calendar_view` (`calendar` default, `list`) setting to the user profile with a migration and the Preferences form
-- [ ] 1.2 Build the calendar items for an article from its `CalendarEntry`s (maintenance, loans, occasion entries via the packlist) plus the expiry date, each with a type, start and end
-- [ ] 1.3 Add a helper that builds the weeks and day cells for a month and places each item as a bar (wrapped per week, with lanes for overlaps) or a dot
-- [ ] 1.4 Render the month grid in `articleCalendar.html`: month header, weekday row, day cells, bars/dots, legend, today and week highlighting
-- [ ] 1.5 Add the grid/list switch (per-user setting, like the accordion/tabs toggle); keep the list over the same items
+- [x] 1.1 Add a `detail_calendar_view` (`calendar` default, `list`) setting to the user profile with a migration and the Preferences form
+- [x] 1.2 Build the calendar items for an article from its `CalendarEntry`s (maintenance, loans, occasion entries via the packlist) plus the expiry date, each with a type, start and end
+- [x] 1.3 Add a helper that builds the weeks and day cells for a month and places each item as a bar (wrapped per week, with lanes for overlaps) or a dot
+- [x] 1.4 Render the month grid in `articleCalendar.html`: month header, weekday row, day cells, bars/dots, legend, today and week highlighting
+- [x] 1.5 Add the grid/list switch (per-user setting, like the accordion/tabs toggle); keep the list over the same items
 
 ## 2. Month scrolling and lazy loading (point 2)
 
