@@ -306,7 +306,7 @@ def articleIncert(request, typ, articleId):
     if p.base.pType.name == typ:
         base = _article_base(typ, articleId)
         bpar = FormArticleBase(instance=p.base, prefix="base", article_type=p.base.pType)
-        par = FormChangeArticle(instance=p, article_type=p.base.pType)
+        par = FormChangeArticle(instance=p, prefix="article", article_type=p.base.pType)
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -610,6 +610,8 @@ def updateArticle(request, typ, articleId):
                         article=article, stored=None, defaults={"menge": menge})
                     stock.menge = menge
                     stock.save()
+            else:
+                return toast(request, "Error", articleForm.errors, "alert")
 
             response = toast(request, _("Update"), _("article was updated"), "status")
             response["HX-Trigger"] = "detail-updated"

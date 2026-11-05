@@ -98,6 +98,12 @@ will make that test fail and force it to be updated.
 | KI-029 | `hub/templates/hub/header.html` | Card selection set `check.checked` in JS without firing a `change` event, so the bulk-action forms (`#delForm`/`#exportForm`/`#qrForm`) never received the selected cards — bulk actions on card selections did nothing. | ✅ fixed | redesign-list-views | – (client-side) |
 | KI-030 | `hub/modules/search.html`, `hub/modules/list.html` | `#modeInput` was rendered with the resolved list mode (on the first request, which carries no client hint, that is the desktop default) and the search field sent it on every request, so `mode=table` overrode the per-device setting — a phone never got its configured default (cards). | ✅ fixed | list-views | `article/tests/test_all_views.py`, `storage/tests/test_all_views.py` |
 
+## Detail view (§ detail-view)
+
+| ID | Location | Symptom | Status | Found in | Test |
+|---|---|---|---|---|---|
+| KI-031 | `article/views.py` `articleIncert` / `updateArticle` | The `.../i` edit form rendered the article fields without the `article-` prefix (only `base-` was prefixed), while `updateArticle` binds `FormChangeArticle(..., prefix="article")`. The article fields were absent from the POST → the article form was invalid, but `updateArticle` had no `else` branch and always returned the "article was updated" toast → edits were silently discarded. | ✅ fixed | redesign-detail-views | `article/tests/test_detail_modal.py` |
+
 ## Frontend / Assets
 
 | ID | Location | Symptom | Status | Found in | Test |

@@ -104,3 +104,21 @@ class DetailViewTest(TestCase):
         content = response.content.decode()
         self.assertIn('<details id="section-tags"', content)
         self.assertNotIn("fields=sections", content)
+
+    def test_edit_form_uses_the_update_prefixes(self):
+        response = self.client.get(f"/article/tent/{self.article.pk}/i", HTTP_HX_REQUEST="true")
+        self.assertContains(response, 'name="base-name"')
+        self.assertContains(response, 'name="article-zustand"')
+
+    def test_edit_form_round_trip_saves(self):
+        self.client.post(
+            f"/article/tent/{self.article.pk}/update",
+            {
+                "base-name": "Jurte",
+                "article-zustand": "defekt",
+                "version": str(self.article.version),
+            },
+            HTTP_HX_REQUEST="true",
+        )
+        self.article.refresh_from_db()
+        self.assertEqual(self.article.zustand, "defekt")

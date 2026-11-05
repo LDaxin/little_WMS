@@ -48,3 +48,7 @@
 - [x] 7.1 Rebuild `itemForm.html` to the same label/value grid as the summary; drop `form-floating` and `input-group-text`, keep the `stored`/`code` QR branch and the scanner/info divs
 - [x] 7.2 Give widgets a Bootstrap class by type (`form-control` / `form-select` / `form-check-input`) in one shared helper (`hub/forms.py`); booleans render as a checkbox/switch
 - [x] 7.3 Format the read-only values (`field_display`): choice labels, ✓/— for booleans, — for empty, join multi-values
+
+## 8. Fixes
+
+- [x] 8.1 `articleIncert` rendered the article fields without the `article-` prefix, so `updateArticle` never received them (silent "updated" toast); add the prefix and return the article form errors instead of a false success (KI-031)
