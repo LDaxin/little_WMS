@@ -172,11 +172,17 @@ def month_grid(year, month, items, today=None):
     }
 
 
+def shift_month(year, month, delta):
+    """The (year, month) ``delta`` months away from (year, month) (§ detail-calendar)."""
+    total = year * 12 + (month - 1) + delta
+    y, m = divmod(total, 12)
+    return y, m + 1
+
+
 def month_strip(year, month, items, today=None):
     """The current month plus its neighbours, newest last (§ detail-calendar)."""
     months = []
     for offset in (-1, 0, 1):
-        total = (year * 12 + (month - 1)) + offset
-        y, m = divmod(total, 12)
-        months.append(month_grid(y, m + 1, items, today=today))
+        y, m = shift_month(year, month, offset)
+        months.append(month_grid(y, m, items, today=today))
     return months

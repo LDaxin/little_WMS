@@ -1,0 +1,8 @@
+{% load i18n %}
+{% if dir == "prev" %}
+<div class="cal-sentinel cal-sentinel-top" hx-get="{{ calendarMonthUrl }}?year={{ prev.year }}&month={{ prev.month }}&dir=prev" hx-trigger="revealed" hx-swap="outerHTML"></div>
+{% endif %}
+{% include "hub/modules/calendarMonthGrid.html" %}
+{% if dir == "next" %}
+<div class="cal-sentinel cal-sentinel-bottom" hx-get="{{ calendarMonthUrl }}?year={{ next.year }}&month={{ next.month }}&dir=next" hx-trigger="revealed" hx-swap="outerHTML"></div>
+{% endif %}

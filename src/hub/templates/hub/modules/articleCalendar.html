@@ -25,33 +25,16 @@
         {% endfor %}
     </ul>
     {% else %}
-    {% for month in calendarMonths %}
-    <div class="cal-month">
-        <div class="cal-month-head">{{ month.start|date:"F Y" }}</div>
-        <div class="cal-weekdays">
-            <span>{% trans "Mo" %}</span><span>{% trans "Tu" %}</span><span>{% trans "We" %}</span><span>{% trans "Th" %}</span><span>{% trans "Fr" %}</span><span>{% trans "Sa" %}</span><span>{% trans "Su" %}</span>
-        </div>
-        {% for week in month.weeks %}
-        <div class="cal-week" style="--lanes: {{ week.lane_count }}">
-            <div class="cal-days">
-                {% for cell in week.cells %}
-                <div class="cal-day{% if not cell.in_month %} cal-day-out{% endif %}{% if cell.is_today %} cal-day-today{% endif %}">
-                    <span class="cal-daynum">{{ cell.day }}</span>
-                    {% for dot in cell.dots %}<span class="cal-dot" style="background: {{ dot.color }}" title="{{ dot.title }}"></span>{% endfor %}
-                </div>
-                {% endfor %}
-            </div>
-            <div class="cal-bars">
-                {% for seg in week.segments %}
-                <div class="cal-bar{% if seg.continues_left %} cal-bar-cont-left{% endif %}{% if seg.continues_right %} cal-bar-cont-right{% endif %}"
-                     style="left: {{ seg.left_pct }}%; width: {{ seg.width_pct }}%; top: calc({{ seg.lane }} * 1.1rem); background: {{ seg.item.color }}"
-                     title="{{ seg.item.title }}">{{ seg.item.title }}</div>
-                {% endfor %}
-            </div>
-        </div>
-        {% endfor %}
+    <div class="d-flex justify-content-end mb-1">
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="calScrollToday()">{% trans "Today" %}</button>
     </div>
-    {% endfor %}
+    <div class="cal-scroll" id="calScroll">
+        <div class="cal-sentinel cal-sentinel-top" hx-get="{{ calendarMonthUrl }}?year={{ calendarFirstPrev.year }}&month={{ calendarFirstPrev.month }}&dir=prev" hx-trigger="revealed" hx-swap="outerHTML"></div>
+        {% for month in calendarMonths %}
+        {% include "hub/modules/calendarMonthGrid.html" %}
+        {% endfor %}
+        <div class="cal-sentinel cal-sentinel-bottom" hx-get="{{ calendarMonthUrl }}?year={{ calendarLastNext.year }}&month={{ calendarLastNext.month }}&dir=next" hx-trigger="revealed" hx-swap="outerHTML"></div>
+    </div>
     <div class="cal-legend">
         {% for entry in calendarLegend %}
         <span class="text-nowrap"><span class="cal-dot" style="background: {{ entry.color }}"></span> {{ entry.label }}</span>

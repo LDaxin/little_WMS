@@ -8,10 +8,10 @@
 
 ## 2. Month scrolling and lazy loading (point 2)
 
-- [ ] 2.1 Put the months in a scrollable area with a sticky month header
-- [ ] 2.2 Add sentinels that load the previous/next month on `revealed` (HTMX) and append/prepend the block
-- [ ] 2.3 Compensate the scroll position when a month is prepended
-- [ ] 2.4 Add a "Today" action that scrolls to the current month
+- [x] 2.1 Put the months in a scrollable area with a sticky month header
+- [x] 2.2 Add sentinels that load the previous/next month on `revealed` (HTMX) and append/prepend the block
+- [x] 2.3 Compensate the scroll position when a month is prepended
+- [x] 2.4 Add a "Today" action that scrolls to the current month
 
 ## 3. Period selection and term creation (point 3)
 

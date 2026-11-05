@@ -24,6 +24,7 @@ urlpatterns = [
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/images/(?P<imageId>[0-9]+)/delete', views.deleteArticleImage, name="delete article image"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/images/(?P<imageId>[0-9]+)/primary', views.setPrimaryArticleImage, name="set primary article image"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/i', views.articleIncert, name="article"),
+    re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/calendar/month', views.articleCalendarMonth, name="article calendar month"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)/calendar', views.articleCalendar, name="article calendar"),
     re_path(r'^article/(?P<typ>\w+)/(?P<articleId>[0-9]+)', views.article, name="article"),
     re_path(r"^article/(?P<typ>\w+)/add/modal", views.addModal, name="add Article Modal"),

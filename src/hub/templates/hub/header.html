@@ -176,6 +176,8 @@
             .cal-bar-cont-right { border-top-right-radius: 0; border-bottom-right-radius: 0; }
             .cal-legend { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .25rem; font-size: .7rem; color: #6c757d; }
             .cal-legend .cal-dot { margin-right: .2rem; }
+            .cal-scroll { max-height: 60vh; overflow-y: auto; overflow-x: hidden; position: relative; }
+            .cal-sentinel { height: 1px; }
         </style>
         {% livereload_script %}
     </head>
@@ -339,6 +341,31 @@
                 var lb = document.getElementById("imageLightbox");
                 if (lb) { lb.hidden = true; }
             }
+            function calScrollToday() {
+                var now = new Date();
+                var el = document.getElementById("cal-month-" + now.getFullYear() + "-" + (now.getMonth() + 1));
+                if (el) { el.scrollIntoView({block: "start"}); }
+            }
+            document.body.addEventListener("htmx:beforeSwap", function (event) {
+                var elt = event.detail.elt;
+                if (elt && elt.classList && elt.classList.contains("cal-sentinel-top")) {
+                    var scroll = document.getElementById("calScroll");
+                    if (scroll) {
+                        elt.dataset.calScrollHeight = scroll.scrollHeight;
+                        elt.dataset.calScrollTop = scroll.scrollTop;
+                    }
+                }
+            });
+            document.body.addEventListener("htmx:afterSwap", function (event) {
+                var elt = event.detail.elt;
+                if (elt && elt.classList && elt.classList.contains("cal-sentinel-top") && elt.dataset.calScrollHeight) {
+                    var scroll = document.getElementById("calScroll");
+                    if (scroll) {
+                        var delta = scroll.scrollHeight - parseInt(elt.dataset.calScrollHeight, 10);
+                        scroll.scrollTop = parseInt(elt.dataset.calScrollTop, 10) + delta;
+                    }
+                }
+            });
             document.addEventListener("keydown", function (event) {
                 if (event.key === "Escape") { closeImageLightbox(); }
             });

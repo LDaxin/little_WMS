@@ -64,23 +64,38 @@ def _article_terms(article):
 
 def _calendar_context(article, request, typ, view=None):
     """The context for the article calendar module (§ detail-calendar)."""
-    from .calendar import TERM_COLORS, TERM_LABELS, calendar_items, month_strip
+    from .calendar import (
+        TERM_COLORS,
+        TERM_LABELS,
+        calendar_items,
+        month_strip,
+        shift_month,
+    )
 
     items = calendar_items(article)
     today = date.today()
+    months = month_strip(today.year, today.month, items)
+    first, last = months[0], months[-1]
     return {
         "typ": typ,
         "id": article.pk,
         "articleTerms": _article_terms(article),
         "calendarItems": items,
-        "calendarMonths": month_strip(today.year, today.month, items),
+        "calendarMonths": months,
+        "calendarFirstPrev": _year_month(*shift_month(first["year"], first["month"], -1)),
+        "calendarLastNext": _year_month(*shift_month(last["year"], last["month"], 1)),
         "calendarLegend": [
             {"label": TERM_LABELS[kind], "color": TERM_COLORS[kind]}
             for kind in ("occasion", "maintenance", "lend", "borrow", "expiry")
         ],
         "detailCalendarView": view or resolve_detail_calendar_view(request),
         "calendarUrl": _article_base(typ, article.pk) + "/calendar",
+        "calendarMonthUrl": _article_base(typ, article.pk) + "/calendar/month",
     }
+
+
+def _year_month(year, month):
+    return {"year": year, "month": month}
 
 
 # TODO make that if a new template gets created were there is a similar or equal one that there is a question if you want to create a new one or build from the old
@@ -288,6 +303,30 @@ def articleCalendar(request, typ, articleId):
             profile.save(update_fields=["detail_calendar_view"])
     return render(request, "hub/modules/articleCalendar.html",
                   _calendar_context(article, request, typ, view=view or None))
+
+
+@login_required(login_url='/accounts/login/')
+@require_scope("article", "view")
+def articleCalendarMonth(request, typ, articleId):
+    """Render one month block for the lazy-loaded calendar (§ detail-calendar)."""
+    from .calendar import calendar_items, month_grid, shift_month
+
+    article = Article.objects.get(pk=articleId)
+    _require_article(request, "view", article)
+    year = request.GET.get("year", "")
+    month = request.GET.get("month", "")
+    if not (year.isdigit() and month.isdigit() and 1 <= int(month) <= 12):
+        today = date.today()
+        year, month = today.year, today.month
+    year, month = int(year), int(month)
+    grid = month_grid(year, month, calendar_items(article))
+    return render(request, "hub/modules/calendarMonth.html", {
+        "month": grid,
+        "dir": request.GET.get("dir", "next"),
+        "prev": _year_month(*shift_month(year, month, -1)),
+        "next": _year_month(*shift_month(year, month, 1)),
+        "calendarMonthUrl": _article_base(typ, article.pk) + "/calendar/month",
+    })
 
 
 @login_required(login_url='/accounts/login/')
