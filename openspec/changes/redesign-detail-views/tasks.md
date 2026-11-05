@@ -36,3 +36,9 @@
 - [x] 5.2 Add tests: compact header, collapsed sections with counts, read-only summary, Edit/Cancel swap, layout resolution (param wins, setting default, mobile accordion)
 - [x] 5.3 Run the full test suite in Docker; must be green
 - [x] 5.4 Rebuild Docker (`docker compose build && up -d`) and report how to test (URL, credentials)
+
+## 6. Header rework (mobile first)
+
+- [x] 6.1 Rebuild `itemHeader.html`: name row on top, image (~110 px, rounded) left with type / condition / tags / quantity·locations stacked right, code and action row below
+- [x] 6.2 Extend the article `detailHeader` context with condition, total quantity, unit, storage-location count and tags
+- [x] 6.3 Keep the existing actions (copy link, floor plan, store, edit) and add an "Open" action (full detail page); hide article-only fields for Storage/Location/Tag

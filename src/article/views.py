@@ -13,6 +13,7 @@ from .models import *
 from codeSystem.models import *
 from .forms import *
 from space.models import Space
+from space.services import space_path
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -94,6 +95,11 @@ def article(request, typ, articleId):
         auditLogs = AuditLog.objects.filter(
             content_type=ContentType.objects.get_for_model(Article),
             object_id=p.pk)[:20]
+        stored_stocks = p.stocks.exclude(stored=None)
+        location_count = stored_stocks.count()
+        single_location = (
+            space_path(stored_stocks.first().stored) if location_count == 1 else ""
+        )
         context = {
             "symbol":p.base.pType.symbol,
             "searchFieldName":"articleSearch" + p.base.pType.name,
@@ -136,6 +142,13 @@ def article(request, typ, articleId):
                 "image":p.primary_image,
                 "link":("/a/" + p.code.code) if p.code else "",
                 "store":True,
+                "condition":p.zustand,
+                "stock":True,
+                "quantity":p.stocks.aggregate(total=Sum("menge"))["total"] or 0,
+                "unit":p.mengeneinheit,
+                "locations":location_count,
+                "singleLocation":single_location,
+                "tags":p.tags.all(),
             },
         }
         if p.space and p.space.active:

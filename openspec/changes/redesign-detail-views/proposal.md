@@ -9,10 +9,12 @@ every device, with no way to choose a calmer layout.
 
 ## What Changes
 
-- **Compact header**: each detail view gets a fixed header with only identity
-  (small image, name, code, type) and the primary actions (Store/Move, Edit).
-  Editable values (quantity, condition, location, description, …) move out of
-  the header into the field area.
+- **Compact header**: each detail view gets a fixed header with the object's
+  identity and a short read-only summary (for an article: prominent image and
+  name, type, condition badge, tags, total quantity with unit, number of storage
+  locations, code) and the actions (copy link, open, and per type floor
+  plan / store / edit). Editable values move out of the header into the field
+  area.
 - **Collapsible sections**: the remaining modules (stock, calendar,
   composition, tags, assigned, images, history) become collapsible sections with
   a count badge in the summary. Default collapsed. Scroll and context are kept.

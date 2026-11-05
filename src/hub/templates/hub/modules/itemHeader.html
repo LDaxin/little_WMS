@@ -1,21 +1,63 @@
-{% load i18n %}
-<div class="detailHeader d-flex align-items-center gap-2 p-2 mb-2 border rounded">
-    {% if detailHeader.image %}
-    <img src="{{ detailHeader.image.thumbnail.url }}" alt=""
-         style="height:48px;width:48px;object-fit:cover" class="rounded border flex-shrink-0">
-    {% endif %}
-    <div class="flex-grow-1 overflow-hidden">
-        <div class="fw-bold text-truncate">{{ detailHeader.name }}</div>
-        <div class="small text-muted text-truncate">
-            {% if detailHeader.code %}<span class="badge text-bg-secondary">{{ detailHeader.code }}</span>{% endif %}
-            {{ detailHeader.type }}
+{% load i18n list_columns %}
+<div class="detailHeader border rounded mb-2 overflow-hidden">
+    <div class="px-2 py-1 border-bottom fw-bold fs-4 text-truncate text-center">{{ detailHeader.name }}</div>
+    <div class="d-flex gap-3 p-2">
+        <div class="rounded border bg-light flex-shrink-0 d-flex align-items-center justify-content-center overflow-hidden"
+             style="width:50%;aspect-ratio:1/1">
+            {% symbol_svg symbol as symbolSvg %}
+            {% if detailHeader.image %}
+            <img src="{{ detailHeader.image.thumbnail.url }}" alt="" class="w-100 h-100" style="object-fit:cover">
+            {% elif symbolSvg %}
+            <img src="{{ symbolSvg }}" alt="" style="width:60%;height:60%;object-fit:contain">
+            {% else %}
+            <span class="text-secondary fw-bold fs-3 text-center px-1">{{ symbol }}</span>
+            {% endif %}
+        </div>
+        <div class="flex-grow-1 min-w-0">
+            <div class="text-truncate"><span class="text-muted">{% trans "Type" %}:</span> {{ detailHeader.type }}</div>
+            {% if detailHeader.condition %}
+            <div class="mt-1">
+                <span class="text-muted">{% trans "Condition" %}:</span>
+                <span class="badge bg-{{ detailHeader.condition|condition_color }}">{{ detailHeader.condition|condition_label }}</span>
+            </div>
+            {% endif %}
+            {% if detailHeader.stock or detailHeader.tags %}
+            <hr class="my-1">
+            {% endif %}
+            {% if detailHeader.stock %}
+            {% if detailHeader.singleLocation %}
+            {% if detailHeader.quantity != 1 %}
+            <div class="small text-muted">{{ detailHeader.quantity }} {{ detailHeader.unit }}</div>
+            {% endif %}
+            <div class="small text-muted">{{ detailHeader.singleLocation }}</div>
+            {% else %}
+            <div class="small text-muted">
+                {% if detailHeader.quantity != 1 %}{{ detailHeader.quantity }} {{ detailHeader.unit }}{% if detailHeader.locations %} &middot; {% endif %}{% endif %}
+                {% if detailHeader.locations %}{{ detailHeader.locations }} {% trans "locations" %}{% endif %}
+            </div>
+            {% endif %}
+            {% endif %}
+            {% if detailHeader.tags %}
+            <div class="mt-1">
+                <div class="text-muted small">{% trans "Tags" %}:</div>
+                <div class="d-flex flex-wrap gap-1">
+                    {% for tag in detailHeader.tags %}<span class="badge text-bg-secondary">{{ tag.name }}</span>{% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
-    <div class="d-flex gap-1 flex-shrink-0">
+    {% if detailHeader.code %}
+    <div class="px-2 pt-1 border-top text-center">
+        <span class="badge text-bg-secondary">{{ detailHeader.code }}</span>
+    </div>
+    {% endif %}
+    <div class="d-flex flex-wrap gap-1 p-2 justify-content-center">
         {% if detailHeader.link %}
         <button type="button" class="btn btn-sm btn-outline-secondary"
                 onclick="copyToClipboard(window.location.origin + '{{ detailHeader.link }}', this);">{% trans "Copy link" %}</button>
         {% endif %}
+        <a class="btn btn-sm btn-outline-primary" href="{{ detailUrl }}">{% trans "Open" %}</a>
         {% if detailHeader.floorPlan %}
         <a class="btn btn-sm btn-outline-secondary" href="{{ detailHeader.floorPlan }}">{% trans "Floor plan" %}</a>
         {% endif %}

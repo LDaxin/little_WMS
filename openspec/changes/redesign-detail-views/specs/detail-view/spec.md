@@ -1,21 +1,44 @@
 ## ADDED Requirements
 
-### Requirement: The detail view has a compact header
+### Requirement: The detail view has a header with identity and summary
 
-Each detail view SHALL show a compact header with only the object's identity
-(small image, name, code, type) and the primary actions (Store/Move, Edit).
-Editable values (quantity, condition, location, description, and the other form
-fields) SHALL NOT be shown in the header; they SHALL live in the field area.
+Each detail view SHALL show a header with the object's identity and a short
+read-only summary. For an article the header shows the image, the name
+(prominent), the type, the condition badge, the tags, the total quantity with
+its unit, the storage locations and the code. The quantity SHALL be omitted
+when it is 1. When the article is stored in exactly one location, that
+location's name SHALL be shown instead of a location count. The header SHALL
+NOT be the editing surface: editable values remain in the field area.
 
-#### Scenario: Header shows identity and actions
+#### Scenario: Header shows identity and summary
+
+- **WHEN** an article detail view is open
+- **THEN** the header shows the image, the name, the type, the condition badge, the tags, the total quantity with unit, the storage locations and the code
+
+#### Scenario: Quantity of one is hidden
+
+- **WHEN** the article's total quantity is 1
+- **THEN** the header does not show the quantity
+
+#### Scenario: A single storage location is shown by name
+
+- **WHEN** the article is stored in exactly one location
+- **THEN** the header shows that location's name instead of a location count
+
+#### Scenario: Header shows the actions
 
 - **WHEN** the detail view is open
-- **THEN** the header shows the small image, name, code and type, plus the Store/Move and Edit actions
+- **THEN** the header shows the actions (copy link, open, and per type floor plan / store / edit) in a row
 
-#### Scenario: Editable values are not in the header
+#### Scenario: Editable values remain in the field area
 
-- **WHEN** the detail view is open
-- **THEN** quantity, condition and location are shown in the field area, not in the header
+- **WHEN** the user wants to change the quantity or the condition
+- **THEN** the change happens in the field area, not in the header
+
+#### Scenario: Types without the extra fields
+
+- **WHEN** a Storage, Location or Tag detail view is open
+- **THEN** the header shows only the fields that type has (identity and code), not an empty condition or quantity row
 
 ### Requirement: Detail sections are collapsible with count summaries
 

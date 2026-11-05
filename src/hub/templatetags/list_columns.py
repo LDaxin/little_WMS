@@ -44,3 +44,15 @@ def elided_page_range(page):
 def has_level(columns, level):
     """Whether any of ``columns`` has the given level (§ list-views)."""
     return any(c.level == level for c in columns)
+
+
+@register.simple_tag
+def symbol_svg(symbol):
+    """Static URL of ``hub/symbols/<symbol>.svg`` if it exists, else ``""``."""
+    from django.contrib.staticfiles import finders
+    from django.templatetags.static import static
+
+    if not symbol:
+        return ""
+    path = "hub/symbols/%s.svg" % symbol
+    return static(path) if finders.find(path) else ""
