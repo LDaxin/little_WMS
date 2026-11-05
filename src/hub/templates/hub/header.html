@@ -130,6 +130,34 @@
                 border-bottom-color: #0d6efd;
                 box-shadow: none;
             }
+            /* image lightbox (§ detail-view) */
+            .imageLightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.92); z-index: 2100; }
+            .imageLightbox[hidden] { display: none; }
+            .imageLightboxTrack {
+                display: flex; height: 100%;
+                overflow-x: auto; overflow-y: hidden;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            .imageLightboxSlide {
+                position: relative; flex: 0 0 100%; scroll-snap-align: center;
+                display: flex; align-items: center; justify-content: center;
+            }
+            .imageLightboxSlide > img { max-width: 100%; max-height: 100%; object-fit: contain; }
+            .imageLightboxClose {
+                position: absolute; top: .25rem; right: .5rem; z-index: 2;
+                font-size: 2rem; line-height: 1; color: #fff; background: none; border: 0;
+            }
+            .imageLightboxStarForm { position: absolute; right: 1rem; bottom: 1rem; z-index: 2; }
+            .imageLightboxStar {
+                width: 2.75rem; height: 2.75rem; font-size: 1.5rem; color: #fff;
+                background: rgba(0, 0, 0, 0.45); border: 0; border-radius: 50%;
+            }
+            .imageLightboxStar.is-primary { color: #ffc107; }
+            .imageLightboxCaption {
+                position: absolute; left: 0; right: 0; bottom: 1rem;
+                padding: 0 4.5rem; text-align: center; color: #fff;
+            }
         </style>
         {% livereload_script %}
     </head>
@@ -279,6 +307,34 @@
                 }
                 el.scrollIntoView({block: "nearest"});
             }
+            function openImageLightbox() {
+                var lb = document.getElementById("imageLightbox");
+                if (!lb) { return; }
+                lb.hidden = false;
+                var track = document.getElementById("imageLightboxTrack");
+                if (!track) { return; }
+                var current = track.querySelector(".imageLightboxStar.is-primary");
+                var slide = current ? current.closest(".imageLightboxSlide") : track.firstElementChild;
+                if (slide) { slide.scrollIntoView({inline: "center", block: "nearest"}); }
+            }
+            function closeImageLightbox() {
+                var lb = document.getElementById("imageLightbox");
+                if (lb) { lb.hidden = true; }
+            }
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") { closeImageLightbox(); }
+            });
+            document.body.addEventListener("htmx:afterRequest", function (event) {
+                var elt = event.detail.elt;
+                var form = elt && elt.closest ? elt.closest(".imageLightboxStarForm") : null;
+                if (!form || !event.detail.successful) { return; }
+                var headerImg = document.getElementById("detailHeaderImage");
+                if (headerImg && form.dataset.thumb) { headerImg.src = form.dataset.thumb; }
+                document.querySelectorAll(".imageLightboxStarForm").forEach(function (other) {
+                    var star = other.querySelector(".imageLightboxStar");
+                    if (star) { star.classList.toggle("is-primary", other.dataset.imageId === form.dataset.imageId); }
+                });
+            });
             document.body.addEventListener("detail-updated", function () {
                 var fields = document.getElementById("detailFields");
                 if (fields && fields.dataset.readUrl) {

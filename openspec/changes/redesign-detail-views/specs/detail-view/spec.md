@@ -165,6 +165,34 @@ a check for a true boolean and a dash for an empty value.
 - **WHEN** the summary shows a choice, a boolean or an empty value
 - **THEN** it shows the choice's label, a check or dash for the boolean, or a dash for the empty value
 
+### Requirement: The header image opens a lightbox
+
+When the object has images, tapping the header image SHALL open a full-screen
+lightbox. The lightbox SHALL show the images large and allow scrolling sideways
+between them. Each image SHALL offer a star that sets it as the primary image;
+setting it SHALL update the header image and the image section. Without an image
+the header shows the placeholder and no lightbox is rendered.
+
+#### Scenario: Opening the lightbox
+
+- **WHEN** the user taps the header image
+- **THEN** a full-screen lightbox opens, positioned at the primary image
+
+#### Scenario: Scrolling between images
+
+- **WHEN** the lightbox is open
+- **THEN** the user can scroll sideways through all of the object's images
+
+#### Scenario: Setting the primary image
+
+- **WHEN** the user taps the star on an image in the lightbox
+- **THEN** that image becomes primary and the header image updates to it
+
+#### Scenario: No image
+
+- **WHEN** the object has no image
+- **THEN** the header shows the placeholder and no lightbox exists
+
 ### Requirement: All shared detail views use the framework
 
 The framework SHALL apply to every detail view that shares the detail templates:

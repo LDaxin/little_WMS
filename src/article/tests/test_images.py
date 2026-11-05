@@ -98,3 +98,16 @@ class ArticleImageViewTest(TestCase):
             f"/article/werkzeug/{self.article.pk}/images/{img.pk}/delete"
         )
         self.assertFalse(ArticleImage.objects.filter(pk=img.pk).exists())
+
+    def test_detail_header_has_lightbox_with_images(self):
+        ArticleImage.objects.create(article=self.article, image=image_file(), is_primary=True)
+        second = ArticleImage.objects.create(article=self.article, image=image_file())
+        response = self.client.get(f"/article/werkzeug/{self.article.pk}")
+        self.assertContains(response, 'id="imageLightbox"')
+        self.assertContains(
+            response, f"/article/werkzeug/{self.article.pk}/images/{second.pk}/primary"
+        )
+
+    def test_detail_without_image_has_no_lightbox(self):
+        response = self.client.get(f"/article/werkzeug/{self.article.pk}")
+        self.assertNotContains(response, 'id="imageLightbox"')

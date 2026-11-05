@@ -6,7 +6,11 @@
              style="width:50%;aspect-ratio:1/1">
             {% symbol_svg symbol as symbolSvg %}
             {% if detailHeader.image %}
-            <img src="{{ detailHeader.image.thumbnail.url }}" alt="" class="w-100 h-100" style="object-fit:cover">
+            <img id="detailHeaderImage" src="{{ detailHeader.image.thumbnail.url }}" alt=""
+                 class="w-100 h-100" style="object-fit:cover;cursor:pointer"
+                 role="button" tabindex="0"
+                 onclick="openImageLightbox()"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openImageLightbox();}">
             {% elif symbolSvg %}
             <img src="{{ symbolSvg }}" alt="" style="width:60%;height:60%;object-fit:contain">
             {% else %}
@@ -69,3 +73,22 @@
                 hx-get="{{ editUrl }}" hx-target="#detailFields" hx-swap="outerHTML">{% trans "Edit" %}</button>
     </div>
 </div>
+{% if detailHeader.image %}
+<div id="imageLightbox" class="imageLightbox" hidden>
+    <button type="button" class="imageLightboxClose" onclick="closeImageLightbox()" aria-label="{% trans 'Close' %}">&times;</button>
+    <div id="imageLightboxTrack" class="imageLightboxTrack">
+        {% for img in images %}
+        <div class="imageLightboxSlide" onclick="if(event.target===this)closeImageLightbox()">
+            <img src="{{ img.image.url }}" alt="{{ img.caption }}">
+            <form hx-post="{{ imageBaseUrl }}{{ img.id }}/primary" hx-target="#imageGallery" hx-swap="outerHTML"
+                  class="imageLightboxStarForm" data-image-id="{{ img.id }}" data-thumb="{{ img.thumbnail.url }}">
+                {% csrf_token %}
+                <button type="submit" class="imageLightboxStar{% if img.is_primary %} is-primary{% endif %}"
+                        title="{% trans 'Set primary' %}">&#9733;</button>
+            </form>
+            {% if img.caption %}<div class="imageLightboxCaption">{{ img.caption }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

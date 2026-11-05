@@ -52,3 +52,9 @@
 ## 8. Fixes
 
 - [x] 8.1 `articleIncert` rendered the article fields without the `article-` prefix, so `updateArticle` never received them (silent "updated" toast); add the prefix and return the article form errors instead of a false success (KI-031)
+
+## 9. Header image lightbox
+
+- [x] 9.1 Make the header image clickable (only when an image exists) and open a full-screen overlay
+- [x] 9.2 Show the images in a horizontally scroll-snapping track (sideways swipe, no JS)
+- [x] 9.3 Add a star per image that sets it primary via the existing `.../images/<id>/primary` endpoint; update the header image and the image section
